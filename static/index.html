@@ -45,23 +45,27 @@
     </nav>
 
     <!-- ================= LIVE ================= -->
-    <section id="tab-live">
-        <h2 class="section-header collapsible" data-section="today"><span class="collapse-caret">▾</span>Today</h2>
-        <div class="stats-bar" data-body="today">
-            <div class="stat"><div class="k">👥 Online now</div><div class="v" id="sOnline">–</div></div>
-            <div class="stat"><div class="k">🎙️ Talks</div><div class="v" id="sTalks">–</div></div>
-            <div class="stat"><div class="k">⏱️ Airtime</div><div class="v" id="sAir">–</div></div>
-            <div class="stat"><div class="k">📻 Stations heard</div><div class="v" id="sSt">–</div></div>
-            <div class="stat"><div class="k">📈 Peak online</div><div class="v" id="sPeak">–</div></div>
+    <section id="tab-live" class="live-page">
+        <div class="live-overview">
+            <div class="live-primary">
+                <h2 class="section-header collapsible" data-section="today"><span class="collapse-caret">▾</span>Today</h2>
+                <div class="stats-bar" data-body="today">
+                    <div class="stat"><div class="k">👥 Online now</div><div class="v" id="sOnline">–</div></div>
+                    <div class="stat"><div class="k">🎙️ Talks</div><div class="v" id="sTalks">–</div></div>
+                    <div class="stat"><div class="k">⏱️ Airtime</div><div class="v" id="sAir">–</div></div>
+                    <div class="stat"><div class="k">📻 Stations heard</div><div class="v" id="sSt">–</div></div>
+                    <div class="stat"><div class="k">📈 Peak online</div><div class="v" id="sPeak">–</div></div>
+                </div>
+                <h2 class="section-header collapsible" data-section="onair"><span class="collapse-caret">▾</span>On air</h2>
+                <div class="onair" id="onair" data-body="onair"></div>
+            </div>
+            <div class="live-rooms">
+                <h2 class="section-header collapsible" data-section="rooms"><span class="collapse-caret">▾</span>Rooms <span class="count" id="roomCount"></span></h2>
+                <div class="rooms" id="rooms" data-body="rooms"></div>
+            </div>
         </div>
 
-        <h2 class="section-header collapsible" data-section="onair"><span class="collapse-caret">▾</span>On air</h2>
-        <div class="onair" id="onair" data-body="onair"></div>
-
-        <h2 class="section-header collapsible" data-section="rooms"><span class="collapse-caret">▾</span>Rooms <span class="count" id="roomCount"></span></h2>
-        <div class="rooms" id="rooms" data-body="rooms"></div>
-
-        <div class="grid lh-top" style="margin-top:8px">
+        <div class="grid lh-top live-activity" style="margin-top:8px">
             <div>
                 <h2 class="section-header collapsible" data-section="lh"><span class="collapse-caret">▾</span>Last heard <span class="seg" id="lhFilter" style="margin-left:auto" onclick="event.stopPropagation()"></span></h2>
                 <div class="card" data-body="lh"><div class="tbl-wrap"><table class="tbl">
