@@ -62,6 +62,17 @@ function toast(msg, bad) {
     t.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:4000;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw;white-space:normal';
     t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), bad ? 6000 : 3200);
 }
+function toggleLinks(ev) {
+    ev.stopPropagation();
+    const menu = $('linksMenu'); menu.classList.toggle('open');
+    if (menu.dataset.bound !== '1') { menu.dataset.bound = '1'; document.addEventListener('click', e => { if (!menu.contains(e.target)) menu.classList.remove('open'); }); }
+}
+function applyAccent(value) {
+    if (!/^#[0-9a-f]{6}$/i.test(value || '')) return;
+    document.documentElement.style.setProperty('--user-accent', value);
+    try { localStorage.setItem('frnadn-accent', value); } catch(e) {}
+}
+try { applyAccent(localStorage.getItem('frnadn-accent') || '#5ac8fa'); } catch(e) {}
 function isAdmin() { return S.me && (S.me.role === 'admin' || S.me.role === 'superadmin'); }
 function bindSeg(id, fn) {
     $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('active', x === b)); fn(b.dataset.v); });
@@ -804,7 +815,9 @@ async function loadSystem() {
             <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkAllUpdates(this)">↻ Check now</button><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button><button class="btn primary" id="upgradeGit" disabled onclick="upgradeNow('github', this)">Upgrade Dashboard now</button></div>
             <div class="dim" id="updInfo" style="font-size:12.5px;margin-top:8px">Not checked yet.</div></div>
         <div class="tile"><h3>📥 Import server.properties</h3><div class="subt">Import supported server settings from an existing FRN installation. A backup is made before replacing the generated configuration. Existing ACL files are left untouched.</div>
-            <div class="actions"><input type="file" id="propertiesFile" accept=".properties,text/plain"><button class="btn" onclick="importProperties()">Import configuration</button></div><div id="importInfo" class="dim" style="margin-top:8px"></div></div></div>`;
+            <div class="actions"><input type="file" id="propertiesFile" accept=".properties,text/plain"><button class="btn" onclick="importProperties()">Import configuration</button></div><div id="importInfo" class="dim" style="margin-top:8px"></div></div>
+        <div class="tile"><h3>🎨 Appearance</h3><div class="subt">Choose the dashboard accent and upload your own PNG logo (max. 2 MB).</div>
+            <div class="actions"><label>Accent <input type="color" id="brandAccent" value="#5ac8fa" onchange="applyAccent(this.value)"></label><input type="file" id="brandLogo" accept="image/png"><button class="btn" onclick="saveBranding()">Save appearance</button></div></div></div>`;
 }
 
 async function checkAllUpdates(btn) {
@@ -842,7 +855,19 @@ async function importProperties() {
     } catch(e) { $('importInfo').textContent = e.message; toast(e.message, true); }
 }
 
-async function restartApp() {
+
+async function saveBranding() {
+    const file = $('brandLogo')?.files?.[0];
+    const accent = $('brandAccent')?.value || '#5ac8fa';
+    const payload = {theme: accent};
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) { toast('Logo is larger than 2 MB.', true); return; }
+        payload.logo = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); });
+    }
+    try { await api('POST', '/api/admin/branding', payload); applyAccent(accent); $('brandLogo').value = ''; document.querySelectorAll('.brand img, .logo').forEach(x => x.src = '/branding/logo?v=' + Date.now()); toast('Appearance saved.'); }
+    catch(e) { toast(e.message, true); }
+}
+\nasync function restartApp() {
     if (!await confirmBox({ title: 'Restart the dashboard?', body: 'Only frn_adn starts again (a few seconds); the FRN server keeps running.' }, 'Restart')) return;
     try { await api('POST', '/api/admin/restart', {}); toast('Restarting …'); setTimeout(() => location.reload(), 6000); } catch (e) { toast(e.message, true); }
 }
