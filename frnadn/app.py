@@ -70,7 +70,8 @@ class Ctx:
         self.system = System(demo=DEMO)
         self.sockets: Dict[WebSocket, Dict[str, Any]] = {}
         self.restart_needed = False
-        self.tasks: List[asyncio.Task] = []
+        self.dashboard_restart_needed = False
+        self.tasks: List[asyncio.Task] =
 
     def notify(self, ev: Dict[str, Any]) -> None:
         try:
@@ -353,6 +354,8 @@ async def save_settings(request: Request):
         raise HTTPError(400, "Default room: this room does not exist.")
     changed = ctx.settings.update(changes, u["username"])
     keys = [f.key for f in changed]
+    if any(k.startswith("https.") for k in keys):
+        ctx.dashboard_restart_needed = True
     if keys:
         ctx.auth.audit("settings_changed", u["username"], ", ".join(k for k in keys), ip_of(request))
         ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
@@ -361,7 +364,7 @@ async def save_settings(request: Request):
         refresh_sockets()
         await push({"type": "info"})
         await push({"type": "rooms"})
-    return {"changed": keys, "restart_needed": ctx.restart_needed}
+    return {"changed": keys, "restart_needed": ctx.restart_needed, "dashboard_restart_needed": ctx.dashboard_restart_needed}
 
 
 @app.post("/api/admin/server/{action}")
@@ -995,8 +998,141 @@ app.router.lifespan_context = lifespan
 app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
 
 
+_tls_manager = None
+
+
+class _Server:
+    """Uvicorn server without per-instance signal handlers (HTTP + HTTPS share one process)."""
+    @staticmethod
+    def make(app_, **kwargs):
+        import contextlib
+        import uvicorn
+
+        class Server(uvicorn.Server):
+            @contextlib.contextmanager
+            def capture_signals(self):
+                yield
+
+        kwargs.setdefault("log_level", "warning")
+        kwargs.setdefault("access_log", False)
+        kwargs.setdefault("loop", "asyncio")
+        kwargs.setdefault("proxy_headers", True)
+        kwargs.setdefault("forwarded_allow_ips", "127.0.0.1")
+        return Server(uvicorn.Config(app_, **kwargs))
+
+
+async def _serve(host: str, port: int) -> None:
+    """Run the dashboard and (when enabled) the ACME HTTP listener + HTTPS server."""
+    import signal
+    global ctx, _tls_manager
+    if ctx is None:
+        ctx = Ctx()
+    https_cfg = {
+        "enabled": ctx.settings.get("https.enabled"),
+        "domain": ctx.settings.get("https.domain"),
+        "email": ctx.settings.get("https.email"),
+        "staging": ctx.settings.get("https.staging"),
+        "http_port": ctx.settings.get("https.http_port"),
+        "port": ctx.settings.get("https.port"),
+        "letsencrypt": True,
+    }
+    servers, server_tasks, helpers = [], [], []
+    stopping = asyncio.Event()
+    loop = asyncio.get_running_loop()
+
+    def stop_all():
+        stopping.set()
+        for srv in servers:
+            srv.should_exit = True
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop_all)
+        except (NotImplementedError, RuntimeError):
+            pass
+
+    async def serve_contained(srv):
+        try:
+            await srv.serve()
+        except SystemExit:
+            log.exception("Uvicorn server exited unexpectedly")
+
+    async def start(srv, optional=False):
+        servers.append(srv)
+        task = asyncio.create_task(serve_contained(srv))
+        while not srv.started and not task.done() and not stopping.is_set():
+            await asyncio.sleep(0.05)
+        if not srv.started and not stopping.is_set():
+            servers.remove(srv)
+            if optional:
+                return None
+            raise RuntimeError(f"Dashboard-Port {srv.config.port} ist belegt oder nicht erlaubt.")
+        server_tasks.append(task)
+        return srv
+
+    if https_cfg["enabled"]:
+        from .tls import CertManager, build_http_app
+        cm = CertManager(https_cfg, DATA)
+        _tls_manager = cm
+        http_app = build_http_app(cm, redirect=True)
+        await start(_Server.make(http_app, host=host, port=cm.http_port, lifespan="off"), optional=False)
+
+        def tls_server(lifespan):
+            return _Server.make(app, host=host, port=cm.https_port, lifespan=lifespan,
+                                ssl_certfile=cm.cert_file, ssl_keyfile=cm.key_file)
+
+        async def renew_loop(main_server):
+            while not stopping.is_set():
+                await asyncio.sleep(12 * 3600)
+                if await cm.renew() and main_server.config.ssl is not None:
+                    main_server.config.ssl.load_cert_chain(cm.cert_file, cm.key_file)
+                    log.info("Let's Encrypt Zertifikat neu geladen.")
+
+        if cm.have_cert():
+            main = await start(tls_server("on"))
+            log.info("Dashboard HTTPS aktiv: %s", cm.https_url())
+            if port not in (cm.http_port, cm.https_port):
+                await start(_Server.make(http_app, host=host, port=port, lifespan="off"), optional=True)
+            helpers.append(asyncio.create_task(renew_loop(main)))
+        else:
+            # Keep the dashboard available while certbot obtains its first certificate.
+            fallback_port = port if port not in (cm.http_port, cm.https_port) else 8080
+            await start(_Server.make(app, host=host, port=fallback_port, lifespan="on"))
+            log.info("Noch kein Zertifikat. Dashboard vorübergehend unter http://%s:%s erreichbar.", host, fallback_port)
+
+            async def obtain_then_serve():
+                if await cm.obtain() and not stopping.is_set():
+                    main = await start(tls_server("off"), optional=True)
+                    if main:
+                        log.info("Let's Encrypt HTTPS ist aktiv: %s", cm.https_url())
+                        await renew_loop(main)
+                    else:
+                        log.error("HTTPS-Port %s konnte nicht geöffnet werden.", cm.https_port)
+                elif not stopping.is_set():
+                    log.error("Let's Encrypt Zertifikat nicht verfügbar; Dashboard bleibt vorübergehend auf HTTP.")
+
+            helpers.append(asyncio.create_task(obtain_then_serve()))
+    else:
+        await start(_Server.make(app, host=host, port=port, lifespan="on"))
+        log.info("Dashboard HTTP aktiv auf %s:%s", host, port)
+
+    stop_wait = asyncio.create_task(stopping.wait())
+    if server_tasks:
+        await asyncio.wait([*server_tasks, stop_wait], return_when=asyncio.FIRST_COMPLETED)
+    stop_all()
+    for task in helpers:
+        task.cancel()
+    pending = [task for task in server_tasks if not task.done()]
+    if pending:
+        await asyncio.wait(pending, timeout=8)
+    if ctx:
+        await _shutdown()
+
+
 def main() -> None:
-    import uvicorn
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-    uvicorn.run(app, host=os.environ.get("FRNADN_BIND", "0.0.0.0"), port=int(os.environ.get("FRNADN_PORT", "80")),
-                log_level="warning", proxy_headers=True, forwarded_allow_ips="127.0.0.1")
+    try:
+        asyncio.run(_serve(os.environ.get("FRNADN_BIND", "0.0.0.0"),
+                           int(os.environ.get("FRNADN_PORT", "80"))))
+    except KeyboardInterrupt:
+        pass
