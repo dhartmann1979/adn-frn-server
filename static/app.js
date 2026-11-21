@@ -858,7 +858,7 @@ async function saveLinksAdmin(btn) {
     finally { if (btn) btn.disabled = false; }
 }
 
-function loadImportAdmin() {
+async function loadImportAdmin() {
     $('admin-import').innerHTML = `<div class="tile import-card">
         <h3>📥 Import legacy server.properties</h3>
         <p class="subt">Optional: import settings from the previous FRN installation into this fresh installation. Only supported properties and room definitions are transferred. The old database, Java JAR, ACL lists and password XML files are not copied.</p>
