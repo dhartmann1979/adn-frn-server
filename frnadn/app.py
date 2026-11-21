@@ -435,9 +435,9 @@ def parse_java_properties(raw: str) -> Dict[str, str]:
         line = line.rstrip()
         if not logical and (not line.strip() or line.lstrip().startswith(("#", "!"))): continue
         logical += line.lstrip() if logical else line
-        if logical.endswith("\\\\"):
+        if logical.endswith("\\"):
             logical = logical[:-1]; continue
-        m = re.match(r"^([^:=\\s]+)\\s*(?:[:=]|\\s)\\s*(.*)$", logical)
+        m = re.match(r"^([^:=\s]+)\s*(?:[:=]|\s)\s*(.*)$", logical)
         if m: values[m.group(1)] = m.group(2).strip()
         logical = ""
     return values
@@ -523,10 +523,41 @@ async def import_server_properties(request: Request):
     current = FRN_HOME / "server.properties"
     if current.exists(): shutil.copy2(current, backup)
     ctx.settings.update(changes, u["username"])
+    imported_rooms = []
+    suffixes = {"_enable":"enabled", "_owner":"owners", "_show_infomessage":"show_info", "_tot":"tot",
+                "_speechpause":"speechpause", "_speechpause_msg":"speechpause_msg", "_parrot_enable":"parrot",
+                "_parrot_startstop_enable":"parrot_startstop", "_unmute":"unmute_min", "_acl_cl":"acl_cl",
+                "_acl_gw":"acl_gw", "_acl_info":"acl_info", "_bl_regexp":"bl_regexp", "_bl_info":"bl_info",
+                "_tgbot_params":"tg_params"}
+    for key, room_name in parsed.items():
+        match = re.fullmatch(r"net(\\d{2})", key)
+        if not match or not room_name.strip(): continue
+        idx = int(match.group(1))
+        room = ctx.store.room_by_name(room_name.strip())
+        if room is None:
+            if idx in {r["idx"] for r in ctx.store.rooms() if r["idx"] is not None}:
+                continue
+            rid = ctx.store.room_create(room_name.strip())
+            ctx.db.x("UPDATE rooms SET idx=? WHERE id=?", (idx, rid))
+            room = next(r for r in ctx.store.rooms() if r["id"] == rid) if any(r["id"] == rid for r in ctx.store.rooms()) else {"id": rid}
+        values = {}
+        for suffix, column in suffixes.items():
+            prop = key + suffix
+            if prop not in parsed: continue
+            value = parsed[prop]
+            if column in ("enabled", "parrot", "parrot_startstop"): value = 1 if value.lower() in ("yes", "true", "1", "on") else 0
+            elif column in ("tot", "speechpause", "unmute_min"):
+                try: value = int(value)
+                except ValueError: continue
+            elif column == "show_info": value = "always" if value.lower() == "always" else "acl"
+            values[column] = value
+        if values: ctx.store.room_update(room["id"], values)
+        imported_rooms.append(room_name.strip())
+    ctx.store.invalidate()
     ctx.java.write_config()
     ctx.restart_needed = True
-    ctx.auth.audit("properties_import", u["username"], f"{len(changes)} settings; backup={backup if current.exists() else 'none'}", ip_of(request))
-    return {"ok": True, "imported": list(changes), "ignored": [k for k in parsed if k not in mapping], "backup": str(backup) if backup.exists() else None,
+    ctx.auth.audit("properties_import", u["username"], f"{len(changes)} settings; {len(imported_rooms)} rooms; backup={backup if current.exists() else 'none'}", ip_of(request))
+    return {"ok": True, "imported": list(changes), "rooms": imported_rooms, "ignored": [k for k in parsed if k not in mapping], "backup": str(backup) if backup.exists() else None,
             "restart_needed": True}
 
 # ---------------------------------------------------------------- admin: rooms
