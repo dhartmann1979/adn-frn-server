@@ -3,7 +3,7 @@
 # Der FRN-Server läuft dabei weiter. Daten (SQLite), Benutzer und Einstellungen bleiben erhalten.
 # Den Java-FRN-Server selbst aktualisiert das Admin-Portal (Settings → Check for update)
 # oder ein erneuter Aufruf von scripts/install.sh.
-#   cd /opt/frnadn && sudo ./scripts/update.sh
+#   cd /opt/adn-frn-server && sudo ./scripts/update.sh
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ "$(id -u)" -eq 0 ] || { echo "Bitte mit sudo starten."; exit 1; }
