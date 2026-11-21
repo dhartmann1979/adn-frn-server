@@ -94,7 +94,7 @@ command -v apt-get >/dev/null || fail "Dieses Skript ist für Debian, Ubuntu und
 step 2 "Pakete: Python und Java"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq >/dev/null
-apt-get install -y -q --no-install-recommends python3 python3-venv python3-pip sudo curl unzip ca-certificates >/dev/null
+apt-get install -y -q --no-install-recommends python3 python3-venv python3-pip sudo curl unzip ca-certificates certbot >/dev/null
 if ! command -v java >/dev/null; then
     info "Java wird installiert (der FRN-Server ist ein Java-Programm) …"
     apt-get install -y -q --no-install-recommends default-jre-headless >/dev/null || fail "Java (default-jre-headless) ließ sich nicht installieren."
@@ -290,7 +290,7 @@ systemctl restart frn-server
 systemctl restart frnadn
 ok "frn-server und frnadn laufen und starten beim Booten"
 if command -v ufw >/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
-    ufw allow "$PORT/tcp" >/dev/null; ufw allow "$FPORT/tcp" >/dev/null
+    ufw allow "$PORT/tcp" >/dev/null; ufw allow "$FPORT/tcp" >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
     ok "Firewall (ufw): Port ${PORT} (Dashboard) und ${FPORT} (FRN) freigegeben"
 fi
 
