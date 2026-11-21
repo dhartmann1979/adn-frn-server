@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1224">
+    <title>Auf der NachtSchicht</title>
+    <link rel="icon" href="/static/adn-icon.svg?v={{V}}">
+    <link rel="apple-touch-icon" href="/static/adn-icon-192.png?v={{V}}">
+    <link rel="stylesheet" href="/static/app.css?v={{V}}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="brand">
+            <img src="/static/adn-icon.svg?v={{V}}" alt="Auf der NachtSchicht">
+            <div>
+                <h1 id="title">Auf der NachtSchicht</h1>
+                <div class="sub" id="subtitle">&nbsp;</div>
+            </div>
+        </div>
+        <div class="chips">
+            <span class="chip" id="chipLive">Live data</span>
+            <span class="chip" id="chipServer">Server</span>
+            <span class="chip" id="chipOnline">Online</span>
+            <span class="chip" id="chipAir">Quiet</span>
+            <span id="userArea"></span>
+        </div>
+    </header>
+
+    <div class="banner warn hidden" id="setupBanner">
+        <span>🧭 <b>No superadmin yet.</b> Finish the guided installation on the server: <code>sudo ./scripts/install.sh</code> – or create one with <code>sudo frnadn set-superadmin NAME</code>.</span>
+    </div>
+    <div class="banner info hidden" id="restartBanner">
+        <span>⚙️ <b>Configuration saved.</b> The FRN server uses the new server.properties after a restart (all stations reconnect by themselves).</span>
+        <button class="btn primary" onclick="restartServer(this)">Restart now</button>
+    </div>
+
+    <nav class="tabs" id="mainTabs">
+        <button data-tab="live" class="active">🎙️ Live</button>
+        <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
+        <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
+        <button data-tab="chat" id="tabChatBtn" class="hidden">💬 Chat</button>
+        <button data-tab="admin" id="tabAdminBtn" class="hidden">⚙️ Admin</button>
+    </nav>
+
+    <!-- ================= LIVE ================= -->
+    <section id="tab-live">
+        <h2 class="section-header collapsible" data-section="today"><span class="collapse-caret">▾</span>Today</h2>
+        <div class="stats-bar" data-body="today">
+            <div class="stat"><div class="k">👥 Online now</div><div class="v" id="sOnline">–</div></div>
+            <div class="stat"><div class="k">🎙️ Talks</div><div class="v" id="sTalks">–</div></div>
+            <div class="stat"><div class="k">⏱️ Airtime</div><div class="v" id="sAir">–</div></div>
+            <div class="stat"><div class="k">📻 Stations heard</div><div class="v" id="sSt">–</div></div>
+            <div class="stat"><div class="k">📈 Peak online</div><div class="v" id="sPeak">–</div></div>
+        </div>
+
+        <h2 class="section-header collapsible" data-section="onair"><span class="collapse-caret">▾</span>On air</h2>
+        <div class="onair" id="onair" data-body="onair"></div>
+
+        <h2 class="section-header collapsible" data-section="rooms"><span class="collapse-caret">▾</span>Rooms <span class="count" id="roomCount"></span></h2>
+        <div class="rooms" id="rooms" data-body="rooms"></div>
+
+        <div class="grid lh-top" style="margin-top:8px">
+            <div>
+                <h2 class="section-header collapsible" data-section="lh"><span class="collapse-caret">▾</span>Last heard <span class="seg" id="lhFilter" style="margin-left:auto" onclick="event.stopPropagation()"></span></h2>
+                <div class="card" data-body="lh"><div class="tbl-wrap"><table class="tbl">
+                    <thead><tr><th>Time</th><th>Station</th><th>Room</th><th class="num">Duration</th><th class="hide-sm">Band</th></tr></thead>
+                    <tbody id="lhBody"><tr><td colspan="5" class="empty">Nothing heard yet.</td></tr></tbody>
+                </table></div></div>
+            </div>
+            <div>
+                <h2 class="section-header collapsible" data-section="feed"><span class="collapse-caret">▾</span>Comings &amp; goings</h2>
+                <div class="card" data-body="feed"><div class="feed" id="feed"><div class="empty">–</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= STATISTICS ================= -->
+    <section id="tab-stats" class="hidden">
+        <h2 class="section-header">📈 Statistics</h2>
+        <div class="card" style="padding: 16px">
+            <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; margin-bottom:14px">
+                <div class="seg" id="stRange"><button data-v="today" class="active">Today</button><button data-v="24h">24 h</button><button data-v="7d">7 days</button><button data-v="30d">30 days</button><button data-v="90d">90 days</button><button data-v="1y">1 year</button></div>
+                <div class="seg" id="stMetric"><button data-v="duration" class="active">⏱️ Airtime</button><button data-v="talks">🎙️ Talks</button></div>
+            </div>
+            <div class="kpis">
+                <div class="kpi"><div class="k">🎙️ Talks</div><div class="v" id="kTalks">–</div></div>
+                <div class="kpi"><div class="k">⏱️ Airtime</div><div class="v" id="kAir">–</div></div>
+                <div class="kpi"><div class="k">📻 Stations heard</div><div class="v" id="kSt">–</div></div>
+                <div class="kpi"><div class="k">📈 Peak online</div><div class="v" id="kPeak">–</div></div>
+            </div>
+            <div class="grid st-grid">
+                <div class="panel"><h3><span>Top stations</span><small id="stTopNote"></small></h3><div class="chart" id="stBars"></div></div>
+                <div class="panel"><h3><span>Activity per room</span></h3><div class="legend" id="stLegend"></div><div class="chart" id="stTime"></div></div>
+            </div>
+            <div class="grid g2" style="margin-top:14px">
+                <div class="panel"><h3><span>Stations online</span><small>maximum, sampled every 5 minutes</small></h3><div class="chart" id="stOnline"></div></div>
+                <div class="panel"><h3><span>When is talked</span><small id="heatNote"></small></h3><div id="stHeat"></div></div>
+            </div>
+            <div class="grid g2" style="margin-top: 14px">
+                <div class="panel"><h3><span>Rooms</span></h3><div class="tbl-wrap"><table class="tbl">
+                    <thead><tr><th>Room</th><th class="num">Talks</th><th class="num">Airtime</th><th class="num hide-sm">Stations</th><th class="hide-sm">Share</th></tr></thead><tbody id="stRoomTable"></tbody></table></div></div>
+                <div class="panel"><h3><span>Most active stations</span></h3><div class="tbl-wrap"><table class="tbl">
+                    <thead><tr><th>Station</th><th class="num">Talks</th><th class="num">Airtime</th><th class="hide-sm">Mostly in</th></tr></thead><tbody id="stStTable"></tbody></table></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= STATIONS ================= -->
+    <section id="tab-stations" class="hidden">
+        <h2 class="section-header">📇 Stations <span class="count" id="dirCount"></span></h2>
+        <div class="card" style="padding:16px">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <input type="text" id="dirSearch" placeholder="🔎 Search: callsign, name, city or country" style="max-width:420px" autocomplete="off">
+                <div class="seg" id="dirFilter"><button data-v="all" class="active">All</button><button data-v="online">🟢 Online now</button><button data-v="talked">🎙️ Talked (30 d)</button></div>
+            </div>
+            <div class="tbl-wrap"><table class="tbl">
+                <thead><tr><th>Station</th><th class="hide-sm">From</th><th class="hide-sm">Band</th><th class="num">Talks (30 d)</th><th class="num hide-sm">Airtime</th><th>Last seen</th></tr></thead>
+                <tbody id="dirBody"></tbody>
+            </table></div>
+            <div class="actions" style="justify-content:center"><button class="btn small hidden" id="dirMore">Show more</button></div>
+        </div>
+    </section>
+
+    <!-- ================= CHAT ================= -->
+    <section id="tab-chat" class="hidden">
+        <h2 class="section-header">💬 Room chat <span class="seg" id="chatFilter" style="margin-left:auto"></span></h2>
+        <div class="card" style="padding:16px"><div class="chat-list" id="chatList"></div></div>
+    </section>
+
+    <!-- ================= ADMIN ================= -->
+    <section id="tab-admin" class="hidden">
+        <nav class="tabs sub" id="adminTabs">
+            <button data-a="settings" class="active">⚙️ Settings</button>
+            <button data-a="rooms">🏠 Rooms</button>
+            <button data-a="lists">🛡️ Server lists</button>
+            <button data-a="accounts">🔑 FRN accounts</button>
+            <button data-a="users">👥 Users</button>
+            <button data-a="system">🖥️ System</button>
+            <button data-a="logs">📜 Logs</button>
+            <button data-a="audit">🔐 Sessions &amp; log</button>
+        </nav>
+        <div id="admin-settings"></div>
+        <div id="admin-rooms" class="hidden"></div>
+        <div id="admin-lists" class="hidden"></div>
+        <div id="admin-accounts" class="hidden"></div>
+        <div id="admin-users" class="hidden"></div>
+        <div id="admin-system" class="hidden"></div>
+        <div id="admin-logs" class="hidden"></div>
+        <div id="admin-audit" class="hidden"></div>
+    </section>
+
+    <footer>frn_adn <span id="ver"></span> · Java FRN server by freeradionetwork.de · Design: Auf der NachtSchicht</footer>
+</div>
+<div class="tip" id="tip"></div>
+<div id="modalRoot"></div>
+<script src="/static/app.js?v={{V}}"></script>
+</body>
+</html>
