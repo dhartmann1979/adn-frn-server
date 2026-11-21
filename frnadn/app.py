@@ -539,7 +539,8 @@ async def import_server_properties(request: Request):
                 continue
             rid = ctx.store.room_create(room_name.strip())
             ctx.db.x("UPDATE rooms SET idx=? WHERE id=?", (idx, rid))
-            room = next(r for r in ctx.store.rooms() if r["id"] == rid) if any(r["id"] == rid for r in ctx.store.rooms()) else {"id": rid}
+            ctx.store.invalidate()
+            room = ctx.store.room_by_name(room_name.strip()) or {"id": rid}
         values = {}
         for suffix, column in suffixes.items():
             prop = key + suffix
