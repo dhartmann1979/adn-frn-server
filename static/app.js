@@ -611,7 +611,7 @@ async function loadSettings() {
 async function saveSettings(form) {
     try {
         const r = await api('POST', '/api/admin/settings', { changes: formValues(form) });
-        toast(r.changed.length ? `Saved (${r.changed.length})` : 'No changes'); setRestart(r.restart_needed);
+        toast(r.dashboard_restart_needed ? 'HTTPS settings saved. Restart the dashboard service to apply them.' : (r.changed.length ? `Saved (${r.changed.length})` : 'No changes')); setRestart(r.restart_needed);
         const i = await api('GET', '/api/info'); S.info = { ...S.info, ...i }; renderHeader();
     } catch (e) { toast(e.message, true); }
 }
