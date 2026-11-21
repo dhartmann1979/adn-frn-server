@@ -8,6 +8,11 @@ set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ "$(id -u)" -eq 0 ] || { echo "Bitte mit sudo starten."; exit 1; }
 cd "$DIR"
+if command -v apt-get >/dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -y -q --no-install-recommends certbot
+fi
 if [ -d .git ]; then
     git config --global --add safe.directory "$DIR" 2>/dev/null || true
     git pull --ff-only
