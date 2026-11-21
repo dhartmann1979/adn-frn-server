@@ -20,7 +20,7 @@ Alle Einstellungen liegen in der SQLite-Datenbank. Daraus schreibt frn_adn nur d
 | Python | 3.9 oder neuer (wird installiert) |
 | Speicher | ca. 300 MB RAM für Java und Dashboard |
 | FRN-Konto | für den Betrieb am SystemManager: dein FRN-Benutzerkonto (E-Mail und das Passwort, das der SystemManager per Mail geschickt hat) |
-| Netz | **TCP 10024** (FRN, änderbar) von außen erreichbar, **TCP 80** fürs Dashboard |
+| Netz | **TCP 10024** (FRN, änderbar); für Let's Encrypt zusätzlich **TCP 80 und 443** eingehend |
 
 ## Schritt für Schritt
 
@@ -117,7 +117,8 @@ Vor dem Import empfiehlt sich ein Backup des neuen Datenverzeichnisses. Nach dem
 |---|---|---|
 | TCP 10024 (bzw. `server_port`) | eingehend, Portweiterleitung | FRN-Clients **und** Prüfung durch den SystemManager |
 | TCP 10025 | ausgehend | Verbindung zum SystemManager (normalerweise offen) |
-| TCP 80 | eingehend, optional | Dashboard von außen |
+| TCP 80 | eingehend | Let's Encrypt HTTP-01 und HTTP→HTTPS-Weiterleitung |
+| TCP 443 | eingehend, bei HTTPS | Dashboard über HTTPS |
 
 `ufw` wird vom Installer automatisch freigegeben, falls aktiv.
 
@@ -125,15 +126,39 @@ Vor dem Import empfiehlt sich ein Backup des neuen Datenverzeichnisses. Nach dem
 
 Am SystemManager erscheint der Server im FRN-Client in der Serverliste. Stand-alone: im Client Server und Port direkt eintragen.
 
-## HTTPS (optional)
+## HTTPS mit Let's Encrypt (optional)
 
-Dashboard hinter einen Reverse-Proxy setzen, z. B. Caddy, und frn_adn auf Port 8080 installieren (`sudo FRNADN_PORT=8080 ./scripts/install.sh`):
+frn_adn enthält das automatische HTTPS-System aus **HBlink4-FreeRadioID**. Ein zusätzlicher Reverse-Proxy wie Caddy oder Nginx ist dafür nicht nötig.
 
+**Voraussetzungen vor dem Einschalten:**
+- Ein öffentlicher DNS-A- bzw. AAAA-Record für den Dashboard-Hostnamen zeigt auf diesen Server.
+- Eingehend TCP **80** und **443** sind in Router und Firewall freigegeben. Port 80 muss für die HTTP-01-Prüfung direkt erreichbar sein; ein vorgeschalteter Proxy darf die Challenge-URL nicht abfangen.
+- Certbot wird vom Installer als Systempaket installiert.
+
+**Einrichtung im Admin-Portal:**
+
+1. Anmelden und **Settings → HTTPS & web** öffnen.
+2. **Enable HTTPS with Let's Encrypt** einschalten.
+3. Domain (nur Hostname, ohne `https://`) und E-Mail-Adresse eintragen.
+4. Optional zunächst **Use test certificates (staging)** aktivieren, um die DNS-/Firewall-Konfiguration zu prüfen.
+5. Speichern und den Dashboard-Dienst neu starten:
+
+```bash
+sudo systemctl restart frnadn
+sudo journalctl -u frnadn -n 80 --no-pager
 ```
-frn.example.org {
-    reverse_proxy 127.0.0.1:8080
-}
-```
+
+<p align="center"><img src="../images/https-admin-preview.svg" alt="Schematische Vorschau der HTTPS-Einstellungen" width="90%"></p>
+<small>UI-Vorschau der neuen HTTPS-Einstellungsseite (schematische Darstellung, kein Live-Screenshot).</small>
+
+**Technik und Betrieb:**
+- Der HTTP-Listener auf Port 80 bedient `/.well-known/acme-challenge/` direkt aus dem Webroot und leitet alle anderen Anfragen mit HTTP 301 auf HTTPS um.
+- Certbot läuft als Dienstbenutzer `frnadn`; Konfiguration, Arbeitsdateien, Logs und Webroot liegen getrennt unter `$FRNADN_DATA/letsencrypt/`.
+- Mit vorhandenem Zertifikat läuft das Dashboard auf HTTPS-Port 443. Während der ersten Ausstellung bleibt es übergangsweise auf Port 8080 erreichbar, falls der konfigurierte Dashboard-Port 80 vom Challenge-Listener belegt wird.
+- Alle 12 Stunden wird `certbot renew` ausgeführt. Bei erfolgreicher Erneuerung wird das Zertifikat direkt im laufenden TLS-Kontext neu geladen; ein Dienstneustart ist dafür nicht nötig.
+- Bei Problemen bleibt der HTTP-Fallback erreichbar. Details stehen in `journalctl -u frnadn`.
+
+**Deaktivieren:** HTTPS in **Settings → HTTPS & web** ausschalten, speichern und `sudo systemctl restart frnadn` ausführen. Das Zertifikatsverzeichnis wird dabei nicht automatisch gelöscht.
 
 ## Aktualisieren
 
