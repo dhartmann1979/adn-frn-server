@@ -421,8 +421,7 @@ async def check_all_updates(force: bool = False) -> Dict[str, Any]:
         sha = remote.get("sha", "")
         return {"ok": True, "repo": GITHUB_REPO, "local": local_sha, "latest": sha,
                 "update": bool(local_sha and sha and local_sha != sha),
-                "message": (remote.get("commit", {}).get("message", "").split("
-")[0])}
+                "message": (remote.get("commit", {}).get("message", "").split("\n")[0])}
     try: gh = await asyncio.to_thread(github_check)
     except Exception as e: gh = {"ok": False, "error": str(e)[:200], "update": False}
     java = await ctx.java.check_update()
