@@ -858,8 +858,7 @@ async def frnlog(request: Request, lines: int = 400):
             text = f.read().decode("utf-8", "replace")
     except FileNotFoundError:
         return {"text": f"{path} does not exist yet – has the FRN server been started?"}
-    return {"text": "
-".join(text.splitlines()[-min(max(lines, 10), 3000):])}
+    return {"text": "\n".join(text.splitlines()[-min(max(lines, 10), 3000):])}
 
 
 @app.get("/api/admin/visits")
