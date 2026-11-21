@@ -24,7 +24,7 @@
             <span class="chip" id="chipServer">Server</span>
             <span class="chip" id="chipOnline">Online</span>
             <span class="chip" id="chipAir">Quiet</span>
-            <div class="links-menu" id="linksMenu"><button class="btn" onclick="toggleLinks(event)">🔗 Links ▾</button><div class="links-pop"><a href="https://freeradionetwork.de/" target="_blank" rel="noopener">🌐 FreeRadioNetwork</a><a href="https://github.com/dhartmann1979/adn-frn-server" target="_blank" rel="noopener">⌘ ADN FRN Server</a><a href="https://github.com/dhartmann1979/HBlink4-FreeRadioID" target="_blank" rel="noopener">⌘ HBlink4-FreeRadioID</a><a href="https://github.com/dhartmann1979/frn_adn" target="_blank" rel="noopener">⌘ frn_adn source</a></div></div><span id="userArea"></span>
+            <div class="links-menu" id="linksMenu"><button class="btn links-trigger" type="button" aria-expanded="false" aria-controls="linksPop" onclick="toggleLinks(event)">🔗 Links <span aria-hidden="true">▾</span></button><div class="links-pop" id="linksPop" role="menu"><div class="links-loading">Links werden geladen …</div></div></div><span id="userArea"></span>
         </div>
     </header>
 
@@ -138,6 +138,8 @@
             <button data-a="accounts">🔑 FRN accounts</button>
             <button data-a="users">👥 Users</button>
             <button data-a="system">🖥️ System</button>
+            <button data-a="links">🔗 Links</button>
+            <button data-a="import">📥 Import</button>
             <button data-a="logs">📜 Logs</button>
             <button data-a="audit">🔐 Sessions &amp; log</button>
         </nav>
@@ -147,6 +149,8 @@
         <div id="admin-accounts" class="hidden"></div>
         <div id="admin-users" class="hidden"></div>
         <div id="admin-system" class="hidden"></div>
+        <div id="admin-links" class="hidden"></div>
+        <div id="admin-import" class="hidden"></div>
         <div id="admin-logs" class="hidden"></div>
         <div id="admin-audit" class="hidden"></div>
     </section>
