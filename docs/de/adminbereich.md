@@ -30,6 +30,31 @@ Darunter fünf Karten, jede mit eigenem *Save*:
 | 🖥️ Dashboard | Titel, Untertitel, öffentliche Ansicht, versteckte Räume, Chat, Login-Dauer | nur SQLite |
 | 🗄️ Data | Aufbewahrung von Durchgängen, Logins, Chat | nur SQLite |
 
+## 🔒 HTTPS & web – Let's Encrypt
+
+<p align="center"><img src="../images/https-admin-preview.svg" alt="Schematische Vorschau der HTTPS-Einstellungen" width="90%"></p>
+<small>Schematische UI-Vorschau, kein Live-Screenshot.</small>
+
+Der Abschnitt **HTTPS & web** übernimmt das automatische Zertifikatsmanagement aus HBlink4-FreeRadioID:
+
+- **Enable HTTPS with Let's Encrypt:** aktiviert den HTTPS-Listener und den HTTP-01-Challenge-Endpunkt.
+- **Public domain:** öffentlicher DNS-Name des Dashboards, ohne Schema oder Pfad.
+- **Certificate e-mail:** Kontaktadresse für Let's Encrypt.
+- **Use test certificates (staging):** Testumgebung zum Prüfen von DNS und Portfreigaben; Browser vertrauen diesen Zertifikaten nicht.
+- **HTTP challenge / redirect port:** normalerweise TCP 80.
+- **HTTPS port:** normalerweise TCP 443.
+
+Nach dem Speichern ist ein Neustart des Dashboard-Dienstes erforderlich:
+
+```bash
+sudo systemctl restart frnadn
+sudo journalctl -u frnadn -n 80 --no-pager
+```
+
+Der Listener auf HTTP beantwortet ACME-Challenges und leitet sonst mit HTTP 301 auf HTTPS um. Certbot läuft als Benutzer `frnadn`; seine Daten liegen im Datenverzeichnis unter `letsencrypt/`. Die Erneuerung wird alle zwölf Stunden geprüft. Ein erneuertes Zertifikat wird in den laufenden TLS-Kontext geladen, ohne den Dienst neu zu starten.
+
+Voraussetzung sind ein korrekt auf den Server zeigender öffentlicher DNS-Eintrag und eingehend freigegebene Ports TCP 80 und 443. Wenn die erste Zertifikatsausstellung scheitert, bleibt das Dashboard vorübergehend auf HTTP-Port 8080 erreichbar (sofern Port 80 für den ACME-Listener verwendet wird); die Ursache steht im Journal.
+
 ## 🏠 Rooms
 
 <p align="center"><img src="../images/admin-rooms.png" alt="Rooms" width="90%"></p>
