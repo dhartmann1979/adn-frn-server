@@ -39,7 +39,7 @@ Jede Frage hat eine Vorgabe in `[Klammern]`, Enter übernimmt sie.
 |---|---|
 | **1 System prüfen** | Betriebssystem, Architektur, systemd, apt |
 | **2 Pakete** | Python, venv, curl, unzip und **Java** |
-| **3 FRN-Server** | lädt `FRN_Server.zip` von **freeradionetwork.de**, entpackt `FRN_Server.jar` nach `/opt/frn-server`. Ist er schon da, wird die Version mit freeradionetwork.de verglichen und ein Update angeboten |
+| **3 FRN-Server** | lädt `FRN_Server.zip` von **freeradionetwork.de**, entpackt `FRN_Server.jar` nach `/opt/frn-server`. Der Installer lädt das Java-FRN-Paket für die neue Installation herunter. Eine bereits vorhandene JAR wird nicht übernommen; bei erkannter Altinstallation bricht der Installer vorher ab |
 | **4 Dashboard** | kopiert das Dashboard nach `/opt/adn-frn-server`, legt die Python-Umgebung, den Dienstbenutzer `frnadn` und den Befehl `frnadn` an |
 | **5 Superadmin** | Benutzername und Passwort (mind. 10 Zeichen, zweimal) – gespeichert als scrypt-Hash |
 | **6 FRN-Server einrichten** | Betriebsart, Serveradresse, Port, Besitzer, Räume, Titel |
@@ -84,6 +84,13 @@ Danach im Admin-Portal unter **Settings** Serveradresse und SystemManager-Konto 
 
 Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
 
+
+## Alte Konfiguration optional übernehmen
+
+Die Installation bleibt eine frische Installation mit neuer SQLite-Datenbank und neuem Java-FRN-Server. Es wird keine alte Installation automatisch ersetzt oder migriert. Wenn du die bisherigen Servereinstellungen behalten möchtest, melde dich nach Abschluss im Admin-Portal an und wähle **Admin → System → Import server.properties**. Lade ausschließlich die Datei `server.properties` aus der alten Installation hoch. Der Import übernimmt nur unterstützte Einstellungen und Raumdefinitionen. Alte Datenbanken, JAR-Dateien, ACL-Listen und FRN-Passwortdateien werden nicht kopiert.
+
+Vor dem Import empfiehlt sich ein Backup des neuen Datenverzeichnisses. Nach dem Import den Java-FRN-Server über das Admin-Portal neu starten.
+
 ## Router und Firewall
 
 | Port | Richtung | Wofür |
@@ -112,8 +119,8 @@ frn.example.org {
 
 | Was | Wie |
 |---|---|
-| Java-FRN-Server | Admin-Portal → **Settings → Check for update** → *Install* (lädt von freeradionetwork.de, startet neu) – oder `install.sh` erneut |
-| frn_adn | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – der FRN-Server läuft dabei weiter |
+| Java-FRN-Server | Admin-Portal → **System → Upgrade Java now** (lädt von freeradionetwork.de und startet den Dienst neu) |
+| Dashboard | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – der FRN-Server läuft dabei weiter |
 
 `install.sh` ist ausschließlich für eine frische Installation vorgesehen. Es bricht ab, wenn bereits eine FRN-Datenbank, eine vorhandene `server.properties` oder ein laufender FRN-Dienst erkannt wird. Für Updates ist `scripts/update.sh` vorgesehen; `install.sh` nicht erneut auf einem installierten System ausführen.
 
