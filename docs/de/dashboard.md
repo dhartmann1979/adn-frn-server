@@ -6,6 +6,15 @@ Das Dashboard ist eine einzige Seite mit Tabs. Die Live-Daten liest frn_adn aus 
 
 <p align="center"><img src="../images/live.png" alt="Live" width="90%"></p>
 
+## Kompakte Live-Startseite
+
+Die Live-Startseite ist jetzt in zwei Hauptbereiche gegliedert: links die Tages-Kennzahlen und „On air“, rechts die Räume. Die Raumliste hat auf großen Bildschirmen einen eigenen Scrollbereich. „Last heard“ und „Comings & goings“ stehen gemeinsam darunter. Auf kleinen Displays wechseln die Bereiche automatisch in eine einspaltige Darstellung.
+
+<p align="center"><img src="../images/dashboard-compact-preview.svg" alt="Schematische Vorschau des kompakten Live-Dashboards" width="95%"></p>
+<small>Layout-Vorschau zur Dokumentation (schematische Darstellung, kein Live-Screenshot).</small>
+
+Damit bleiben Serverstatus, Tageswerte, aktive Aussendungen und Räume auf Desktop-Bildschirmen deutlich kompakter erreichbar. Bei sehr vielen Räumen scrollt nur die Raumkarte statt der gesamten Seite.
+
 ## Kopfzeile
 
 | Anzeige | Bedeutung |
