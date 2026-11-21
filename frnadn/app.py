@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import logging
 import os
 import re
@@ -441,6 +442,62 @@ def parse_java_properties(raw: str) -> Dict[str, str]:
         if m: values[m.group(1)] = m.group(2).strip()
         logical = ""
     return values
+
+
+DEFAULT_LINKS = [
+    {"label": "FreeRadioNetwork", "url": "https://freeradionetwork.de/"},
+    {"label": "ADN FRN Server", "url": "https://github.com/dhartmann1979/adn-frn-server"},
+    {"label": "HBlink4-FreeRadioID", "url": "https://github.com/dhartmann1979/HBlink4-FreeRadioID"},
+    {"label": "frn_adn source", "url": "https://github.com/dhartmann1979/frn_adn"},
+]
+
+
+def read_dashboard_links():
+    path = DATA / "branding" / "links.json"
+    if not path.exists():
+        return DEFAULT_LINKS
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, list) else DEFAULT_LINKS
+    except (OSError, ValueError):
+        return DEFAULT_LINKS
+
+
+@app.get("/api/links")
+async def public_links():
+    return {"links": read_dashboard_links()}
+
+
+@app.get("/api/admin/links")
+async def admin_get_links(request: Request):
+    need_admin(request)
+    return {"links": read_dashboard_links()}
+
+
+@app.post("/api/admin/links")
+async def admin_save_links(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    entries = b.get("links")
+    if not isinstance(entries, list) or len(entries) > 20:
+        raise HTTPError(400, "Please provide up to 20 links.")
+    clean = []
+    for item in entries:
+        if not isinstance(item, dict):
+            raise HTTPError(400, "Each link needs a label and URL.")
+        label, url = str(item.get("label", "")).strip(), str(item.get("url", "")).strip()
+        from urllib.parse import urlsplit
+        parsed = urlsplit(url)
+        if not label or len(label) > 50 or len(url) > 500 or parsed.scheme not in ("http", "https") or not parsed.netloc:
+            raise HTTPError(400, "Link labels must be 1–50 characters and URLs must use http:// or https://.")
+        clean.append({"label": label, "url": url})
+    folder = DATA / "branding"
+    folder.mkdir(parents=True, exist_ok=True)
+    tmp = folder / "links.json.tmp"
+    tmp.write_text(json.dumps(clean, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(tmp, folder / "links.json")
+    ctx.auth.audit("links_changed", u["username"], f"{len(clean)} dashboard links saved", ip_of(request))
+    return {"ok": True, "links": clean}
 
 
 @app.get("/branding/logo")
