@@ -96,7 +96,7 @@ FIELDS: List[Field] = [
     Field("https.enabled", "https", "Enable HTTPS with Let's Encrypt", "bool", False,
           "Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn."),
     Field("https.domain", "https", "Public domain", "text", "",
-          "Example: dashboard.example.org. Do not enter http:// or a path.", pattern=r"(?=.{4,253}$)([A-Za-z0-9-]{1,63}\\.)+[A-Za-z]{2,63}"),
+          "Example: dashboard.example.org. Do not enter http:// or a path.", pattern=r"(?=.{4,253}$)([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,63}"),
     Field("https.email", "https", "Certificate e-mail", "text", "",
           "Let's Encrypt expiry and important certificate notices."),
     Field("https.staging", "https", "Use test certificates (staging)", "bool", False,
