@@ -71,7 +71,7 @@ class Ctx:
         self.sockets: Dict[WebSocket, Dict[str, Any]] = {}
         self.restart_needed = False
         self.dashboard_restart_needed = False
-        self.tasks: List[asyncio.Task] =
+        self.tasks: List[asyncio.Task] = []
 
     def notify(self, ev: Dict[str, Any]) -> None:
         try:
