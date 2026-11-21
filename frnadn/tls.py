@@ -21,7 +21,7 @@ from starlette.routing import Route
 
 logger = logging.getLogger("frnadn.tls")
 _TOKEN_RE = re.compile(r"^[A-Za-z0-9_-]{10,200}$")
-_DOMAIN_RE = re.compile(r"^(?=.{4,253}$)([A-Za-z0-9-]{1,63}\\.)+[A-Za-z]{2,63}$")
+_DOMAIN_RE = re.compile(r"^(?=.{4,253}$)([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,63}$")
 
 
 class CertManager:
