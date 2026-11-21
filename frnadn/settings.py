@@ -96,7 +96,7 @@ FIELDS: List[Field] = [
     Field("https.enabled", "https", "Enable HTTPS with Let's Encrypt", "bool", False,
           "Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn."),
     Field("https.domain", "https", "Public domain", "text", "",
-          "Example: dashboard.example.org. Do not enter http:// or a path."),
+          "Example: dashboard.example.org. Do not enter http:// or a path.", pattern=r"(?=.{4,253}$)([A-Za-z0-9-]{1,63}\\.)+[A-Za-z]{2,63}"),
     Field("https.email", "https", "Certificate e-mail", "text", "",
           "Let's Encrypt expiry and important certificate notices."),
     Field("https.staging", "https", "Use test certificates (staging)", "bool", False,
@@ -148,7 +148,7 @@ def validate(f: Field, raw: Any) -> Any:
         raise SettingsError(f"{f.label}: '{v}' is not valid.")
     if f.key == "frn.owner_callsign":
         v = v.upper()
-    if f.key in ("frn.owner_email", "sysman.email"):
+    if f.key in ("frn.owner_email", "sysman.email", "https.email"):
         v = v.lower()
         if v and not re.fullmatch(r"[^@\s<>]+@[^@\s<>]+", v):
             raise SettingsError(f"{f.label}: not an e-mail address.")
