@@ -830,7 +830,7 @@ async function loadSystem() {
 
 async function loadLinksAdmin() {
     const d = await api('GET', '/api/admin/links');
-    const value = (d.links || []).map(x => x.label + ' | ' + x.url).join('\\n');
+    const value = (d.links || []).map(x => x.label + ' | ' + x.url).join('\n');
     $('admin-links').innerHTML = `<div class="tile links-editor">
         <h3>🔗 Dashboard link menu</h3>
         <p class="subt">Edit the links shown in the top-right menu. One entry per line, formatted as <code>Label | https://example.org</code>. Only HTTP and HTTPS links are accepted.</p>
@@ -841,7 +841,7 @@ async function loadLinksAdmin() {
     </div>`;
 }
 async function saveLinksAdmin(btn) {
-    const rows = $('linksConfig').value.split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+    const rows = $('linksConfig').value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
     const links = [];
     for (const row of rows) {
         const at = row.indexOf('|');
@@ -917,7 +917,7 @@ async function saveBranding() {
     try { await api('POST', '/api/admin/branding', payload); applyAccent(accent); $('brandLogo').value = ''; document.querySelectorAll('.brand img, .logo').forEach(x => x.src = '/branding/logo?v=' + Date.now()); toast('Appearance saved.'); }
     catch(e) { toast(e.message, true); }
 }
-\nasync function restartApp() {
+async function restartApp() {
     if (!await confirmBox({ title: 'Restart the dashboard?', body: 'Only frn_adn starts again (a few seconds); the FRN server keeps running.' }, 'Restart')) return;
     try { await api('POST', '/api/admin/restart', {}); toast('Restarting …'); setTimeout(() => location.reload(), 6000); } catch (e) { toast(e.message, true); }
 }
