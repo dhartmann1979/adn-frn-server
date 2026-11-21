@@ -62,9 +62,18 @@ function toast(msg, bad) {
     t.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:4000;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw;white-space:normal';
     t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), bad ? 6000 : 3200);
 }
+async function loadPublicLinks() {
+    try {
+        const d = await api('GET', '/api/links');
+        const pop = $('linksPop');
+        if (!pop) return;
+        pop.innerHTML = (d.links || []).map(x => `<a role="menuitem" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.label)}</a>`).join('') || '<div class="links-loading">No links configured.</div>';
+    } catch (e) { const pop = $('linksPop'); if (pop) pop.innerHTML = '<div class="links-loading">Links unavailable.</div>'; }
+}
 function toggleLinks(ev) {
     ev.stopPropagation();
     const menu = $('linksMenu'); menu.classList.toggle('open');
+    menu.querySelector('.links-trigger')?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     if (menu.dataset.bound !== '1') { menu.dataset.bound = '1'; document.addEventListener('click', e => { if (!menu.contains(e.target)) menu.classList.remove('open'); }); }
 }
 function applyAccent(value) {
@@ -84,7 +93,7 @@ async function boot() {
         const info = await api('GET', '/api/info');
         S.info = info; S.me = info.user || null;
         if (info.login_required && !S.me) { renderHeader(); if (!info.setup_needed) openLogin(true); return; }
-        renderHeader(); renderUser();
+        renderHeader(); renderUser(); loadPublicLinks();
         $('ver').textContent = 'v' + info.version;
         const live = await api('GET', '/api/live');
         S.live = live; renderLive();
@@ -538,14 +547,14 @@ function renderChat() {
 $('chatFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.chat.room = b.dataset.v; renderChat(); });
 
 // ---------------------------------------------------------------- admin
-const ADMIN_TABS = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'logs', 'audit'];
+const ADMIN_TABS = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'links', 'import', 'logs', 'audit'];
 function showAdmin(a) {
     if (!ADMIN_TABS.includes(a)) a = 'settings';
     S.admin.tab = a;
     document.querySelectorAll('#adminTabs button').forEach(b => b.classList.toggle('active', b.dataset.a === a));
     ADMIN_TABS.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== a));
     ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
-       system: loadSystem, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
+       system: loadSystem, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
     if (S.tab === 'admin') history.replaceState(null, '', '#admin/' + a);
 }
 $('adminTabs').addEventListener('click', e => { const b = e.target.closest('button[data-a]'); if (b) showAdmin(b.dataset.a); });
@@ -814,13 +823,53 @@ async function loadSystem() {
         <div class="tile"><h3>⬆️ Software updates</h3><div class="subt">Automatic check every full hour. Updates are only installed after an administrator action.</div>
             <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkAllUpdates(this)">↻ Check now</button><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button><button class="btn primary" id="upgradeGit" disabled onclick="upgradeNow('github', this)">Upgrade Dashboard now</button></div>
             <div class="dim" id="updInfo" style="font-size:12.5px;margin-top:8px">Not checked yet.</div></div>
-        <div class="tile"><h3>📥 Import server.properties</h3><div class="subt">Import supported server settings from an existing FRN installation. A backup is made before replacing the generated configuration. Existing ACL files are left untouched.</div>
-            <div class="actions"><input type="file" id="propertiesFile" accept=".properties,text/plain"><button class="btn" onclick="importProperties()">Import configuration</button></div><div id="importInfo" class="dim" style="margin-top:8px"></div></div>
         <div class="tile"><h3>🎨 Appearance</h3><div class="subt">Choose the dashboard accent and upload your own PNG logo (max. 2 MB).</div>
             <div class="actions"><label>Accent <input type="color" id="brandAccent" value="#5ac8fa" onchange="applyAccent(this.value)"></label><input type="file" id="brandLogo" accept="image/png"><button class="btn" onclick="saveBranding()">Save appearance</button></div></div></div>`;
     checkAllUpdates();
 }
 
+async function loadLinksAdmin() {
+    const d = await api('GET', '/api/admin/links');
+    const value = (d.links || []).map(x => x.label + ' | ' + x.url).join('\\n');
+    $('admin-links').innerHTML = `<div class="tile links-editor">
+        <h3>🔗 Dashboard link menu</h3>
+        <p class="subt">Edit the links shown in the top-right menu. One entry per line, formatted as <code>Label | https://example.org</code>. Only HTTP and HTTPS links are accepted.</p>
+        <label for="linksConfig">Links (one per line)</label>
+        <textarea id="linksConfig" rows="8" spellcheck="false">${esc(value)}</textarea>
+        <div class="actions"><button class="btn" onclick="loadLinksAdmin()">Reset changes</button><button class="btn primary" onclick="saveLinksAdmin(this)">Save link menu</button></div>
+        <div class="dim" id="linksInfo" role="status"></div>
+    </div>`;
+}
+async function saveLinksAdmin(btn) {
+    const rows = $('linksConfig').value.split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+    const links = [];
+    for (const row of rows) {
+        const at = row.indexOf('|');
+        if (at < 1) { $('linksInfo').textContent = 'Invalid line: use Label | https://example.org'; return; }
+        links.push({label: row.slice(0, at).trim(), url: row.slice(at + 1).trim()});
+    }
+    if (btn) btn.disabled = true;
+    try {
+        await api('POST', '/api/admin/links', {links});
+        $('linksInfo').textContent = 'Link menu saved.';
+        await loadPublicLinks();
+        toast('Link menu saved.');
+    } catch (e) { $('linksInfo').textContent = e.message; toast(e.message, true); }
+    finally { if (btn) btn.disabled = false; }
+}
+
+function loadImportAdmin() {
+    $('admin-import').innerHTML = `<div class="tile import-card">
+        <h3>📥 Import legacy server.properties</h3>
+        <p class="subt">Optional: import settings from the previous FRN installation into this fresh installation. Only supported properties and room definitions are transferred. The old database, Java JAR, ACL lists and password XML files are not copied.</p>
+        <div class="import-drop">
+            <label for="propertiesFile">Select the old server.properties file</label>
+            <input type="file" id="propertiesFile" accept=".properties,text/plain">
+            <button class="btn primary" onclick="importProperties()">Import server.properties</button>
+        </div>
+        <div id="importInfo" class="dim" role="status" style="margin-top:12px"></div>
+    </div>`;
+}
 async function checkAllUpdates(btn) {
     if (btn) btn.disabled = true;
     try {
