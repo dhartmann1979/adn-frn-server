@@ -421,7 +421,8 @@ async def check_all_updates(force: bool = False) -> Dict[str, Any]:
         sha = remote.get("sha", "")
         return {"ok": True, "repo": GITHUB_REPO, "local": local_sha, "latest": sha,
                 "update": bool(local_sha and sha and local_sha != sha),
-                "message": (remote.get("commit", {}).get("message", "").split("\n")[0])}
+                "message": (remote.get("commit", {}).get("message", "").split("
+")[0])}
     try: gh = await asyncio.to_thread(github_check)
     except Exception as e: gh = {"ok": False, "error": str(e)[:200], "update": False}
     java = await ctx.java.check_update()
@@ -457,7 +458,8 @@ async def save_branding(request: Request):
     if encoded:
         try: data = base64.b64decode(encoded.split(",", 1)[-1], validate=True)
         except Exception: raise HTTPError(400, "Invalid logo upload.")
-        if len(data) > 2_000_000 or not data.startswith(b"\x89PNG\r\n\x1a\n"):
+        if len(data) > 2_000_000 or not data.startswith(b"\x89PNG\r\n\x1a
+"):
             raise HTTPError(400, "Please upload a PNG image up to 2 MB.")
         folder = DATA / "branding"; folder.mkdir(parents=True, exist_ok=True)
         tmp = folder / "logo.png.tmp"; tmp.write_bytes(data); os.replace(tmp, folder / "logo.png")
@@ -510,7 +512,12 @@ async def import_server_properties(request: Request):
     mapping = {"server_addr":"frn.address", "server_port":"frn.port", "sysman_server_addr":"sysman.host",
                "sysman_auth_emailaddr":"sysman.email", "sysman_auth_password":"sysman.password",
                "server_owner":"frn.owner_email", "website":"frn.website", "client_sotimeout":"frn.client_timeout",
-               "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room",\n               "standalone":"frn.standalone", "allowLANAddr":"frn.allow_lan",\n               "backup_server_addr":"frn.backup_host", "backup_server_port":"frn.backup_port",\n               "voip_skip_muted_crosslink_clients":"frn.skip_muted_crosslink",\n               "voip_skip_muted_gateway_clients":"frn.skip_muted_gateway",\n               "voip_skip_muted_pconly_clients":"frn.skip_muted_pconly"}
+               "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room",
+               "standalone":"frn.standalone", "allowLANAddr":"frn.allow_lan",
+               "backup_server_addr":"frn.backup_host", "backup_server_port":"frn.backup_port",
+               "voip_skip_muted_crosslink_clients":"frn.skip_muted_crosslink",
+               "voip_skip_muted_gateway_clients":"frn.skip_muted_gateway",
+               "voip_skip_muted_pconly_clients":"frn.skip_muted_pconly"}
     changes = {}
     known = {field["key"]: field for section in ctx.settings.describe() for field in section["fields"]}
     for prop, key in mapping.items():
@@ -604,7 +611,8 @@ def _room_values(b: Dict[str, Any]) -> Dict[str, Any]:
                     raise HTTPError(400, f"'{e}' is not an e-mail address.")
             v[k] = ",".join(items)
         else:
-            v[k] = str(x or "").replace("\n", " ").replace("\r", " ")[:2000]
+            v[k] = str(x or "").replace("
+", " ").replace("\r", " ")[:2000]
     return v
 
 
@@ -851,7 +859,8 @@ async def frnlog(request: Request, lines: int = 400):
             text = f.read().decode("utf-8", "replace")
     except FileNotFoundError:
         return {"text": f"{path} does not exist yet – has the FRN server been started?"}
-    return {"text": "\n".join(text.splitlines()[-min(max(lines, 10), 3000):])}
+    return {"text": "
+".join(text.splitlines()[-min(max(lines, 10), 3000):])}
 
 
 @app.get("/api/admin/visits")
