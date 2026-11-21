@@ -18,6 +18,8 @@
 #  Umgebungsvariablen (optional):
 #    FRNADN_DIR=/opt/adn-frn-server Programmverzeichnis des Dashboards
 #    FRNADN_PORT=80               Web-Port des Dashboards
+#    FRNADN_DATA=/var/lib/adn-frn-server   neues, leeres Datenverzeichnis
+#    FRNADN_FRN_HOME=/var/lib/adn-frn-server/frn  FRN-Konfiguration/Logs
 #    FRN_DIR=/opt/frn-server      Verzeichnis für FRN_Server.jar
 #    FRN_ZIP=/pfad/FRN_Server.zip vorhandenes Paket statt Download
 #    FRNADN_YES=1                 keine Fragen, Vorgaben übernehmen
@@ -27,8 +29,8 @@ set -euo pipefail
 DIR="${FRNADN_DIR:-/opt/adn-frn-server}"
 PORT="${FRNADN_PORT:-80}"
 FRN_DIR="${FRN_DIR:-/opt/frn-server}"
-DATA=/var/lib/frnadn
-FRN_HOME="$DATA/frn"
+DATA="${FRNADN_DATA:-/var/lib/frnadn}"
+FRN_HOME="${FRNADN_FRN_HOME:-$DATA/frn}"
 SVC_USER=frnadn
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG=/var/log/frnadn-install.log
@@ -278,10 +280,10 @@ FPORT="$(cdef frn.port 10024)"
 
 # ---------------------------------------------------------------------------
 step 7 "Dienste frn-server und frnadn"
-sed -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" -e "s#/opt/frn-server#${FRN_DIR}#g" -e "s#/usr/bin/java#${JAVA}#" \
+sed -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" -e "s#/var/lib/frnadn#${DATA}#g" -e "s#/opt/frn-server#${FRN_DIR}#g" -e "s#/usr/bin/java#${JAVA}#" \
     "$DIR/systemd/frn-server.service" > /etc/systemd/system/frn-server.service
 sed -e "s#/opt/frnadn#${DIR}#g" -e "s#FRNADN_PORT=80#FRNADN_PORT=${PORT}#" -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" \
-    -e "s#/opt/frn-server#${FRN_DIR}#g" "$DIR/systemd/frnadn.service" > /etc/systemd/system/frnadn.service
+    -e "s#/var/lib/frnadn#${DATA}#g" -e "s#/opt/frn-server#${FRN_DIR}#g" "$DIR/systemd/frnadn.service" > /etc/systemd/system/frnadn.service
 systemctl daemon-reload
 systemctl enable -q frn-server frnadn
 systemctl restart frn-server
