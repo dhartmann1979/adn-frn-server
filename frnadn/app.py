@@ -493,6 +493,8 @@ async def updates_upgrade(request: Request):
             return {"ok": True, "output": pull.stdout[-1000:]}
         result = await asyncio.to_thread(fast_forward)
         result["restart_required"] = True
+        # systemd Restart=always brings the dashboard back on the updated code.
+        asyncio.get_running_loop().call_later(1.5, os._exit, 3)
     else: raise HTTPError(400, "Unknown update target.")
     ctx.auth.audit("upgrade_" + target, u["username"], str(result), ip_of(request))
     return result
