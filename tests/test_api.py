@@ -111,3 +111,17 @@ def test_server_control_demo(client):
     r = client.post("/api/admin/server/restart", json={}, headers=H)
     assert r.status_code == 200 and r.json()["ok"]
     assert client.post("/api/admin/server/reboot", json={}, headers=H).status_code == 404
+
+
+
+def test_dashboard_links_editable_by_admin(client):
+    defaults = client.get("/api/links").json()["links"]
+    assert defaults and defaults[0]["label"] == "FreeRadioNetwork"
+    assert client.get("/api/admin/links").status_code in (401, 403)
+    login(client)
+    payload = {"links": [{"label": "My FRN page", "url": "https://example.org/frn"},
+                         {"label": "GitHub", "url": "https://github.com/"}]}
+    saved = client.post("/api/admin/links", json=payload, headers=H)
+    assert saved.status_code == 200, saved.text
+    assert client.get("/api/links").json()["links"] == payload["links"]
+    assert client.post("/api/admin/links", json={"links": [{"label": "bad", "url": "javascript:alert(1)"}]}, headers=H).status_code == 400
