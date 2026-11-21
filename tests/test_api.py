@@ -125,3 +125,17 @@ def test_dashboard_links_editable_by_admin(client):
     assert saved.status_code == 200, saved.text
     assert client.get("/api/links").json()["links"] == payload["links"]
     assert client.post("/api/admin/links", json={"links": [{"label": "bad", "url": "javascript:alert(1)"}]}, headers=H).status_code == 400
+
+
+
+def test_https_settings_are_admin_configurable_and_require_dashboard_restart(client):
+    login(client)
+    settings = client.get("/api/admin/settings").json()
+    https = next(x for x in settings["sections"] if x["id"] == "https")
+    assert {f["key"] for f in https["fields"]} >= {"https.enabled", "https.domain", "https.email", "https.port", "https.http_port"}
+    saved = client.post("/api/admin/settings", json={"changes": {
+        "https.enabled": True, "https.domain": "dash.example.org", "https.email": "admin@example.org"
+    }}, headers=H)
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["dashboard_restart_needed"] is True
+    assert saved.json()["restart_needed"] is False
