@@ -82,8 +82,28 @@ sudo frnadn set-superadmin admin              # Superadmin anlegen
 
 Danach im Admin-Portal unter **Settings** Serveradresse und SystemManager-Konto eintragen und den FRN-Server neu starten.
 
-Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
+Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_DATA` (Vorgabe `/var/lib/frnadn`), `FRNADN_FRN_HOME` (Vorgabe `$FRNADN_DATA/frn`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
 
+
+## Neuinstallation auf einem Rechner mit einer alten FRN-Installation
+
+Wenn die alte Installation auf demselben Rechner liegt, zuerst nur die alte Konfigurationsdatei sichern und beide alten Dienste stoppen. Die alten Verzeichnisse und Datenbanken bleiben unangetastet:
+
+```bash
+sudo cp -a /var/lib/frnadn/frn/server.properties /root/server.properties.alt
+sudo systemctl stop frnadn frn-server
+```
+
+Danach die neue Installation mit eigenen, leeren Daten- und Java-Verzeichnissen starten. So werden alte Daten und JAR-Dateien nicht wiederverwendet:
+
+```bash
+cd /opt/adn-frn-server
+sudo FRNADN_DATA=/var/lib/adn-frn-server \
+     FRN_DIR=/opt/adn-frn-server/java \
+     ./scripts/install.sh
+```
+
+Nach erfolgreicher Installation im Admin-Portal **Admin → System → Import server.properties** öffnen und `/root/server.properties.alt` auswählen. Nur unterstützte Einstellungen und Raumdefinitionen werden importiert. Die alte Datenbank, ACL-Dateien, FRN-Passwortlisten und Java-JAR werden nicht übernommen. Alte Verzeichnisse erst löschen, wenn die neue Installation geprüft und ein Backup vorhanden ist.
 
 ## Alte Konfiguration optional übernehmen
 
