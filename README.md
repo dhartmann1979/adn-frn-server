@@ -19,6 +19,7 @@ On Debian/Ubuntu/Raspberry Pi OS:
 ```bash
 git clone https://github.com/dhartmann1979/adn-frn-server.git
 cd adn-frn-server
+chmod +x scripts/install.sh scripts/update.sh
 sudo ./scripts/install.sh
 ```
 
