@@ -1125,8 +1125,6 @@ async def _serve(host: str, port: int) -> None:
     pending = [task for task in server_tasks if not task.done()]
     if pending:
         await asyncio.wait(pending, timeout=8)
-    if ctx:
-        await _shutdown()
 
 
 def main() -> None:
