@@ -132,7 +132,7 @@ function modal(html, locked, wide) {
 function closeModal() { $('modalRoot').innerHTML = ''; }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ov')?.dataset.locked) closeModal(); });
 function openLogin(locked) {
-    modal(`<img class="logo" src="/static/adn-icon.svg" alt="">
+    modal(`<img class="logo" src="/branding/logo" alt="">
         <h2 style="text-align:center">${esc((S.info && S.info.title) || 'Auf der NachtSchicht')}</h2>
         <p class="dim" style="text-align:center;margin:0 0 12px">${locked ? 'This dashboard is private. Please log in.' : 'Log in to manage the FRN server.'}</p>
         <form onsubmit="event.preventDefault(); doLogin(this)">
