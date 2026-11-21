@@ -214,9 +214,10 @@ class LogWatch:
 
     # ------------------------------------------------------------ state for the dashboard
     def state(self) -> Dict[str, Any]:
-        running = self.service == "active" and bool(self.listen) and not self.error
+        # SystemManager errors are upstream warnings, not proof that the Java process stopped.
+        running = self.service == "active" and bool(self.listen)
         return {"running": running, "service": self.service, "started": self.started, "listen": self.listen,
-                "error": self.error, "version": self.version, "restarts": self.restarts,
+                "error": self.error, "warning": self.error, "version": self.version, "restarts": self.restarts,
                 "clients": sum(1 for r in self.rooms.values() for c in r.clients if not c.is_parrot)}
 
     def _state_changed(self) -> None:
