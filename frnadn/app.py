@@ -561,7 +561,7 @@ async def import_server_properties(request: Request):
     ctx.java.write_config()
     ctx.restart_needed = True
     ctx.auth.audit("properties_import", u["username"], f"{len(changes)} settings; {len(imported_rooms)} rooms; backup={backup if current.exists() else 'none'}", ip_of(request))
-    return {"ok": True, "imported": list(changes), "rooms": imported_rooms, "ignored": [k for k in parsed if k not in mapping and not re.fullmatch(r"net\\d{2}(?:_[A-Za-z0-9_]+)?", k)], "backup": str(backup) if backup.exists() else None,
+    return {"ok": True, "imported": list(changes), "rooms": imported_rooms, "ignored": [k for k in parsed if k not in mapping and not re.fullmatch(r"net\d{2}(?:_[A-Za-z0-9_]+)?", k)], "backup": str(backup) if backup.exists() else None,
             "restart_needed": True}
 
 # ---------------------------------------------------------------- admin: rooms
