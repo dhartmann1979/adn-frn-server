@@ -1,0 +1,26 @@
+[Unit]
+Description=Java FRN server (freeradionetwork.de), configured by frn_adn
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=frnadn
+Group=frnadn
+# server.properties, log4j.xml, acl/ and logs/ – written and read by frn_adn
+WorkingDirectory=/var/lib/frnadn/frn
+ExecStart=/usr/bin/java -Xms32m -Xmx256m -jar /opt/frn-server/FRN_Server.jar -sp server.properties -lp log4j.xml
+# The server stops itself on SystemManager errors (wrong account, not reachable, …).
+# Wait a minute before the next try so the SystemManager is not flooded.
+Restart=always
+RestartSec=60
+SuccessExitStatus=143
+TimeoutStopSec=20
+# FRN ports below 1024 without root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+ProtectSystem=full
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
