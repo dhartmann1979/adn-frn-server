@@ -241,7 +241,7 @@ function renderChips() {
     set('chipLive', S.wsOk ? 'ok' : 'bad', S.wsOk ? '✓ Live data' : '✕ Live data');
     const st = S.live && S.live.server;
     if (!st) set('chipServer', '', '🛰️ FRN server');
-    else set('chipServer', st.running ? 'ok' : 'bad', st.running ? '✓ FRN server' : st.error ? '✕ FRN server: error' : st.service === 'active' ? '… FRN server starting' : '✕ FRN server stopped');
+    else set('chipServer', st.running ? 'ok' : 'bad', st.running ? (st.warning ? '✓ FRN server · SystemManager warning' : '✓ FRN server') : st.error ? '✕ FRN server: error' : st.service === 'active' ? '… FRN server starting' : '✕ FRN server stopped');
     const online = rooms().reduce((a, r) => a + r.clients.filter(c => !c.parrot).length, 0);
     set('chipOnline', online ? 'info' : '', `👥 ${online} online`);
     const talkers = rooms().map(r => r.talking).filter(Boolean);
