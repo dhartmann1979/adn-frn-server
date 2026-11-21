@@ -335,3 +335,12 @@ textarea.json { min-height: 520px; font-size: 12px; line-height: 1.45; tab-size:
 .acl { width: 100%; border-collapse: collapse; }
 .acl td { padding: 3px 4px 3px 0; }
 .banner code { background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
+
+/* HBlink4-inspired links popover and configurable accent */
+.links-menu { position: relative; }
+.links-pop { display:none; position:absolute; right:0; top:calc(100% + 6px); min-width:230px; z-index:120; padding:6px; border-radius:14px;
+ background:rgba(16,22,40,.97); border:1px solid var(--glass-border); box-shadow:0 14px 40px rgba(0,0,0,.5); }
+.links-menu.open .links-pop { display:block; }
+.links-pop a { display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px; color:var(--text); text-decoration:none; font-size:13px; font-weight:600; }
+.links-pop a:hover { background:rgba(90,200,250,.14); }
+body { --accent: var(--user-accent, #5ac8fa); }
