@@ -507,13 +507,13 @@ async def import_server_properties(request: Request):
     mapping = {"server_addr":"frn.address", "server_port":"frn.port", "sysman_server_addr":"sysman.host",
                "sysman_auth_emailaddr":"sysman.email", "sysman_auth_password":"sysman.password",
                "server_owner":"frn.owner_email", "website":"frn.website", "client_sotimeout":"frn.client_timeout",
-               "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room"}
+               "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room",\n               "standalone":"frn.standalone", "allowLANAddr":"frn.allow_lan",\n               "backup_server_addr":"frn.backup_host", "backup_server_port":"frn.backup_port",\n               "voip_skip_muted_crosslink_clients":"frn.skip_muted_crosslink",\n               "voip_skip_muted_gateway_clients":"frn.skip_muted_gateway",\n               "voip_skip_muted_pconly_clients":"frn.skip_muted_pconly"}
     changes = {}
     known = {field["key"]: field for section in ctx.settings.describe() for field in section["fields"]}
     for prop, key in mapping.items():
         if prop in parsed and key in known:
             val: Any = parsed[prop]
-            if known[key].get("kind") in ("int", "ports"):
+            if known[key].get("kind") == "bool": val = val.lower() in ("yes", "true", "1", "on")\n            elif known[key].get("kind") in ("int", "ports"):
                 try: val = int(val)
                 except ValueError: raise HTTPError(400, f"Invalid number for {prop}.")
             changes[key] = val
