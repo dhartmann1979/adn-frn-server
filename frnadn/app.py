@@ -488,11 +488,11 @@ async def import_server_properties(request: Request):
                "server_owner":"frn.owner_email", "website":"frn.website", "client_sotimeout":"frn.client_timeout",
                "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room"}
     changes = {}
-    known = {f.key:f for f in ctx.settings.describe()["sections"] for f in f.get("fields", [])}
+    known = {field["key"]: field for section in ctx.settings.describe() for field in section["fields"]}
     for prop, key in mapping.items():
         if prop in parsed and key in known:
             val: Any = parsed[prop]
-            if known[key].get("kind") == "int":
+            if known[key].get("kind") in ("int", "ports"):
                 try: val = int(val)
                 except ValueError: raise HTTPError(400, f"Invalid number for {prop}.")
             changes[key] = val
