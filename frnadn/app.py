@@ -457,7 +457,7 @@ async def save_branding(request: Request):
     if encoded:
         try: data = base64.b64decode(encoded.split(",", 1)[-1], validate=True)
         except Exception: raise HTTPError(400, "Invalid logo upload.")
-        if len(data) > 2_000_000 or not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+        if len(data) > 2_000_000 or not data.startswith(b"\x89PNG\r\n\x1a\n"):
             raise HTTPError(400, "Please upload a PNG image up to 2 MB.")
         folder = DATA / "branding"; folder.mkdir(parents=True, exist_ok=True)
         tmp = folder / "logo.png.tmp"; tmp.write_bytes(data); os.replace(tmp, folder / "logo.png")
