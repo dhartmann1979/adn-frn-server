@@ -463,7 +463,8 @@ async def save_branding(request: Request):
         tmp = folder / "logo.png.tmp"; tmp.write_bytes(data); os.replace(tmp, folder / "logo.png")
     ctx.auth.audit("branding_changed", u["username"], "logo updated" if encoded else "theme changed", ip_of(request))
     return {"ok": True}
-\n@app.get("/api/admin/updates")
+
+@app.get("/api/admin/updates")
 async def updates_check(request: Request):
     need_admin(request)
     return await check_all_updates()
