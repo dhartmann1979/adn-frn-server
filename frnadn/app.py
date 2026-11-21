@@ -19,6 +19,8 @@ import contextlib
 import logging
 import os
 import re
+import shutil
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -401,6 +403,111 @@ async def server_properties(request: Request):
     return {"text": ctx.java.properties_text(), "path": str(FRN_HOME / "server.properties")}
 
 
+
+# ---------------------------------------------------------------- updates and legacy configuration import
+GITHUB_REPO = os.environ.get("FRNADN_GITHUB_REPO", "dhartmann1979/adn-frn-server")
+_update_state: Dict[str, Any] = {"checked": None, "github": None, "java": None}
+
+async def check_all_updates(force: bool = False) -> Dict[str, Any]:
+    import json, urllib.request
+    def github_check():
+        req = urllib.request.Request(f"https://api.github.com/repos/{GITHUB_REPO}/commits/main",
+            headers={"User-Agent": "frn-adn-update", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=12) as r: remote = json.loads(r.read(500000))
+        try:
+            local = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5)
+            local_sha = local.stdout.strip() if local.returncode == 0 else ""
+        except Exception: local_sha = ""
+        sha = remote.get("sha", "")
+        return {"ok": True, "repo": GITHUB_REPO, "local": local_sha, "latest": sha,
+                "update": bool(local_sha and sha and local_sha != sha),
+                "message": (remote.get("commit", {}).get("message", "").split("\n")[0])}
+    try: gh = await asyncio.to_thread(github_check)
+    except Exception as e: gh = {"ok": False, "error": str(e)[:200], "update": False}
+    java = await ctx.java.check_update()
+    _update_state.update(checked=time.time(), github=gh, java=java)
+    return dict(_update_state)
+
+def parse_java_properties(raw: str) -> Dict[str, str]:
+    values: Dict[str, str] = {}
+    logical = ""
+    for line in raw.splitlines():
+        line = line.rstrip()
+        if not logical and (not line.strip() or line.lstrip().startswith(("#", "!"))): continue
+        logical += line.lstrip() if logical else line
+        if logical.endswith("\\\\"):
+            logical = logical[:-1]; continue
+        m = re.match(r"^([^:=\\s]+)\\s*(?:[:=]|\\s)\\s*(.*)$", logical)
+        if m: values[m.group(1)] = m.group(2).strip()
+        logical = ""
+    return values
+
+@app.get("/api/admin/updates")
+async def updates_check(request: Request):
+    need_admin(request)
+    return await check_all_updates()
+
+@app.post("/api/admin/updates/check")
+async def updates_force_check(request: Request):
+    need_admin(request)
+    return await check_all_updates(True)
+
+@app.post("/api/admin/updates/upgrade")
+async def updates_upgrade(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    target = str(b.get("target", "java"))
+    if target == "java":
+        result = await ctx.java.install_update()
+    elif target == "github":
+        if not _update_state.get("github", {}).get("update"):
+            raise HTTPError(400, "No checked GitHub update is available.")
+        def fast_forward():
+            dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"], capture_output=True, text=True, timeout=8)
+            if dirty.returncode or dirty.stdout.strip(): raise RuntimeError("Working tree is not clean; refusing to overwrite local changes.")
+            fetch = subprocess.run(["git", "-C", str(ROOT), "fetch", "--no-tags", "origin", "main"], capture_output=True, text=True, timeout=120)
+            if fetch.returncode: raise RuntimeError(fetch.stderr[-500:])
+            pull = subprocess.run(["git", "-C", str(ROOT), "merge", "--ff-only", "FETCH_HEAD"], capture_output=True, text=True, timeout=60)
+            if pull.returncode: raise RuntimeError(pull.stderr[-500:])
+            return {"ok": True, "output": pull.stdout[-1000:]}
+        result = await asyncio.to_thread(fast_forward)
+        result["restart_required"] = True
+    else: raise HTTPError(400, "Unknown update target.")
+    ctx.auth.audit("upgrade_" + target, u["username"], str(result), ip_of(request))
+    return result
+
+@app.post("/api/admin/server/properties/import")
+async def import_server_properties(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    raw = str(b.get("text", ""))
+    if not raw.strip() or len(raw) > 1_000_000: raise HTTPError(400, "Please upload a valid server.properties file (max. 1 MB).")
+    parsed = parse_java_properties(raw)
+    mapping = {"server_addr":"frn.address", "server_port":"frn.port", "sysman_server_addr":"sysman.host",
+               "sysman_auth_emailaddr":"sysman.email", "sysman_auth_password":"sysman.password",
+               "server_owner":"frn.owner_email", "website":"frn.website", "client_sotimeout":"frn.client_timeout",
+               "client_txtimeout":"frn.tx_timeout", "default_net":"frn.default_room"}
+    changes = {}
+    known = {f.key:f for f in ctx.settings.describe()["sections"] for f in f.get("fields", [])}
+    for prop, key in mapping.items():
+        if prop in parsed and key in known:
+            val: Any = parsed[prop]
+            if known[key].get("kind") == "int":
+                try: val = int(val)
+                except ValueError: raise HTTPError(400, f"Invalid number for {prop}.")
+            changes[key] = val
+    if not changes: raise HTTPError(400, "No supported FRN settings were found in this file.")
+    backup = FRN_HOME / ("server.properties.import-backup-" + time.strftime("%Y%m%d-%H%M%S"))
+    FRN_HOME.mkdir(parents=True, exist_ok=True)
+    current = FRN_HOME / "server.properties"
+    if current.exists(): shutil.copy2(current, backup)
+    ctx.settings.update(changes, u["username"])
+    ctx.java.write_config()
+    ctx.restart_needed = True
+    ctx.auth.audit("properties_import", u["username"], f"{len(changes)} settings; backup={backup if current.exists() else 'none'}", ip_of(request))
+    return {"ok": True, "imported": list(changes), "ignored": [k for k in parsed if k not in mapping], "backup": str(backup) if backup.exists() else None,
+            "restart_needed": True}
+
 # ---------------------------------------------------------------- admin: rooms
 def _room_values(b: Dict[str, Any]) -> Dict[str, Any]:
     v: Dict[str, Any] = {}
@@ -698,6 +805,15 @@ async def visits(request: Request, limit: int = 200):
 
 
 # ---------------------------------------------------------------- background
+async def hourly_update_check() -> None:
+    # Run at each full local hour; never install automatically.
+    while True:
+        now = time.time()
+        wait = 3600 - (now % 3600)
+        await asyncio.sleep(wait)
+        try: await check_all_updates(True)
+        except Exception: log.exception("hourly update check")
+
 async def background() -> None:
     n = 0
     while True:
@@ -736,6 +852,7 @@ async def _startup() -> None:
         await ctx.java.control("start")
     await ctx.server.start()
     ctx.tasks.append(asyncio.ensure_future(background()))
+    ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
 
 
 async def _shutdown() -> None:
