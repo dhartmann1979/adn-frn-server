@@ -79,7 +79,7 @@ Im Bereich **Admin → System** prüft das Dashboard automatisch zu jeder vollen
 
 - **Java-Upgrade:** lädt die vom FRN-Server bereitgestellte neue Version und ersetzt die installierte JAR nach dem vorgesehenen Updateablauf.
 - **Dashboard-Upgrade:** übernimmt ausschließlich einen Fast-Forward von GitHub. Bei lokalen Änderungen im Programmverzeichnis wird das Update aus Sicherheitsgründen abgebrochen. Nach erfolgreichem Update startet der Dashboard-Dienst neu.
-- **Import server.properties:** wählt eine vorhandene Konfigurationsdatei aus. Erkannte Serverparameter und Raumdefinitionen werden in die SQLite-Konfiguration übernommen. Vor dem Schreiben wird die bisherige `server.properties` mit Zeitstempel gesichert. Vorhandene ACL- und Passwort-XML-Dateien werden durch den Import nicht ersetzt.
+- **Import server.properties:** optionale Übernahme einer einzelnen Konfigurationsdatei aus einer früheren FRN-Installation nach der frischen Installation. Es werden nur erkannte Properties und Raumdefinitionen in die neue SQLite-Konfiguration übernommen. Es werden weder die alte Installation noch Datenbank, JAR, ACL-Dateien oder Passwort-XML übernommen. Vor dem Schreiben wird die bisherige `server.properties` mit Zeitstempel gesichert. Vorhandene ACL- und Passwort-XML-Dateien werden durch den Import nicht ersetzt.
 - **Appearance:** setzt die Akzentfarbe und lädt ein eigenes PNG-Logo (maximal 2 MB) hoch. Das Logo wird im Datenverzeichnis gespeichert und bleibt bei Programmupdates erhalten.
 
 **Wichtig:** Vor einem Import sollte zusätzlich ein vollständiges Backup des Datenverzeichnisses erstellt werden. Nicht unterstützte oder unbekannte Properties werden nicht in die Einstellungen übernommen. Nach dem Import ist ein Neustart des Java-FRN-Servers erforderlich.
