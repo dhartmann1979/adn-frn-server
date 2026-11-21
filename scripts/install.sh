@@ -10,11 +10,13 @@
 #
 #    sudo ./scripts/install.sh
 #
-#  Ein zweiter Aufruf aktualisiert die Installation; vorhandene Werte sind
-#  dann die Vorgaben, Daten und Benutzer bleiben erhalten.
+#  Das Skript ist für eine FRISCHE Installation gedacht.
+#  Vorhandene Installationen/Daten werden nicht überschrieben. Für Updates
+#  ist ausschließlich scripts/update.sh vorgesehen. Alte server.properties
+#  können nach der Neuinstallation freiwillig im Admin-Portal importiert werden.
 #
 #  Umgebungsvariablen (optional):
-#    FRNADN_DIR=/opt/frnadn       Programmverzeichnis des Dashboards
+#    FRNADN_DIR=/opt/adn-frn-server Programmverzeichnis des Dashboards
 #    FRNADN_PORT=80               Web-Port des Dashboards
 #    FRN_DIR=/opt/frn-server      Verzeichnis für FRN_Server.jar
 #    FRN_ZIP=/pfad/FRN_Server.zip vorhandenes Paket statt Download
@@ -22,7 +24,7 @@
 # =============================================================================
 set -euo pipefail
 
-DIR="${FRNADN_DIR:-/opt/frnadn}"
+DIR="${FRNADN_DIR:-/opt/adn-frn-server}"
 PORT="${FRNADN_PORT:-80}"
 FRN_DIR="${FRN_DIR:-/opt/frn-server}"
 DATA=/var/lib/frnadn
@@ -64,6 +66,13 @@ interactive() { [ "$YES" != 1 ] && [ -t 0 ]; }
 ver_of() { sed -n '1s/^\xEF\xBB\xBF//; 1s/.*Release V *\([0-9.]*\) *(Build *\([0-9.]*\)).*/\1 (\2)/p'; }
 
 [ "$(id -u)" -eq 0 ] || fail "Bitte mit sudo starten: sudo $0"
+# This installer is intentionally for a clean deployment. Never adopt or
+# overwrite an earlier dashboard/FRN installation; import only a properties
+# file later through the authenticated admin UI.
+if [ -e "$DATA/frnadn.db" ] || [ -e "$FRN_HOME/server.properties" ] || [ -e "$FRN_DIR/FRN_Server.jar" ] \
+   || systemctl is-active --quiet frnadn.service 2>/dev/null || systemctl is-active --quiet frn-server.service 2>/dev/null; then
+    fail "Vorhandene FRN-Installation erkannt. Dieses Installationsskript richtet nur ein frisches System ein und überschreibt keine vorhandenen Daten. Für eine Neuinstallation bitte neue, leere Installationspfade verwenden. Eine alte server.properties kann nach der frischen Installation im Admin-Portal importiert werden."
+fi
 exec > >(tee -a "$LOG") 2>&1
 
 echo -e "
