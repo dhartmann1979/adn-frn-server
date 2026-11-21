@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b1224">
     <title>Auf der NachtSchicht</title>
-    <link rel="icon" href="/static/adn-icon.svg?v={{V}}">
+    <link rel="icon" href="/branding/logo?v={{V}}">
     <link rel="apple-touch-icon" href="/static/adn-icon-192.png?v={{V}}">
     <link rel="stylesheet" href="/static/app.css?v={{V}}">
 </head>
@@ -24,7 +24,7 @@
             <span class="chip" id="chipServer">Server</span>
             <span class="chip" id="chipOnline">Online</span>
             <span class="chip" id="chipAir">Quiet</span>
-            <span id="userArea"></span>
+            <div class="links-menu" id="linksMenu"><button class="btn" onclick="toggleLinks(event)">🔗 Links ▾</button><div class="links-pop"><a href="https://freeradionetwork.de/" target="_blank" rel="noopener">🌐 FreeRadioNetwork</a><a href="https://github.com/dhartmann1979/adn-frn-server" target="_blank" rel="noopener">⌘ ADN FRN Server</a><a href="https://github.com/dhartmann1979/HBlink4-FreeRadioID" target="_blank" rel="noopener">⌘ HBlink4-FreeRadioID</a><a href="https://github.com/dhartmann1979/frn_adn" target="_blank" rel="noopener">⌘ frn_adn source</a></div></div><span id="userArea"></span>
         </div>
     </header>
 
