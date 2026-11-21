@@ -7,7 +7,7 @@ Installiert werden zwei Dienste:
 | Dienst | Was | Wo |
 |---|---|---|
 | `frn-server` | der **Java-FRN-Server von freeradionetwork.de** (FRN_Server.jar) | Programm `/opt/frn-server`, Konfiguration `/var/lib/frnadn/frn` |
-| `frnadn` | Dashboard und Admin-Portal | Programm `/opt/frnadn`, Datenbank `/var/lib/frnadn/frnadn.db` |
+| `frnadn` | Dashboard und Admin-Portal | Programm `/opt/adn-frn-server`, Datenbank `/var/lib/frnadn/frnadn.db` |
 
 Alle Einstellungen liegen in der SQLite-Datenbank. Daraus schreibt frn_adn nur die Dateien, die der Java-Server braucht.
 
@@ -40,7 +40,7 @@ Jede Frage hat eine Vorgabe in `[Klammern]`, Enter übernimmt sie.
 | **1 System prüfen** | Betriebssystem, Architektur, systemd, apt |
 | **2 Pakete** | Python, venv, curl, unzip und **Java** |
 | **3 FRN-Server** | lädt `FRN_Server.zip` von **freeradionetwork.de**, entpackt `FRN_Server.jar` nach `/opt/frn-server`. Ist er schon da, wird die Version mit freeradionetwork.de verglichen und ein Update angeboten |
-| **4 Dashboard** | kopiert frn_adn nach `/opt/frnadn`, legt die Python-Umgebung, den Dienstbenutzer `frnadn` und den Befehl `frnadn` an |
+| **4 Dashboard** | kopiert das Dashboard nach `/opt/adn-frn-server`, legt die Python-Umgebung, den Dienstbenutzer `frnadn` und den Befehl `frnadn` an |
 | **5 Superadmin** | Benutzername und Passwort (mind. 10 Zeichen, zweimal) – gespeichert als scrypt-Hash |
 | **6 FRN-Server einrichten** | Betriebsart, Serveradresse, Port, Besitzer, Räume, Titel |
 | **7 Dienste** | richtet `frn-server.service` und `frnadn.service` ein, startet beide, öffnet die Ports in `ufw` |
@@ -82,7 +82,7 @@ sudo frnadn set-superadmin admin              # Superadmin anlegen
 
 Danach im Admin-Portal unter **Settings** Serveradresse und SystemManager-Konto eintragen und den FRN-Server neu starten.
 
-Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/frnadn`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
+Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
 
 ## Router und Firewall
 
@@ -113,9 +113,9 @@ frn.example.org {
 | Was | Wie |
 |---|---|
 | Java-FRN-Server | Admin-Portal → **Settings → Check for update** → *Install* (lädt von freeradionetwork.de, startet neu) – oder `install.sh` erneut |
-| frn_adn | `cd /opt/frnadn && sudo ./scripts/update.sh` – der FRN-Server läuft dabei weiter |
+| frn_adn | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – der FRN-Server läuft dabei weiter |
 
-`install.sh` kann jederzeit erneut laufen: vorhandene Werte sind dann die Vorgaben, die Fragen lassen sich überspringen.
+`install.sh` ist ausschließlich für eine frische Installation vorgesehen. Es bricht ab, wenn bereits eine FRN-Datenbank, eine vorhandene `server.properties` oder ein laufender FRN-Dienst erkannt wird. Für Updates ist `scripts/update.sh` vorgesehen; `install.sh` nicht erneut auf einem installierten System ausführen.
 
 ## Deinstallieren
 
