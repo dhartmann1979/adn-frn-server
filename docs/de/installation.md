@@ -38,7 +38,7 @@ Jede Frage hat eine Vorgabe in `[Klammern]`, Enter übernimmt sie.
 | Schritt | Was passiert |
 |---|---|
 | **1 System prüfen** | Betriebssystem, Architektur, systemd, apt |
-| **2 Pakete** | Python, venv, curl, unzip und **Java** |
+| **2 Pakete** | Python, venv, curl, unzip, **Certbot** (für Let's Encrypt) und **Java** |
 | **3 FRN-Server** | lädt `FRN_Server.zip` von **freeradionetwork.de**, entpackt `FRN_Server.jar` nach `/opt/frn-server`. Der Installer lädt das Java-FRN-Paket für die neue Installation herunter. Eine bereits vorhandene JAR wird nicht übernommen; bei erkannter Altinstallation bricht der Installer vorher ab |
 | **4 Dashboard** | kopiert das Dashboard nach `/opt/adn-frn-server`, legt die Python-Umgebung, den Dienstbenutzer `frnadn` und den Befehl `frnadn` an |
 | **5 Superadmin** | Benutzername und Passwort (mind. 10 Zeichen, zweimal) – gespeichert als scrypt-Hash |
