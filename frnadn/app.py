@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
@@ -442,7 +442,28 @@ def parse_java_properties(raw: str) -> Dict[str, str]:
         logical = ""
     return values
 
-@app.get("/api/admin/updates")
+
+@app.get("/branding/logo")
+async def branding_logo():
+    p = DATA / "branding" / "logo.png"
+    return FileResponse(p, media_type="image/png") if p.exists() else FileResponse(STATIC / "adn-icon.svg", media_type="image/svg+xml")
+
+@app.post("/api/admin/branding")
+async def save_branding(request: Request):
+    u = need_admin(request)
+    import base64
+    b = await body(request)
+    encoded = str(b.get("logo", ""))
+    if encoded:
+        try: data = base64.b64decode(encoded.split(",", 1)[-1], validate=True)
+        except Exception: raise HTTPError(400, "Invalid logo upload.")
+        if len(data) > 2_000_000 or not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+            raise HTTPError(400, "Please upload a PNG image up to 2 MB.")
+        folder = DATA / "branding"; folder.mkdir(parents=True, exist_ok=True)
+        tmp = folder / "logo.png.tmp"; tmp.write_bytes(data); os.replace(tmp, folder / "logo.png")
+    ctx.auth.audit("branding_changed", u["username"], "logo updated" if encoded else "theme changed", ip_of(request))
+    return {"ok": True}
+\n@app.get("/api/admin/updates")
 async def updates_check(request: Request):
     need_admin(request)
     return await check_all_updates()
