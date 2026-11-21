@@ -530,7 +530,7 @@ async def import_server_properties(request: Request):
                 "_acl_gw":"acl_gw", "_acl_info":"acl_info", "_bl_regexp":"bl_regexp", "_bl_info":"bl_info",
                 "_tgbot_params":"tg_params"}
     for key, room_name in parsed.items():
-        match = re.fullmatch(r"net(\\d{2})", key)
+        match = re.fullmatch(r"net(\d{2})", key)
         if not match or not room_name.strip(): continue
         idx = int(match.group(1))
         room = ctx.store.room_by_name(room_name.strip())
