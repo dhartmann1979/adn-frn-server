@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = id => document.getElementById(id);
-const S = { info: null, me: null, live: null, ws: null, wsOk: false, services: {}, lhRoom: 'all', tab: 'live',
+const S = { info: null, me: null, live: null, ws: null, wsOk: false, services: {}, lhRoom: 'all', liveRoom: '', tab: 'live',
             stats: { range: 'today', metric: 'duration', data: null, slots: {} },
             admin: { tab: 'server', frn: null, room: null, logs: [] }, chat: { room: 'all', entries: [] } };
 
@@ -272,19 +272,31 @@ function renderRooms() {
     const rs = rooms();
     $('roomCount').textContent = rs.length;
     if (!rs.length) { $('rooms').innerHTML = '<div class="card empty">No open rooms.</div>'; return; }
-    $('rooms').innerHTML = rs.map(r => {
+    if (!rs.some(r => r.name === S.liveRoom)) S.liveRoom = rs[0].name;
+    const selected = rs.find(r => r.name === S.liveRoom) || rs[0];
+    const tabs = rs.map(r => {
         const n = r.clients.filter(c => !c.parrot).length;
-        const rows = r.clients.map(c => `<div class="st-row ${c.talking ? 'talk' : ''} ${c.parrot ? '' : 'station-link'}" ${c.parrot ? '' : `onclick="openStation('${esc(c.callsign)}')"`}>
-            ${c.parrot ? '<span class="avatar sm" style="background:linear-gradient(135deg,#30d158,#0a84ff)">🦜</span>' : avatar(c.callsign, 'sm')}<div class="c"><b>${esc(c.callsign)}</b>${c.talking ? '<span class="mic"></span>' : ''}${c.muted ? ' <span title="muted">🔇</span>' : ''}${c.access === 'OWNER' || c.access === 'NETOWNER' ? ' <span title="Owner">👑</span>' : c.access === 'ADMIN' ? ' <span title="Admin">🛡️</span>' : ''}
-            <small>${esc(c.name)}${c.name && (c.city || c.country) ? ' · ' : ''}${flag(c.country)} ${esc(place(c))}</small></div>
-            <div class="r"><span class="band" title="${esc(c.band)}">${clIcon(c)} <span class="band-txt">${esc((c.band || '').length > 22 ? c.band.slice(0, 21) + '…' : c.band || '')}</span></span>${c.since ? `<div data-since="${c.since}">${since(c.since)}</div>` : ''}</div>
-</div>`).join('');
-        return `<div class="room ${r.talking ? 'live' : ''}"><div class="room-head"><span class="dot ${S.live.server && S.live.server.running ? 'on' : 'off'}"></span><h3>${r.hidden ? '🔒 ' : ''}${esc(r.name)}</h3>
-            ${r.parrot ? '<span class="pill" title="Parrot echo test is on">🦜</span>' : ''}
-            <span class="room-count ${n ? '' : 'zero'}">${n}</span></div>
-            ${rows || '<div class="none">Nobody in this room</div>'}</div>`;
+        return `<button type="button" class="room-tab ${r.name === selected.name ? 'active' : ''} ${r.talking ? 'is-live' : ''}" data-room="${esc(r.name)}" aria-selected="${r.name === selected.name ? 'true' : 'false'}">
+            <span class="room-tab-dot"></span><span class="room-tab-name">${r.hidden ? '🔒 ' : ''}${esc(r.name)}</span><span class="room-count ${n ? '' : 'zero'}">${n}</span>${r.talking ? '<span class="pill air">ON AIR</span>' : ''}
+        </button>`;
     }).join('');
+    const n = selected.clients.filter(c => !c.parrot).length;
+    const rows = selected.clients.map(c => `<div class="st-row ${c.talking ? 'talk' : ''} ${c.parrot ? '' : 'station-link'}" ${c.parrot ? '' : `onclick="openStation('${esc(c.callsign)}')"`}>
+        ${c.parrot ? '<span class="avatar sm" style="background:linear-gradient(135deg,#30d158,#0a84ff)">🦜</span>' : avatar(c.callsign, 'sm')}<div class="c"><b>${esc(c.callsign)}</b>${c.talking ? '<span class="mic"></span>' : ''}${c.muted ? ' <span title="muted">🔇</span>' : ''}${c.access === 'OWNER' || c.access === 'NETOWNER' ? ' <span title="Owner">👑</span>' : c.access === 'ADMIN' ? ' <span title="Admin">🛡️</span>' : ''}
+        <small>${esc(c.name)}${c.name && (c.city || c.country) ? ' · ' : ''}${flag(c.country)} ${esc(place(c))}</small></div>
+        <div class="r"><span class="band" title="${esc(c.band)}">${clIcon(c)} <span class="band-txt">${esc((c.band || '').length > 22 ? c.band.slice(0, 21) + '…' : c.band || '')}</span></span>${c.since ? `<div data-since="${c.since}">${since(c.since)}</div>` : ''}</div>
+    </div>`).join('');
+    $('rooms').innerHTML = `<div class="room-tabs" role="tablist" aria-label="FRN rooms">${tabs}</div>
+        <div class="room ${selected.talking ? 'live' : ''}" role="tabpanel"><div class="room-head"><span class="dot ${S.live.server && S.live.server.running ? 'on' : 'off'}"></span><h3>${selected.hidden ? '🔒 ' : ''}${esc(selected.name)}</h3>
+        ${selected.parrot ? '<span class="pill" title="Parrot echo test is on">🦜</span>' : ''}<span class="room-count ${n ? '' : 'zero'}">${n}</span></div>
+        ${rows || '<div class="none">Nobody in this room</div>'}</div>`;
 }
+$('rooms').addEventListener('click', e => {
+    const tab = e.target.closest('.room-tab');
+    if (!tab || !tab.dataset.room || tab.dataset.room === S.liveRoom) return;
+    S.liveRoom = tab.dataset.room;
+    renderRooms();
+});
 function renderLHFilter() {
     const names = rooms().map(r => r.name);
     if (S.lhRoom !== 'all' && !names.includes(S.lhRoom)) S.lhRoom = 'all';
