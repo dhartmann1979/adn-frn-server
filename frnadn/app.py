@@ -526,7 +526,7 @@ async def import_server_properties(request: Request):
                 try: val = int(val)
                 except ValueError: raise HTTPError(400, f"Invalid number for {prop}.")
             changes[key] = val
-    has_room_definitions = any(re.fullmatch(r"net\\d{2}", key) and value.strip() for key, value in parsed.items())
+    has_room_definitions = any(re.fullmatch(r"net\d{2}", key) and value.strip() for key, value in parsed.items())
     if not changes and not has_room_definitions:
         raise HTTPError(400, "No supported FRN settings or room definitions were found in this file.")
     backup = FRN_HOME / ("server.properties.import-backup-" + time.strftime("%Y%m%d-%H%M%S"))
