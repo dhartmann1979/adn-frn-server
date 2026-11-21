@@ -27,6 +27,7 @@ Alle Einstellungen liegen in der SQLite-Datenbank. Daraus schreibt frn_adn nur d
 ```bash
 git clone https://github.com/dhartmann1979/adn-frn-server
 cd adn-frn-server
+chmod +x scripts/install.sh scripts/update.sh   # falls beim Kopieren Rechte verloren gingen
 sudo ./scripts/install.sh
 ```
 
