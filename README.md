@@ -1,6 +1,6 @@
 # ADN FRN Server
 
-A browser dashboard and administration portal for the Java FreeRadioNetwork server.
+A fresh-install dashboard and administration portal for the Java FreeRadioNetwork server.
 
 ## Features
 
@@ -9,10 +9,10 @@ A browser dashboard and administration portal for the Java FreeRadioNetwork serv
 - FRN settings stored in SQLite and rendered to `server.properties`
 - Hourly update checks at each full hour for this GitHub repository and the upstream Java FRN server
 - Separate **Upgrade Dashboard** and **Upgrade Java** actions; updates are never installed automatically
-- Import of existing `server.properties` with a timestamped backup; recognized server options and room definitions are imported while existing ACL XML files are preserved
+- Optional import of a single legacy `server.properties` file after installation; no old database, JAR, ACL files or running installation is migrated
 - HBlink4-inspired links popover, accent color selection and PNG logo upload
 
-## Install
+## Fresh installation
 
 On Debian/Ubuntu/Raspberry Pi OS:
 
@@ -23,19 +23,34 @@ chmod +x scripts/install.sh scripts/update.sh
 sudo ./scripts/install.sh
 ```
 
-The existing installer provisions Java, the FRN server and the dashboard. Review the installation script and configure the service paths before deploying to a production host.
+The installer defaults to `/opt/adn-frn-server`. It is intentionally for a clean installation and stops if it detects an existing FRN database, FRN `server.properties`, or running FRN service. It does not overwrite an older installation.
 
-## Update behavior
+## Import an older server.properties (optional)
 
-The dashboard checks both sources at the next full hour and then hourly. Administrators can also check manually. GitHub updates are fast-forward-only and are refused if the working tree has local changes. The Java update uses the upstream FRN release archive and restarts the FRN service. Dashboard code updates require restarting the dashboard service after installation.
+After the fresh installation, sign in to the Admin panel and use **System → Import server.properties**. Select only the old `server.properties` file. Supported server settings and room definitions are imported into the new dashboard database. No old application files, database, JAR, ACL XML or FRN password XML are copied. Review the import result and restart the Java FRN server to apply it.
 
-## Importing a legacy configuration
+## Updates
 
-Open **Admin → System → Import server.properties**, choose the existing file and confirm. Supported server and room properties are imported into SQLite. The current generated `server.properties` is backed up before it is regenerated. ACL XML files and FRN password XML are not overwritten by the import.
+The dashboard checks both sources at the next full hour and then hourly. Administrators can also check manually. GitHub updates are fast-forward-only and are refused if the working tree has local changes. The Java update uses the upstream FRN release archive. Updates are not installed automatically.
+
+For a dashboard update:
+
+```bash
+cd /opt/adn-frn-server
+sudo ./scripts/update.sh
+```
 
 ## Branding
 
 The **Appearance** panel in Admin → System accepts a PNG logo (up to 2 MB) and an accent color. The logo is stored in the dashboard data directory, not in the source checkout.
+
+## Documentation
+
+- [German installation guide](docs/de/installation.md)
+- [Admin panel](docs/de/adminbereich.md)
+- [Operations and troubleshooting](docs/de/betrieb.md)
+- [Dashboard](docs/de/dashboard.md)
+- [Configuration reference](docs/de/konfiguration.md)
 
 ## References
 
