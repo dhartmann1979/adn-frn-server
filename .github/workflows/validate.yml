@@ -18,6 +18,8 @@ jobs:
         run: bash -n scripts/install.sh scripts/update.sh
       - name: Check Python syntax
         run: python -m compileall -q frnadn tests
+      - name: Check JavaScript syntax
+        run: node --check static/app.js
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
