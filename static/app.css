@@ -405,3 +405,24 @@ body { --accent: var(--user-accent, #5ac8fa); }
     .live-primary .stat .v { font-size:21px; }
     .live-rooms .rooms { grid-template-columns:minmax(0,1fr); max-height:none; overflow:visible; }
 }
+
+
+/* Slimmer live header: keep Quiet only in the On air panel, not in the global status row. */
+#chipAir { display:none !important; }
+header { padding:7px 12px; gap:9px; }
+.brand { gap:10px; }
+.brand img { width:46px; height:46px; border-radius:12px; }
+.brand h1 { font-size:21px; }
+.brand .sub { font-size:12px; margin-top:1px; }
+.chips { gap:6px; }
+.chip { padding:5px 10px; font-size:12px; gap:5px; }
+.links-trigger, #userArea .btn { min-height:31px; padding:5px 11px; font-size:12px; }
+.tabs { padding:4px; gap:4px; }
+.tabs button { padding:7px 12px; font-size:12px; }
+@media (max-width:600px) {
+    header { padding:7px 9px; gap:7px; }
+    .brand img { width:40px; height:40px; }
+    .brand h1 { font-size:18px; }
+    .chip { padding:4px 8px; font-size:11px; }
+    .links-trigger, #userArea .btn { min-height:29px; padding:4px 9px; font-size:11px; }
+}
