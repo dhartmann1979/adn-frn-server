@@ -851,7 +851,7 @@ async function importProperties() {
     try {
         const text = await file.text();
         const r = await api('POST', '/api/admin/server/properties/import', {text});
-        $('importInfo').textContent = 'Imported: ' + r.imported.join(', ') + (r.backup ? ' · Backup: ' + r.backup : '');
+        $('importInfo').textContent = 'Imported settings: ' + r.imported.join(', ') + ' · Rooms: ' + (r.rooms || []).join(', ') + (r.backup ? ' · Backup: ' + r.backup : '');
         toast('Configuration imported. Restart the FRN server to apply it.');
     } catch(e) { $('importInfo').textContent = e.message; toast(e.message, true); }
 }
