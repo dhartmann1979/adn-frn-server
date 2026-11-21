@@ -39,6 +39,7 @@ SECTIONS: List[Tuple[str, str, str]] = [
     ("owner", "👤 Operator", "Server owner (gets OWNER rights in every room)"),
     ("dashboard", "🖥️ Dashboard", "Title, public view and what visitors see"),
     ("data", "🗄️ Data", "How long talks and logins are kept"),
+    ("https", "🔒 HTTPS & web", "Automatic HTTPS certificates with Let’s Encrypt (requires public DNS and ports 80/443)"),
 ]
 
 FIELDS: List[Field] = [
@@ -91,6 +92,19 @@ FIELDS: List[Field] = [
           "Daily totals are kept for ever, they are small", min=7, max=3650),
     Field("data.visit_days", "data", "Keep logins (days)", "int", 180, min=7, max=3650),
     Field("data.chat_days", "data", "Keep chat messages (days)", "int", 30, min=1, max=3650),
+    # HTTPS – applied by the dashboard process on its next restart
+    Field("https.enabled", "https", "Enable HTTPS with Let's Encrypt", "bool", False,
+          "Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn."),
+    Field("https.domain", "https", "Public domain", "text", "",
+          "Example: dashboard.example.org. Do not enter http:// or a path."),
+    Field("https.email", "https", "Certificate e-mail", "text", "",
+          "Let's Encrypt expiry and important certificate notices."),
+    Field("https.staging", "https", "Use test certificates (staging)", "bool", False,
+          "For testing only; browsers do not trust staging certificates."),
+    Field("https.http_port", "https", "HTTP challenge / redirect port", "int", 80,
+          "Public TCP port used by HTTP-01 challenge and HTTP → HTTPS redirect.", min=1, max=65535),
+    Field("https.port", "https", "HTTPS port", "int", 443,
+          "Public HTTPS port. Standard is 443.", min=1, max=65535),
 ]
 BY_KEY = {f.key: f for f in FIELDS}
 
