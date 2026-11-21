@@ -278,6 +278,16 @@ footer { text-align: center; color: var(--text-faint); font-size: 12px; margin: 
 .feed .ev:first-child { border-top: 0; }
 .feed .ev .t { color: var(--text-faint); font-variant-numeric: tabular-nums; font-size: 12px; min-width: 62px; }
 .lh-top { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); margin-top: 0; }
+.live-activity { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; }
+.live-activity-wide { min-width:0; }
+.room-tabs { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 10px; padding:0 0 7px; border-bottom:1px solid var(--glass-border); }
+.room-tab { display:inline-flex; align-items:center; gap:8px; min-width:0; max-width:100%; padding:8px 11px; border-radius:12px; color:var(--text-dim); background:rgba(255,255,255,.035); border:1px solid var(--glass-border); cursor:pointer; font:inherit; font-size:12px; font-weight:700; transition:background .15s,border-color .15s,color .15s; }
+.room-tab:hover { background:rgba(255,255,255,.08); color:var(--text); }
+.room-tab.active { color:var(--text); background:rgba(90,200,250,.15); border-color:rgba(90,200,250,.48); box-shadow:inset 0 0 0 1px rgba(90,200,250,.08); }
+.room-tab-dot { width:7px; height:7px; flex:0 0 7px; border-radius:50%; background:var(--text-faint); }
+.room-tab.is-live .room-tab-dot { background:#30d158; box-shadow:0 0 9px rgba(48,209,88,.75); }
+.room-tab-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.room-tabs + .room { margin-top:0; }
 .addr { font-family: var(--mono); font-size: 12.5px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 2px 8px; }
 
 /* heatmap */
