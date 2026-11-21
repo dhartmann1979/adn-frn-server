@@ -818,6 +818,7 @@ async function loadSystem() {
             <div class="actions"><input type="file" id="propertiesFile" accept=".properties,text/plain"><button class="btn" onclick="importProperties()">Import configuration</button></div><div id="importInfo" class="dim" style="margin-top:8px"></div></div>
         <div class="tile"><h3>🎨 Appearance</h3><div class="subt">Choose the dashboard accent and upload your own PNG logo (max. 2 MB).</div>
             <div class="actions"><label>Accent <input type="color" id="brandAccent" value="#5ac8fa" onchange="applyAccent(this.value)"></label><input type="file" id="brandLogo" accept="image/png"><button class="btn" onclick="saveBranding()">Save appearance</button></div></div></div>`;
+    checkAllUpdates();
 }
 
 async function checkAllUpdates(btn) {
