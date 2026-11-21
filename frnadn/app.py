@@ -513,7 +513,8 @@ async def import_server_properties(request: Request):
     for prop, key in mapping.items():
         if prop in parsed and key in known:
             val: Any = parsed[prop]
-            if known[key].get("kind") == "bool": val = val.lower() in ("yes", "true", "1", "on")\n            elif known[key].get("kind") in ("int", "ports"):
+            if known[key].get("kind") == "bool": val = val.lower() in ("yes", "true", "1", "on")
+            elif known[key].get("kind") in ("int", "ports"):
                 try: val = int(val)
                 except ValueError: raise HTTPError(400, f"Invalid number for {prop}.")
             changes[key] = val
