@@ -611,8 +611,7 @@ def _room_values(b: Dict[str, Any]) -> Dict[str, Any]:
                     raise HTTPError(400, f"'{e}' is not an e-mail address.")
             v[k] = ",".join(items)
         else:
-            v[k] = str(x or "").replace("
-", " ").replace("\r", " ")[:2000]
+            v[k] = str(x or "").replace("\n", " ").replace("\r", " ")[:2000]
     return v
 
 
