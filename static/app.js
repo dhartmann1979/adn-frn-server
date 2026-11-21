@@ -800,9 +800,48 @@ async function loadSystem() {
             <div class="k">Disk</div><div class="v">${fmtBytes(i.disk_total - i.disk_free)} of ${fmtBytes(i.disk_total)}</div>
             <div class="k">Uptime</div><div class="v">${fmtDur(i.uptime, true)}</div></div>
             ${sa ? '<div class="actions"><button class="btn" onclick="power(\'reboot\')">🔄 Reboot</button><button class="btn danger" onclick="power(\'poweroff\')">⏻ Shut down</button></div>' : ''}</div>
-        <div class="tile"><h3>⬆️ Updates</h3><div class="subt">The Java FRN server comes from freeradionetwork.de; frn_adn itself is updated with <span class="mono">sudo ./scripts/update.sh</span>.</div>
-            <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkUpdate(this)">⬆️ Check FRN server</button><span class="dim" id="updInfo" style="font-size:12.5px"></span></div></div></div>`;
+        <div class="tile"><h3>⬆️ Software updates</h3><div class="subt">Automatic check every full hour. Updates are only installed after an administrator action.</div>
+            <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkAllUpdates(this)">↻ Check now</button><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button><button class="btn primary" id="upgradeGit" disabled onclick="upgradeNow('github', this)">Upgrade Dashboard now</button></div>
+            <div class="dim" id="updInfo" style="font-size:12.5px;margin-top:8px">Not checked yet.</div></div>
+        <div class="tile"><h3>📥 Import server.properties</h3><div class="subt">Import supported server settings from an existing FRN installation. A backup is made before replacing the generated configuration. Existing ACL files are left untouched.</div>
+            <div class="actions"><input type="file" id="propertiesFile" accept=".properties,text/plain"><button class="btn" onclick="importProperties()">Import configuration</button></div><div id="importInfo" class="dim" style="margin-top:8px"></div></div></div>`;
 }
+
+async function checkAllUpdates(btn) {
+    if (btn) btn.disabled = true;
+    try {
+        const r = await api('POST', '/api/admin/updates/check', {});
+        const gh = r.github || {}, java = r.java || {};
+        $('updInfo').innerHTML = `GitHub: ${gh.ok ? (gh.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(gh.error || 'unknown')} · Java FRN: ${java.ok ? (java.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(java.error || 'unknown')}<br>Last check: ${r.checked ? new Date(r.checked * 1000).toLocaleString('de-DE') : '–'}`;
+        $('upgradeJava').disabled = !java.update;
+        $('upgradeGit').disabled = !gh.update;
+    } catch(e) { $('updInfo').textContent = e.message; }
+    finally { if (btn) btn.disabled = false; }
+}
+async function upgradeNow(target, btn) {
+    const title = target === 'java' ? 'Upgrade Java FRN server?' : 'Upgrade dashboard from GitHub?';
+    const body = target === 'java' ? 'The current FRN_Server.jar will be replaced and the Java server restarted.' : 'The dashboard checkout will be fast-forwarded. Local changes prevent the upgrade; restart the dashboard afterwards.';
+    if (!await confirmBox({title, body}, 'Upgrade')) return;
+    btn.disabled = true;
+    try {
+        await api('POST', '/api/admin/updates/upgrade', {target});
+        toast('Upgrade completed.');
+        if (target === 'github') toast('Please restart the dashboard service.');
+        await checkAllUpdates();
+    } catch(e) { toast(e.message, true); btn.disabled = false; }
+}
+async function importProperties() {
+    const file = $('propertiesFile')?.files?.[0];
+    if (!file) { toast('Select a server.properties file first.', true); return; }
+    if (!await confirmBox({title:'Import server.properties?', body:'Supported settings will be imported into the dashboard database. The current server.properties is backed up first. Room-specific ACLs and other XML files are not modified.'}, 'Import')) return;
+    try {
+        const text = await file.text();
+        const r = await api('POST', '/api/admin/server/properties/import', {text});
+        $('importInfo').textContent = 'Imported: ' + r.imported.join(', ') + (r.backup ? ' · Backup: ' + r.backup : '');
+        toast('Configuration imported. Restart the FRN server to apply it.');
+    } catch(e) { $('importInfo').textContent = e.message; toast(e.message, true); }
+}
+
 async function restartApp() {
     if (!await confirmBox({ title: 'Restart the dashboard?', body: 'Only frn_adn starts again (a few seconds); the FRN server keeps running.' }, 'Restart')) return;
     try { await api('POST', '/api/admin/restart', {}); toast('Restarting …'); setTimeout(() => location.reload(), 6000); } catch (e) { toast(e.message, true); }
