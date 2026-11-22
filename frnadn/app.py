@@ -473,7 +473,9 @@ async def admin_save_links(request: Request):
     except ValueError as e:
         raise HTTPError(400, str(e))
     linkstore.write(LINKS_FILE, cfg)
-    await asyncio.to_thread(siteicons.refresh_many, ctx.db, [x["url"] for x in cfg["items"]], bool(b.get("refresh_icons")))
+    await asyncio.to_thread(siteicons.refresh_many, ctx.db,
+                            [x["url"] for x in cfg["items"] if x.get("site_icon", True)],
+                            bool(b.get("refresh_icons")))
     ctx.auth.audit("links_changed", u["username"], f"{len(cfg['items'])} dashboard links saved ({cfg['style']})", ip_of(request))
     return {"ok": True, **links_payload(cfg)}
 
@@ -1058,7 +1060,7 @@ async def _startup() -> None:
         log.warning("ACL import: %s", error)
     configured_links = linkstore.read(LINKS_FILE)
     ctx.tasks.append(asyncio.create_task(asyncio.to_thread(
-        siteicons.refresh_many, ctx.db, [x["url"] for x in configured_links["items"]])))
+        siteicons.refresh_many, ctx.db, [x["url"] for x in configured_links["items"] if x.get("site_icon", True)])))
     ctx.server.reload_rooms()
     try:
         ctx.java.write_config()

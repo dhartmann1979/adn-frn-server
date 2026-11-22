@@ -31,7 +31,7 @@
     function bindSiteIcons(root) {
         root.querySelectorAll('.site-icon-img').forEach(img => img.addEventListener('error', () => {
             const retries = Number(img.dataset.retry || 0);
-            if (retries >= 2) { img.remove(); return; }
+            if (retries >= 4) { img.remove(); return; }
             img.dataset.retry = String(retries + 1);
             setTimeout(() => { if (img.isConnected) img.src = img.src.split('?')[0] + '?retry=' + img.dataset.retry; }, 3500);
         }));

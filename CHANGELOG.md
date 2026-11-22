@@ -2,6 +2,11 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.2.2 – 2026-11-22
+
+### Behoben
+- Link-Site-Icons werden zusätzlich anhand der `rel=icon`-Angaben der Zielseite gefunden (auch bei nicht standardmäßigen Icon-Pfaden) und in SQLite gecacht. Alte negative Cache-Einträge werden einmalig erneut geprüft.
+
 ## 2.2.1 – 2026-11-22
 
 ### Behoben

@@ -2,20 +2,23 @@
 from __future__ import annotations
 
 import hashlib
+from html.parser import HTMLParser
 import ipaddress
+import re
 import socket
 import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Iterable, Optional, Tuple
-from urllib.parse import urlsplit
+from urllib.parse import urljoin, urlsplit
 
 from .db import DB
 
 MAX_BYTES = 256 * 1024
 CACHE_SECONDS = 30 * 86400
 MISS_CACHE_SECONDS = 3600
+DISCOVERY_CACHE_VERSION = "discovery-v2:"
 TIMEOUT = 3.5
 
 
@@ -100,7 +103,40 @@ def _image_type(data: bytes) -> str:
         return "image/jpeg"
     if len(data) >= 12 and data[:4] == b"RIFF" and data[8:12] == b"WEBP":
         return "image/webp"
+    if _safe_svg(data):
+        return "image/svg+xml"
     return ""
+
+
+def _safe_svg(data: bytes) -> bool:
+    """Accept self-contained SVG icons only; reject active or externally loaded content."""
+    if len(data) > MAX_BYTES:
+        return False
+    try:
+        text = data.decode("utf-8-sig").strip()
+    except UnicodeDecodeError:
+        return False
+    if not re.search(r"<svg(?:\s|>)", text, re.I) or re.search(
+        r"<!DOCTYPE|<!ENTITY|<\s*script\b|<\s*foreignObject\b|\bon[a-z]+\s*=|url\s*\(|@import|xml-stylesheet|(?:href|src)\s*=\s*['\"](?!#)",
+        text, re.I,
+    ):
+        return False
+    return True
+
+
+class _IconLinks(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.hrefs = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "link":
+            return
+        fields = {key.lower(): value or "" for key, value in attrs}
+        rel = set(fields.get("rel", "").lower().split())
+        href = fields.get("href", "").strip()
+        if href and rel.intersection({"icon", "shortcut", "apple-touch-icon", "mask-icon"}):
+            self.hrefs.append(("apple-touch-icon" in rel, href))
 
 
 def _fetch_icon(origin: str) -> Tuple[Optional[bytes], str, str]:
@@ -114,6 +150,27 @@ def _fetch_icon(origin: str) -> Tuple[Optional[bytes], str, str]:
             failures.append("server returned an unsupported image format")
         elif error:
             failures.append(error)
+    # Many sites keep their icon at a nonstandard path and advertise it in the page head.
+    page, error = _get(origin + "/", "text/html,application/xhtml+xml;q=0.9,*/*;q=0.5")
+    if page:
+        parser = _IconLinks()
+        try:
+            parser.feed(page.decode("utf-8", "replace"))
+        except Exception:
+            parser.hrefs = []
+        # Prefer the site's normal favicon, then its touch icon; hrefs are resolved relative to the site.
+        for _, href in sorted(parser.hrefs, key=lambda row: row[0])[:8]:
+            icon_url = urljoin(origin + "/", href)
+            data, icon_error = _get(icon_url, "image/avif,image/webp,image/png,image/*,*/*;q=0.5")
+            if data:
+                content_type = _image_type(data)
+                if content_type:
+                    return data, content_type, ""
+                failures.append("site-advertised icon has an unsupported image format")
+            elif icon_error:
+                failures.append(icon_error)
+    elif error:
+        failures.append(error)
     return None, "", failures[-1] if failures else "no site icon found"
 
 
@@ -122,11 +179,14 @@ def refresh_one(db: DB, url: str, force: bool = False) -> bool:
     if not origin:
         return False
     key = hashlib.sha256(origin.encode("utf-8")).hexdigest()
-    current = db.q("SELECT fetched_at,data FROM link_icons WHERE url_hash=?", (key,))
+    current = db.q("SELECT fetched_at,data,error FROM link_icons WHERE url_hash=?", (key,))
     interval = CACHE_SECONDS if current and current[0]["data"] is not None else MISS_CACHE_SECONDS
-    if current and not force and time.time() - float(current[0]["fetched_at"]) < interval:
+    recent_failure = current and str(current[0]["error"]).startswith(DISCOVERY_CACHE_VERSION)
+    if current and not force and (current[0]["data"] is not None or recent_failure) and time.time() - float(current[0]["fetched_at"]) < interval:
         return current[0]["data"] is not None
     data, content_type, error = _fetch_icon(origin)
+    if error:
+        error = DISCOVERY_CACHE_VERSION + error
     db.x("""INSERT INTO link_icons(url_hash,origin,content_type,data,fetched_at,error) VALUES(?,?,?,?,?,?)
            ON CONFLICT(url_hash) DO UPDATE SET origin=excluded.origin,content_type=excluded.content_type,
            data=excluded.data,fetched_at=excluded.fetched_at,error=excluded.error""",
