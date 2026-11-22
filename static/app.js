@@ -250,6 +250,16 @@ function renderChips() {
 }
 const CL_ICON = { 0: ['🔗', 'Crosslink'], 1: ['📻', 'Gateway (radio)'], 2: ['💻', 'PC only'] };
 function clIcon(c) { if (c.parrot) return '<span title="Parrot – echo test">🦜</span>'; const x = CL_ICON[Number(c.client)] || CL_ICON[2]; return `<span title="${x[1]}">${x[0]}</span>`; }
+function clientOrder(c) {
+    if (c.parrot) return -1;
+    const type = Number(c.client);
+    if (type === 2) return 5;
+    if (type === 0) return 0;
+    if (['OWNER', 'NETOWNER', 'ADMIN'].includes(c.access)) return 1;
+    if (Number(c.status) === 0) return 2;
+    if (Number(c.status) === 1) return 3;
+    return 4;
+}
 function renderOnAir() {
     const cards = rooms().filter(r => r.talking).map(r => ({ r, t: r.talking }));
     if (!cards.length) {
@@ -281,7 +291,7 @@ function renderRooms() {
         </button>`;
     }).join('');
     const n = selected.clients.filter(c => !c.parrot).length;
-    const rows = selected.clients.map(c => `<div class="st-row ${c.talking ? 'talk' : ''} ${c.parrot ? '' : 'station-link'}" ${c.parrot ? '' : `onclick="openStation('${esc(c.callsign)}')"`}>
+    const rows = selected.clients.map((c, i) => ({ c, i })).sort((a, b) => clientOrder(a.c) - clientOrder(b.c) || a.i - b.i).map(({ c }) => `<div class="st-row ${c.talking ? 'talk' : ''} ${c.parrot ? '' : 'station-link'}" ${c.parrot ? '' : `onclick="openStation('${esc(c.callsign)}')"`}>
         ${c.parrot ? '<span class="avatar sm" style="background:linear-gradient(135deg,#30d158,#0a84ff)">🦜</span>' : avatar(c.callsign, 'sm')}<div class="c"><b>${esc(c.callsign)}</b>${c.talking ? '<span class="mic"></span>' : ''}${c.muted ? ' <span title="muted">🔇</span>' : ''}${c.access === 'OWNER' || c.access === 'NETOWNER' ? ' <span title="Owner">👑</span>' : c.access === 'ADMIN' ? ' <span title="Admin">🛡️</span>' : ''}
         <small>${esc(c.name)}${c.name && (c.city || c.country) ? ' · ' : ''}${flag(c.country)} ${esc(place(c))}</small></div>
         <div class="r"><span class="band" title="${esc(c.band)}">${clIcon(c)} <span class="band-txt">${esc((c.band || '').length > 22 ? c.band.slice(0, 21) + '…' : c.band || '')}</span></span>${c.since ? `<div data-since="${c.since}">${since(c.since)}</div>` : ''}</div>

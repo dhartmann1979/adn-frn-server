@@ -52,7 +52,7 @@ Die Abschnitte lassen sich wie beim DMR-Dashboard mit **▾** zuklappen; der Bro
 
 - **Today** – Online jetzt, Durchgänge, Sprechzeit, gehörte Stationen und Spitzenwert heute.
 - **On air** – pro Raum eine grüne Karte mit Rufzeichen, Name, Ort, Client-Art und laufender Zeit; `max. 180 s` ist die maximale Sendezeit des Raums. Auch der Parrot erscheint hier, wenn er einen Durchgang abspielt.
-- **Rooms** – jeder Raum mit seinen Stationen: 📻 Gateway (Funk), 💻 PC-Client, 🔗 Crosslink, 🦜 Parrot; 🔇 stumm. 🔒 = auf dem Dashboard versteckt (nur nach Login).
+- **Rooms** – jeder Raum mit seinen Stationen: 📻 Gateway (Funk), 💻 PC-Client, 🔗 Crosslink, 🦜 Parrot; 🔇 stumm. Die Stationsliste sortiert Crosslinks zuerst, dann Admins/Owner, QRV, QRL und die übrigen Stationen. **PC Only steht immer am Ende.** 🔒 = auf dem Dashboard versteckt (nur nach Login).
 - **Last heard** – die letzten Durchgänge mit Dauer laut FRN-Server, filterbar nach Raum.
 - **Comings & goings** – Logins und Logouts.
 

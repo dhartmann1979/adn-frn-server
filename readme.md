@@ -33,7 +33,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 
 | | |
 |---|---|
-| 🎙️ **Live-Dashboard** | Wer gerade spricht, steht oben (**ON AIR**). Räume mit ihren Stationen, Last heard, Comings & goings. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
+| 🎙️ **Live-Dashboard** | Wer gerade spricht, steht oben (**ON AIR**). Räume mit sortierten Stationslisten (Crosslinks, Admins, QRV, QRL; PC Only zuletzt), Last heard und Comings & goings. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
 | 📈 **Statistik** | Sprechzeit und Durchgänge je Raum und Station, heute bis ein Jahr, Aktivität nach Wochentag und Uhrzeit, Spitzenwert der Stationen online. |
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
 | ⚙️ **Admin-Portal statt Config-Dateien** | Alle Einstellungen, Räume und FRN-Konten liegen in SQLite; frn_adn schreibt daraus `server.properties`. Server starten, stoppen und neu starten per Knopf. |
