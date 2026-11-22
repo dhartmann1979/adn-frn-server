@@ -165,7 +165,7 @@ sudo journalctl -u frnadn -n 80 --no-pager
 | Was | Wie |
 |---|---|
 | Java-FRN-Server | Admin-Portal → **System → Upgrade Java now** (lädt von freeradionetwork.de und startet den Dienst neu) |
-| Dashboard | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – der FRN-Server läuft dabei weiter |
+| Dashboard | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – Dashboard und FRN-Server starten danach neu; Stationen verbinden sich automatisch wieder |
 
 `install.sh` ist ausschließlich für eine frische Installation vorgesehen. Es bricht ab, wenn bereits eine FRN-Datenbank, eine vorhandene `server.properties` oder ein laufender FRN-Dienst erkannt wird. Für Updates ist `scripts/update.sh` vorgesehen; `install.sh` nicht erneut auf einem installierten System ausführen.
 

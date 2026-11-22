@@ -40,7 +40,7 @@ Die Abfrage an GitHub braucht keinen Zugang (zwei Anfragen pro Prüfung). Das Er
 
 1. **↻ Check now** – steht dort **update available**, zeigt die Karte, was neu ist.
 2. **Upgrade Dashboard now** und bestätigen.
-3. Das Dashboard holt genau den Stand, den du gesehen hast (kein neuerer, ungeprüfter), setzt ihn per Fast-Forward ein, installiert geänderte Python-Pakete (`requirements.txt`) und startet sich selbst neu. Die Seite zeigt „restarting …“ und lädt sich neu, sobald das Dashboard wieder antwortet. Der **FRN-Server läuft dabei weiter**; Einstellungen, Benutzer und Datenbank bleiben unberührt.
+3. Das Dashboard holt genau den Stand, den du gesehen hast (kein neuerer, ungeprüfter), setzt ihn per Fast-Forward ein, installiert geänderte Python-Pakete (`requirements.txt`) und startet den **FRN-Server sowie anschließend das Dashboard** neu. Der FRN-Neustart aktualisiert den Live-Site-Status; verbundene Stationen verbinden sich automatisch wieder. Die Seite lädt sich neu, sobald das Dashboard wieder antwortet. Einstellungen, Benutzer und Datenbank bleiben unberührt.
 
 Der Knopf ist grau, wenn das Upgrade so nicht möglich ist; die Karte nennt den Grund (siehe unten).
 
@@ -51,7 +51,7 @@ cd /opt/adn-frn-server
 sudo ./scripts/update.sh
 ```
 
-`update.sh` holt den neuen Stand, installiert die Python-Pakete, stellt die Dateirechte ein, schreibt die Konfiguration neu und startet das Dashboard neu.
+`update.sh` holt den neuen Stand, installiert die Python-Pakete, stellt die Dateirechte ein und startet zuerst den FRN-Server und danach das Dashboard neu. Verbundene Stationen verbinden sich automatisch wieder.
 
 ## Java-FRN-Server aktualisieren
 

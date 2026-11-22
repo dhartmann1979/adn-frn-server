@@ -1165,7 +1165,7 @@ async function checkAllUpdates(btn) {
 }
 async function upgradeNow(target, btn) {
     const title = target === 'java' ? 'Upgrade Java FRN server?' : 'Upgrade dashboard from GitHub?';
-    const body = target === 'java' ? 'The current FRN_Server.jar will be replaced and the Java server restarted.' : 'The dashboard checkout will be fast-forwarded. Local changes prevent the upgrade; restart the dashboard afterwards.';
+    const body = target === 'java' ? 'The current FRN_Server.jar will be replaced and the Java server restarted.' : 'The dashboard checkout will be fast-forwarded. The FRN server restarts to refresh its live status, then restart the dashboard to load the update.';
     if (!await confirmBox({title, body}, 'Upgrade')) return;
     btn.disabled = true;
     try {

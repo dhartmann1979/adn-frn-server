@@ -129,7 +129,7 @@ cd /opt/adn-frn-server
 sudo ./scripts/update.sh
 ```
 
-Der FRN-Server läuft dabei weiter; Datenbank, Benutzer und Einstellungen bleiben erhalten. Mehr dazu: **[Updates](docs/de/updates.md)**.
+Dashboard und FRN-Server starten danach neu; verbundene Stationen verbinden sich automatisch wieder. Datenbank, Benutzer und Einstellungen bleiben erhalten. Mehr dazu: **[Updates](docs/de/updates.md)**.
 
 ## Entwicklung
 

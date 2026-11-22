@@ -607,6 +607,13 @@ async def updates_upgrade(request: Request):
         except updater.UpdateError as e:
             raise HTTPError(400, str(e))
         if result.get("changed"):
+            # Restart FRN as well: the dashboard's site status is derived from the server's live log stream.
+            try:
+                frn_restart = await ctx.java.control("restart")
+                result["frn_restart"] = {"ok": frn_restart.get("rc") == 0, **frn_restart}
+            except Exception as e:
+                log.exception("FRN restart after dashboard update")
+                result["frn_restart"] = {"ok": False, "out": str(e)}
             # systemd (Restart=always) starts the dashboard again on the new code; without systemd the admin must do it.
             result["restart_required"] = True
             result["restarting"] = updater.under_systemd()

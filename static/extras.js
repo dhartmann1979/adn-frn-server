@@ -241,15 +241,18 @@
         const title = isJava ? 'Upgrade Java FRN server?' : 'Upgrade dashboard from GitHub?';
         const body = isJava
             ? `FRN_Server.zip is loaded from freeradionetwork.de${java.latest ? ' (' + html(java.latest.version) + ')' : ''}, FRN_Server.jar is replaced and the Java server restarts. Stations reconnect by themselves.`
-            : `${html(gh.behind || 'New')} commit${gh.behind === 1 ? '' : 's'} will be applied${gh.remote_version ? ' (v' + html(gh.remote_version) + ')' : ''}. Changed Python packages are installed, then the dashboard restarts and this page reloads. The FRN server keeps running.`;
+            : `${html(gh.behind || 'New')} commit${gh.behind === 1 ? '' : 's'} will be applied${gh.remote_version ? ' (v' + html(gh.remote_version) + ')' : ''}. Changed Python packages are installed, then the FRN server and dashboard restart. Connected stations reconnect automatically, and this page reloads.`;
         if (!await confirmBox({ title, body }, 'Upgrade')) return;
         if (btn) btn.disabled = true;
         try {
             const r = await api('POST', '/api/admin/updates/upgrade', isJava ? { target } : { target, expected: (gh.latest || {}).commit });
             if (isJava) toast('Java FRN server upgraded' + (r.installed ? ' to ' + r.installed.version : '') + '.');
             else if (!r.changed) toast('Already up to date.');
-            else if (r.restarting) { await waitForDashboard(); return; }
-            else toast('Dashboard files updated. Restart the service to use them: sudo systemctl restart frnadn', true);
+            else if (r.restarting) {
+                if (r.frn_restart && !r.frn_restart.ok) alert('Dashboard updated, but the FRN server could not be restarted automatically. Please restart it from Admin → System.\n\n' + (r.frn_restart.out || 'Unknown error'));
+                await waitForDashboard(); return;
+            }
+            else toast('FRN server restarted. Restart the dashboard to load the update: sudo systemctl restart frnadn', true);
             await window.checkAllUpdates();
         } catch (e) { toast(e.message, true); if (btn) btn.disabled = false; }
     };

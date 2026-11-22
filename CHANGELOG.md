@@ -2,6 +2,11 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.2.1 – 2026-11-22
+
+### Behoben
+- Dashboard-Updates starten nun auch den FRN-Server neu, damit der Live-Site-Status nach der Aktualisierung wieder stimmt. `scripts/update.sh` startet ebenfalls beide Dienste neu.
+
 ## 2.2.0 – 2026-11-22
 
 ### Neu
