@@ -77,7 +77,7 @@ Jede Frage hat eine Vorgabe, die du mit Enter übernimmst. Danach öffnest du da
 
 Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, wenn er schon eine FRN-Datenbank, eine `server.properties` oder einen laufenden FRN-Dienst findet.
 
-> **Nach der Installation einmal** `cd /opt/adn-frn-server && sudo ./scripts/update.sh` ausführen. Das stellt die Dateirechte so ein, dass sich das Dashboard später selbst aus dem Admin-Portal aktualisieren kann. Siehe [Updates](docs/de/updates.md#einmalig-nach-einer-neuinstallation).
+> **Nach der Installation einmal** `cd /opt/adn-frn-server && sudo ./scripts/update.sh` ausführen. Das installiert zugleich den aktuellen Stand und stellt die Dateirechte so ein, dass sich das Dashboard später selbst aus dem Admin-Portal aktualisieren kann. Für das öffentliche Standard-Repository ist kein GitHub-Token nötig. Siehe [Updates](docs/de/updates.md#upgrade-dashboard-now-einmalig-freischalten).
 
 ➡️ Ausführlich: **[Installation](docs/de/installation.md)**
 

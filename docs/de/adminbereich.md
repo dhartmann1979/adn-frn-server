@@ -106,7 +106,7 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 Das Dashboard prüft 30 Sekunden nach dem Start und danach zu **jeder vollen Stunde** auf neue Commits im GitHub-Repository und auf eine neue Version des Java-FRN-Servers. Nichts wird automatisch installiert. **↻ Check now** prüft sofort. Für jedes Programm zeigt die Karte die installierte und die neue Version; bei GitHub außerdem die neuen Commits und einen Vergleichslink.
 
 - **Upgrade Java now:** lädt `FRN_Server.zip` von freeradionetwork.de, ersetzt die JAR und startet den Java-Server neu.
-- **Upgrade Dashboard now:** holt genau den angezeigten Stand per Fast-Forward, installiert geänderte Python-Pakete und startet das Dashboard neu; die Seite lädt sich danach selbst. Bei lokalen Änderungen im Programmverzeichnis oder fehlenden Schreibrechten ist der Knopf grau und die Karte nennt den Grund.
+- **Upgrade Dashboard now:** holt genau den angezeigten Stand per Fast-Forward, installiert geänderte Python-Pakete und startet das Dashboard neu; die Seite lädt sich danach selbst. Bei lokalen Änderungen im Programmverzeichnis oder fehlenden Schreibrechten ist der Knopf grau und die Karte nennt den Grund. Nach der Neuinstallation einmal `sudo ./scripts/update.sh` als root ausführen; das setzt die nötigen Schreibrechte. Für das öffentliche Standard-Repository ist kein GitHub-Token nötig: [Update-Funktion einrichten](updates.md#upgrade-dashboard-now-einmalig-freischalten).
 
 Alle Meldungen und Lösungen: **[Updates](updates.md)**.
 

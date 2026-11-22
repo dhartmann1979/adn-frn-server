@@ -13,6 +13,19 @@ Zwei Programme werden aktualisiert, jedes mit eigenem Knopf. **Nichts wird autom
 
 Zu finden unter **⚙️ Admin → 🖥️ System → ⬆️ Software updates**.
 
+## „Upgrade Dashboard now“ einmalig freischalten
+
+Für die Standardinstallation sind keine zusätzlichen Einstellungen und kein GitHub-Token nötig: Das Repository `dhartmann1979/adn-frn-server` ist öffentlich; die Update-Prüfung und der Download funktionieren ohne Anmeldung. Das Dashboard muss als Git-Checkout mit `origin` auf `main` installiert sein. Nur für ein anderes öffentliches Repository oder einen anderen Branch sind die optionalen Variablen `FRNADN_GITHUB_REPO` und `FRNADN_GITHUB_BRANCH` nötig (siehe unten).
+
+Der Dienst läuft als Benutzer `frnadn`. Dieser braucht Schreibrechte auf das Programmverzeichnis **einschließlich `.git`**, damit er den neuen Stand holen und einsetzen kann. Nach einer Neuinstallation gehört das Verzeichnis zunächst `root`. Führe deshalb einmalig als root aus:
+
+```bash
+cd /opt/adn-frn-server
+sudo ./scripts/update.sh
+```
+
+> **Hinweis:** Dieser einmalige Schritt installiert zugleich den aktuellen Stand, stellt die Dateirechte ein und startet das Dashboard neu. Danach kann **Upgrade Dashboard now** im Admin-Portal verwendet werden. Bei einem anderen Installationspfad ersetze `/opt/adn-frn-server` entsprechend.
+
 ## Wann wird geprüft?
 
 - 30 Sekunden nach dem Start des Dashboards,
@@ -40,16 +53,6 @@ sudo ./scripts/update.sh
 
 `update.sh` holt den neuen Stand, installiert die Python-Pakete, stellt die Dateirechte ein, schreibt die Konfiguration neu und startet das Dashboard neu.
 
-### Einmalig nach einer Neuinstallation
-
-Das Programmverzeichnis gehört nach der Installation `root`, das Dashboard läuft aber als Benutzer `frnadn`. Damit sich das Dashboard selbst aktualisieren darf, einmal ausführen:
-
-```bash
-cd /opt/adn-frn-server && sudo ./scripts/update.sh
-```
-
-Das Skript übergibt das Verzeichnis dabei an den Dienstbenutzer. Danach funktioniert **Upgrade Dashboard now**. Bis dahin zeigt die Karte den Hinweis dazu an.
-
 ## Java-FRN-Server aktualisieren
 
 **Upgrade Java now** lädt `FRN_Server.zip` von freeradionetwork.de, ersetzt `FRN_Server.jar` (und `releasenotes.txt`) und startet den Java-Server neu. Alle Stationen verbinden sich danach selbst wieder. Dieselbe Prüfung gibt es auch unter **Settings → ⬆️ Check for update**.
@@ -71,7 +74,7 @@ Das Skript übergibt das Verzeichnis dabei an den Dienstbenutzer. Danach funktio
 
 ## Eigenes Repository oder anderer Branch
 
-Wer eine eigene Kopie pflegt, stellt sie in der Unit `frnadn.service` per Umgebungsvariable ein:
+Wer eine eigene öffentliche Kopie pflegt, stellt Repository und Branch in der Unit `frnadn.service` per Umgebungsvariable ein:
 
 ```ini
 Environment=FRNADN_GITHUB_REPO=meinname/adn-frn-server
