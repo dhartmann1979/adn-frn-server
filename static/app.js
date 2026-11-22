@@ -4,7 +4,7 @@
 const $ = id => document.getElementById(id);
 const S = { info: null, me: null, live: null, ws: null, wsOk: false, services: {}, lhRoom: 'all', liveRoom: '', tab: 'live',
             stats: { range: 'today', metric: 'duration', data: null, slots: {} },
-            admin: { tab: 'server', frn: null, room: null, logs: [] }, chat: { room: 'all', entries: [] } };
+            admin: { tab: 'server', frn: null, room: null, logs: [], aclClients: [] }, chat: { room: 'all', entries: [] } };
 
 // ---------------------------------------------------------------- helpers
 function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -718,18 +718,105 @@ async function deleteRoom(id, name) {
 }
 async function makeDefault(name) { try { await api('POST', '/api/admin/settings', { changes: { 'frn.default_room': name } }); loadRoomsAdmin(); } catch (e) { toast(e.message, true); } }
 
-// admin / mute / block / access lists – kept by the FRN server itself
-async function loadLists() {
-    const d = await api('GET', '/api/admin/acl');
-    const lbl = { AdminList: '🛡️ Admins', MuteList: '🔇 Muted', BlockList: '⛔ Blocked', AccessList: '🔐 Access list' };
-    $('admin-lists').innerHTML = `<div class="tile"><h3>🛡️ Admins, muted, blocked and access lists</h3>
-        <div class="subt">These lists belong to the FRN server: owners and admins change them in the FRN client (right click on a station). Shown here read-only, as the server stored them.</div>
-        ${d.files.length ? d.files.map(f => `<div style="margin-top:14px"><div class="dim" style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">
-            ${lbl[f.kind] || esc(f.file)} · ${esc(f.room)} <span class="count">${f.entries.length}</span> <span style="font-weight:400;text-transform:none;letter-spacing:0">· ${esc(f.file)} · ${fmtDate(f.mtime)}</span></div>
-            ${f.entries.length ? `<div class="tbl-wrap"><table class="tbl"><tbody>${f.entries.map(e => `<tr>${Object.entries(e).slice(0, 5).map(([k, v]) => `<td><span class="dim" style="font-size:11px">${esc(k)}</span><br>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
-              : `<details><summary class="dim" style="cursor:pointer">show file</summary><pre class="term" style="max-height:240px;overflow:auto">${esc(f.text)}</pre></details>`}</div>`).join('')
-          : '<div class="empty">The server has not stored any list yet.</div>'}</div>`;
+// ACL lists: SQLite-backed forms exported to the FRN server's XML files.
+const ACL_LABEL = { admin: '🛡️ Admins', mute: '🔇 Muted', block: '⛔ Blocked', access: '🔐 Access list' };
+function aclListForm(room, kind, entries) {
+    const kindEntries = entries || [];
+    const rows = kindEntries.length ? kindEntries.map(e => `<form class="acl-entry" data-acl-form data-action="edit" data-kind="${kind}" data-room="${room.id}" data-row="${esc(e.row_id)}">
+        <input type="hidden" name="id" value="${esc(e.id)}">
+        <label>FRN ID<input type="text" name="id_display" value="${esc(e.id)}" readonly title="The entry ID is kept for compatibility"></label>
+        <label>E-mail<input type="text" name="email" value="${esc(e.email)}" maxlength="250" required></label>
+        <label>Callsign<input type="text" name="callsign" value="${esc(e.callsign)}" maxlength="30"></label>
+        <label>Name<input type="text" name="name" value="${esc(e.name)}" maxlength="80"></label>
+        <label>Client type<select name="client_type"><option value="0" ${e.client_type === '0' ? 'selected' : ''}>Crosslink</option><option value="1" ${e.client_type === '1' ? 'selected' : ''}>Gateway</option><option value="2" ${e.client_type === '2' ? 'selected' : ''}>PC Only</option></select></label>
+        <label>Band / channel<input type="text" name="band_channel" value="${esc(e.band_channel)}" maxlength="100"></label>
+        <label>Country<input type="text" name="country" value="${esc(e.country)}" maxlength="80"></label>
+        <label>City<input type="text" name="city" value="${esc(e.city)}" maxlength="100"></label>
+        ${kind === 'access' ? `<label class="acl-check"><input type="checkbox" name="can_tx" ${e.can_tx ? 'checked' : ''}> Can transmit</label>` : ''}
+        <div class="acl-actions"><button class="btn small" type="submit">Save</button><button class="btn small danger" type="button" data-acl-delete>Remove</button></div>
+    </form>`).join('') : '<div class="empty acl-empty">No entries in this list.</div>';
+    const pick = S.admin.aclClients.length ? `<label class="acl-pick">Copy an online station <select data-acl-client><option value="">Select a connected station…</option>${S.admin.aclClients.map((c, i) => `<option value="${i}">${esc(c.callsign)} · ${esc(c.email || 'no e-mail')} · ${esc(c.id)}</option>`).join('')}</select></label>` : '';
+    return `<section class="acl-list"><h4>${ACL_LABEL[kind]} <span class="count">${kindEntries.length}</span></h4>${rows}
+        <form class="acl-entry acl-add" data-acl-form data-action="add" data-kind="${kind}" data-room="${room.id}">
+            <div class="acl-add-title">Add entry</div>${pick}
+            <label>FRN client ID<input type="text" name="id" maxlength="120" required></label>
+            <label>E-mail<input type="text" name="email" maxlength="250" required></label>
+            <label>Callsign<input type="text" name="callsign" maxlength="30"></label>
+            <label>Name<input type="text" name="name" maxlength="80"></label>
+            <label>Client type<select name="client_type"><option value="0">Crosslink</option><option value="1">Gateway</option><option value="2" selected>PC Only</option></select></label>
+            <label>Band / channel<input type="text" name="band_channel" value="PC Only" maxlength="100"></label>
+            <label>Country<input type="text" name="country" maxlength="80"></label>
+            <label>City<input type="text" name="city" maxlength="100"></label>
+            ${kind === 'access' ? '<label class="acl-check"><input type="checkbox" name="can_tx" checked> Can transmit</label>' : ''}
+            <div class="acl-actions"><button class="btn primary small" type="submit">Add to list</button></div>
+        </form></section>`;
 }
+async function loadLists() {
+    try {
+        const d = await api('GET', '/api/admin/acl');
+        S.admin.aclClients = d.clients || [];
+        $('admin-lists').innerHTML = `<div class="tile"><h3>🛡️ Server access lists</h3>
+            <div class="subt">Lists are stored in SQLite and written in the FRN server's XML format. Existing XML entries are imported automatically. Changes take effect after restarting the FRN server; original XML files are backed up before replacement.</div>
+            ${d.errors && d.errors.length ? `<div class="notice-box">Some ACL files could not be imported: ${d.errors.map(esc).join('<br>')}</div>` : ''}
+            ${d.rooms.map(room => {
+                const file = kind => d.files.find(f => f.room_id === room.id && f.kind === ({admin:'AdminList',mute:'MuteList',block:'BlockList',access:'AccessList'}[kind]));
+                return `<section class="acl-room"><h3>🏠 ${esc(room.name)} <span class="dim mono">net${String(room.idx).padStart(2, '0')}</span></h3>
+                    <form class="acl-mode" data-acl-form data-action="config" data-kind="access" data-room="${room.id}">
+                        <label><input type="checkbox" name="access_on" ${room.access_on ? 'checked' : ''}> Only allow entries on the access list</label>
+                        <label><input type="checkbox" name="txright_on" ${room.txright_on ? 'checked' : ''}> Require talk permission</label>
+                        <label class="acl-notice">Access message<textarea name="notice" maxlength="1000">${esc(room.notice)}</textarea></label>
+                        <div class="acl-actions"><button class="btn small" type="submit">Save access settings</button></div>
+                    </form>
+                    <div class="acl-grid">${['admin','mute','block','access'].map(kind => aclListForm(room, kind, file(kind)?.entries || [])).join('')}</div>
+                </section>`;
+            }).join('') || '<div class="empty">No rooms configured.</div>'}
+            <div class="notice-box">FRN owners and admins can still change these lists in the FRN client. The dashboard imports changes from the XML files before displaying or editing them.</div>
+        </div>`;
+    } catch (e) { $('admin-lists').innerHTML = `<div class="tile empty">${esc(e.message)}</div>`; }
+}
+async function saveAclForm(f, action = f.dataset.action) {
+    const kind = f.dataset.kind, room_id = Number(f.dataset.room);
+    const b = { action, kind, room_id };
+    if (action === 'config') {
+        b.access_on = f.elements.access_on.checked; b.txright_on = f.elements.txright_on.checked;
+        b.notice = f.elements.notice.value;
+    } else {
+        const entry = Object.fromEntries(new FormData(f));
+        entry.id = f.dataset.action === 'edit' ? f.elements.id.value : entry.id;
+        entry.can_tx = f.elements.can_tx ? f.elements.can_tx.checked : true;
+        b.entry = entry;
+        if (action === 'edit') { b.row_id = f.dataset.row; b.old_email = f.elements.email.defaultValue; }
+    }
+    try {
+        const r = await api('POST', '/api/admin/acl', b);
+        setRestart(r.restart_needed);
+        toast('ACL saved. Restart the FRN server to apply the change.');
+        await loadLists();
+    } catch (e) { toast(e.message, true); }
+}
+$('admin-lists').addEventListener('submit', e => {
+    const f = e.target.closest('[data-acl-form]');
+    if (!f) return;
+    e.preventDefault(); saveAclForm(f);
+});
+$('admin-lists').addEventListener('click', async e => {
+    const button = e.target.closest('[data-acl-delete]');
+    if (!button) return;
+    const f = button.closest('[data-acl-form]');
+    if (!await confirmBox({ title: 'Remove this ACL entry?', body: 'The list file will be backed up before it is rewritten. Restart the FRN server to apply the change.' }, 'Remove', 'danger')) return;
+    try {
+        const r = await api('POST', '/api/admin/acl', { action: 'delete', kind: f.dataset.kind, room_id: Number(f.dataset.room), row_id: f.dataset.row });
+        setRestart(r.restart_needed); toast('ACL entry removed. Restart the FRN server to apply the change.'); await loadLists();
+    } catch (err) { toast(err.message, true); }
+});
+$('admin-lists').addEventListener('change', e => {
+    const select = e.target.closest('[data-acl-client]');
+    if (!select || select.value === '') return;
+    const c = S.admin.aclClients[Number(select.value)], f = select.closest('form');
+    if (!c || !f) return;
+    for (const [key, value] of Object.entries({ id: c.id, email: c.email, callsign: c.callsign, name: c.name,
+        client_type: c.client_type, band_channel: c.band_channel })) if (f.elements[key] && value) f.elements[key].value = value;
+});
 
 // own password list (stand-alone: acl/FRNPasswd.xml)
 async function loadAccounts() {

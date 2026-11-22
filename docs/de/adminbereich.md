@@ -67,7 +67,14 @@ Rechts alle Parameter des Raums mit ihrem Namen aus `server.properties` – Bede
 
 ## 🛡️ Server lists
 
-Die Admin-, Stumm-, Sperr- und Zugangslisten gehören dem FRN-Server selbst: Owner und Admins ändern sie im **FRN-Client** (Rechtsklick auf eine Station). Der Server speichert sie als XML in `acl/`; das Admin-Portal zeigt sie hier zum Nachsehen an.
+<p align="center"><img src="../images/admin-acl.png" alt="Schematische Vorschau der formularbasierten ACL-Verwaltung" width="95%"></p>
+<small>Schematische Vorschau mit Beispieldaten.</small>
+
+Das Dashboard importiert vorhandene `AdminList`, `MuteList`, `BlockList` und `AccessList` XML-Dateien beim Start und vor jeder Anzeige oder Änderung nach SQLite. Auch Änderungen, die Owner oder Admins weiterhin im **FRN-Client** vornehmen, werden beim nächsten Öffnen der ACL-Seite übernommen.
+
+Im Admin-Portal lassen sich Einträge je Raum hinzufügen, bearbeiten und entfernen. Für neue Einträge kann eine aktuell verbundene Station übernommen werden; alternativ werden FRN-ID und E-Mail von Hand eingetragen. Die Access-Liste steuert zusätzlich, wer dem Raum beitreten und wer sprechen darf.
+
+Beim Speichern schreibt frn_adn die Listen im FRN-kompatiblen XML-Format zurück. Die vorherige Datei wird unter `acl/backups/` gesichert. Der FRN-Server braucht danach einen Neustart, um die Änderungen zu übernehmen; das Dashboard zeigt dafür den Neustart-Hinweis an.
 
 ## 🔑 FRN accounts
 

@@ -8,11 +8,11 @@ So viel wie möglich in SQLite, in Dateien nur, was der Java-FRN-Server lesen mu
 
 | Ort | Inhalt | wer schreibt |
 |---|---|---|
-| `/var/lib/frnadn/frnadn.db` | **alle Einstellungen**, Räume, FRN-Konten, Benutzer, Sitzungen, Protokoll, Statistik | frn_adn |
+| `/var/lib/frnadn/frnadn.db` | Einstellungen, Räume, ACL-Einträge, FRN-Konten, Benutzer, Sitzungen, Protokoll, Statistik | frn_adn |
 | `/var/lib/frnadn/frn/server.properties` | Server und Räume für den Java-Server | frn_adn, aus der Datenbank |
 | `/var/lib/frnadn/frn/log4j.xml` | Logging: `logs/server.log` und `logs/server_clients.log` | frn_adn |
 | `/var/lib/frnadn/frn/acl/FRNPasswd.xml` | eigene Passwortliste (Stand-alone) | frn_adn |
-| `/var/lib/frnadn/frn/acl/*List*.xml` | Admin-, Stumm-, Sperr-, Zugangslisten | der FRN-Server (Moderation im Client) |
+| `/var/lib/frnadn/frn/acl/*List*.xml` | FRN-kompatible Kopie der Admin-, Stumm-, Sperr- und Zugangslisten | FRN-Server und frn_adn |
 | `/opt/frn-server/FRN_Server.jar` | der FRN-Server von freeradionetwork.de | Installer / Update |
 | `/etc/systemd/system/frn-server.service`, `frnadn.service` | Dienste | Installer |
 
@@ -24,6 +24,8 @@ sudo frnadn write-config                      # server.properties & Co. neu schr
 sudo frnadn set-superadmin NAME · sudo frnadn reset-password NAME
 sudo frnadn add-account E-MAIL RUFZEICHEN [NAME]
 ```
+
+Die ACL-Dateien werden beim Dashboard-Start in SQLite übernommen. Änderungen aus dem FRN-Client bleiben möglich und werden vor dem nächsten Öffnen der ACL-Seite eingelesen. Bei einer Änderung im Admin-Portal wird die vorherige XML-Datei in `acl/backups/` gesichert.
 
 ## Server (server.properties)
 

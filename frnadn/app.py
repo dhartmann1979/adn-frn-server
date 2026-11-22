@@ -33,6 +33,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from . import __version__, links as linkstore, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
+from .frn.acl import ACLStore
 from .frn.javasrv import JavaServer
 from .frn.logwatch import LogWatch
 from .frn.store import MAX_ROOMS, ROOM_COLUMNS, Store
@@ -60,6 +61,7 @@ class Ctx:
         self.auth = Auth(self.db)
         self.settings = Settings(self.db)
         self.store = Store(self.db, self.settings)
+        self.acls = ACLStore(self.db, self.store, FRN_HOME)
         self.stats = Stats(self.db)
         self.live = Live(self.db, self.notify, self.stats.bump)
         self.java = JavaServer(self.store, self.settings, FRN_HOME, FRN_JAR, demo=DEMO)
@@ -741,7 +743,30 @@ async def rooms_order(request: Request):
 @app.get("/api/admin/acl")
 async def acl_get(request: Request):
     need_admin(request)
-    return {"files": ctx.java.acl_files()}
+    payload = ctx.acls.payload()
+    clients = {}
+    for room in (ctx.server.rooms or {}).values():
+        for client in room.clients:
+            if client.is_parrot:
+                continue
+            key = (client.cid or client.on, client.email)
+            clients[key] = {"id": key[0], "email": client.email, "callsign": client.callsign, "name": client.name,
+                            "client_type": str(client.client), "band_channel": client.band, "country": client.country, "city": client.city}
+    payload["clients"] = sorted(clients.values(), key=lambda c: (c["callsign"].lower(), c["email"].lower()))
+    return payload
+
+
+@app.post("/api/admin/acl")
+async def acl_save(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        result = ctx.acls.save(u["username"], b)
+    except (ValueError, KeyError) as e:
+        raise HTTPError(400, str(e))
+    ctx.restart_needed = True
+    ctx.auth.audit("acl", u["username"], f"{b.get('action', '')} {b.get('kind', '')}", ip_of(request))
+    return {**result, "restart_needed": ctx.restart_needed}
 
 
 @app.get("/api/admin/accounts")
@@ -937,6 +962,8 @@ async def _startup() -> None:
     if ctx is None:
         ctx = Ctx()
     ctx.store.ensure_rooms()
+    for error in ctx.acls.sync_from_files():
+        log.warning("ACL import: %s", error)
     ctx.server.reload_rooms()
     try:
         ctx.java.write_config()
