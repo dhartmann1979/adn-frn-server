@@ -2,6 +2,32 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.5.0 – 2026-11-22
+
+Neue Kopfzeile: **ein Menü** statt Status-Chips plus Reiter, darunter eine schmale **Statusleiste** – derselbe Aufbau wie in
+HBlink4-FreeRadioID und N8-HotSpot.
+
+### 🧭 Ein Menü in der Kopfzeile
+- Die Kopfzeile enthält nur noch Logo/Titel, die Reiter (**🎙️ Live · 📈 Statistics · 📇 Stations · 💬 Chat**) und rechts Links + Anmeldung.
+- **⚙️ Admin** ist nach dem Login ein eigener, gestrichelt umrandeter Menüpunkt; der Weg über das Benutzermenü entfällt.
+- **🔐 Login** steht ganz rechts. Angemeldet zeigt der Platz **👤 Name** (Klick öffnet das eigene Konto mit Passwortwechsel) und **⏻ Abmelden**
+  daneben – kein Aufklappmenü mehr.
+
+### 🟢 Statusleiste
+- Neue, 22 px niedrige Leiste direkt unter dem Menü: **Live data**, **FRN server**, **n online** und rechts **On air: Rufzeichen** bzw. **💤 Quiet**.
+- Der Zustand steht als farbiger Punkt vor dem Text (grün ok, gelb wartet, rot Problem, blau Info); die Texte sind kurz und ohne ✓/✕.
+- Am Smartphone bleibt sie eine Zeile; die Statuspunkte in der Kopfzeile entfallen, die Reiter stehen in voller Breite darunter.
+
+### 🛠️ Technik
+- Neue gemeinsame Datei `static/n8-header.css` (`.n8-topbar`, `.n8-strip`, `.n8-ss ok/warn/bad/info/idle/plain`, `.n8-user`,
+  `.n8-logout`, `.n8-menu-admin`, helles Theme, Smartphone) – identisch mit N8-HotSpot.
+- `renderUser()` baut Name + ⏻ statt des Benutzermenüs; `renderChips()` schreibt in die Statusleiste. IDs der Elemente bleiben gleich.
+
+### 📚 Doku
+- *Dashboard → Kopfzeile und Menü* neu geschrieben (Menü- und Statusleisten-Tabelle, Smartphone).
+- Screenshots neu: Kopfzeile Desktop/Smartphone, Live (öffentlich, angemeldet, Smartphone), Stations, Statistik und alle Admin-Seiten.
+- Adminbereich und Betrieb verweisen auf den Menüpunkt **⚙️ Admin** bzw. die Statusleiste.
+
 ## 2.4.1 – 2026-11-22
 
 ### Geändert

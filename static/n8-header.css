@@ -1,0 +1,50 @@
+/*
+ * N8 Header 2 – shared by the N8schicht dashboards (HBlink4-FreeRadioID, ADN FRN Server, N8-HotSpot).
+ * The same file is in every repository; change it in one, copy it to the others.
+ *
+ *   <div class="n8-topbar">
+ *     <header> logo/title | menu (… ⚙️ Admin after login) | links + 🔐 Login / user + ⏻, far right </header>
+ *     <div class="n8-strip"> <span class="n8-ss ok">Live data</span> … <span class="n8-sp"></span> … </div>
+ *   </div>
+ *
+ * One menu in the header, the status of the services in a slim strip under it
+ * (lower than the menu, attached to the header). Status items: .n8-ss + ok | warn | bad | info | idle.
+ */
+.n8-topbar { position: sticky; top: 10px; z-index: 50; margin-bottom: 18px; }
+.n8-topbar > header { position: relative !important; top: auto !important; margin-bottom: 0 !important; z-index: 2; }
+
+.n8-strip { display: flex; align-items: center; gap: 4px 16px; margin: -1px 24px 0; padding: 0 14px; height: 22px;
+            font-size: 11.5px; font-weight: 600; line-height: 22px; color: var(--text-dim, rgba(235, 240, 250, .62));
+            border-radius: 0 0 14px 14px; position: relative; z-index: 1; white-space: nowrap;
+            background: rgba(12, 17, 34, 0.72); border: 1px solid var(--glass-border, rgba(255, 255, 255, .12)); border-top: 0;
+            -webkit-backdrop-filter: var(--glass-blur, blur(22px)); backdrop-filter: var(--glass-blur, blur(22px));
+            overflow-x: auto; scrollbar-width: none; }
+.n8-strip::-webkit-scrollbar { display: none; }
+.n8-ss { display: inline-flex; align-items: center; gap: 0; border: 0; background: none; padding: 0; color: inherit; font: inherit; }
+.n8-ss::before { content: ''; flex: none; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%;
+                 background: #8e8e93; box-shadow: 0 0 5px rgba(142, 142, 147, .6); }
+.n8-ss.ok::before { background: #30d158; box-shadow: 0 0 6px rgba(48, 209, 88, .8); }
+.n8-ss.warn::before { background: #ffd60a; box-shadow: 0 0 6px rgba(255, 214, 10, .7); }
+.n8-ss.bad::before { background: #ff453a; box-shadow: 0 0 6px rgba(255, 69, 58, .8); animation: n8-pulse 2s ease-in-out infinite; }
+.n8-ss.info::before { background: #0a84ff; box-shadow: 0 0 6px rgba(10, 132, 255, .8); }
+.n8-ss.plain::before { display: none; }
+.n8-ss.ok, .n8-ss.bad { color: var(--text, #f5f7fb); }
+.n8-ss b { color: var(--accent, #5ac8fa); }
+button.n8-ss { cursor: pointer; }
+button.n8-ss:hover { color: var(--text, #f5f7fb); }
+.n8-sp { flex: 1 1 auto; }
+@keyframes n8-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+
+/* logged in: who am I (click = my account) and log out – no drop-down */
+.n8-user { display: inline-flex; align-items: center; gap: 4px; }
+.n8-user .n8-logout { padding-left: 10px !important; padding-right: 10px !important; }
+.n8-user .n8-logout:hover { background: rgba(255, 69, 58, .22) !important; border-color: rgba(255, 69, 58, .5) !important; }
+.n8-menu-admin { border: 1px dashed rgba(var(--accent-rgb, 90, 200, 250), .45) !important; }
+
+html[data-theme-mode=light] .n8-strip { background: rgba(255, 255, 255, .78); }
+@media (max-width: 1280px) { .n8-user .u-name { display: none; } }
+@media (max-width: 600px) {
+    .n8-topbar { top: 6px; margin-bottom: 10px; }
+    .n8-strip { margin: -1px 12px 0; padding: 0 10px; gap: 4px 12px; height: 20px; line-height: 20px; font-size: 10.5px; }
+    .n8-strip .n8-long { display: none; }
+}

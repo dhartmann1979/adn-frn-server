@@ -39,18 +39,29 @@ dem Rufzeichen heißt: spricht gerade.
 
 ## Kopfzeile und Menü
 
-Wie bei HBlink4-FreeRadioID liegt alles in **einer** Kopfzeile: links Logo, Titel und Untertitel, in der Mitte die **Reiter**, rechts Status, Links-Knopf und Anmeldung.
+Wie bei HBlink4-FreeRadioID und N8-HotSpot gibt es oben **ein** Menü: links Logo, Titel und Untertitel, in der Mitte die **Reiter**,
+rechts Links-Knopf und Anmeldung. Direkt darunter hängt eine schmale **Statusleiste** – bewusst niedriger als das Menü –, die nur den
+Zustand der Dienste zeigt. Beides bleibt beim Scrollen oben stehen.
 
-<p align="center"><img src="../images/header-desktop.png" alt="Kopfzeile am Desktop" width="95%"></p>
+<p align="center"><img src="../images/header-desktop.png" alt="Kopfzeile mit Menü und Statusleiste" width="95%"></p>
+
+**Menü**
+
+| Eintrag | Bedeutung |
+|---|---|
+| 🎙️ Live · 📈 Statistics · 📇 Stations · 💬 Chat | die Reiter; *Chat* nur mit Berechtigung |
+| ⚙️ Admin | erscheint nach dem Login für Admins als eigener Menüpunkt (gestrichelt umrandet) |
+| 🔗 Links ▾ | das Link-Menü (siehe unten) |
+| 🔐 Login | ganz rechts; angemeldet steht dort **👤 Name** (Klick = eigenes Konto, Passwort) und daneben **⏻** zum Abmelden – ohne Aufklappmenü |
+
+**Statusleiste** – der farbige Punkt sagt den Zustand: grün = ok, gelb = wartet, rot = Problem, blau = Info.
 
 | Anzeige | Bedeutung |
 |---|---|
-| 🎙️ Live · 📈 Statistics · 📇 Stations · 💬 Chat · ⚙️ Admin | die Reiter; *Chat* und *Admin* nur mit Berechtigung |
-| ✓ Live data | Verbindung des Browsers zum Dashboard steht |
-| ✓ FRN server | Der Dienst `frn-server` läuft und lauscht auf seinem Port; ✕ mit Grund (gestoppt, SystemManager-Fehler) |
-| 👥 n online | Stationen in allen sichtbaren Räumen (ohne Parrot) |
-| 🔗 Links ▾ | das Link-Menü (siehe unten) |
-| 🔐 Login / 👤 Name | Anmelden bzw. Benutzer-Menü (Admin-Portal, eigenes Konto, Abmelden) |
+| Live data | Verbindung des Browsers zum Dashboard steht; rot: *Live data offline*, wird automatisch neu aufgebaut |
+| FRN server | Der Dienst `frn-server` läuft und lauscht auf seinem Port; rot mit Grund (gestoppt, SystemManager-Fehler) |
+| n online | Stationen in allen sichtbaren Räumen (ohne Parrot) |
+| On air / Quiet (rechts) | wer gerade spricht bzw. 💤 *Quiet* |
 
 Wer gerade spricht, steht im Bereich **On air** der Live-Seite. Das Farbschema (7 Profile, darunter das helle *Daylight*, jede Farbe frei wählbar) stellt der Admin unter **Admin → Theme** ein.
 
@@ -68,9 +79,8 @@ Jeder Weblink kann sein Website-Site-Icon anzeigen. Das Dashboard cached die abg
 
 ### Am Smartphone
 
-Die Kopfzeile bleibt **eine Zeile**: Logo und Titel, *Live data* und *FRN server* als zwei Statuspunkte (grün = ok, rot = Problem),
-die Zahl der Stationen sowie Links und Benutzer als Symbole. Die Reiter stehen darunter. Die Kacheln bilden ein 3+2-Raster,
-alles Weitere ist einspaltig.
+Oben stehen Logo, Titel sowie Links und Benutzer als Symbole, darunter die Reiter in voller Breite (*Stats* statt *Statistics*).
+Die Statusleiste bleibt eine einzige, niedrige Zeile. Die Kacheln bilden ein 3+2-Raster, alles Weitere ist einspaltig.
 
 <p align="center"><img src="../images/header-mobile.png" alt="Kopfzeile am Smartphone" width="45%"> <img src="../images/live-mobile.png" alt="Live am Smartphone" width="30%"></p>
 

@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.4.0-4f8cff"></a>
+  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.5.0-4f8cff"></a>
   <a href="CHANGELOG.md"><img alt="Änderungen" src="https://img.shields.io/badge/Änderungen-CHANGELOG-7c5cff"></a>
   <a href="LICENSE"><img alt="Lizenz" src="https://img.shields.io/badge/Lizenz-GPLv3-30d158"></a>
 </p>
@@ -39,6 +39,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
 | ⚙️ **Admin-Portal statt Config-Dateien** | Alle Einstellungen, Räume und FRN-Konten liegen in SQLite; frn_adn schreibt daraus `server.properties`. Server starten, stoppen und neu starten per Knopf. |
 | 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu Sitzungen und ein Protokoll aller Änderungen. |
+| 🧭 **Ein Menü + Statusleiste** | Kopfzeile mit Logo, Reitern, Links und Login ganz rechts (ohne Aufklappmenü, **⚙️ Admin** nach dem Login als Menüpunkt); darunter eine schmale Statusleiste für Live-Daten, FRN-Server, Stationen online und On air |
 | 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit den **Favicons der verlinkten Seiten** (in SQLite zwischengespeichert), „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
 | ⬆️ **Updates mit Vorschau** | Zu jeder vollen Stunde und auf Knopfdruck: neue Commits für das Dashboard (GitHub) und neue Versionen des Java-Servers. Zwei getrennte Knöpfe, nie automatisch. |
 | 🎨 **Eigenes Aussehen** | N8 Theme wie bei HBlink4-FreeRadioID und N8-Hotspot: 7 Profile inkl. hellem *Daylight*, jede Farbe frei wählbar, dazu Dashboard-Logo, Site-Icon und Client-Logos. |
@@ -47,7 +48,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 🧭 **Geführte Installation** | `scripts/install.sh` fragt alles ab, richtet beide Dienste ein und prüft am Ende das Ergebnis. |
 
 <p align="center">
-  <img src="docs/images/header-desktop.png" alt="Kopfzeile mit Reitern, Status und Link-Menü" width="95%">
+  <img src="docs/images/header-desktop.png" alt="Kopfzeile mit Menü und Statusleiste" width="95%">
 </p>
 
 <p align="center">

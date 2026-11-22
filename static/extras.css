@@ -120,3 +120,6 @@ header .chips { flex: 0 1 auto; justify-content: flex-end; flex-wrap: nowrap; }
                 animation: restart-spin 0.9s linear infinite; }
 @keyframes restart-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .restart-spin { animation-duration: 3s; } }
+
+/* status strip (n8-header.css): "on air" lives there now */
+.n8-strip #chipAir { display: inline-flex !important; }

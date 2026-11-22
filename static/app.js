@@ -244,7 +244,10 @@ function renderHeader() {
 function renderUser() {
     const el = $('userArea');
     if (!S.me) { el.innerHTML = '<button class="btn primary" onclick="openLogin()" title="Login">🔐<span class="u-name">&nbsp;Login</span></button>'; return; }
-    el.innerHTML = `<button class="btn" onclick="userMenu(event)" title="${esc(S.me.display_name || S.me.username)}">👤<span class="u-name">&nbsp;${esc(S.me.display_name || S.me.username)} ▾</span></button>`;
+    // logged in: name (click = my account) and log out – no drop-down; ⚙️ Admin is a menu item
+    const name = esc(S.me.display_name || S.me.username);
+    el.innerHTML = `<span class="n8-user"><button class="btn" onclick="openAccount()" title="${name} · ${esc(S.me.role)} – my account">👤<span class="u-name">&nbsp;${name}</span></button>
+        <button class="btn n8-logout" onclick="logout()" title="Log out" aria-label="Log out">⏻</button></span>`;
 }
 function userMenu(ev) {
     ev.stopPropagation(); closeModal();
@@ -366,16 +369,18 @@ function onEvent(ev) {
 function rooms() { return (S.live && S.live.rooms) || []; }
 function renderLive() { renderChips(); renderOnAir(); renderRooms(); renderLHFilter(); renderLH(); renderFeed(); }
 function renderChips() {
-    const set = (id, cls, text) => { const e = $(id); e.className = 'chip ' + cls; e.textContent = text; e.title = text; };
-    set('chipLive', S.wsOk ? 'ok' : 'bad', S.wsOk ? '✓ Live data' : '✕ Live data');
+    // status strip under the menu: a coloured dot says it, the text stays short
+    const set = (id, cls, text) => { const e = $(id); e.className = 'n8-ss ' + cls; e.textContent = text; e.title = text; };
+    set('chipLive', S.wsOk ? 'ok' : 'bad', S.wsOk ? 'Live data' : 'Live data offline');
     const st = S.live && S.live.server;
-    if (!st) set('chipServer', '', '🛰️ FRN server');
-    else set('chipServer', st.running ? 'ok' : 'bad', st.running ? (st.warning ? '✓ FRN server · SystemManager warning' : '✓ FRN server') : st.error ? '✕ FRN server: error' : st.service === 'active' ? '… FRN server starting' : '✕ FRN server stopped');
+    if (!st) set('chipServer', '', 'FRN server');
+    else set('chipServer', st.running ? (st.warning ? 'warn' : 'ok') : st.service === 'active' && !st.error ? 'warn' : 'bad',
+             st.running ? (st.warning ? 'FRN server · SystemManager warning' : 'FRN server') : st.error ? 'FRN server: error' : st.service === 'active' ? 'FRN server starting' : 'FRN server stopped');
     const online = rooms().reduce((a, r) => a + r.clients.filter(c => !c.parrot).length, 0);
-    set('chipOnline', online ? 'info' : '', '');
-    $('chipOnline').innerHTML = `👥 ${online}<span class="ch-l">&nbsp;online</span>`;
+    set('chipOnline', online ? 'info' : 'idle', '');
+    $('chipOnline').innerHTML = `<b>${online}</b>&nbsp;online`;
     const talkers = rooms().map(r => r.talking).filter(Boolean);
-    set('chipAir', talkers.length ? 'ok' : '', talkers.length ? `🎙️ ${talkers.map(t => t.callsign || '?').join(', ')}` : '💤 Quiet');
+    set('chipAir', talkers.length ? 'ok' : 'plain', talkers.length ? `🎙️ On air: ${talkers.map(t => t.callsign || '?').join(', ')}` : '💤 Quiet');
     $('sOnline').textContent = online;
 }
 const CL_ICON = { 0: ['🔗', 'Crosslink'], 1: ['📻', 'Gateway (radio)'], 2: ['💻', 'PC only'] };

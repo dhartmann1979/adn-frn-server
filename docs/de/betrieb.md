@@ -32,7 +32,7 @@ Sie stehen im Admin-Portal oben unter *Settings* und im Log:
 
 | Problem | Ursache / Lösung |
 |---|---|
-| **✕ FRN server** in der Kopfzeile | Dienst gestoppt oder Fehler: Admin-Portal → Settings zeigt den Grund; Logs → *server.log* |
+| **FRN server** mit rotem Punkt in der Statusleiste | Dienst gestoppt oder Fehler: Admin-Portal → Settings zeigt den Grund; Logs → *server.log* |
 | Port belegt | `sudo ss -ltnp \| grep 10024` – läuft noch ein anderer FRN-Server? |
 | Dashboard zeigt keine Stationen, obwohl Clients verbunden sind | `server_clients.log` fehlt? `sudo frnadn write-config` schreibt `log4j.xml` neu, danach FRN-Server neu starten |
 | Änderungen wirken nicht | Der Java-Server liest `server.properties` nur beim Start: oben *Restart now* |

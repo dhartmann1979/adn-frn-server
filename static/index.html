@@ -13,9 +13,11 @@
     <link rel="stylesheet" href="/static/extras.css?v={{V}}">
     <link rel="stylesheet" href="/static/n8-live.css?v={{V}}">
     <link rel="stylesheet" href="/static/n8-light.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-header.css?v={{V}}">
 </head>
 <body>
 <div class="container">
+    <div class="n8-topbar">
     <header>
         <div class="brand">
             <img src="/branding/logo?v={{V}}" alt="Auf der NachtSchicht">
@@ -29,16 +31,21 @@
             <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
             <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
             <button data-tab="chat" id="tabChatBtn" class="hidden">💬 Chat</button>
-            <button data-tab="admin" id="tabAdminBtn" class="hidden">⚙️ Admin</button>
+            <button data-tab="admin" id="tabAdminBtn" class="hidden n8-menu-admin">⚙️ Admin</button>
         </nav>
         <div class="chips">
-            <span class="chip" id="chipLive">Live data</span>
-            <span class="chip" id="chipServer">Server</span>
-            <span class="chip" id="chipOnline">Online</span>
-            <span class="chip" id="chipAir">Quiet</span>
             <div class="links-menu" id="linksMenu"><button class="btn links-trigger" type="button" aria-expanded="false" aria-controls="linksPop" onclick="toggleLinks(event)"><span class="links-label">🔗 Links</span> <span aria-hidden="true">▾</span></button><div class="links-pop" id="linksPop" role="menu"><div class="links-loading">Loading links …</div></div></div><span id="userArea"></span>
         </div>
     </header>
+    <!-- status of the services: one slim line under the menu -->
+    <div class="n8-strip" id="statusStrip" role="status">
+        <span class="n8-ss" id="chipLive">Live data</span>
+        <span class="n8-ss" id="chipServer">FRN server</span>
+        <span class="n8-ss" id="chipOnline">Online</span>
+        <span class="n8-sp"></span>
+        <span class="n8-ss" id="chipAir">Quiet</span>
+    </div>
+    </div><!-- /n8-topbar -->
     <nav class="links-bar" id="linksBar" hidden aria-label="Links"></nav>
 
     <div class="banner warn hidden" id="setupBanner">
