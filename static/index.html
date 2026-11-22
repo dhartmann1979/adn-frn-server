@@ -64,10 +64,7 @@
             <h2 class="section-header collapsible" data-section="onair"><span class="collapse-caret">▾</span>On air</h2>
             <div class="onair" id="onair" data-body="onair"></div>
         </div>
-        <div class="live-rooms">
-            <h2 class="section-header collapsible" data-section="rooms"><span class="collapse-caret">▾</span>Rooms <span class="count" id="roomCount"></span></h2>
-            <div class="rooms" id="rooms" data-body="rooms"></div>
-        </div>
+        <!-- last heard and rooms side by side with the same height; each scrolls inside -->
         <div class="lv-lh">
             <h2 class="section-header collapsible" data-section="lh"><span class="collapse-caret">▾</span>Last heard <span class="seg" id="lhFilter" style="margin-left:auto" onclick="event.stopPropagation()"></span></h2>
             <div class="card lh-card" data-body="lh">
@@ -76,9 +73,9 @@
                 <button type="button" class="lh-more" id="lhMore" hidden onclick="S.lhAll = !S.lhAll; renderLH()"></button>
             </div>
         </div>
-        <div class="lv-feed">
-            <h2 class="section-header collapsible" data-section="feed"><span class="collapse-caret">▾</span>Comings &amp; goings</h2>
-            <div class="card" data-body="feed"><div class="feed" id="feed"><div class="empty">–</div></div></div>
+        <div class="live-rooms">
+            <h2 class="section-header collapsible" data-section="rooms"><span class="collapse-caret">▾</span>Rooms <span class="count" id="roomCount"></span></h2>
+            <div class="rooms" id="rooms" data-body="rooms"></div>
         </div>
     </section>
 
@@ -110,6 +107,8 @@
                 <div class="panel"><h3><span>Most active stations</span></h3><div class="tbl-wrap"><table class="tbl">
                     <thead><tr><th>Station</th><th class="num">Talks</th><th class="num">Airtime</th><th class="hide-sm">Mostly in</th></tr></thead><tbody id="stStTable"></tbody></table></div></div>
             </div>
+            <div class="panel st-feed" style="margin-top:14px"><h3><span>🚪 Comings &amp; goings</span><small>logins and logouts, live</small></h3>
+                <div class="feed" id="feed"><div class="empty">–</div></div></div>
         </div>
     </section>
 

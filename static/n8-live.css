@@ -5,16 +5,33 @@
 #tab-live > .stats-bar .stat { padding: 10px 14px; min-width: 0; }
 #tab-live > .stats-bar .stat .v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* desktop: tiles / on air + comings & goings left, rooms right / last heard over the full width.
-   On narrow screens the natural order applies: tiles, on air, rooms, last heard, comings & goings. */
-#tab-live { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 14px; align-items: start; }
+/* desktop: tiles / on air over the full width / last heard and rooms side by side with the SAME height.
+   Both lists scroll inside their card, so the page itself hardly scrolls. Narrow screens: natural order. */
+#tab-live { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 14px; align-items: stretch;
+            --lv-h: clamp(420px, calc(100vh - 300px), 900px); }
 #tab-live > * { min-width: 0; }
 #tab-live > .stats-bar { grid-column: 1 / -1; grid-row: 1; }
-#tab-live > .lv-onair { grid-column: 1; grid-row: 2; }
-#tab-live > .live-rooms { grid-column: 2; grid-row: 2 / span 2; }
-#tab-live > .lv-feed { grid-column: 1; grid-row: 3; }
-#tab-live > .lv-lh { grid-column: 1 / -1; grid-row: 4; }
-#tab-live .feed { max-height: 230px; overflow: auto; }
+#tab-live > .lv-onair { grid-column: 1 / -1; grid-row: 2; }
+#tab-live > .lv-lh { grid-column: 1; grid-row: 3; }
+#tab-live > .live-rooms { grid-column: 2; grid-row: 3; }
+#tab-live > .lv-lh, #tab-live > .live-rooms { display: flex; flex-direction: column; height: var(--lv-h); min-height: 0; }
+#tab-live > .lv-lh > .lh-card, #tab-live > .live-rooms > .rooms { flex: 1 1 auto; min-height: 0; overflow: auto; }
+#tab-live > .lv-lh:has(> .lh-card.hidden), #tab-live > .live-rooms:has(> .rooms.hidden) { height: auto; align-self: start; }
+#tab-live .lh-head { position: sticky; top: 0; z-index: 2; background: var(--surface-2, rgba(20, 26, 45, .9)); }
+/* on air: cards next to each other; "quiet" is one slim line */
+#tab-live .onair { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+#tab-live .onair .slot.idle { padding: 9px 16px; display: flex; align-items: center; gap: 14px; min-height: 0; }
+#tab-live .onair .slot.idle .lbl { margin: 0; gap: 10px; }
+#tab-live .onair .slot.idle .idle-text { padding: 0; text-align: left; }
+#tab-live .onair:has(.slot.idle) { grid-template-columns: 1fr; }
+.st-feed .feed { max-height: 360px; overflow: auto; }
+/* last heard gets the same frame as the rooms */
+#tab-live > .lv-lh { border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 12px;
+                     background: rgba(255, 255, 255, .025); box-shadow: inset 0 1px 0 var(--glass-highlight); }
+#tab-live > .lv-lh .section-header { margin: 2px 3px 9px; }
+#tab-live > .lv-lh > .lh-card { background: transparent; border: 0; box-shadow: none; padding: 0 !important; }
+#tab-live > .live-rooms > .rooms { max-height: none; align-content: start; }
+#tab-live > .lv-onair { margin-bottom: 4px; }
 .lh-l1 { display: inline-flex; align-items: center; gap: 5px; }
 
 /* last heard: compact rows */
@@ -38,10 +55,23 @@
 .lh-more { display: block; margin: 6px auto 2px; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 650; cursor: pointer;
            color: var(--text); background: rgba(127, 127, 127, .1); border: 1px solid var(--glass-border); }
 
+/* the band column is the first to go when last heard gets narrow */
+@media (min-width: 1101px) and (max-width: 1400px) {
+    #tab-live .lh-head, #tab-live .lh-row { grid-template-columns: 70px minmax(0, 1.6fr) minmax(0, 1fr) 64px; }
+    #tab-live .lh-head > :nth-child(5), #tab-live .lh-band { display: none; }
+}
 @media (max-width: 1100px) {
-    #tab-live { display: block; }
+    /* one column: tiles, on air, rooms, last heard */
+    #tab-live { display: flex; flex-direction: column; }
+    #tab-live > .live-rooms { order: 3; } #tab-live > .lv-lh { order: 4; margin-top: 12px; }
+    #tab-live > .lv-lh .section-header { flex-wrap: wrap; row-gap: 6px; }
+    #tab-live > .lv-lh .section-header .seg { max-width: 100%; overflow-x: auto; }
+    #tab-live > .lv-lh, #tab-live > .live-rooms { height: auto; display: block; }
+    #tab-live > .lv-lh > .lh-card, #tab-live > .live-rooms > .rooms { overflow: visible; }
+    #tab-live .lh-head { position: static; }
 }
 @media (max-width: 760px) {
+    #tab-live > .lv-lh { padding: 8px; }
     .lh-head { display: none; }
     .lh-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "st time" "band room"; row-gap: 2px; padding: 7px 8px; }
     .lh-st { grid-area: st; } .lh-time { grid-area: time; font-size: 12px; } .lh-room { grid-area: room; justify-self: end; }

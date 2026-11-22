@@ -8,17 +8,24 @@ Das Dashboard ist eine einzige Seite mit Tabs. Die Live-Daten liest frn_adn aus 
 
 ## Startseite wie beim DMR-Dashboard
 
-Seit Version 2.3.0 ist die Live-Seite genauso aufgebaut wie die Startseite von **DMR Die N8schicht** (HBlink4-FreeRadioID):
-oben die Tageszahlen als Kacheln, darunter zwei Spalten – links **On air** und **Comings & goings**, rechts die **Räume** –
-und über die ganze Breite die kompakte **Last-heard**-Liste. Man muss am Desktop kaum scrollen.
+Seit Version 2.3 ist die Live-Seite wie die Startseite von **DMR Die N8schicht** aufgebaut, ab 2.4 so, dass man am Desktop
+praktisch nicht mehr scrollen muss:
+
+1. **Kacheln** mit den Tageszahlen
+2. **On air** über die ganze Breite – wer gerade spricht, pro Raum eine Karte; ist es still, eine schmale Zeile mit dem letzten Durchgang
+3. **Last heard** (links) und **Rooms** (rechts) **nebeneinander und gleich hoch**. Beide füllen den Rest des Fensters und rollen
+   in sich; die Höhe passt sich an, wenn On air wächst oder das Fenster sich ändert.
 
 | Bereich | Inhalt |
 |---|---|
 | **Kacheln** | *Online now*, *Talks today*, *Airtime today*, *Stations heard*, *Peak online* mit Uhrzeit |
-| **On air** | wer gerade spricht – pro Raum eine grüne Karte mit Avatar, Rufzeichen, Name, Ort, Band und laufender Zeit |
-| **Rooms** | Raum-Auswahl als Chips (Zahl der Stationen, ● ON AIR); geöffnet ist der Raum, in dem gesprochen wird, sonst der vollste |
-| **Comings & goings** | Logins und Logouts mit Uhrzeit |
-| **Last heard** | eine Zeile pro Durchgang: Zeit, Avatar, Rufzeichen mit Flagge, Raum, Dauer, Band. Die ersten 8 (Handy: 5) stehen da, **Show all** zeigt alle |
+| **On air** | Avatar, Rufzeichen, Name, Ort, Band und laufende Zeit |
+| **Last heard** | eine Zeile pro Durchgang: Zeit, Avatar, Rufzeichen mit Flagge, Raum, Dauer, Band; filterbar nach Raum. Am Desktop stehen alle letzten 20 Durchgänge in der Liste (sie rollt), bis 1400 px Breite ohne die Spalte *Band* |
+| **Rooms** | Raum-Chips mit Stationszahl und ● ON AIR; geöffnet ist der Raum, in dem gesprochen wird, sonst der vollste |
+
+**Comings & goings** (Logins und Logouts) steht seit 2.4 im Tab **📈 Statistics** ganz unten.
+
+Unter 1100 px Breite (Tablet, Handy) ist alles einspaltig: Kacheln, On air, Räume, Last heard (5 bzw. 8 Einträge, **Show all**).
 
 <p align="center"><img src="../images/rooms-avatars.png" alt="Raumliste mit Client-Avataren und Rollen" width="60%"></p>
 
@@ -74,8 +81,7 @@ Die Abschnitte lassen sich wie beim DMR-Dashboard mit **▾** zuklappen; der Bro
 - **Today** – Online jetzt, Durchgänge, Sprechzeit, gehörte Stationen und Spitzenwert heute.
 - **On air** – pro Raum eine grüne Karte mit Client-Avatar, Rufzeichen, Name, Ort, Band und laufender Zeit; `max. 180 s` ist die maximale Sendezeit des Raums. Auch der Parrot erscheint hier, wenn er einen Durchgang abspielt.
 - **Rooms** – jeder Raum mit seinen Stationen, Avatar = Client-Software (siehe oben), danach 👑/🛡️ und das Rufzeichen; rechts Band und Dauer; 🔇 stumm. Die Stationsliste sortiert Crosslinks zuerst, dann Admins/Owner, QRV, QRL und die übrigen Stationen. **PC Only steht immer am Ende.** 🔒 = auf dem Dashboard versteckt (nur nach Login).
-- **Last heard** – die letzten Durchgänge mit Dauer laut FRN-Server, filterbar nach Raum (*All* oder ein Raum); kompakt mit **Show all**.
-- **Comings & goings** – Logins und Logouts.
+- **Last heard** – die letzten Durchgänge mit Dauer laut FRN-Server, filterbar nach Raum (*All* oder ein Raum); neben den Räumen, gleich hoch.
 
 Ein Klick auf eine Station öffnet ihre Detailansicht. Moderiert wird – wie bei FRN üblich – im FRN-Client als Owner oder Admin (Rechtsklick auf die Station); das Dashboard zeigt das Ergebnis sofort an.
 
@@ -89,6 +95,9 @@ Zeitraum *Today, 24 h, 7/30/90 days, 1 year* und Maß *Airtime* oder *Talks*.
 - **Stations online** – Maximum, alle 5 Minuten gemessen
 - **When is talked** – Wochentag × Uhrzeit
 - Tabellen **Rooms** und **Most active stations**
+- **Comings & goings** – Logins und Logouts, live (die letzten 40)
+
+<p align="center"><img src="../images/stats-feed.png" alt="Comings & goings im Statistik-Tab" width="90%"></p>
 
 Für lange Zeiträume rechnet frn_adn mit Tagessummen und speichert Ergebnisse im Cache.
 

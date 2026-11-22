@@ -456,7 +456,8 @@ function renderLH(newId) {
     rows = rows.slice(0, 20);
     const more = $('lhMore');
     if (!rows.length) { $('lhBody').innerHTML = '<div class="lh-empty">Nothing heard yet.</div>'; if (more) more.hidden = true; return; }
-    const limit = matchMedia('(max-width: 760px)').matches ? 5 : 8;
+    // desktop: last heard scrolls inside its box next to the rooms, so all rows are shown; phone/tablet: 5 / 8 + "Show all"
+    const limit = matchMedia('(max-width: 760px)').matches ? 5 : matchMedia('(min-width: 1101px)').matches ? 1000 : 8;
     if (more) { more.hidden = rows.length <= limit; more.textContent = S.lhAll ? 'Show less ▴' : `Show all ${rows.length} ▾`; }
     if (!S.lhAll) rows = rows.slice(0, limit);
     $('lhBody').innerHTML = rows.map(e => `<div class="lh-row ${e.id === newId ? 'new' : ''}" role="listitem">
@@ -468,7 +469,7 @@ function renderLH(newId) {
 }
 function renderFeed(flash) {
     const v = (S.live && S.live.visits) || [];
-    $('feed').innerHTML = v.length ? v.slice(0, 14).map((e, i) => `<div class="ev ${flash && i === 0 ? 'new' : ''}"><span class="t">${fmtTime(e.ts).slice(0, 5)}</span>
+    $('feed').innerHTML = v.length ? v.slice(0, 40).map((e, i) => `<div class="ev ${flash && i === 0 ? 'new' : ''}"><span class="t">${fmtTime(e.ts).slice(0, 5)}</span>
         <span>${e.action === 'login' ? '🟢' : '⚪'}</span><span style="min-width:0;flex:1"><b class="station-link" onclick="openStation('${esc(e.callsign)}')">${esc(e.callsign)}</b>
         <span class="dim">${e.action === 'login' ? 'joined' : 'left'}</span> ${esc(e.room)}</span></div>`).join('') : '<div class="empty">No logins yet.</div>';
 }
@@ -1330,4 +1331,19 @@ boot();
         document.querySelectorAll(`[data-body="${k}"]`).forEach(b => b.classList.toggle('hidden', on)); };
     document.querySelectorAll('.collapsible[data-section]').forEach(h => { apply(h.dataset.section);
         h.addEventListener('click', () => { st[h.dataset.section] = !st[h.dataset.section]; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} apply(h.dataset.section); }); });
+})();
+
+// Desktop live page: last heard and rooms fill the rest of the window (same height, both scroll inside),
+// so on air, the lists and everything above fit on one screen. Recomputed when on air or the window changes.
+(function () {
+    const page = $('tab-live'), box = page && page.querySelector('.lv-lh');
+    if (!box || !window.ResizeObserver) return;
+    const fit = () => {
+        if (!matchMedia('(min-width: 1101px)').matches || page.classList.contains('hidden')) return;
+        const top = box.getBoundingClientRect().top + scrollY;
+        page.style.setProperty('--lv-h', Math.max(420, Math.min(1000, innerHeight - top - 16)) + 'px');
+    };
+    new ResizeObserver(fit).observe(page.querySelector('.lv-onair'));
+    addEventListener('resize', fit);
+    setTimeout(fit, 300);
 })();

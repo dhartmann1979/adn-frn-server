@@ -2,6 +2,17 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.4.0 – 2026-11-22
+
+### Geändert
+- **Live-Seite ohne Scrollen:** *On air* steht jetzt direkt unter den Tageskacheln über die ganze Breite (still: eine schmale Zeile).
+  Darunter **Last heard** und **Rooms nebeneinander und gleich hoch**; beide füllen den Rest des Fensters und rollen in sich.
+  Die Höhe passt sich automatisch an, wenn On air wächst oder das Fenster sich ändert. Last heard zeigt am Desktop alle 20 letzten
+  Durchgänge (zwischen 1100 und 1400 px ohne Spalte *Band*).
+- **Comings & goings** ist in den Tab **Statistics** umgezogen (ganz unten, die letzten 40 Logins/Logouts, live).
+- Tablet/Handy (unter 1100 px): einspaltig in der Reihenfolge Kacheln, On air, Räume, Last heard; die Raumfilter von Last heard
+  brechen am Handy sauber um.
+
 ## 2.3.0 – 2026-11-22
 
 Neues Aussehen wie bei **DMR Die N8schicht**: Startseite, Farben und Kopfzeile folgen jetzt dem Dashboard von

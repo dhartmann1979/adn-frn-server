@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.3.0-4f8cff"></a>
+  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.4.0-4f8cff"></a>
   <a href="CHANGELOG.md"><img alt="Änderungen" src="https://img.shields.io/badge/Änderungen-CHANGELOG-7c5cff"></a>
   <a href="LICENSE"><img alt="Lizenz" src="https://img.shields.io/badge/Lizenz-GPLv3-30d158"></a>
 </p>
@@ -33,7 +33,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 
 | | |
 |---|---|
-| 🎙️ **Live-Dashboard** | Aufgebaut wie die Startseite von DMR Die N8schicht: Tageskacheln, **ON AIR**, Räume mit sortierten Stationslisten (Crosslinks, Admins, QRV, QRL; PC Only zuletzt), kompakte Last-heard-Liste und Comings & goings. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
+| 🎙️ **Live-Dashboard** | Aufgebaut wie die Startseite von DMR Die N8schicht: Tageskacheln, **ON AIR**, darunter Last heard und Räume nebeneinander in gleicher Höhe – am Desktop ohne Scrollen. Stationslisten sortiert (Crosslinks, Admins, QRV, QRL; PC Only zuletzt). Comings & goings im Statistik-Tab. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
 | 📡 **Avatar = Client-Software** | Jede Station zeigt, woher sie kommt: DMR, Zello, SvxLink, EchoLink, AllStar, YSF, D-STAR, M17, TeamSpeak, Crosslink, Funk-Gateway, PC. 👑 Owner und 🛡️ Admin stehen direkt vor dem Rufzeichen. Eigene Bilder je Art hochladbar. |
 | 📈 **Statistik** | Sprechzeit und Durchgänge je Raum und Station, heute bis ein Jahr, Aktivität nach Wochentag und Uhrzeit, Spitzenwert der Stationen online. |
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
