@@ -23,6 +23,7 @@ import re
 import shutil
 import time
 import base64
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -1096,9 +1097,30 @@ async def hourly_update_check() -> None:
     """One check shortly after start, then at every full hour. Never installs anything by itself."""
     await asyncio.sleep(30)
     while True:
+        next_check = (int(time.time() // 3600) + 1) * 3600 + 5
         try: await check_all_updates(True)
         except Exception: log.exception("update check")
-        await asyncio.sleep(3600 - (time.time() % 3600) + 5)
+        await asyncio.sleep(max(1, next_check - time.time()))
+
+
+def _seconds_to_local_midnight() -> float:
+    now = time.time()
+    tomorrow = datetime.fromtimestamp(now).date() + timedelta(days=1)
+    midnight = time.mktime((tomorrow.year, tomorrow.month, tomorrow.day, 0, 0, 0, -1, -1, -1))
+    return max(1.0, midnight - now)
+
+
+async def midnight_site_icon_refresh() -> None:
+    """Refresh the linked website icons at local midnight."""
+    while True:
+        await asyncio.sleep(_seconds_to_local_midnight())
+        try:
+            cfg = linkstore.read(LINKS_FILE)
+            urls = [item["url"] for item in cfg["items"] if item.get("site_icon", True)]
+            await asyncio.to_thread(siteicons.refresh_many, ctx.db, urls, True)
+            log.info("Midnight site icon refresh completed (%s links)", len(urls))
+        except Exception:
+            log.exception("midnight site icon refresh")
 
 async def background() -> None:
     n = 0
@@ -1144,6 +1166,7 @@ async def _startup() -> None:
     await ctx.server.start()
     ctx.tasks.append(asyncio.ensure_future(background()))
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
+    ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
 
 
 async def _shutdown() -> None:

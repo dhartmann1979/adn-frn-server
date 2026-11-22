@@ -2,6 +2,12 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.4.1 – 2026-11-22
+
+### Geändert
+- Link-Site-Icons werden zusätzlich zu **Save & refresh site icons** jede Nacht um Mitternacht neu abgerufen.
+- Der automatische Updatecheck wird auf die volle Stunde ausgerichtet.
+
 ## 2.4.0 – 2026-11-22
 
 ### Geändert
