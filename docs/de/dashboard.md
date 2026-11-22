@@ -1,6 +1,6 @@
 # 🎙️ Dashboard
 
-[← Übersicht](../../readme.md) · [Installation](installation.md) · **Dashboard** · [Admin-Portal](adminbereich.md) · [Konfiguration](konfiguration.md) · [Betrieb & Fehlersuche](betrieb.md)
+[← Übersicht](../../readme.md) · [Installation](installation.md) · **Dashboard** · [Admin-Portal](adminbereich.md) · [Konfiguration](konfiguration.md) · [Betrieb & Fehlersuche](betrieb.md) · [Updates](updates.md) · [Anleitungen](anleitungen.md)
 
 Das Dashboard ist eine einzige Seite mit Tabs. Die Live-Daten liest frn_adn aus den beiden Logdateien des Java-FRN-Servers: `server_clients.log` – die vollständige Clientliste jedes Raums nach jeder Änderung, vom Autor des Servers genau dafür eingebaut – und `server.log` mit Logins, E-Mail, Client-Art, Sprechbeginn und -ende. Änderungen gehen per WebSocket sofort an alle Browser.
 
@@ -15,15 +15,36 @@ Die Live-Startseite ist jetzt in zwei Hauptbereiche gegliedert: links die Tages-
 
 Damit bleiben Serverstatus, Tageswerte, aktive Aussendungen und Räume auf Desktop-Bildschirmen deutlich kompakter erreichbar. Bei sehr vielen Räumen scrollt nur die Raumkarte statt der gesamten Seite.
 
-## Kopfzeile
+## Kopfzeile und Menü
+
+Wie bei HBlink4-FreeRadioID liegt alles in **einer** Kopfzeile: links Logo, Titel und Untertitel, in der Mitte die **Reiter**, rechts Status, Links-Knopf und Anmeldung.
+
+<p align="center"><img src="../images/header-desktop.png" alt="Kopfzeile am Desktop" width="95%"></p>
 
 | Anzeige | Bedeutung |
 |---|---|
+| 🎙️ Live · 📈 Statistics · 📇 Stations · 💬 Chat · ⚙️ Admin | die Reiter; *Chat* und *Admin* nur mit Berechtigung |
 | ✓ Live data | Verbindung des Browsers zum Dashboard steht |
 | ✓ FRN server | Der Dienst `frn-server` läuft und lauscht auf seinem Port; ✕ mit Grund (gestoppt, SystemManager-Fehler) |
 | 👥 n online | Stationen in allen sichtbaren Räumen (ohne Parrot) |
-| 🎙️ … | Wer gerade spricht |
+| 🔗 Links ▾ | das Link-Menü (siehe unten) |
 | 🔐 Login / 👤 Name | Anmelden bzw. Benutzer-Menü (Admin-Portal, eigenes Konto, Abmelden) |
+
+Wer gerade spricht, steht im Bereich **On air** der Live-Seite. Die Akzentfarbe (Reiter, Links-Knopf, Hervorhebungen) stellt der Admin unter *Appearance* ein.
+
+### 🔗 Link-Menü
+
+Das Menü zeigt die eigenen Links des Betreibers – für alle, auch ohne Login. Es gibt zwei Darstellungen:
+
+<p align="center"><img src="../images/links-menu.png" alt="Link-Menü" width="62%"> <img src="../images/links-bar.png" alt="Knopfreihe" width="95%"></p>
+
+*Button with drop-down menu* öffnet die Liste unter dem Knopf (Esc oder Klick daneben schließt sie); *Row of buttons* zeigt alle Links als Reihe unter der Kopfzeile. Ein Link `#stations` wechselt zu diesem Reiter. Einrichten: [Anleitungen → Link-Menü](anleitungen.md#-link-menü-einrichten).
+
+### Am Smartphone
+
+Die Reiter rutschen in eine eigene Zeile, Status und Links-Knopf umbrechen; die Live-Seite ist einspaltig.
+
+<p align="center"><img src="../images/header-mobile.png" alt="Kopfzeile am Smartphone" width="45%"> <img src="../images/live-mobile.png" alt="Live am Smartphone" width="30%"></p>
 
 ## Tab 🎙️ Live
 
