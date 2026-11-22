@@ -19,7 +19,6 @@ Eigene Links (Webseite, Chat-Gruppe, Kontakt …) erscheinen in der Kopfzeile, f
 5. **Save links**. Die Kopfzeile aktualisiert sich sofort. Mit **Save & refresh site icons** werden die Favicons zusätzlich neu abgerufen.
 
 <p align="center"><img src="../images/admin-links-siteicons.png" alt="Link-Editor im Admin-Portal mit gecachten Site-Icons" width="85%"></p>
-<small>Schematische Vorschau mit Beispieldaten.</small>
 
 Erlaubte Adressen: `https://…`, `http://…`, `mailto:…`, `#stats` bzw. `#stations` (wechselt zu diesem Tab, ohne die Seite zu verlassen) und `/pfad` auf diesem Server. Alles andere – etwa `javascript:` – lehnt das Dashboard ab. Bis zu 20 Links sind möglich. Mit dem Schalter **Show the link menu** blendest du das Menü aus, ohne die Liste zu löschen.
 
@@ -44,7 +43,6 @@ Ist der Knopf grau, steht der Grund auf der Karte. Meist hilft einmalig `sudo ./
 **⚙️ Admin → 🎨 Theme**: Farbschema wählen oder Akzent-, Hintergrund-, Karten- und Textfarbe individuell festlegen. Du kannst ein Dashboard-Logo als PNG und ein Site-Icon als PNG oder ICO hochladen (jeweils bis 2 MB). **Save theme & assets** speichert die Theme-Farben global in SQLite. Logo und Site-Icon liegen im Datenverzeichnis und überstehen Programmupdates. Über **Use default logo/site icon** setzt du ein Bild zurück.
 
 <p align="center"><img src="../images/admin-theme.png" alt="Theme-Tab mit Farbschemata, Logo und Site-Icon" width="90%"></p>
-<small>Schematische Vorschau mit Beispieldaten.</small>
 
 ## 📥 Umzug von einer alten FRN-Installation
 

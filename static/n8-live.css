@@ -1,0 +1,96 @@
+/* ADN FRN Server 2.3 – live page in the layout of the DMR Die N8schicht dashboard (desktop and phone). Loaded after extras.css. */
+
+/* stat tiles: one row on the desktop, 3 + 2 on the phone */
+#tab-live > .stats-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 14px 0 4px; }
+#tab-live > .stats-bar .stat { padding: 10px 14px; min-width: 0; }
+#tab-live > .stats-bar .stat .v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* desktop: tiles / on air + comings & goings left, rooms right / last heard over the full width.
+   On narrow screens the natural order applies: tiles, on air, rooms, last heard, comings & goings. */
+#tab-live { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 14px; align-items: start; }
+#tab-live > * { min-width: 0; }
+#tab-live > .stats-bar { grid-column: 1 / -1; grid-row: 1; }
+#tab-live > .lv-onair { grid-column: 1; grid-row: 2; }
+#tab-live > .live-rooms { grid-column: 2; grid-row: 2 / span 2; }
+#tab-live > .lv-feed { grid-column: 1; grid-row: 3; }
+#tab-live > .lv-lh { grid-column: 1 / -1; grid-row: 4; }
+#tab-live .feed { max-height: 230px; overflow: auto; }
+.lh-l1 { display: inline-flex; align-items: center; gap: 5px; }
+
+/* last heard: compact rows */
+.lh-card { padding: 4px 6px 6px !important; }
+.lh-head, .lh-row { display: grid; grid-template-columns: 84px minmax(0, 1.6fr) minmax(0, 1fr) 80px minmax(0, 1.2fr); gap: 10px; align-items: center; padding: 0 12px; }
+.lh-head { height: 30px; font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim);
+           border-bottom: 1px solid var(--glass-border); }
+.lh-head .r, .lh-dur { text-align: right; }
+.lh-row { min-height: 44px; border-bottom: 1px solid rgba(127, 127, 127, .12); border-radius: 10px; transition: background .15s; }
+.lh-row:last-child { border-bottom: 0; }
+.lh-row:hover { background: rgba(127, 127, 127, .08); }
+.lh-row.new { animation: lhNew 2s ease; }
+@keyframes lhNew { from { background: rgba(var(--accent-rgb), .22); } to { background: transparent; } }
+.lh-c { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; }
+.lh-time, .lh-dur { font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.lh-who { display: inline-flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.lh-who small { color: var(--text-dim); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; }
+.lh-st .who { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; }
+.lh-band { color: var(--text-dim); font-size: 12.5px; }
+.lh-empty { padding: 14px; text-align: center; color: var(--text-dim); }
+.lh-more { display: block; margin: 6px auto 2px; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 650; cursor: pointer;
+           color: var(--text); background: rgba(127, 127, 127, .1); border: 1px solid var(--glass-border); }
+
+@media (max-width: 1100px) {
+    #tab-live { display: block; }
+}
+@media (max-width: 760px) {
+    .lh-head { display: none; }
+    .lh-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "st time" "band room"; row-gap: 2px; padding: 7px 8px; }
+    .lh-st { grid-area: st; } .lh-time { grid-area: time; font-size: 12px; } .lh-room { grid-area: room; justify-self: end; }
+    .lh-band { grid-area: band; padding-left: 39px; font-size: 11.5px; } .lh-dur { display: none; }
+}
+
+/* phone: header in one row (logo, title, status dots, links, login) + tabs; tiles 3 + 2 */
+@media (max-width: 600px) {
+    body { padding: 8px !important; }
+    #tab-live > .stats-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    #tab-live > .stats-bar .stat { padding: 7px 9px; }
+    #tab-live > .stats-bar .stat .k { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #tab-live > .stats-bar .stat .v { font-size: 16px; }
+    #tab-live > .stats-bar .stat .v small { display: none; }
+    header { flex-wrap: wrap !important; row-gap: 6px !important; padding: 7px 10px 5px !important; top: 6px !important; }
+    header .brand { flex: 1 1 0 !important; min-width: 0; gap: 8px; }
+    header .brand img { width: 34px !important; height: 34px !important; border-radius: 9px; }
+    header .brand h1 { font-size: 17px !important; overflow: hidden; text-overflow: ellipsis; }
+    header .brand .sub { display: none; }
+    header .chips { flex: 0 0 auto !important; width: auto !important; flex-wrap: nowrap !important; gap: 4px !important; order: 2; margin-left: auto; }
+    header #chipLive, header #chipServer { font-size: 0 !important; padding: 0 !important; width: 12px; height: 12px; border: 0 !important; background: none !important; }
+    header #chipLive::before, header #chipServer::before { content: ''; display: block; width: 9px; height: 9px; border-radius: 50%; background: #ffd60a; box-shadow: 0 0 6px rgba(255, 214, 10, .7); }
+    header #chipLive.ok::before, header #chipServer.ok::before { background: #30d158; box-shadow: 0 0 6px rgba(48, 209, 88, .8); }
+    header #chipLive.bad::before, header #chipServer.bad::before { background: #ff453a; box-shadow: 0 0 6px rgba(255, 69, 58, .8); }
+    header #chipOnline { padding: 4px 8px !important; font-size: 11.5px !important; }
+    header #chipOnline .ch-l { display: none; }
+    header .links-trigger > span[aria-hidden] { display: none; }
+    header #chipAir { display: none !important; }
+    header .links-label { display: none; }
+    header .links-trigger::before { content: '🔗'; }
+    header .links-trigger, header #userArea .btn { padding: 4px 8px !important; font-size: 12px !important; }
+    header #userArea .btn .u-name, header #userArea .btn span:not(.avatar):not([aria-hidden]) { display: none; }
+    header .tabs { order: 3; flex: 1 1 100% !important; margin: 0 !important; }
+    .section-header { margin: 12px 4px 6px !important; }
+}
+
+/* footer like the DMR Die N8schicht dashboard */
+.site-footer { margin: 26px auto 14px; padding: 10px 18px; display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;
+               font-size: 12.5px; color: var(--text-dim); border-radius: var(--radius-md); background: var(--glass-bg); border: 1px solid var(--glass-border);
+               -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); text-align: center; }
+.site-footer .ft-sep { opacity: .5; }
+.site-footer a { color: var(--text-dim); }
+@media (max-width: 600px) { .site-footer { font-size: 11.5px; gap: 5px; margin: 18px 0 8px; } }
+
+/* file inputs in the N8 style (theme logo, site icon, server.properties import) */
+input[type=file] { font-size: 13px; color: var(--text-dim); max-width: 100%; }
+input[type=file]::file-selector-button {
+    margin-right: 10px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong, rgba(255,255,255,.09)); color: var(--text); font: inherit; font-weight: 600; cursor: pointer;
+}
+input[type=file]::file-selector-button:hover { background: rgba(var(--accent-rgb, 90,200,250), .16); }
+

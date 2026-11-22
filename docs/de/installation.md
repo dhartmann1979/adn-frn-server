@@ -148,8 +148,7 @@ sudo systemctl restart frnadn
 sudo journalctl -u frnadn -n 80 --no-pager
 ```
 
-<p align="center"><img src="../images/https-admin-preview.svg" alt="Schematische Vorschau der HTTPS-Einstellungen" width="90%"></p>
-<small>UI-Vorschau der neuen HTTPS-Einstellungsseite (schematische Darstellung, kein Live-Screenshot).</small>
+<p align="center"><img src="../images/admin-https.png" alt="HTTPS-Einstellungen" width="45%"></p>
 
 **Technik und Betrieb:**
 - Der HTTP-Listener auf Port 80 bedient `/.well-known/acme-challenge/` direkt aus dem Webroot und leitet alle anderen Anfragen mit HTTP 301 auf HTTPS um.

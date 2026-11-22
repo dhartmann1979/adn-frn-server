@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from .db import DB
+from . import clientsw
 
 RANGES = ("today", "24h", "7d", "30d", "90d", "1y")
 TOP_ROOMS = 5
@@ -203,6 +204,7 @@ class Stats:
         if not rows:
             return None
         s = dict(rows[0])
+        s["sw"] = clientsw.detect(s.get("band"), s.get("descr"), s.get("name"), s.get("client"))
         hide = " AND net NOT IN (%s)" % ",".join("?" * len(hidden)) if hidden else ""
         hargs = list(hidden or ())
         since = time.time() - 30 * 86400
@@ -232,9 +234,11 @@ class Stats:
             "SELECT callsign, COUNT(*) AS n, SUM(duration) AS d FROM talks WHERE ts>=? AND end_ts IS NOT NULL AND callsign<>''" + hide +
             " GROUP BY callsign", [since] + list(hidden or ()))}
         out = []
-        for r in self.db.q("SELECT callsign, name, band, country, city, client, first_ts, last_ts, last_net FROM stations ORDER BY last_ts DESC"):
+        for r in self.db.q("SELECT callsign, name, band, country, city, client, descr, first_ts, last_ts, last_net FROM stations ORDER BY last_ts DESC"):
             if hidden and r["last_net"] in hidden:
                 continue
             a = act.get(r["callsign"])
-            out.append({**dict(r), "talks": a["n"] if a else 0, "duration": round(a["d"], 1) if a else 0})
+            row = dict(r)
+            row["sw"] = clientsw.detect(row["band"], row.pop("descr"), row["name"], row["client"])
+            out.append({**row, "talks": a["n"] if a else 0, "duration": round(a["d"], 1) if a else 0})
         return out

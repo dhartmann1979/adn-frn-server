@@ -1,0 +1,56 @@
+# GitHub release with the full description from CHANGELOG.md for every version.
+#
+# Runs when frnadn/__init__.py or CHANGELOG.md change on main (or by hand):
+# - no release for the version in frnadn/__init__.py yet -> create tag vX.Y.Z on this commit + release
+# - release exists                                        -> update its text from CHANGELOG.md
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [frnadn/__init__.py, CHANGELOG.md, .github/workflows/release.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version and release notes
+        id: v
+        run: |
+          python3 - <<'PY'
+          import os, re
+          init = open("frnadn/__init__.py", encoding="utf-8").read()
+          version = re.search(r'__version__\s*=\s*"([^"]+)"', init).group(1)
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          heads = list(re.finditer(r"^##\s*\[?v?(\d+\.\d+\.\d+)\]?\s*(?:[-–—]\s*(\S+))?.*$", text, re.M))
+          for i, h in enumerate(heads):
+              if h.group(1) == version:
+                  end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
+                  notes, date = text[h.end():end].strip(), h.group(2) or ""
+                  break
+          else:
+              raise SystemExit(f"CHANGELOG.md has no section for {version}")
+          open("notes.md", "w", encoding="utf-8").write(notes + "\n")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"version={version}\ntitle=v{version}{' – ' + date if date else ''}\n")
+          PY
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.v.outputs.version }}
+          TITLE: ${{ steps.v.outputs.title }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TITLE" --notes-file notes.md
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" --notes-file notes.md --latest
+          fi

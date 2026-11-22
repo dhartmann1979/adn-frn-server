@@ -22,6 +22,7 @@ import os
 import re
 import shutil
 import time
+import base64
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -30,7 +31,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
-from . import __version__, branding as brandstore, links as linkstore, siteicons, updater
+from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
 from .frn.acl import ACLStore
@@ -230,13 +231,24 @@ async def index():
     return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
 
+_BUILD: Dict[str, Any] = {}
+
+
+def build_info() -> Dict[str, Any]:
+    """Version, commit and date of this installation for the footer (read once)."""
+    if not _BUILD:
+        v = updater.local_version()
+        _BUILD.update(version=v["version"], commit=v["short"], date=v["date"])
+    return dict(_BUILD)
+
+
 @app.get("/api/info")
 async def api_info(request: Request):
     u = user_of(request)
     i = info_for(u)
     if not u and not i["public"]:
         return {"title": i["title"], "public": False, "user": None, "login_required": True, "setup_needed": i["setup_needed"]}
-    return {**i, "user": u}
+    return {**i, "user": u, "build": build_info()}
 
 
 @app.get("/api/live")
@@ -566,6 +578,58 @@ async def save_branding(request: Request):
     ctx.auth.audit("branding_changed", u["username"], "theme, logo or site icon updated", ip_of(request))
     return {"ok": True, "theme": theme, "logo_updated": logo.stat().st_mtime if logo and logo.exists() else None,
             "site_icon_updated": site_icon.stat().st_mtime if site_icon and site_icon.exists() else None}
+
+
+# ---------------------------------------------------------------- client software avatars
+@app.get("/api/client-logos")
+async def client_logos_list():
+    """Kinds of client software and which of them have an own image (key -> version)."""
+    own = {r["key"]: int(r["updated_at"]) for r in ctx.db.q("SELECT key, updated_at FROM client_logos")}
+    return {"kinds": [{"key": k, "label": clientsw.LABELS[k], "own": own.get(k)} for k in clientsw.KEYS]}
+
+
+@app.get("/client-logos/{key}")
+async def client_logo(key: str):
+    if key not in clientsw.KEYS:
+        raise HTTPError(404, "Unknown client software.")
+    rows = ctx.db.q("SELECT content_type, data FROM client_logos WHERE key=?", (key,))
+    if not rows:
+        raise HTTPError(404, "No own image.")
+    return Response(bytes(rows[0]["data"]), media_type=rows[0]["content_type"], headers={
+        "Cache-Control": "public, max-age=86400", "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'"})
+
+
+@app.post("/api/admin/client-logos/{key}")
+async def client_logo_upload(key: str, request: Request):
+    u = need_admin(request)
+    if key not in clientsw.KEYS:
+        raise HTTPError(404, "Unknown client software.")
+    b = await body(request)
+    try:
+        raw = base64.b64decode(str(b.get("data") or "").split(",", 1)[-1], validate=True)
+    except Exception:
+        raise HTTPError(400, "Invalid image.")
+    if not raw or len(raw) > 512 * 1024:
+        raise HTTPError(400, "The image must be smaller than 512 KB.")
+    ctype = siteicons._image_type(raw)          # PNG, ICO, GIF, JPEG, WebP or a harmless SVG
+    if not ctype:
+        raise HTTPError(400, "Please upload PNG, JPEG, WebP, GIF, ICO or a plain SVG.")
+    ctx.db.x("INSERT INTO client_logos (key, content_type, data, updated_at, updated_by) VALUES (?,?,?,?,?) "
+             "ON CONFLICT(key) DO UPDATE SET content_type=excluded.content_type, data=excluded.data, "
+             "updated_at=excluded.updated_at, updated_by=excluded.updated_by", (key, ctype, raw, time.time(), u["username"]))
+    ctx.auth.audit("client_logo", u["username"], f"own image for {key}", ip_of(request))
+    await push({"type": "client_logos"})
+    return {"ok": True}
+
+
+@app.delete("/api/admin/client-logos/{key}")
+async def client_logo_delete(key: str, request: Request):
+    u = need_admin(request)
+    ctx.db.x("DELETE FROM client_logos WHERE key=?", (key,))
+    ctx.auth.audit("client_logo", u["username"], f"image for {key} removed", ip_of(request))
+    await push({"type": "client_logos"})
+    return {"ok": True}
 
 
 @app.get("/link-icons/{key}")

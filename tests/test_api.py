@@ -123,7 +123,9 @@ def test_dashboard_links_editable_by_admin(client):
                          {"label": "GitHub", "url": "https://github.com/"}]}
     saved = client.post("/api/admin/links", json=payload, headers=H)
     assert saved.status_code == 200, saved.text
-    assert client.get("/api/links").json()["links"] == payload["links"]
+    got = client.get("/api/links").json()["links"]
+    assert [(x["label"], x["url"]) for x in got] == [(x["label"], x["url"]) for x in payload["links"]]
+    assert all(x["site_icon"] and x["new_tab"] and x["site_icon_url"].startswith("/link-icons/") for x in got)
     assert client.post("/api/admin/links", json={"links": [{"label": "bad", "url": "javascript:alert(1)"}]}, headers=H).status_code == 400
 
 
@@ -151,7 +153,9 @@ def test_link_menu_options_and_validation(client):
     assert saved.status_code == 200, saved.text
     got = client.get("/api/links").json()
     assert got["style"] == "bar" and got["label"] == "Mehr" and got["enabled"] is True
-    assert got["items"] == cfg["items"] == got["links"]
+    plain = lambda items: [{k: v for k, v in i.items() if k not in ("site_icon", "site_icon_url")} for i in items]
+    assert plain(got["items"]) == cfg["items"] == plain(got["links"])
+    assert got["links"][0]["site_icon_url"].startswith("/link-icons/") and "site_icon" not in got["items"][1]
     assert client.post("/api/admin/links", json={**cfg, "style": "tiles"}, headers=H).status_code == 400
     assert client.post("/api/admin/links", json={"items": [{"label": "x", "url": "//evil.example"}]}, headers=H).status_code == 400
     assert client.post("/api/admin/links", json={"enabled": False, "items": []}, headers=H).status_code == 200

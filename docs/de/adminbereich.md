@@ -32,8 +32,7 @@ Darunter fünf Karten, jede mit eigenem *Save*:
 
 ## 🔒 HTTPS & web – Let's Encrypt
 
-<p align="center"><img src="../images/https-admin-preview.svg" alt="Schematische Vorschau der HTTPS-Einstellungen" width="90%"></p>
-<small>Schematische UI-Vorschau, kein Live-Screenshot.</small>
+<p align="center"><img src="../images/admin-https.png" alt="HTTPS-Einstellungen" width="45%"></p>
 
 Der Abschnitt **HTTPS & web** übernimmt das automatische Zertifikatsmanagement aus HBlink4-FreeRadioID:
 
@@ -67,8 +66,7 @@ Rechts alle Parameter des Raums mit ihrem Namen aus `server.properties` – Bede
 
 ## 🛡️ Server lists
 
-<p align="center"><img src="../images/admin-acl.png" alt="Schematische Vorschau der formularbasierten ACL-Verwaltung" width="95%"></p>
-<small>Schematische Vorschau mit Beispieldaten.</small>
+<p align="center"><img src="../images/admin-acl.png" alt="Server lists: Admins, Muted, Blocked, Access list" width="95%"></p>
 
 Das Dashboard importiert vorhandene `AdminList`, `MuteList`, `BlockList` und `AccessList` XML-Dateien beim Start und vor jeder Anzeige oder Änderung nach SQLite. Auch Änderungen, die Owner oder Admins weiterhin im **FRN-Client** vornehmen, werden beim nächsten Öffnen der ACL-Seite übernommen.
 
@@ -125,20 +123,75 @@ Eigener Admin-Tab **🔗 Links** mit Schalter *Show links on the dashboard*, Men
 
 ### 📥 Import
 
+<p align="center"><img src="../images/admin-import.png" alt="Import einer alten server.properties" width="70%"></p>
+
 Eigener Admin-Tab **📥 Import**. Hier kann nach der frischen Installation eine einzelne `server.properties` der früheren FRN-Installation ausgewählt werden. Übernommen werden nur erkannte Properties und Raumdefinitionen; Installation, Datenbank, JAR, ACL-Dateien und Passwort-XML nicht. Vor dem Schreiben wird die bisherige `server.properties` mit Zeitstempel gesichert.
 
 **Wichtig:** Vor einem Import zusätzlich das Datenverzeichnis sichern. Nicht unterstützte Properties werden nicht übernommen. Nach dem Import den Java-FRN-Server neu starten.
 
 ### 🎨 Theme
 
-<p align="center"><img src="../images/admin-theme.png" alt="Theme-Tab mit Logo- und Site-Icon-Verwaltung" width="90%"></p>
-<small>Schematische Vorschau mit Beispieldaten.</small>
+<p align="center"><img src="../images/admin-theme.png" alt="Theme-Tab: Farben, Logo, Site-Icon und Client-Logos" width="90%"></p>
 
-Eigener Admin-Tab **🎨 Theme**. Wähle eines der Farbschemata **Midnight, Ocean, Forest, Sunset, Violet** oder **Light** und passe Akzent, Seitenhintergrund, Kartenfarbe und Textfarbe einzeln an. Die Vorschau wirkt sofort; **Save theme & assets** speichert das Schema global in SQLite.
+Eigener Admin-Tab **🎨 Theme** mit drei Bereichen. Seit Version 2.3.0 arbeitet hier dieselbe Farb-Engine (**N8 Theme**) wie im
+Dashboard von [HBlink4-FreeRadioID](https://github.com/dhartmann1979/HBlink4-FreeRadioID) und im
+[N8-Hotspot](https://github.com/dhartmann1979/N8-HotSpot) – ein Farbschema sieht also in allen drei Oberflächen gleich aus.
 
-Das Dashboard-Logo akzeptiert PNG bis 2 MB. Das Site-Icon (Favicon für Browser-Tab und Lesezeichen) akzeptiert PNG oder ICO bis 2 MB. Beide Dateien liegen im Datenverzeichnis, überstehen Updates und lassen sich auf das jeweilige Standardmotiv zurücksetzen.
+**🎨 Colours**
 
-Website-Links können außerdem ihr Site-Icon verwenden. Die Icons werden beim Speichern der Links bzw. beim Dashboard-Start abgerufen, geprüft und als Bilddaten in der SQLite-Tabelle `link_icons` zwischengespeichert. Nicht erreichbare oder private Adressen werden nicht abgerufen; in diesem Fall bleibt das Fallback-Emoji sichtbar.
+| Teil | Bedeutung |
+|---|---|
+| **Colour profile** | sieben fertige Profile: *N8 Night* (Vorgabe), *Ocean*, *Aurora*, *Ember*, *Violet*, *Graphite* und das helle *Daylight* |
+| **Own colours** | jede Farbe einzeln: *Accent* (Knöpfe, aktive Reiter, Zahlen), *Accent 2* (Verlauf von Knöpfen und Titel), *Background*, drei Leuchtfarben (*Glow top left / top right / bottom*), *Text*, *Card tint*. „from profile“ = Farbe kommt aus dem Profil, ↺ nimmt eine eigene Farbe wieder zurück |
+| **Background glow** | Stärke der farbigen Lichtflecken im Hintergrund, 0 = flacher Hintergrund |
+| **Card brightness** | wie deutlich sich die Glas-Karten vom Hintergrund abheben |
+| **Roundness** | Rundung von Karten und Knöpfen (0–28 px) |
+| **Glass blur** | Unschärfe hinter den Karten; aus = schneller auf alten Handys |
+| **Vorschau** | Titel, Reiter, Zahl und Knopf in den gewählten Farben, dazu die **Lesbarkeit** (Kontrast Text/Hintergrund, Warnung unter 4,5 : 1) |
+
+Jede Änderung wirkt sofort als Vorschau auf der ganzen Seite. Gespeichert – global in SQLite, für alle Besucher – wird erst mit
+**💾 Save colours, logo & icon**. **Discard changes** holt den gespeicherten Stand zurück, **↺ N8 standard** die Werksfarben.
+Schemata aus Version 2.2 (*Midnight, Forest, Sunset, Light* …) werden beim ersten Laden automatisch übernommen: eigene Farben bleiben,
+das Profil wird auf das passende neue gesetzt.
+
+<p align="center"><img src="../images/theme-daylight.png" alt="Profil Daylight" width="90%"></p>
+
+**🖼️ Logo & site icon**
+
+Das Dashboard-Logo akzeptiert PNG bis 2 MB (Kopfzeile und Login-Dialog). Das Site-Icon (Favicon für Browser-Tab und Lesezeichen)
+akzeptiert PNG oder ICO bis 2 MB. Beide Dateien liegen im Datenverzeichnis, überstehen Updates und lassen sich mit
+*Use default …* auf das Standardmotiv zurücksetzen.
+
+**📡 Client logos**
+
+<p align="center"><img src="../images/admin-client-logos.png" alt="Client-Logos" width="90%"></p>
+
+Jede Station bekommt als Avatar ein Bild der **Software bzw. des Netzes, aus dem sie kommt**. Erkannt wird das aus dem Band-Text,
+der Beschreibung und der Client-Art, die der FRN-Server meldet:
+
+| Logo | erkannt an (Beispiele) |
+|---|---|
+| **DMR** | „DMR“, „Brandmeister“, „BM 2623“, „TG 262“, „TGIF“, „HBlink“, „FreeDMR“ |
+| **Zello** | „Zello“ |
+| **SvxLink** | alles mit „svx“ (SvxLink, SVXReflector) |
+| **EchoLink** | „EchoLink“, „Echo Link“ |
+| **AllStar** | „AllStar“, „ASL“, „HamVoIP“ |
+| **C4FM / YSF**, **D-STAR**, **M17** | „YSF“, „C4FM“, „Wires-X“, „Fusion“ · „D-STAR“, „DPlus“, „DExtra“, „REF001“, „XLX…“ · „M17“ |
+| **TeamSpeak / Mumble** | „TeamSpeak“, „TS3“, „Mumble“ |
+
+Der erste Treffer gewinnt (Reihenfolge wie in der Tabelle). Ohne Treffer entscheidet die Client-Art:
+
+| Logo | erkannt an |
+|---|---|
+| **Crosslink** | Client-Art *Crosslink* |
+| **Gateway (radio)** | Client-Art *Gateway* mit Frequenz, z. B. „438.950 MHz FM“ |
+| **PC / app** | Band „PC Only“ oder Client-Art *PC* |
+| **Parrot / echo test** | der Parrot des Servers |
+
+Ab Werk sind das **selbst gezeichnete Abzeichen** (Farbe + Kürzel), keine Original-Logos der Hersteller: Die Marken von Zello,
+EchoLink, TeamSpeak usw. sind geschützt und dürfen nicht einfach mitgeliefert werden. Mit **⬆️** lädst du für jede Art ein eigenes Bild
+hoch (PNG, JPEG, WebP, GIF, ICO oder SVG ohne Skripte, max. 512 KB) – z. B. das offizielle Logo, wenn du es verwenden darfst.
+**✕** löscht es wieder. Das neue Bild erscheint sofort bei allen Besuchern.
 
 ## 📜 Logs
 

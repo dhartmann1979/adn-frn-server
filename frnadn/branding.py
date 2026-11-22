@@ -5,39 +5,48 @@ import json
 import re
 from typing import Any, Dict
 
-PALETTES: Dict[str, Dict[str, str]] = {
-    "midnight": {"name": "Midnight", "accent": "#5ac8fa", "page": "#0b1224", "panel": "#1c2740", "text": "#f5f7fb"},
-    "ocean": {"name": "Ocean", "accent": "#42d9c8", "page": "#071d28", "panel": "#12333c", "text": "#effbfa"},
-    "forest": {"name": "Forest", "accent": "#84d98b", "page": "#101e17", "panel": "#243b2a", "text": "#f2f8ef"},
-    "sunset": {"name": "Sunset", "accent": "#ff9f6e", "page": "#24130f", "panel": "#3a211a", "text": "#fff4ee"},
-    "violet": {"name": "Violet", "accent": "#bf5af2", "page": "#170e29", "panel": "#2a1a3d", "text": "#f8f0ff"},
-    "light": {"name": "Light", "accent": "#0077cc", "page": "#edf3f8", "panel": "#ffffff", "text": "#162331"},
+from . import n8theme
+
+# colours of the profiles before 2.3 (only used to convert saved themes)
+_OLD_PALETTES = {
+    "midnight": {"accent": "#5ac8fa", "background": "#0b1224", "text": "#f5f7fb"},
+    "ocean": {"accent": "#42d9c8", "background": "#071d28", "text": "#effbfa"},
+    "forest": {"accent": "#84d98b", "background": "#101e17", "text": "#f2f8ef"},
+    "sunset": {"accent": "#ff9f6e", "background": "#24130f", "text": "#fff4ee"},
+    "violet": {"accent": "#bf5af2", "background": "#170e29", "text": "#f8f0ff"},
+    "light": {"accent": "#0077cc", "background": "#edf3f8", "text": "#162331"},
 }
-DEFAULT_THEME = {"preset": "midnight", **{k: v for k, v in PALETTES["midnight"].items() if k != "name"}}
-HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+# Colour profiles of N8 Theme 2 (shared with HBlink4-FreeRadioID and N8-HotSpot)
+PALETTES: Dict[str, Dict[str, str]] = {k: {"name": v} for k, v in n8theme.PRESETS.items()}
+DEFAULT_THEME = dict(n8theme.DEFAULT)
+HEX = n8theme.HEX
 
 
-def normalize_theme(value: Any) -> Dict[str, str]:
-    """Validate a theme object. A legacy hex string is treated as an accent override."""
+def normalize_theme(value: Any, strict: bool = True) -> Dict[str, Any]:
+    """Validated N8 Theme 2 object. Themes of version 2.2 ({preset, accent, page, panel, text}) are converted:
+    page -> background, accent and text stay; the old solid panel colour is dropped (cards are glass now)."""
     if isinstance(value, str):
-        value = {"preset": "midnight", "accent": value}
+        value = {"accent": value}
     if not isinstance(value, dict):
         value = {}
-    preset = str(value.get("preset", "midnight"))
-    if preset not in PALETTES:
-        raise ValueError("Choose a known color preset.")
-    clean = {"preset": preset}
-    for key in ("accent", "page", "panel", "text"):
-        raw = str(value.get(key, PALETTES[preset][key]))
-        if not HEX.fullmatch(raw):
-            raise ValueError(f"Invalid theme color: {key}.")
-        clean[key] = raw.lower()
-    return clean
+    if "page" in value and "background" not in value:
+        old_preset = value.get("preset", "")
+        legacy = n8theme.LEGACY.get(str(value.get("preset", "")), str(value.get("preset", "n8")))
+        value = {"preset": legacy, "accent": value.get("accent", ""), "background": value.get("page", ""),
+                 "text": value.get("text", "")}
+        # keep only colours that were changed against the old profile; the rest comes from the new profile
+        old = _OLD_PALETTES.get(str(old_preset), {})
+        value = {k: v for k, v in value.items() if k == "preset" or str(v).lower() != old.get(k, "")}
+    try:
+        return n8theme.normalize(value, strict=strict)
+    except n8theme.ThemeError as e:
+        raise ValueError(str(e))
 
 
 def read_theme(db) -> Dict[str, str]:
     try:
         value = json.loads(db.kv_get("branding-theme", "{}"))
-        return normalize_theme(value)
+        return normalize_theme(value, strict=False)
     except (ValueError, TypeError, json.JSONDecodeError):
         return dict(DEFAULT_THEME)

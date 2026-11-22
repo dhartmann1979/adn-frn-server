@@ -38,7 +38,84 @@ function num(n) { return Number(n || 0).toLocaleString('de-DE'); }
 function initials(c) { return esc((c || '?').replace(/[^A-Za-z0-9]/g, '').replace(/^([A-Z]{1,2}\d)/, '').slice(0, 2).toUpperCase() || (c || '?').slice(0, 2)); }
 function hashStr(s) { let h = 0; for (const ch of String(s || '')) h = (h * 31 + ch.charCodeAt(0)) | 0; return Math.abs(h); }
 function avatarColor(call) { const h = (hashStr(call) * 47) % 360; return `linear-gradient(135deg, hsl(${h} 70% 50%), hsl(${(h + 40) % 360} 75% 42%))`; }
-function avatar(call, cls) { return `<span class="avatar ${cls || ''}" style="background:${avatarColor(call)}">${initials(call)}</span>`; }
+// ---------------------------------------------------------------- client software avatars
+// Own drawings (not the brand logos): a badge with the type name or a symbol. Admins can upload
+// their own image per kind (Admin → Theme → Client logos); those come from /client-logos/<key>.
+const SW_STYLE = {
+    dmr:       { t: 'DMR', c: ['#2f6bff', '#1b2f8f'] },
+    zello:     { g: 'walkie', t: 'Z', c: ['#ffb020', '#c2570c'] },
+    svxlink:   { t: 'SVX', c: ['#22b35e', '#0f5a31'] },
+    echolink:  { t: 'EL', c: ['#18a0d8', '#174a8c'] },
+    allstar:   { t: 'ASL', c: ['#9a4dff', '#4a1d96'] },
+    c4fm:      { t: 'YSF', c: ['#10b3a3', '#0f4f4a'] },
+    dstar:     { t: 'D★', c: ['#6366f1', '#2e2a85'] },
+    m17:       { t: 'M17', c: ['#f0503a', '#8a1c12'] },
+    teamspeak: { g: 'headset', c: ['#7b8aa3', '#2b3446'] },
+    crosslink: { g: 'link', c: ['#16c2d8', '#145d74'] },
+    gateway:   { g: 'antenna', c: ['#3ccf6e', '#16622f'] },
+    pc:        { g: 'monitor', c: ['#7c83ff', '#3b3a9e'] },
+    parrot:    { g: 'echo', c: ['#30d158', '#0a84ff'] },
+};
+const SW_GLYPH = {
+    walkie: '<rect x="20" y="22" width="22" height="32" rx="5" fill="none" stroke="#fff" stroke-width="4"/><path d="M26 22V9" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M26 31h10M26 37h10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
+    headset: '<path d="M15 38v-6a17 17 0 0 1 34 0v6" fill="none" stroke="#fff" stroke-width="4"/><rect x="12" y="36" width="9" height="14" rx="3" fill="#fff"/><rect x="43" y="36" width="9" height="14" rx="3" fill="#fff"/>',
+    link: '<rect x="9" y="25" width="26" height="14" rx="7" fill="none" stroke="#fff" stroke-width="4"/><rect x="29" y="25" width="26" height="14" rx="7" fill="none" stroke="#fff" stroke-width="4"/>',
+    antenna: '<path d="M32 26v28M24 54h16" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="22" r="4" fill="#fff"/><path d="M21 13a16 16 0 0 0 0 18M43 13a16 16 0 0 1 0 18" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>',
+    monitor: '<rect x="11" y="15" width="42" height="27" rx="4" fill="none" stroke="#fff" stroke-width="4"/><path d="M32 42v8M22 51h20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>',
+    echo: '<path d="M18 22h18a10 10 0 0 1 0 20H26l-8 7v-7" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/><path d="M42 27a8 8 0 0 1 0 10M47 23a14 14 0 0 1 0 18" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
+};
+const SW_LABEL = { dmr: 'DMR', zello: 'Zello', svxlink: 'SvxLink', echolink: 'EchoLink', allstar: 'AllStar', c4fm: 'C4FM / YSF', dstar: 'D-STAR', m17: 'M17',
+                   teamspeak: 'TeamSpeak / Mumble', crosslink: 'Crosslink', gateway: 'Gateway (radio)', pc: 'PC / app', parrot: 'Parrot / echo test' };
+const SW_SVG = {};
+function swSvg(key) {
+    if (SW_SVG[key]) return SW_SVG[key];
+    const st = SW_STYLE[key] || SW_STYLE.pc;
+    const id = 'g' + key;
+    const text = st.t && !st.g ? `<text x="32" y="${st.t.length > 2 ? 40 : 42}" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="${st.t.length > 2 ? 20 : 25}" fill="#fff">${st.t}</text>` : '';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${st.c[0]}"/><stop offset="1" stop-color="${st.c[1]}"/></linearGradient></defs>`
+        + `<rect width="64" height="64" fill="url(#${id})"/>${st.g ? SW_GLYPH[st.g] : ''}${text}</svg>`;
+    return (SW_SVG[key] = 'data:image/svg+xml,' + encodeURIComponent(svg));
+}
+function avatar(call, cls, sw) {
+    if (sw && SW_STYLE[sw]) {
+        const own = S.clientLogos && S.clientLogos[sw];
+        const src = own ? `/client-logos/${sw}?v=${own}` : swSvg(sw);
+        return `<span class="avatar sw ${cls || ''}" title="${esc(SW_LABEL[sw] || sw)}"><img src="${src}" alt="${esc(SW_LABEL[sw] || sw)}" onerror="this.src='${swSvg(sw)}'"></span>`;
+    }
+    return `<span class="avatar ${cls || ''}" style="background:${avatarColor(call)}">${initials(call)}</span>`;
+}
+async function loadClientLogos() {
+    try { const d = await api('GET', '/api/client-logos'); S.clientLogos = Object.fromEntries(d.kinds.filter(k => k.own).map(k => [k.key, k.own])); }
+    catch (e) { S.clientLogos = {}; }
+}
+function roleBadge(c) {
+    return c.access === 'OWNER' || c.access === 'NETOWNER' ? '<span class="role-badge owner" title="Owner">👑</span>'
+         : c.access === 'ADMIN' ? '<span class="role-badge admin" title="Admin">🛡️</span>' : '';
+}
+async function renderClientLogoAdmin() {
+    const el = $('clientLogoAdmin'); if (!el) return;
+    let d; try { d = await api('GET', '/api/client-logos'); } catch (e) { el.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
+    el.innerHTML = `<h3>📡 Client logos</h3>
+        <p class="subt">Stations show the software or network they come from as their avatar – detected from band, description and client type (crosslink, gateway, PC).
+        The built-in pictures are simple badges. You can replace each one with your own image (PNG, JPEG, WebP, GIF, ICO or plain SVG, max. 512 KB) –
+        for example an official logo, if you are allowed to use it.</p>
+        <div class="cl-grid">${d.kinds.map(k => `<div class="cl-item">
+            <span class="avatar sw"><img src="${k.own ? `/client-logos/${k.key}?v=${k.own}` : swSvg(k.key)}" alt=""></span>
+            <div class="cl-txt"><b>${esc(k.label)}</b><small>${k.own ? 'own image' : 'built-in'}</small></div>
+            <label class="btn small">⬆️<input type="file" hidden accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.ico" onchange="uploadClientLogo('${k.key}', this)"></label>
+            ${k.own ? `<button class="btn small" title="Back to the built-in picture" onclick="deleteClientLogo('${k.key}')">↺</button>` : ''}</div>`).join('')}</div>`;
+}
+async function uploadClientLogo(key, input) {
+    const f = input.files && input.files[0]; if (!f) return;
+    if (f.size > 512 * 1024) { toast('The image must be smaller than 512 KB.', true); return; }
+    try { await api('POST', `/api/admin/client-logos/${key}`, { data: await readFileData(f) }); toast('Logo saved.'); await loadClientLogos(); renderClientLogoAdmin(); renderAllLive(); }
+    catch (e) { toast(e.message, true); }
+}
+async function deleteClientLogo(key) {
+    try { await api('DELETE', `/api/admin/client-logos/${key}`); toast('Built-in picture again.'); await loadClientLogos(); renderClientLogoAdmin(); renderAllLive(); }
+    catch (e) { toast(e.message, true); }
+}
+function renderAllLive() { try { renderRooms(); renderOnAir(); renderLH(); } catch (e) { /* not on the live tab yet */ } }
 const FLAGS = { germany: 'DE', deutschland: 'DE', austria: 'AT', 'österreich': 'AT', switzerland: 'CH', schweiz: 'CH', netherlands: 'NL', niederlande: 'NL',
     holland: 'NL', belgium: 'BE', belgien: 'BE', luxembourg: 'LU', luxemburg: 'LU', france: 'FR', frankreich: 'FR', italy: 'IT', italien: 'IT',
     spain: 'ES', spanien: 'ES', portugal: 'PT', poland: 'PL', polen: 'PL', 'czech republic': 'CZ', czechia: 'CZ', tschechien: 'CZ', denmark: 'DK',
@@ -104,35 +181,32 @@ function darken(hex, factor) {
     if (!/^#[0-9a-f]{6}$/i.test(hex || '') || !Number.isFinite(n)) return '#070b17';
     return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(x => Math.round(x * factor).toString(16).padStart(2, '0')).join('');
 }
+// Colours come from the shared N8 Theme 2 engine (static/n8-theme.js); the --theme-*/--user-* variables
+// of this stylesheet are derived from the same colours.
 function applyTheme(theme) {
-    if (!theme) return;
-    const root = document.documentElement, color = theme.accent || '#5ac8fa', page = theme.page || '#0b1224', panel = theme.panel || '#1c2740', text = theme.text || '#f5f7fb';
-    root.style.setProperty('--user-accent', color);
-    const accentN = parseInt(color.slice(1), 16);
-    root.style.setProperty('--accent-rgb', `${accentN >> 16}, ${(accentN >> 8) & 255}, ${accentN & 255}`);
-    root.style.setProperty('--user-text', text);
-    root.style.setProperty('--user-muted', rgba(text, .64));
-    root.style.setProperty('--theme-accent-soft', rgba(color, .18));
-    root.style.setProperty('--theme-accent-border', rgba(color, .38));
-    root.style.setProperty('--theme-accent-focus', rgba(color, .62));
-    root.style.setProperty('--theme-accent-shadow', rgba(color, .16));
-    root.style.setProperty('--theme-accent-glow', rgba(color, .35));
-    root.style.setProperty('--glass-bg', rgba(panel, .52));
-    root.style.setProperty('--glass-bg-strong', rgba(panel, .72));
-    root.style.setProperty('--glass-border', rgba(text, .14));
-    root.style.setProperty('--glass-highlight', rgba(text, .18));
-    root.style.setProperty('--theme-input-bg', rgba(panel, .54));
-    root.style.setProperty('--theme-input-border', rgba(text, .2));
-    root.style.setProperty('--theme-option-bg', panel);
-    root.style.setProperty('--theme-popover', rgba(panel, .985));
-    root.style.setProperty('--theme-page-top', darken(page, .62));
-    root.style.setProperty('--theme-page-bottom', page);
-    root.style.setProperty('--theme-header', rgba(panel, .84));
-    root.style.setProperty('--theme-glow-a', rgba(color, .29));
-    root.style.setProperty('--theme-glow-b', rgba(color, .15));
-    root.style.setProperty('--theme-glow-c', rgba(panel, .18));
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = page;
+    const r = N8Theme.apply(theme || {});
+    const c = r.colors, light = r.light, root = document.documentElement;
+    const panelSolid = light ? '#ffffff' : '#141a2e';
+    const set = (k, v) => root.style.setProperty(k, v);
+    set('--user-accent', c.accent); set('--user-text', c.text); set('--user-muted', rgba(c.text, light ? .68 : .64));
+    set('--theme-accent-soft', rgba(c.accent, .18));
+    set('--theme-accent-border', rgba(c.accent, .38));
+    set('--theme-accent-focus', rgba(c.accent, .62));
+    set('--theme-accent-shadow', rgba(c.accent, .16));
+    set('--theme-accent-glow', rgba(c.accent, .35));
+    set('--theme-input-bg', light ? 'rgba(255,255,255,.85)' : 'rgba(0,0,0,.28)');
+    set('--theme-input-border', rgba(c.text, light ? .18 : .14));
+    set('--theme-option-bg', panelSolid);
+    set('--theme-popover', light ? 'rgba(255,255,255,.985)' : 'rgba(16,22,40,.985)');
+    set('--theme-header', light ? 'rgba(255,255,255,.72)' : 'rgba(20,26,45,.55)');
+    return r;
+}
+function renderFooter(info) {
+    const b = (info && info.build) || {};
+    const d = b.date ? new Date(b.date) : new Date();
+    $('footerYear').textContent = d.getFullYear();
+    $('ver').textContent = `ADN FRN Server v${(info && info.version) || '?'}${b.commit ? ' (' + b.commit + ')' : ''}`;
+    $('footerDate').textContent = b.date ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 }
 function isAdmin() { return S.me && (S.me.role === 'admin' || S.me.role === 'superadmin'); }
 function bindSeg(id, fn) {
@@ -144,10 +218,11 @@ async function boot() {
     try {
         const [info, branding] = await Promise.all([api('GET', '/api/info'), api('GET', '/api/branding')]);
         applyTheme(branding.theme);
+        loadClientLogos().then(() => renderAllLive());
         S.info = info; S.me = info.user || null;
         if (info.login_required && !S.me) { renderHeader(); if (!info.setup_needed) openLogin(true); return; }
         renderHeader(); renderUser(); loadPublicLinks();
-        $('ver').textContent = 'v' + info.version;
+        renderFooter(info);
         const live = await api('GET', '/api/live');
         S.live = live; renderLive();
         connectWS();
@@ -168,15 +243,15 @@ function renderHeader() {
 }
 function renderUser() {
     const el = $('userArea');
-    if (!S.me) { el.innerHTML = '<button class="btn primary" onclick="openLogin()">🔐 Login</button>'; return; }
-    el.innerHTML = `<button class="btn" onclick="userMenu(event)">👤 ${esc(S.me.display_name || S.me.username)} ▾</button>`;
+    if (!S.me) { el.innerHTML = '<button class="btn primary" onclick="openLogin()" title="Login">🔐<span class="u-name">&nbsp;Login</span></button>'; return; }
+    el.innerHTML = `<button class="btn" onclick="userMenu(event)" title="${esc(S.me.display_name || S.me.username)}">👤<span class="u-name">&nbsp;${esc(S.me.display_name || S.me.username)} ▾</span></button>`;
 }
 function userMenu(ev) {
     ev.stopPropagation(); closeModal();
     const r = ev.target.getBoundingClientRect();
     const m = document.createElement('div');
     m.className = 'glass';
-    m.style.cssText = `position:fixed;top:${r.bottom + 8}px;right:${Math.max(8, innerWidth - r.right)}px;z-index:300;border-radius:16px;padding:6px;min-width:200px;background:rgba(22,28,48,.95)`;
+    m.style.cssText = `position:fixed;top:${r.bottom + 8}px;right:${Math.max(8, innerWidth - r.right)}px;z-index:300;border-radius:16px;padding:6px;min-width:200px;background:var(--theme-popover)`;
     m.innerHTML = `<div style="padding:8px 12px" class="dim">${esc(S.me.username)} · ${esc(S.me.role)}</div>
         ${isAdmin() ? '<button class="btn" style="width:100%;border-radius:10px;margin:2px 0" onclick="showTab(\'admin\')">⚙️ Admin</button>' : ''}
         <button class="btn" style="width:100%;border-radius:10px;margin:2px 0" onclick="openAccount()">🔑 My account</button>
@@ -282,6 +357,7 @@ function onEvent(ev) {
         case 'chat': S.chat.entries.unshift(ev.entry); if (S.tab === 'chat') renderChat(); break;
         case 'server': if (S.live) { S.live.server = ev.server; renderChips(); } break;
         case 'info': api('GET', '/api/info').then(i => { S.info = { ...S.info, ...i }; renderHeader(); }); break;
+        case 'client_logos': loadClientLogos().then(() => renderAllLive()); break;
         case 'log': S.admin.logs.push(ev.entry); if (S.admin.logs.length > 600) S.admin.logs.shift(); appendLog(ev.entry); break;
     }
 }
@@ -290,13 +366,14 @@ function onEvent(ev) {
 function rooms() { return (S.live && S.live.rooms) || []; }
 function renderLive() { renderChips(); renderOnAir(); renderRooms(); renderLHFilter(); renderLH(); renderFeed(); }
 function renderChips() {
-    const set = (id, cls, text) => { const e = $(id); e.className = 'chip ' + cls; e.textContent = text; };
+    const set = (id, cls, text) => { const e = $(id); e.className = 'chip ' + cls; e.textContent = text; e.title = text; };
     set('chipLive', S.wsOk ? 'ok' : 'bad', S.wsOk ? '✓ Live data' : '✕ Live data');
     const st = S.live && S.live.server;
     if (!st) set('chipServer', '', '🛰️ FRN server');
     else set('chipServer', st.running ? 'ok' : 'bad', st.running ? (st.warning ? '✓ FRN server · SystemManager warning' : '✓ FRN server') : st.error ? '✕ FRN server: error' : st.service === 'active' ? '… FRN server starting' : '✕ FRN server stopped');
     const online = rooms().reduce((a, r) => a + r.clients.filter(c => !c.parrot).length, 0);
-    set('chipOnline', online ? 'info' : '', `👥 ${online} online`);
+    set('chipOnline', online ? 'info' : '', '');
+    $('chipOnline').innerHTML = `👥 ${online}<span class="ch-l">&nbsp;online</span>`;
     const talkers = rooms().map(r => r.talking).filter(Boolean);
     set('chipAir', talkers.length ? 'ok' : '', talkers.length ? `🎙️ ${talkers.map(t => t.callsign || '?').join(', ')}` : '💤 Quiet');
     $('sOnline').textContent = online;
@@ -322,7 +399,7 @@ function renderOnAir() {
         return;
     }
     $('onair').innerHTML = cards.map(({ r, t }) => `<div class="slot active frn"><div class="lbl"><span>🏠 ${esc(r.name)}</span><span class="pill air">ON AIR</span></div>
-        <div class="who ${t.parrot ? '' : 'station-link'}" ${t.parrot ? '' : `onclick="openStation('${esc(t.callsign)}')"`}>${avatar(t.callsign || '?')}
+        <div class="who ${t.parrot ? '' : 'station-link'}" ${t.parrot ? '' : `onclick="openStation('${esc(t.callsign)}')"`}>${avatar(t.callsign || '?', '', t.parrot ? 'parrot' : t.sw)}
           <div style="min-width:0"><div class="call">${clIcon(t)} ${esc(t.callsign || '?')}</div>
           <div class="name">${esc(t.name || '')} ${flag(t.country)} ${esc(place(t))}</div></div>
           <div class="timer" data-start="${t.start}">${fmtClock(Date.now() / 1000 - t.start)}</div></div>
@@ -335,7 +412,11 @@ function renderRooms() {
     const rs = rooms();
     $('roomCount').textContent = rs.length;
     if (!rs.length) { $('rooms').innerHTML = '<div class="card empty">No open rooms.</div>'; return; }
-    if (!rs.some(r => r.name === S.liveRoom)) S.liveRoom = rs[0].name;
+    // first look: the room where someone talks, otherwise the fullest one
+    if (!rs.some(r => r.name === S.liveRoom)) {
+        const busy = rs.find(r => r.talking) || [...rs].sort((a, b) => b.clients.filter(c => !c.parrot).length - a.clients.filter(c => !c.parrot).length)[0];
+        S.liveRoom = busy.name;
+    }
     const selected = rs.find(r => r.name === S.liveRoom) || rs[0];
     const tabs = rs.map(r => {
         const n = r.clients.filter(c => !c.parrot).length;
@@ -345,7 +426,7 @@ function renderRooms() {
     }).join('');
     const n = selected.clients.filter(c => !c.parrot).length;
     const rows = selected.clients.map((c, i) => ({ c, i })).sort((a, b) => clientOrder(a.c) - clientOrder(b.c) || a.i - b.i).map(({ c }) => `<div class="st-row ${c.talking ? 'talk' : ''} ${c.parrot ? '' : 'station-link'}" ${c.parrot ? '' : `onclick="openStation('${esc(c.callsign)}')"`}>
-        ${c.parrot ? '<span class="avatar sm" style="background:linear-gradient(135deg,#30d158,#0a84ff)">🦜</span>' : avatar(c.callsign, 'sm')}<div class="c"><b>${esc(c.callsign)}</b>${c.talking ? '<span class="mic"></span>' : ''}${c.muted ? ' <span title="muted">🔇</span>' : ''}${c.access === 'OWNER' || c.access === 'NETOWNER' ? ' <span title="Owner">👑</span>' : c.access === 'ADMIN' ? ' <span title="Admin">🛡️</span>' : ''}
+        ${avatar(c.callsign, 'sm', c.parrot ? 'parrot' : c.sw)}<div class="c"><b class="st-call">${roleBadge(c)}${esc(c.callsign)}</b>${c.talking ? '<span class="mic"></span>' : ''}${c.muted ? ' <span title="muted">🔇</span>' : ''}
         <small>${esc(c.name)}${c.name && (c.city || c.country) ? ' · ' : ''}${flag(c.country)} ${esc(place(c))}</small></div>
         <div class="r"><span class="band" title="${esc(c.band)}">${clIcon(c)} <span class="band-txt">${esc((c.band || '').length > 22 ? c.band.slice(0, 21) + '…' : c.band || '')}</span></span>${c.since ? `<div data-since="${c.since}">${since(c.since)}</div>` : ''}</div>
     </div>`).join('');
@@ -366,15 +447,24 @@ function renderLHFilter() {
     $('lhFilter').innerHTML = [['all', 'All'], ...names.slice(0, 5).map(n => [n, n])].map(([v, l]) => `<button data-v="${esc(v)}" class="${S.lhRoom === v ? 'active' : ''}">${esc(l)}</button>`).join('');
 }
 $('lhFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.lhRoom = b.dataset.v; renderLHFilter(); renderLH(); });
+// Last heard: compact rows like the DMR dashboard – desktop one line, phone two short lines.
+// The first 8 (phone 5) entries are shown, "Show all" shows the rest.
 function renderLH(newId) {
     if (!S.live) return;
     let rows = S.live.last_heard || [];
     if (S.lhRoom !== 'all') rows = rows.filter(e => e.room === S.lhRoom);
     rows = rows.slice(0, 20);
-    if (!rows.length) { $('lhBody').innerHTML = '<tr><td colspan="5" class="empty">Nothing heard yet.</td></tr>'; return; }
-    $('lhBody').innerHTML = rows.map(e => `<tr class="${e.id === newId ? 'new' : ''}"><td>${fmtTime(e.ts)}</td>
-        <td>${e.callsign ? `<span class="who station-link" onclick="openStation('${esc(e.callsign)}')">${avatar(e.callsign, 'sm')}<span><b>${esc(e.callsign)}</b> ${flag(e.country)}<small>${esc(e.name || place(e))}</small></span></span>` : '<span class="dim">unknown station</span>'}</td>
-        <td><span class="pill tg">${esc(e.room)}</span></td><td class="num">${fmtDur(e.duration)}</td><td class="hide-sm">${bandHtml(e)}</td></tr>`).join('');
+    const more = $('lhMore');
+    if (!rows.length) { $('lhBody').innerHTML = '<div class="lh-empty">Nothing heard yet.</div>'; if (more) more.hidden = true; return; }
+    const limit = matchMedia('(max-width: 760px)').matches ? 5 : 8;
+    if (more) { more.hidden = rows.length <= limit; more.textContent = S.lhAll ? 'Show less ▴' : `Show all ${rows.length} ▾`; }
+    if (!S.lhAll) rows = rows.slice(0, limit);
+    $('lhBody').innerHTML = rows.map(e => `<div class="lh-row ${e.id === newId ? 'new' : ''}" role="listitem">
+        <span class="lh-c lh-time">${fmtTime(e.ts)}</span>
+        <span class="lh-c lh-st">${e.callsign ? `<span class="who station-link" onclick="openStation('${esc(e.callsign)}')">${avatar(e.callsign, 'sm', e.sw)}<span class="lh-who"><span class="lh-l1"><b>${esc(e.callsign)}</b>${flag(e.country)}</span><small>${esc(e.name || place(e))}</small></span></span>` : '<span class="dim">unknown station</span>'}</span>
+        <span class="lh-c lh-room"><span class="pill tg">${esc(e.room)}</span></span>
+        <span class="lh-c lh-dur">${fmtDur(e.duration)}</span>
+        <span class="lh-c lh-band">${bandHtml(e)}</span></div>`).join('');
 }
 function renderFeed(flash) {
     const v = (S.live && S.live.visits) || [];
@@ -401,7 +491,7 @@ async function openStation(call) {
     const maxH = Math.max(...d.hours, 1);
     const bars = d.hours.map((h, i) => `<rect x="${i * 15 + 1}" y="${60 - Math.max(h ? 3 : 1, h / maxH * 56)}" width="13" height="${Math.max(h ? 3 : 1, h / maxH * 56)}" rx="3" fill="${h ? '#3987e5' : 'rgba(255,255,255,.08)'}"><title>${String(i).padStart(2, '0')}:00 · ${fmtDur(h)}</title></rect>`).join('');
     $('ov').querySelector('.modal').innerHTML = `
-        <div class="st-head">${avatar(s.callsign, 'xl')}<div style="min-width:0">
+        <div class="st-head">${avatar(s.callsign, 'xl', s.sw)}<div style="min-width:0">
             <div class="st-call">${esc(s.callsign)} ${flag(s.country)}</div>
             <div class="dim">${esc(s.name)}${s.name && place(s) ? ' · ' : ''}${esc(place(s))}${s.country && flag(s.country) ? ' · ' + esc(s.country) : ''}</div>
             <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${s.band ? `<span class="pill">${isRadio(s) ? '📻' : '💻'} ${esc(s.band)}</span>` : ''}${s.descr ? `<span class="pill">${esc(s.descr)}</span>` : ''}
@@ -597,7 +687,7 @@ function renderDirectory() {
     if (DIR.filter === 'talked') rows = rows.filter(r => r.talks > 0).sort((a, b) => b.duration - a.duration);
     if (q) rows = rows.filter(r => [r.callsign, r.name, r.city, r.country].some(x => (x || '').toLowerCase().includes(q)));
     $('dirCount').textContent = num(rows.length);
-    $('dirBody').innerHTML = rows.slice(0, DIR.limit).map(r => `<tr><td><span class="who station-link" onclick="openStation('${esc(r.callsign)}')">${avatar(r.callsign, 'sm')}<span><b>${esc(r.callsign)}</b><small>${esc(r.name)}</small></span></span></td>
+    $('dirBody').innerHTML = rows.slice(0, DIR.limit).map(r => `<tr><td><span class="who station-link" onclick="openStation('${esc(r.callsign)}')">${avatar(r.callsign, 'sm', r.sw)}<span><b>${esc(r.callsign)}</b><small>${esc(r.name)}</small></span></span></td>
         <td class="hide-sm">${flag(r.country)} ${esc(place(r))}</td><td class="hide-sm">${bandHtml(r)}</td>
         <td class="num">${r.talks || '<span class="dim">–</span>'}</td><td class="num hide-sm">${r.talks ? fmtDur(r.duration, true) : ''}</td>
         <td>${online.has(r.callsign) ? `<span class="pill ok">🟢 ${esc(online.get(r.callsign))}</span>` : `${ago(r.last_ts)}${r.last_net ? ` <span class="dim">· ${esc(r.last_net)}</span>` : ''}`}</td></tr>`).join('')
@@ -677,7 +767,7 @@ async function loadSettings() {
     setRestart(d.restart_needed);
     $('admin-settings').innerHTML = `<div class="tile" style="margin-bottom:14px">${serverBox(d.server, d.jar)}
         <div class="actions" style="justify-content:flex-start;margin-top:10px"><button class="btn small" onclick="checkUpdate(this)">⬆️ Check for update</button>
-            <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="updInfo" style="font-size:12.5px"></span></div></div>
+            <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
         <div class="tiles">${d.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
             ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div>' : ''}
@@ -691,18 +781,18 @@ async function saveSettings(form) {
     } catch (e) { toast(e.message, true); }
 }
 async function checkUpdate(btn) {
-    btn.disabled = true; $('updInfo').textContent = 'checking freeradionetwork.de …';
+    btn.disabled = true; $('javaUpdInfo').textContent = 'checking freeradionetwork.de …';
     try {
         const r = await api('GET', '/api/admin/server/update');
-        if (!r.ok) $('updInfo').textContent = `not reachable: ${r.error}`;
-        else if (r.update) $('updInfo').innerHTML = `Version <b>${esc(r.latest.version)}</b> (${esc(r.latest.build)}) is available – installed ${esc(r.installed ? r.installed.version : '?')}. <button class="btn small primary" onclick="installUpdate(this)">Install</button>`;
-        else $('updInfo').textContent = `✓ up to date (${r.installed ? r.installed.version + ', ' + r.installed.build : '?'})`;
-    } catch (e) { $('updInfo').textContent = e.message; }
+        if (!r.ok) $('javaUpdInfo').textContent = `not reachable: ${r.error}`;
+        else if (r.update) $('javaUpdInfo').innerHTML = `Version <b>${esc(r.latest.version)}</b> (${esc(r.latest.build)}) is available – installed ${esc(r.installed ? r.installed.version : '?')}. <button class="btn small primary" onclick="installUpdate(this)">Install</button>`;
+        else $('javaUpdInfo').textContent = `✓ up to date (${r.installed ? r.installed.version + ', ' + r.installed.build : '?'})`;
+    } catch (e) { $('javaUpdInfo').textContent = e.message; }
     btn.disabled = false;
 }
 async function installUpdate(btn) {
     if (!await confirmBox({ title: 'Install the update?', body: 'FRN_Server.zip is loaded from freeradionetwork.de, FRN_Server.jar replaced and the FRN server restarted.' }, 'Install')) return;
-    btn.disabled = true; $('updInfo').textContent = 'downloading …';
+    btn.disabled = true; $('javaUpdInfo').textContent = 'downloading …';
     try { const r = await api('POST', '/api/admin/server/update', {}); toast(`Installed: ${r.installed ? r.installed.version : ''}`); loadSettings(); } catch (e) { toast(e.message, true); btn.disabled = false; }
 }
 async function showProps() {
@@ -991,24 +1081,19 @@ async function loadSystem() {
 
 async function loadThemeAdmin() {
     const d = await api('GET', '/api/branding');
-    S.admin.branding = d.theme; S.admin.palettes = d.palettes || {};
+    S.admin.branding = d.theme; S.admin.saved = d.theme;
     renderThemeAdmin();
 }
 function renderThemeAdmin() {
-    const t = S.admin.branding || { preset: 'midnight', accent: '#5ac8fa', page: '#0b1224', panel: '#1c2740', text: '#f5f7fb' };
-    const choices = Object.entries(S.admin.palettes).map(([id, p]) => `<option value="${esc(id)}" ${t.preset === id ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
+    const t = S.admin.branding || N8Theme.DEFAULTS;
     const stamp = Date.now();
     $('admin-theme').innerHTML = `<div class="tile theme-card">
-        <h3>🎨 Theme, logo &amp; site icon</h3>
-        <p class="subt">Brand the complete dashboard. Changes are saved globally in SQLite and shown to every visitor.</p>
-        <div class="theme-colors">
-            <label>Color preset<select id="themePreset" onchange="selectThemePreset()">${choices}</select></label>
-            <label>Accent<input type="color" id="themeAccent" value="${esc(t.accent)}" oninput="previewTheme()"></label>
-            <label>Page background<input type="color" id="themePage" value="${esc(t.page)}" oninput="previewTheme()"></label>
-            <label>Card / panel<input type="color" id="themePanel" value="${esc(t.panel)}" oninput="previewTheme()"></label>
-            <label>Text<input type="color" id="themeText" value="${esc(t.text)}" oninput="previewTheme()"></label>
-        </div>
-        <div class="theme-palette" id="themePalettePreview"></div>
+        <h3>🎨 Colours</h3>
+        <p class="subt">Pick a colour profile, then change any colour you like – or build a completely own scheme. The whole page shows it right away; it only stays after <b>Save</b>. Same colour engine as HBlink4-FreeRadioID and N8-HotSpot.</p>
+        ${N8Theme.editorHtml(t, 'themeEditor')}
+    </div>
+    <div class="tile theme-card">
+        <h3>🖼️ Logo &amp; site icon</h3>
         <div class="theme-assets">
             <div class="theme-asset"><div class="theme-asset-preview"><img id="logoPreview" src="/branding/logo?v=${stamp}" alt="Current dashboard logo"></div><div>
                 <b>Dashboard logo</b><p class="subt">PNG image, up to 2 MB. Shown in the header and sign-in dialog.</p>
@@ -1019,34 +1104,24 @@ function renderThemeAdmin() {
                 <input type="file" id="themeSiteIconFile" accept="image/png,.ico,image/x-icon"><label class="theme-toggle"><input type="checkbox" id="resetSiteIcon"> Use default site icon</label>
             </div></div>
         </div>
-        <div class="actions"><button class="btn" onclick="loadThemeAdmin()">Discard preview</button><button class="btn primary" onclick="saveBranding(this)">Save theme &amp; assets</button></div>
+        <div class="actions"><button class="btn" onclick="N8Theme.setEditor($('themeEditor'), N8Theme.DEFAULTS); applyTheme(themeFormValue())">↺ N8 standard</button>
+            <button class="btn" onclick="loadThemeAdmin(); applyTheme(S.admin.saved)">Discard changes</button>
+            <button class="btn primary" onclick="saveBranding(this)">💾 Save colours, logo &amp; icon</button></div>
         <div class="dim" id="themeInfo" role="status"></div>
-    </div>`;
-    const preview = $('themePalettePreview');
-    preview.innerHTML = [t.accent, t.page, t.panel, t.text].map(c => `<span title="${esc(c)}" style="background:${esc(c)}"></span>`).join('');
+    </div>
+    <div class="tile theme-card" id="clientLogoAdmin"></div>`;
+    N8Theme.bindEditor($('themeEditor'), t2 => applyTheme(t2));
     $('themeLogoFile').addEventListener('change', () => { $('resetLogo').checked = false; previewUpload('themeLogoFile', 'logoPreview'); });
     $('themeSiteIconFile').addEventListener('change', () => { $('resetSiteIcon').checked = false; previewUpload('themeSiteIconFile', 'siteIconPreview'); });
     $('resetLogo').addEventListener('change', () => { if ($('resetLogo').checked) { $('themeLogoFile').value = ''; $('logoPreview').src = '/static/adn-icon.svg'; } });
     $('resetSiteIcon').addEventListener('change', () => { if ($('resetSiteIcon').checked) { $('themeSiteIconFile').value = ''; $('siteIconPreview').src = '/static/adn-icon.svg'; } });
+    renderClientLogoAdmin();
 }
 function previewUpload(fileId, imageId) {
     const file = $(fileId).files?.[0];
     if (file) $(imageId).src = URL.createObjectURL(file);
 }
-function themeFormValue() {
-    return { preset: $('themePreset').value, accent: $('themeAccent').value, page: $('themePage').value,
-        panel: $('themePanel').value, text: $('themeText').value };
-}
-function selectThemePreset() {
-    const p = S.admin.palettes[$('themePreset').value];
-    if (!p) return;
-    for (const key of ['accent', 'page', 'panel', 'text']) $('theme' + key[0].toUpperCase() + key.slice(1)).value = p[key];
-    previewTheme();
-}
-function previewTheme() {
-    const theme = themeFormValue(); applyTheme(theme);
-    $('themePalettePreview').innerHTML = [theme.accent, theme.page, theme.panel, theme.text].map(c => `<span title="${esc(c)}" style="background:${esc(c)}"></span>`).join('');
-}
+function themeFormValue() { return N8Theme.readEditor($('themeEditor')); }
 function readFileData(file) {
     return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); });
 }
@@ -1059,7 +1134,7 @@ async function saveBranding(btn) {
         if (icon) payload.site_icon = await readFileData(icon);
         if (btn) btn.disabled = true;
         const d = await api('POST', '/api/admin/branding', payload);
-        S.admin.branding = d.theme; applyTheme(d.theme);
+        S.admin.branding = d.theme; S.admin.saved = d.theme; applyTheme(d.theme);
         const stamp = Date.now();
         document.querySelectorAll('.brand img, .logo').forEach(x => x.src = '/branding/logo?v=' + stamp);
         document.querySelector('link[rel="icon"]').href = '/branding/site-icon?v=' + stamp;
@@ -1152,12 +1227,13 @@ async function loadImportAdmin() {
         <div id="importInfo" class="dim" role="status" style="margin-top:12px"></div>
     </div>`;
 }
+// checkAllUpdates / upgradeNow: simple fallbacks – static/extras.js replaces them with the detailed version
 async function checkAllUpdates(btn) {
     if (btn) btn.disabled = true;
     try {
         const r = await api('POST', '/api/admin/updates/check', {});
         const gh = r.github || {}, java = r.java || {};
-        $('updInfo').innerHTML = `GitHub: ${gh.ok ? (gh.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(gh.error || 'unknown')} · Java FRN: ${java.ok ? (java.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(java.error || 'unknown')}<br>Last check: ${r.checked ? new Date(r.checked * 1000).toLocaleString('de-DE') : '–'}`;
+        $('updInfo').innerHTML = `GitHub: ${gh.ok ? (gh.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(gh.error || 'unknown')} · Java FRN: ${java.ok ? (java.update ? '<b>update available</b>' : 'up to date') : 'check failed: ' + esc(java.error || 'unknown')}`;
         $('upgradeJava').disabled = !java.update;
         $('upgradeGit').disabled = !gh.update;
     } catch(e) { $('updInfo').textContent = e.message; }
@@ -1171,7 +1247,6 @@ async function upgradeNow(target, btn) {
     try {
         await api('POST', '/api/admin/updates/upgrade', {target});
         toast('Upgrade completed.');
-        if (target === 'github') toast('Please restart the dashboard service.');
         await checkAllUpdates();
     } catch(e) { toast(e.message, true); btn.disabled = false; }
 }

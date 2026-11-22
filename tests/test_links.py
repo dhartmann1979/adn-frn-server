@@ -10,7 +10,8 @@ def test_defaults_and_legacy_list(tmp_path):
     assert cfg["enabled"] and cfg["style"] == "menu" and cfg["items"][0]["label"] == "FreeRadioNetwork"
     f.write_text('[{"label": "A", "url": "https://example.org"}]')           # older format
     cfg = links.read(f)
-    assert cfg["items"] == [{"label": "A", "url": "https://example.org"}] and cfg["style"] == "menu"
+    # older entries get the defaults of the new options: new tab and site icon on for web links
+    assert cfg["items"] == [{"label": "A", "url": "https://example.org", "site_icon": True, "new_tab": True}] and cfg["style"] == "menu"
 
 
 def test_normalize_keeps_options():

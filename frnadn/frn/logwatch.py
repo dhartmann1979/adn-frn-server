@@ -25,6 +25,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Tuple
 
+from .. import clientsw
+
 log = logging.getLogger("frnadn.frn")
 
 LINE_RE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d),(\d{3})\s+(?:(\w+)\s+)?-\s(.*)$")
@@ -102,7 +104,8 @@ class LClient:
     def public(self) -> Dict[str, Any]:
         return {"callsign": self.callsign, "name": self.name, "client": self.client, "band": self.band, "descr": self.descr,
                 "country": self.country, "city": self.city, "cid": self.cid or self.on, "status": self.status, "muted": self.muted,
-                "since": self.joined, "access": self.access, "parrot": self.is_parrot}
+                "since": self.joined, "access": self.access, "parrot": self.is_parrot,
+                "sw": clientsw.detect(self.band, self.descr, self.name, self.client, self.is_parrot)}
 
 
 @dataclass(eq=False)

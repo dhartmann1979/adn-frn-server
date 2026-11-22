@@ -2,6 +2,49 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.3.0 – 2026-11-22
+
+Neues Aussehen wie bei **DMR Die N8schicht**: Startseite, Farben und Kopfzeile folgen jetzt dem Dashboard von
+HBlink4-FreeRadioID; Stationen zeigen ihre Client-Software als Avatar.
+
+### Neu
+- **Startseite wie das DMR-Dashboard:** Tageskacheln oben (Online now, Talks today, Airtime today, Stations heard, Peak online),
+  darunter zwei Spalten – links *On air* und *Comings & goings*, rechts die Räume – und die kompakte *Last heard*-Liste über die volle Breite.
+  Am Desktop passt die Seite meist ohne Scrollen auf einen Bildschirm.
+- **Last heard kompakt:** eine Zeile pro Durchgang mit Avatar, Rufzeichen, Flagge, Raum, Dauer und Band; die ersten 8 (Handy: 5) Einträge,
+  **Show all** zeigt alle.
+- **Räume:** Raum-Chips mit Stationszahl und ● ON AIR; geöffnet ist automatisch der Raum, in dem gesprochen wird, sonst der vollste.
+- **Avatar = Client-Software:** DMR, Zello, SvxLink, EchoLink, AllStar, C4FM/YSF, D-STAR, M17, TeamSpeak/Mumble, Crosslink,
+  Funk-Gateway, PC/App und Parrot – erkannt an Band, Beschreibung und Client-Art (`frnadn/clientsw.py`). Die Bilder sind
+  eigene Abzeichen (keine geschützten Hersteller-Logos); unter **Admin → Theme → Client logos** lässt sich jedes durch ein
+  eigenes Bild ersetzen (PNG, JPEG, WebP, GIF, ICO oder SVG ohne Skripte, max. 512 KB, gespeichert in SQLite).
+- **Rollen-Symbole** 👑 Owner und 🛡️ Admin stehen in der Raumliste jetzt **nach dem Avatar und vor dem Rufzeichen**.
+- **N8 Theme:** dieselbe Farb-Engine wie HBlink4-FreeRadioID und N8-Hotspot. 7 Profile (N8 Night, Ocean, Aurora, Ember, Violet,
+  Graphite und das helle **Daylight**), jede Farbe einzeln wählbar (Akzent, Akzent 2, Hintergrund, drei Leuchtfarben, Text, Kartentönung),
+  Regler für Leuchten, Kartenhelligkeit, Rundung und Glas-Unschärfe, Live-Vorschau mit Lesbarkeitsprüfung.
+  Gespeicherte Schemata aus 2.2 (Midnight, Forest, Sunset, Light …) werden automatisch übernommen.
+- **Heller Modus** für alle Seiten und Dialoge (`static/n8-light.css`).
+- **Kopfzeile am Handy in einer Zeile:** *Live data* und *FRN server* als Statuspunkte, Zahl der Stationen, Links und Benutzer als Symbole;
+  Kacheln als 3+2-Raster.
+- **Fußzeile** mit © Die N8schicht, Version, Commit und Datum (`/api/info` liefert dafür `build`).
+- `tools/demo_live.py` schreibt Demo-Stationen in die FRN-Logs (für Tests und Screenshots).
+
+### Behoben
+- **Software updates (Admin → System) blieb bei „Not checked yet.“** Die Seite hatte zwei Elemente mit derselben ID `updInfo`
+  (Java-Hinweis unter *Settings* und die Update-Karte unter *System*); das Prüfergebnis landete im unsichtbaren Element.
+  Die Karte zeigt jetzt wieder Dashboard- und Java-Stand mit Commits und Vergleichslink.
+- Beim Öffnen von *System* wird der zwischengespeicherte Stand (max. 10 Minuten alt) verwendet, statt GitHub jedes Mal neu zu fragen
+  (schont das Abfragelimit). **↻ Check now** fragt weiterhin sofort nach; nach einem Upgrade wird neu geprüft.
+- Link-Liste: *site icon* gilt nur noch für Web-Links, *new tab* nur für Web- und `mailto:`-Links (vorher auch für `#tab`/`/pfad`); 4 Tests angepasst.
+- Datei-Auswahl (Logo, Site-Icon, Client-Logos, Import) im N8-Stil statt Browser-Standard.
+- Benutzer-Menü und Aufklapp-Menüs nutzen die Theme-Farbe statt eines festen Dunkelblaus (lesbar im hellen Modus).
+
+### Doku
+- Alle Screenshots neu (Desktop und Smartphone, Daylight, Theme, Client-Logos, HTTPS, Import, Server-Listen);
+  die schematischen SVG-Vorschauen sind durch echte Screenshots ersetzt.
+- Dashboard: neuer Abschnitt *Startseite wie beim DMR-Dashboard* mit Avataren und Rollen; Admin-Portal: Theme, Client-Logos
+  mit Erkennungsregeln, Import.
+
 ## 2.2.3 – 2026-11-22
 
 ### Behoben

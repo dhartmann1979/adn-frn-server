@@ -180,6 +180,13 @@ CREATE TABLE IF NOT EXISTS link_icons (
     fetched_at  REAL NOT NULL,
     error       TEXT NOT NULL DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS client_logos (      -- own images for the client software avatars (clientsw.py)
+    key          TEXT PRIMARY KEY,
+    content_type TEXT NOT NULL,
+    data         BLOB NOT NULL,
+    updated_at   REAL NOT NULL,
+    updated_by   TEXT NOT NULL DEFAULT ''
+);
 CREATE TABLE IF NOT EXISTS stations (
     callsign  TEXT PRIMARY KEY,
     cid       TEXT NOT NULL DEFAULT '',

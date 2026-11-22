@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.1.0-4f8cff"></a>
+  <a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/Version-2.3.0-4f8cff"></a>
   <a href="CHANGELOG.md"><img alt="Änderungen" src="https://img.shields.io/badge/Änderungen-CHANGELOG-7c5cff"></a>
   <a href="LICENSE"><img alt="Lizenz" src="https://img.shields.io/badge/Lizenz-GPLv3-30d158"></a>
 </p>
@@ -33,14 +33,15 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 
 | | |
 |---|---|
-| 🎙️ **Live-Dashboard** | Wer gerade spricht, steht oben (**ON AIR**). Räume mit sortierten Stationslisten (Crosslinks, Admins, QRV, QRL; PC Only zuletzt), Last heard und Comings & goings. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
+| 🎙️ **Live-Dashboard** | Aufgebaut wie die Startseite von DMR Die N8schicht: Tageskacheln, **ON AIR**, Räume mit sortierten Stationslisten (Crosslinks, Admins, QRV, QRL; PC Only zuletzt), kompakte Last-heard-Liste und Comings & goings. Für Smartphone und Desktop gebaut, Änderungen kommen per WebSocket sofort. |
+| 📡 **Avatar = Client-Software** | Jede Station zeigt, woher sie kommt: DMR, Zello, SvxLink, EchoLink, AllStar, YSF, D-STAR, M17, TeamSpeak, Crosslink, Funk-Gateway, PC. 👑 Owner und 🛡️ Admin stehen direkt vor dem Rufzeichen. Eigene Bilder je Art hochladbar. |
 | 📈 **Statistik** | Sprechzeit und Durchgänge je Raum und Station, heute bis ein Jahr, Aktivität nach Wochentag und Uhrzeit, Spitzenwert der Stationen online. |
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
 | ⚙️ **Admin-Portal statt Config-Dateien** | Alle Einstellungen, Räume und FRN-Konten liegen in SQLite; frn_adn schreibt daraus `server.properties`. Server starten, stoppen und neu starten per Knopf. |
 | 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu Sitzungen und ein Protokoll aller Änderungen. |
-| 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit Symbol, „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
+| 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit den **Favicons der verlinkten Seiten** (in SQLite zwischengespeichert), „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
 | ⬆️ **Updates mit Vorschau** | Zu jeder vollen Stunde und auf Knopfdruck: neue Commits für das Dashboard (GitHub) und neue Versionen des Java-Servers. Zwei getrennte Knöpfe, nie automatisch. |
-| 🎨 **Eigenes Aussehen** | Mehrere Farbschemata, frei wählbare Farben sowie Dashboard-Logo und Site-Icon im Admin-Portal. |
+| 🎨 **Eigenes Aussehen** | N8 Theme wie bei HBlink4-FreeRadioID und N8-Hotspot: 7 Profile inkl. hellem *Daylight*, jede Farbe frei wählbar, dazu Dashboard-Logo, Site-Icon und Client-Logos. |
 | 📥 **Import** | Eine alte `server.properties` nach der Neuinstallation übernehmen; nichts anderes wird kopiert. |
 | 🔒 **HTTPS** | Let's-Encrypt-Zertifikat, automatisch geholt und erneuert. |
 | 🧭 **Geführte Installation** | `scripts/install.sh` fragt alles ab, richtet beide Dienste ein und prüft am Ende das Ergebnis. |
@@ -86,16 +87,23 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 <table>
 <tr>
 <td width="50%"><img src="docs/images/links-menu.png" alt="Link-Menü"><br><b>🔗 Link-Menü</b>: eigene Links in der Kopfzeile, mit Symbol und Aufklapp-Liste.</td>
-<td width="50%"><img src="docs/images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icons"><br><b>Link-Editor</b> mit Site-Icon-Vorschau, Fallback-Emoji, Sortierung und SQLite-Cache (schematische Vorschau).</td>
+<td width="50%"><img src="docs/images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icons"><br><b>Link-Editor</b> mit Site-Icon-Vorschau, Fallback-Emoji, Sortierung und SQLite-Cache.</td>
 </tr>
 <tr>
 <td><img src="docs/images/admin-updates.png" alt="Software-Updates"><br><b>⬆️ Software updates</b>: installierte und neue Version, neue Commits, getrennte Upgrade-Knöpfe.</td>
 <td><img src="docs/images/admin-system.png" alt="System"><br><b>🖥️ System</b>: FRN-Server, Datenbank, Maschine und Updates.</td>
 </tr>
 <tr>
+<td><img src="docs/images/rooms-avatars.png" alt="Räume mit Client-Avataren"><br><b>📡 Räume</b>: Avatar = Client-Software, 👑/🛡️ vor dem Rufzeichen.</td>
+<td><img src="docs/images/admin-client-logos.png" alt="Client-Logos"><br><b>Client logos</b>: eingebaute Abzeichen, je Art durch ein eigenes Bild ersetzbar.</td>
+</tr>
+<tr>
+<td><img src="docs/images/admin-theme.png" alt="Theme-Verwaltung"><br><b>🎨 Theme</b>: N8 Theme mit 7 Profilen (auch hell), jede Farbe frei wählbar, Dashboard-Logo, Site-Icon und Client-Logos.</td>
+<td><img src="docs/images/theme-daylight.png" alt="Daylight"><br><b>☀️ Daylight</b>: das helle Profil.</td>
+</tr>
+<tr>
 <td><img src="docs/images/links-bar.png" alt="Link-Leiste"><br><b>Knopfreihe</b>: dieselben Links als Leiste unter der Kopfzeile.</td>
-<td><img src="docs/images/admin-theme.png" alt="Theme-Verwaltung"><br><b>🎨 Theme</b>: Farbschemata, eigene Farben, Dashboard-Logo und Site-Icon (schematische Vorschau).</td>
-<td><img src="docs/images/links-menu-mobile.png" alt="Link-Menü am Smartphone" width="60%"><br><b>Am Smartphone</b>: Reiter in eigener Zeile, Menü klappt unter dem Knopf auf.</td>
+<td><img src="docs/images/links-menu-mobile.png" alt="Link-Menü am Smartphone" width="60%"><br><b>Am Smartphone</b>: Kopfzeile in einer Zeile, Menü klappt unter dem Knopf auf.</td>
 </tr>
 <tr>
 <td><img src="docs/images/stats-30d.png" alt="Statistik"><br><b>📈 Statistics</b>: Sprechzeit je Raum und Station, Verlauf, Spitzenwerte.</td>

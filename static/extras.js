@@ -190,12 +190,13 @@
             <div class="upd-ver">Installed: ${inst}</div>${detail}</div>`;
     }
 
-    window.checkAllUpdates = async function (btn) {
+    // opening System uses the cached result (max. 10 minutes old); "Check now" asks GitHub and freeradionetwork.de again
+    window.checkAllUpdates = async function (btn, force) {
         const box = byId('updInfo');
         if (btn) btn.disabled = true;
         if (box && !lastUpd) box.textContent = 'Checking …';
         try {
-            const r = await api('POST', '/api/admin/updates/check', {});
+            const r = (btn || force) ? await api('POST', '/api/admin/updates/check', {}) : await api('GET', '/api/admin/updates');
             lastUpd = r;
             const gh = r.github || {}, java = r.java || {};
             if (box) box.innerHTML = dashboardRow(gh) + javaRow(java) + `<div class="upd-when">Last check: ${when(r.checked)} · automatic check every full hour</div>`;
@@ -248,7 +249,7 @@
                 await waitForDashboard(); return;
             }
             else toast('FRN server restarted. Restart the dashboard to load the update: sudo systemctl restart frnadn', true);
-            await window.checkAllUpdates();
+            await window.checkAllUpdates(null, true);
         } catch (e) { toast(e.message, true); if (btn) btn.disabled = false; }
     };
 

@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Any, Callable, Deque, Dict, List, Optional
 
 from .db import DB
+from . import clientsw
 
 LAST_HEARD = 60
 EVENTS = 800
@@ -36,9 +37,12 @@ class Live:
         self._flush: Optional[asyncio.TimerHandle] = None
         self._sample_max: Dict[str, int] = {}
         self._slot: Optional[int] = None
+        st = {r["callsign"]: r for r in self.db.q("SELECT callsign, descr, client FROM stations")}
         for r in reversed(self.db.q("SELECT * FROM talks WHERE end_ts IS NOT NULL ORDER BY ts DESC LIMIT ?", (LAST_HEARD,))):
+            s = st.get(r["callsign"])
             self.last_heard.appendleft({"id": r["id"], "ts": r["ts"], "room": r["net"], "callsign": r["callsign"], "name": r["name"],
-                                        "band": r["band"], "country": r["country"], "city": r["city"], "duration": r["duration"]})
+                                        "band": r["band"], "country": r["country"], "city": r["city"], "duration": r["duration"],
+                                        "sw": clientsw.detect(r["band"], s["descr"] if s else "", r["name"], s["client"] if s else None)})
         # visits left open by a crash or restart are closed
         self.db.x("UPDATE visits SET logout_ts = login_ts WHERE logout_ts IS NULL")
 
@@ -144,7 +148,8 @@ class Live:
                      "DO UPDATE SET talks=talks+1, seconds=seconds+excluded.seconds", (day_of(start), room, c.callsign, dur))])
         self._station(c, room, end)
         entry = {"id": tid, "ts": start, "room": room, "callsign": c.callsign, "name": c.name, "band": c.band,
-                 "country": c.country, "city": c.city, "duration": dur}
+                 "country": c.country, "city": c.city, "duration": dur,
+                 "sw": clientsw.detect(c.band, c.descr, c.name, c.client, c.is_parrot)}
         self.last_heard.appendleft(entry)
         self._touch(room)
         self.notify({"type": "heard", "entry": entry})

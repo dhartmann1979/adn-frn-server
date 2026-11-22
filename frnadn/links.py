@@ -67,8 +67,11 @@ def normalize(payload: Any) -> Dict[str, Any]:
         icon = str(raw.get("icon", "")).strip()
         if icon:
             item["icon"] = icon[:8]
-        item["site_icon"] = _flag(raw.get("site_icon"), True)
-        item["new_tab"] = _flag(raw.get("new_tab"), True)
+        web = url.lower().startswith(("http://", "https://"))
+        if web:                                   # a site icon only exists for web pages
+            item["site_icon"] = _flag(raw.get("site_icon"), True)
+        if web or url.lower().startswith("mailto:"):   # #tab and /path always open in the dashboard itself
+            item["new_tab"] = _flag(raw.get("new_tab"), True)
         items.append(item)
     style = str(payload.get("style", "menu"))
     if style not in STYLES:

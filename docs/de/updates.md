@@ -34,6 +34,12 @@ sudo ./scripts/update.sh
 
 Die Abfrage an GitHub braucht keinen Zugang (zwei Anfragen pro Prüfung). Das Ergebnis zeigt je Programm: installierte Version, neue Version, bei GitHub zusätzlich die Zahl der neuen Commits samt Liste und einen Vergleichslink.
 
+<p align="center"><img src="../images/admin-updates.png" alt="Software updates unter Admin → System" width="70%"></p>
+
+Beim Öffnen von **Admin → System** zeigt die Karte das letzte Ergebnis (höchstens 10 Minuten alt), damit GitHub nicht bei jedem
+Klick gefragt wird – ohne Anmeldung erlaubt GitHub 60 Abfragen pro Stunde. **↻ Check now** fragt immer sofort neu, nach einem Upgrade
+wird automatisch neu geprüft. Die Uhrzeit der letzten Prüfung steht unten in der Karte.
+
 ## Dashboard aktualisieren
 
 ### Im Admin-Portal
@@ -82,3 +88,13 @@ Environment=FRNADN_GITHUB_BRANCH=main
 ```
 
 Danach `sudo systemctl daemon-reload && sudo systemctl restart frnadn`. Das Upgrade holt immer vom konfigurierten `origin` des Verzeichnisses, nie von einer Adresse aus dem Browser.
+
+## Versionen und Releases
+
+Die Versionsnummer steht in `frnadn/__init__.py` (`__version__`), alle Änderungen stehen in [CHANGELOG.md](../../CHANGELOG.md),
+die neueste Version oben (`## 2.3.0 – 2026-11-22`). Die Zählung folgt [Semantic Versioning](https://semver.org/lang/de/):
+MAJOR für Änderungen, nach denen man etwas von Hand anpassen muss, MINOR für neue Funktionen, PATCH für Fehlerbehebungen.
+
+Für eine neue Version: Abschnitt oben in `CHANGELOG.md` ausführlich schreiben, `__version__` erhöhen, committen und pushen.
+Der Workflow `.github/workflows/release.yml` legt daraufhin auf GitHub den Tag `vX.Y.Z` und das Release mit genau dem Text aus
+dem Changelog an. Wird der Text später verbessert, passt der Workflow das Release automatisch an.
