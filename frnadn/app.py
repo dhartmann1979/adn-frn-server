@@ -574,6 +574,15 @@ async def cached_link_icon(key: str):
         raise HTTPError(404, "Site icon not found.")
     icon = siteicons.cached_icon(ctx.db, key)
     if not icon:
+        # The public menu can request the image before the startup warm-up finishes.
+        # Resolve the key only against configured links, fill the SQLite cache, then serve it.
+        cfg = linkstore.read(LINKS_FILE)
+        url = next((item["url"] for item in cfg["items"]
+                    if item.get("site_icon", True) and siteicons.key_for(item["url"]) == key), None)
+        if url:
+            await asyncio.to_thread(siteicons.refresh_one, ctx.db, url)
+            icon = siteicons.cached_icon(ctx.db, key)
+    if not icon:
         raise HTTPError(404, "Site icon not found.")
     return Response(icon["data"], media_type=icon["content_type"], headers={"Cache-Control": "no-cache"})
 

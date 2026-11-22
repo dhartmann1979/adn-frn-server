@@ -2,6 +2,11 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.2.3 – 2026-11-22
+
+### Behoben
+- Der Icon-Endpunkt füllt den SQLite-Cache bei Bedarf, falls das Menü das Bild vor dem Hintergrundabruf anfordert.
+
 ## 2.2.2 – 2026-11-22
 
 ### Behoben
