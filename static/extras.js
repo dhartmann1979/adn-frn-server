@@ -25,7 +25,16 @@
         const anchor = /^#./.test(url);
         const external = i.new_tab !== false && !anchor && !/^(\/(?!\/)|mailto:)/.test(url);
         return `<a role="menuitem" href="${html(url)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}${anchor ? ` data-anchor="${html(url.slice(1))}"` : ''}>`
-            + `<span class="li-ic" aria-hidden="true">${html(i.icon || '🔗')}</span><span class="li-tx">${html(i.label)}</span></a>`;
+            + `<span class="li-ic" aria-hidden="true"><span class="site-icon-fallback">${html(i.icon || '🔗')}</span>${i.site_icon && i.site_icon_url ? `<img class="site-icon-img" src="${html(i.site_icon_url)}" alt="">` : ''}</span><span class="li-tx">${html(i.label)}</span></a>`;
+    }
+
+    function bindSiteIcons(root) {
+        root.querySelectorAll('.site-icon-img').forEach(img => img.addEventListener('error', () => {
+            const retries = Number(img.dataset.retry || 0);
+            if (retries >= 2) { img.remove(); return; }
+            img.dataset.retry = String(retries + 1);
+            setTimeout(() => { if (img.isConnected) img.src = img.src.split('?')[0] + '?retry=' + img.dataset.retry; }, 3500);
+        }));
     }
 
     function renderLinks() {
@@ -35,20 +44,20 @@
         if (!items.length) { menu.hidden = true; if (bar) bar.hidden = true; return; }
         if (LINKS.style === 'bar' && bar) {
             menu.hidden = true; menu.classList.remove('open');
-            bar.hidden = false; bar.innerHTML = items.map(linkHtml).join('');
+            bar.hidden = false; bar.innerHTML = items.map(linkHtml).join(''); bindSiteIcons(bar);
         } else {
             if (bar) bar.hidden = true;
             menu.hidden = false;
             const label = menu.querySelector('.links-label');
             if (label) label.textContent = LINKS.label || '🔗 Links';
-            byId('linksPop').innerHTML = items.map(linkHtml).join('');
+            byId('linksPop').innerHTML = items.map(linkHtml).join(''); bindSiteIcons(byId('linksPop'));
         }
     }
 
     window.loadPublicLinks = async function () {
         try {
             const d = await api('GET', '/api/links');
-            LINKS = { enabled: d.enabled !== false, label: d.label || '🔗 Links', style: d.style === 'bar' ? 'bar' : 'menu', items: d.items || d.links || [] };
+            LINKS = { enabled: d.enabled !== false, label: d.label || '🔗 Links', style: d.style === 'bar' ? 'bar' : 'menu', items: d.links || d.items || [] };
         } catch (e) { LINKS.items = []; }
         renderLinks();
     };
@@ -78,6 +87,7 @@
                 <input class="ln-icon" value="${html(it.icon)}" placeholder="🔗" maxlength="8" aria-label="Icon" title="Emoji in front of the name" oninput="lnSet(${i}, 'icon', this.value)">
                 <input class="ln-label" value="${html(it.label)}" placeholder="Name, e.g. Website" maxlength="50" aria-label="Name" oninput="lnSet(${i}, 'label', this.value)">
                 <input class="ln-url" value="${html(it.url)}" placeholder="https://…" maxlength="500" aria-label="Address" oninput="lnSet(${i}, 'url', this.value)">
+                <label class="ln-site-icon" title="Show this website's cached favicon"><input type="checkbox" ${it.site_icon !== false ? 'checked' : ''} onchange="lnSet(${i}, 'site_icon', this.checked)"> site icon <span class="ln-site-preview"><span class="site-icon-fallback">${html(it.icon || '🔗')}</span>${it.site_icon && it.site_icon_url ? `<img class="site-icon-img" src="${html(it.site_icon_url)}" alt="">` : ''}</span></label>
                 <label class="ln-newtab" title="Open in a new browser tab"><span class="switch"><input type="checkbox" ${it.new_tab ? 'checked' : ''} onchange="lnSet(${i}, 'new_tab', this.checked)"><span></span></span> new tab</label>
                 <span class="ln-move">
                     <button type="button" class="btn small" title="Up" aria-label="Move up" onclick="lnMove(${i}, -1)" ${i ? '' : 'disabled'}>↑</button>
@@ -85,6 +95,7 @@
                     <button type="button" class="btn small danger" title="Remove" aria-label="Remove" onclick="lnDel(${i})">🗑</button>
                 </span>
             </div>`).join('') : '<div class="ln-empty">No links yet. Add the first one below.</div>';
+        bindSiteIcons(el);
     }
     const lnDirty = () => { const f = byId('lnForm'); if (f) f.classList.add('is-dirty'); const s = byId('linksInfo'); if (s) s.textContent = ''; };
     window.lnSet = (i, k, v) => { lnItems[i][k] = v; lnDirty(); };
@@ -92,7 +103,7 @@
     window.lnDel = i => { lnItems.splice(i, 1); lnRows(); lnDirty(); };
     window.lnAdd = tpl => {
         if (lnItems.length >= 20) { toast('Up to 20 links are possible.', true); return; }
-        lnItems.push(tpl || { icon: '🔗', label: '', url: '', new_tab: true }); lnRows(); lnDirty();
+        lnItems.push(tpl || { icon: '🔗', label: '', url: '', site_icon: true, new_tab: true }); lnRows(); lnDirty();
         const rows = document.querySelectorAll('#lnList .ln-label'); if (rows.length) rows[rows.length - 1].focus();
     };
     window.lnCfg = (k, v) => { lnCfg[k] = v; lnDirty(); };
@@ -100,7 +111,8 @@
     window.loadLinksAdmin = async function () {
         const d = await api('GET', '/api/admin/links');
         lnCfg = { enabled: d.enabled !== false, label: d.label || '🔗 Links', style: d.style === 'bar' ? 'bar' : 'menu' };
-        lnItems = (d.items || d.links || []).map(i => ({ icon: i.icon || '', label: i.label, url: i.url, new_tab: i.new_tab !== false }));
+        lnItems = (d.links || d.items || []).map(i => ({ ...i, icon: i.icon || '', label: i.label, url: i.url,
+            site_icon: i.site_icon !== false, new_tab: i.new_tab !== false }));
         byId('admin-links').innerHTML = `<form class="tile links-editor" id="lnForm" onsubmit="event.preventDefault(); saveLinksAdmin(this.querySelector('button.primary'))">
             <div class="ed-head"><div><h3>🔗 Link menu</h3>
                 <p class="subt">Your own links in the header: website, chat group, wiki, donation page … Everyone sees them, also without login.</p></div>
@@ -125,23 +137,25 @@
                 </div>
                 <p class="dim ed-note">Allowed: <code>https://…</code>, <code>http://…</code>, <code>mailto:…</code>, <code>#stats</code> (switches to that tab) and <code>/path</code> on this server.</p>
             </div>
-            <div class="actions"><span class="dim" id="linksInfo" role="status"></span><button type="submit" class="btn primary">💾 Save links</button></div>
+            <div class="actions"><span class="dim" id="linksInfo" role="status"></span><button type="button" class="btn" onclick="saveLinksAdmin(this, true)">↻ Save &amp; refresh site icons</button><button type="submit" class="btn primary">💾 Save links</button></div>
         </form>`;
         lnRows();
     };
 
-    window.saveLinksAdmin = async function (btn) {
+    window.saveLinksAdmin = async function (btn, refreshIcons) {
         const info = byId('linksInfo');
         for (const it of lnItems) {
             if (!String(it.label).trim() || !String(it.url).trim()) { info.textContent = 'Every link needs a name and an address.'; return; }
         }
         if (btn) btn.disabled = true;
         try {
-            const r = await api('POST', '/api/admin/links', { enabled: lnCfg.enabled, label: lnCfg.label, style: lnCfg.style,
-                items: lnItems.map(i => ({ icon: String(i.icon || '').trim(), label: String(i.label).trim(), url: String(i.url).trim(), new_tab: !!i.new_tab })) });
-            lnItems = (r.items || []).map(i => ({ icon: i.icon || '', label: i.label, url: i.url, new_tab: i.new_tab !== false }));
+            const r = await api('POST', '/api/admin/links', { enabled: lnCfg.enabled, label: lnCfg.label, style: lnCfg.style, refresh_icons: !!refreshIcons,
+                items: lnItems.map(i => ({ icon: String(i.icon || '').trim(), label: String(i.label).trim(), url: String(i.url).trim(), site_icon: i.site_icon !== false, new_tab: !!i.new_tab })) });
+            lnItems = (r.links || r.items || []).map(i => ({ ...i, icon: i.icon || '', label: i.label, url: i.url,
+                site_icon: i.site_icon !== false, new_tab: i.new_tab !== false }));
             lnRows(); byId('lnForm').classList.remove('is-dirty');
-            info.textContent = 'Saved.'; toast('Link menu saved.');
+            info.textContent = refreshIcons ? 'Links saved and site icons refreshed into SQLite.' : 'Saved. Site icons are cached in SQLite.';
+            toast(refreshIcons ? 'Links saved and icons refreshed.' : 'Link menu saved.');
             await window.loadPublicLinks();
         } catch (e) { info.textContent = e.message; toast(e.message, true); }
         finally { if (btn) btn.disabled = false; }

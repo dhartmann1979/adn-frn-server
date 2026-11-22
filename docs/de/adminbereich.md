@@ -104,7 +104,7 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 | ↻ Check now | prüft Dashboard (GitHub) und Java-FRN-Server auf neue Versionen |
 | Upgrade Dashboard now / Upgrade Java now | installiert das jeweilige Update – Einzelheiten: [Updates](updates.md) |
 
-## 🔄 Updates, Links, Import und Erscheinungsbild
+## 🔄 Updates, Links und Import
 
 <p align="center"><img src="../images/admin-updates.png" alt="Software-Updates" width="70%"></p>
 
@@ -119,9 +119,9 @@ Alle Meldungen und Lösungen: **[Updates](updates.md)**.
 
 ### 🔗 Links
 
-<p align="center"><img src="../images/admin-links.png" alt="Link-Editor" width="90%"></p>
+<p align="center"><img src="../images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icon-Vorschau und SQLite-Cache" width="90%"></p>
 
-Eigener Admin-Tab **🔗 Links**, aufgebaut wie bei HBlink4-FreeRadioID: Schalter *Show the link menu*, *Menu button text*, *Display* (Aufklapp-Menü oder Knopfreihe) und die Liste mit Symbol, Name, Adresse, **new tab**, ↑ ↓ 🗑 sowie Schnellstart-Knöpfen. Bis zu 20 Links; erlaubt sind `https://`, `http://`, `mailto:`, `#stats` / `#stations` (Tab wechseln) und `/pfad`. Schritt für Schritt: [Anleitungen → Link-Menü](anleitungen.md#-link-menü-einrichten).
+Eigener Admin-Tab **🔗 Links** mit Schalter *Show links on the dashboard*, Menütext, Darstellung als Aufklapp-Menü oder Knopfreihe und einer sortierbaren Liste. Je Link legst du Name, Adresse, Fallback-Emoji, **Site icon** und **New tab** fest. Website-Icons werden in SQLite gecacht; **Save & refresh site icons** ruft sie erneut ab. Wenn ein Ziel kein Icon anbietet, erscheint das Emoji. Bis zu 20 Links; erlaubt sind `https://`, `http://`, `mailto:`, `#stats` / `#stations` (Tab wechseln) und `/pfad`. Schritt für Schritt: [Anleitungen → Link-Menü](anleitungen.md#-link-menü-einrichten).
 
 ### 📥 Import
 
@@ -129,9 +129,16 @@ Eigener Admin-Tab **📥 Import**. Hier kann nach der frischen Installation eine
 
 **Wichtig:** Vor einem Import zusätzlich das Datenverzeichnis sichern. Nicht unterstützte Properties werden nicht übernommen. Nach dem Import den Java-FRN-Server neu starten.
 
-### 🎨 Appearance
+### 🎨 Theme
 
-Akzentfarbe und eigenes PNG-Logo (maximal 2 MB). Das Logo liegt im Datenverzeichnis und bleibt bei Programmupdates erhalten.
+<p align="center"><img src="../images/admin-theme.png" alt="Theme-Tab mit Logo- und Site-Icon-Verwaltung" width="90%"></p>
+<small>Schematische Vorschau mit Beispieldaten.</small>
+
+Eigener Admin-Tab **🎨 Theme**. Wähle eines der Farbschemata **Midnight, Ocean, Forest, Sunset, Violet** oder **Light** und passe Akzent, Seitenhintergrund, Kartenfarbe und Textfarbe einzeln an. Die Vorschau wirkt sofort; **Save theme & assets** speichert das Schema global in SQLite.
+
+Das Dashboard-Logo akzeptiert PNG bis 2 MB. Das Site-Icon (Favicon für Browser-Tab und Lesezeichen) akzeptiert PNG oder ICO bis 2 MB. Beide Dateien liegen im Datenverzeichnis, überstehen Updates und lassen sich auf das jeweilige Standardmotiv zurücksetzen.
+
+Website-Links können außerdem ihr Site-Icon verwenden. Die Icons werden beim Speichern der Links bzw. beim Dashboard-Start abgerufen, geprüft und als Bilddaten in der SQLite-Tabelle `link_icons` zwischengespeichert. Nicht erreichbare oder private Adressen werden nicht abgerufen; in diesem Fall bleibt das Fallback-Emoji sichtbar.
 
 ## 📜 Logs
 

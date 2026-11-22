@@ -2,6 +2,11 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.2.0 – 2026-11-22
+
+### Neu
+- **Theme-Tab im Admin-Portal**: Farbschemata Midnight, Ocean, Forest, Sunset, Violet und Light sowie einzelne Farben für Akzent, Hintergrund, Karten und Text; Dashboard-Logo und Site-Icon (PNG/ICO) sind separat verwaltbar. Link-Site-Icons werden sicher abgerufen und in SQLite gecacht.
+
 ## 2.1.0 – 2026-11-22
 
 ### Behoben

@@ -8,11 +8,12 @@ So viel wie möglich in SQLite, in Dateien nur, was der Java-FRN-Server lesen mu
 
 | Ort | Inhalt | wer schreibt |
 |---|---|---|
-| `/var/lib/frnadn/frnadn.db` | Einstellungen, Räume, ACL-Einträge, FRN-Konten, Benutzer, Sitzungen, Protokoll, Statistik | frn_adn |
+| `/var/lib/frnadn/frnadn.db` | Einstellungen, Räume, ACL-Einträge, Theme und Site-Icon-Cache für Links, FRN-Konten, Benutzer, Sitzungen, Protokoll, Statistik | frn_adn |
 | `/var/lib/frnadn/frn/server.properties` | Server und Räume für den Java-Server | frn_adn, aus der Datenbank |
 | `/var/lib/frnadn/frn/log4j.xml` | Logging: `logs/server.log` und `logs/server_clients.log` | frn_adn |
 | `/var/lib/frnadn/frn/acl/FRNPasswd.xml` | eigene Passwortliste (Stand-alone) | frn_adn |
 | `/var/lib/frnadn/frn/acl/*List*.xml` | FRN-kompatible Kopie der Admin-, Stumm-, Sperr- und Zugangslisten | FRN-Server und frn_adn |
+| `/var/lib/frnadn/branding/` | eigenes Dashboard-Logo und Site-Icon | frn_adn |
 | `/opt/frn-server/FRN_Server.jar` | der FRN-Server von freeradionetwork.de | Installer / Update |
 | `/etc/systemd/system/frn-server.service`, `frnadn.service` | Dienste | Installer |
 

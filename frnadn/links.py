@@ -3,7 +3,7 @@
 Stored as ``<data>/branding/links.json``:
 
     {"enabled": true, "label": "🔗 Links", "style": "menu" | "bar",
-     "items": [{"icon": "🌐", "label": "Website", "url": "https://…", "new_tab": true}, …]}
+     "items": [{"icon": "🌐", "site_icon": true, "label": "Website", "url": "https://…", "new_tab": true}, …]}
 
 The older format (a plain list of ``{"label", "url"}``) is still read.
 """
@@ -39,6 +39,14 @@ def _url_ok(url: str) -> bool:
     return p.scheme == "mailto" and bool(p.path)
 
 
+def _flag(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in ("1", "true", "yes", "on")
+    return bool(value)
+
+
 def normalize(payload: Any) -> Dict[str, Any]:
     """Validate the admin form. Accepts the full object or just a list of items. Raises ValueError."""
     if isinstance(payload, list):
@@ -59,8 +67,8 @@ def normalize(payload: Any) -> Dict[str, Any]:
         icon = str(raw.get("icon", "")).strip()
         if icon:
             item["icon"] = icon[:8]
-        if "new_tab" in raw:
-            item["new_tab"] = bool(raw["new_tab"])
+        item["site_icon"] = _flag(raw.get("site_icon"), True)
+        item["new_tab"] = _flag(raw.get("new_tab"), True)
         items.append(item)
     style = str(payload.get("style", "menu"))
     if style not in STYLES:

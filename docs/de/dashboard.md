@@ -30,11 +30,13 @@ Wie bei HBlink4-FreeRadioID liegt alles in **einer** Kopfzeile: links Logo, Tite
 | 🔗 Links ▾ | das Link-Menü (siehe unten) |
 | 🔐 Login / 👤 Name | Anmelden bzw. Benutzer-Menü (Admin-Portal, eigenes Konto, Abmelden) |
 
-Wer gerade spricht, steht im Bereich **On air** der Live-Seite. Die Akzentfarbe (Reiter, Links-Knopf, Hervorhebungen) stellt der Admin unter *Appearance* ein.
+Wer gerade spricht, steht im Bereich **On air** der Live-Seite. Farbschema, Akzent, Hintergrund, Karten und Text stellt der Admin unter **Admin → Theme** ein.
 
 ### 🔗 Link-Menü
 
 Das Menü zeigt die eigenen Links des Betreibers – für alle, auch ohne Login. Es gibt zwei Darstellungen:
+
+Jeder Weblink kann sein Website-Site-Icon anzeigen. Das Dashboard cached die abgerufenen Icons in SQLite und zeigt andernfalls das konfigurierte Fallback-Emoji.
 
 <p align="center"><img src="../images/links-menu.png" alt="Link-Menü" width="62%"> <img src="../images/links-bar.png" alt="Knopfreihe" width="95%"></p>
 

@@ -40,7 +40,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu Sitzungen und ein Protokoll aller Änderungen. |
 | 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit Symbol, „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
 | ⬆️ **Updates mit Vorschau** | Zu jeder vollen Stunde und auf Knopfdruck: neue Commits für das Dashboard (GitHub) und neue Versionen des Java-Servers. Zwei getrennte Knöpfe, nie automatisch. |
-| 🎨 **Eigenes Aussehen** | Akzentfarbe und eigenes PNG-Logo im Admin-Portal. |
+| 🎨 **Eigenes Aussehen** | Mehrere Farbschemata, frei wählbare Farben sowie Dashboard-Logo und Site-Icon im Admin-Portal. |
 | 📥 **Import** | Eine alte `server.properties` nach der Neuinstallation übernehmen; nichts anderes wird kopiert. |
 | 🔒 **HTTPS** | Let's-Encrypt-Zertifikat, automatisch geholt und erneuert. |
 | 🧭 **Geführte Installation** | `scripts/install.sh` fragt alles ab, richtet beide Dienste ein und prüft am Ende das Ergebnis. |
@@ -86,14 +86,15 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 <table>
 <tr>
 <td width="50%"><img src="docs/images/links-menu.png" alt="Link-Menü"><br><b>🔗 Link-Menü</b>: eigene Links in der Kopfzeile, mit Symbol und Aufklapp-Liste.</td>
-<td width="50%"><img src="docs/images/admin-links.png" alt="Link-Editor"><br><b>Link-Editor</b> im Admin-Portal: Symbol, Name, Adresse, neuer Tab, Reihenfolge, Schnellstart.</td>
+<td width="50%"><img src="docs/images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icons"><br><b>Link-Editor</b> mit Site-Icon-Vorschau, Fallback-Emoji, Sortierung und SQLite-Cache (schematische Vorschau).</td>
 </tr>
 <tr>
 <td><img src="docs/images/admin-updates.png" alt="Software-Updates"><br><b>⬆️ Software updates</b>: installierte und neue Version, neue Commits, getrennte Upgrade-Knöpfe.</td>
-<td><img src="docs/images/admin-system.png" alt="System"><br><b>🖥️ System</b>: FRN-Server, Datenbank, Maschine, Updates und Erscheinungsbild auf einer Seite.</td>
+<td><img src="docs/images/admin-system.png" alt="System"><br><b>🖥️ System</b>: FRN-Server, Datenbank, Maschine und Updates.</td>
 </tr>
 <tr>
 <td><img src="docs/images/links-bar.png" alt="Link-Leiste"><br><b>Knopfreihe</b>: dieselben Links als Leiste unter der Kopfzeile.</td>
+<td><img src="docs/images/admin-theme.png" alt="Theme-Verwaltung"><br><b>🎨 Theme</b>: Farbschemata, eigene Farben, Dashboard-Logo und Site-Icon (schematische Vorschau).</td>
 <td><img src="docs/images/links-menu-mobile.png" alt="Link-Menü am Smartphone" width="60%"><br><b>Am Smartphone</b>: Reiter in eigener Zeile, Menü klappt unter dem Knopf auf.</td>
 </tr>
 <tr>
@@ -112,7 +113,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 |---|---|
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
-| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, System, Updates, Links, Import, Logs |
+| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, System, Theme, Updates, Links, Import, Logs |
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |

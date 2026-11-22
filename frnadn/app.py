@@ -30,7 +30,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
-from . import __version__, links as linkstore, updater
+from . import __version__, branding as brandstore, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
 from .frn.acl import ACLStore
@@ -443,7 +443,14 @@ LINKS_FILE = DATA / "branding" / "links.json"
 
 def links_payload(cfg: Dict[str, Any]) -> Dict[str, Any]:
     """`links` stays the plain item list (older clients); enabled, label and style are new."""
-    return {**cfg, "links": cfg["items"]}
+    links = []
+    for item in cfg["items"]:
+        row = dict(item)
+        key = siteicons.key_for(row["url"]) if row.get("site_icon", True) else None
+        if key:
+            row["site_icon_url"] = f"/link-icons/{key}"
+        links.append(row)
+    return {**cfg, "links": links}
 
 
 @app.get("/api/links")
@@ -466,8 +473,14 @@ async def admin_save_links(request: Request):
     except ValueError as e:
         raise HTTPError(400, str(e))
     linkstore.write(LINKS_FILE, cfg)
+    await asyncio.to_thread(siteicons.refresh_many, ctx.db, [x["url"] for x in cfg["items"]], bool(b.get("refresh_icons")))
     ctx.auth.audit("links_changed", u["username"], f"{len(cfg['items'])} dashboard links saved ({cfg['style']})", ip_of(request))
     return {"ok": True, **links_payload(cfg)}
+
+
+@app.get("/api/branding")
+async def public_branding():
+    return {"theme": brandstore.read_theme(ctx.db), "palettes": brandstore.PALETTES}
 
 
 @app.get("/branding/logo")
@@ -475,21 +488,93 @@ async def branding_logo():
     p = DATA / "branding" / "logo.png"
     return FileResponse(p, media_type="image/png") if p.exists() else FileResponse(STATIC / "adn-icon.svg", media_type="image/svg+xml")
 
+
+@app.get("/branding/site-icon")
+async def branding_site_icon():
+    folder = DATA / "branding"
+    png, ico = folder / "site-icon.png", folder / "site-icon.ico"
+    if png.exists():
+        return FileResponse(png, media_type="image/png", headers={"Cache-Control": "no-cache"})
+    if ico.exists():
+        return FileResponse(ico, media_type="image/x-icon", headers={"Cache-Control": "no-cache"})
+    return FileResponse(STATIC / "adn-icon.svg", media_type="image/svg+xml", headers={"Cache-Control": "no-cache"})
+
+
 @app.post("/api/admin/branding")
 async def save_branding(request: Request):
     u = need_admin(request)
     import base64
     b = await body(request)
-    encoded = str(b.get("logo", ""))
-    if encoded:
-        try: data = base64.b64decode(encoded.split(",", 1)[-1], validate=True)
-        except Exception: raise HTTPError(400, "Invalid logo upload.")
-        if len(data) > 2_000_000 or not data.startswith(bytes.fromhex("89504e470d0a1a0a")):
-            raise HTTPError(400, "Please upload a PNG image up to 2 MB.")
-        folder = DATA / "branding"; folder.mkdir(parents=True, exist_ok=True)
-        tmp = folder / "logo.png.tmp"; tmp.write_bytes(data); os.replace(tmp, folder / "logo.png")
-    ctx.auth.audit("branding_changed", u["username"], "logo updated" if encoded else "theme changed", ip_of(request))
-    return {"ok": True}
+    folder = DATA / "branding"
+    folder.mkdir(parents=True, exist_ok=True)
+
+    def remove(path: Path) -> None:
+        try: path.unlink()
+        except FileNotFoundError: pass
+
+    def decode_upload(encoded: Any, asset: str) -> Optional[tuple[str, bytes]]:
+        if not encoded:
+            return None
+        try:
+            raw = base64.b64decode(str(encoded).split(",", 1)[-1], validate=True)
+        except Exception:
+            raise HTTPError(400, f"Invalid {asset} upload.")
+        if len(raw) > 2_000_000:
+            raise HTTPError(400, f"{asset.capitalize()} must be no larger than 2 MB.")
+        if asset == "logo" and raw.startswith(bytes.fromhex("89504e470d0a1a0a")):
+            name = "logo.png"
+        elif asset == "site icon" and raw.startswith(bytes.fromhex("89504e470d0a1a0a")):
+            name = "site-icon.png"
+        elif asset == "site icon" and raw.startswith((b"\x00\x00\x01\x00", b"\x00\x00\x02\x00")):
+            name = "site-icon.ico"
+        else:
+            allowed = "PNG" if asset == "logo" else "PNG or ICO"
+            raise HTTPError(400, f"Please upload a {allowed} {asset} up to 2 MB.")
+        return name, raw
+
+    def save_upload(decoded: Optional[tuple[str, bytes]], asset: str) -> Optional[Path]:
+        if not decoded:
+            return None
+        name, raw = decoded
+        path = folder / name
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_bytes(raw)
+        os.replace(tmp, path)
+        if asset == "site icon":
+            remove(folder / ("site-icon.ico" if name.endswith(".png") else "site-icon.png"))
+        return path
+
+    try:
+        theme = brandstore.normalize_theme(b.get("theme", brandstore.read_theme(ctx.db)))
+    except ValueError as e:
+        raise HTTPError(400, str(e))
+    # Validate both uploads before replacing either existing asset.
+    logo_data = decode_upload(b.get("logo"), "logo")
+    site_icon_data = decode_upload(b.get("site_icon"), "site icon")
+    logo = save_upload(logo_data, "logo")
+    site_icon = save_upload(site_icon_data, "site icon")
+    if b.get("reset_logo"):
+        remove(folder / "logo.png")
+        logo = folder / "logo.png"
+    if b.get("reset_site_icon"):
+        remove(folder / "site-icon.png")
+        remove(folder / "site-icon.ico")
+        site_icon = folder / "site-icon.png"
+    ctx.db.kv_set("branding-theme", json.dumps(theme))
+    ctx.auth.audit("branding_changed", u["username"], "theme, logo or site icon updated", ip_of(request))
+    return {"ok": True, "theme": theme, "logo_updated": logo.stat().st_mtime if logo and logo.exists() else None,
+            "site_icon_updated": site_icon.stat().st_mtime if site_icon and site_icon.exists() else None}
+
+
+@app.get("/link-icons/{key}")
+async def cached_link_icon(key: str):
+    if not re.fullmatch(r"[0-9a-f]{64}", key):
+        raise HTTPError(404, "Site icon not found.")
+    icon = siteicons.cached_icon(ctx.db, key)
+    if not icon:
+        raise HTTPError(404, "Site icon not found.")
+    return Response(icon["data"], media_type=icon["content_type"], headers={"Cache-Control": "no-cache"})
+
 
 @app.get("/api/admin/updates")
 async def updates_check(request: Request):
@@ -964,6 +1049,9 @@ async def _startup() -> None:
     ctx.store.ensure_rooms()
     for error in ctx.acls.sync_from_files():
         log.warning("ACL import: %s", error)
+    configured_links = linkstore.read(LINKS_FILE)
+    ctx.tasks.append(asyncio.create_task(asyncio.to_thread(
+        siteicons.refresh_many, ctx.db, [x["url"] for x in configured_links["items"]])))
     ctx.server.reload_rooms()
     try:
         ctx.java.write_config()

@@ -172,6 +172,14 @@ CREATE TABLE IF NOT EXISTS kv (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS link_icons (
+    url_hash    TEXT PRIMARY KEY,
+    origin      TEXT NOT NULL,
+    content_type TEXT NOT NULL DEFAULT '',
+    data        BLOB,
+    fetched_at  REAL NOT NULL,
+    error       TEXT NOT NULL DEFAULT ''
+);
 CREATE TABLE IF NOT EXISTS stations (
     callsign  TEXT PRIMARY KEY,
     cid       TEXT NOT NULL DEFAULT '',

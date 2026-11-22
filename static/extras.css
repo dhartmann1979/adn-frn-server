@@ -39,10 +39,12 @@ header .chips { flex: 0 1 auto; justify-content: flex-end; flex-wrap: nowrap; }
                  background: rgba(var(--accent-rgb), 0.14); border: 1px solid rgba(var(--accent-rgb), 0.4); }
 .links-trigger:hover { background: rgba(var(--accent-rgb), 0.24); }
 .links-menu.open .links-trigger { background: rgba(var(--accent-rgb), 0.26); }
-.links-pop { min-width: 230px; padding: 6px; background: rgba(16, 22, 40, 0.97); }
+.links-pop { min-width: 230px; padding: 6px; background: var(--theme-popover, rgba(16, 22, 40, 0.97)); }
 .links-pop a { min-height: 38px; padding: 9px 11px; font-size: 13.5px; }
 .links-pop a:hover, .links-pop a:focus-visible { background: rgba(var(--accent-rgb), 0.16); }
-.li-ic { width: 20px; text-align: center; flex: 0 0 20px; }
+.li-ic { width: 22px; height: 22px; display: inline-grid; place-items: center; position: relative; flex: 0 0 22px; }
+.li-ic img { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; grid-area: 1 / 1; }
+.li-ic .site-icon-fallback { grid-area: 1 / 1; }
 .li-tx { min-width: 0; }
 .links-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 2px 0; }
 .links-bar a { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 650; color: var(--text); text-decoration: none;
@@ -62,14 +64,18 @@ header .chips { flex: 0 1 auto; justify-content: flex-end; flex-wrap: nowrap; }
 .links-editor .switch { justify-self: end; }
 .links-editor input[type=text], .links-editor select, .ln-row input:not([type=checkbox]) {
     width: 100%; min-width: 0; padding: 8px 11px; border-radius: 11px; color: var(--text);
-    background: rgba(8, 12, 24, 0.55); border: 1px solid var(--glass-border); }
-.links-editor select option { background: #101628; }
+    background: var(--theme-input-bg, rgba(8, 12, 24, 0.55)); border: 1px solid var(--theme-input-border, var(--glass-border)); }
+.links-editor select option { background: var(--theme-option-bg, #101628); color: var(--text); }
 .links-editor input:focus-visible, .links-editor select:focus-visible { outline: 2px solid rgba(var(--accent-rgb), .7); outline-offset: 1px; }
 .ln-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
-.ln-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 1.4fr) auto auto; gap: 6px; align-items: center;
+.ln-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 1.4fr) auto auto auto; gap: 6px; align-items: center;
           background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 6px; }
 .ln-row .ln-icon { text-align: center; padding-inline: 4px; }
 .links-editor .ln-newtab { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 650; white-space: nowrap; margin: 0 4px; line-height: 1; }
+.links-editor .ln-site-icon { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:650; white-space:nowrap; margin:0 4px; line-height:1; }
+.ln-site-preview { width:20px; height:20px; display:inline-grid; place-items:center; position:relative; }
+.ln-site-preview img { width:18px; height:18px; object-fit:contain; border-radius:3px; grid-area:1 / 1; }
+.ln-site-preview .site-icon-fallback { grid-area:1 / 1; }
 .links-editor label.switch { display: block; margin: 0; }
 .ln-newtab .switch { display: inline-block; flex: 0 0 46px; justify-self: auto; }
 .ln-move { display: inline-flex; gap: 4px; }
@@ -82,10 +88,11 @@ header .chips { flex: 0 1 auto; justify-content: flex-end; flex-wrap: nowrap; }
 @media (max-width: 720px) {
     .links-editor .ed-row { grid-template-columns: minmax(0, 1fr); }
     .links-editor .switch { justify-self: start; }
-    .ln-row { grid-template-columns: 48px minmax(0, 1fr); }
+    .ln-row { grid-template-columns: 48px minmax(0, 1fr) auto; }
     .ln-row .ln-url { grid-column: 1 / -1; }
-    .links-editor .ln-row .ln-newtab { grid-column: 1; grid-row: 3; margin: 0; }
-    .ln-row .ln-move { grid-column: 2; grid-row: 3; justify-self: end; }
+    .links-editor .ln-row .ln-site-icon { grid-column: 1; grid-row: 3; margin: 0; }
+    .links-editor .ln-row .ln-newtab { grid-column: 2; grid-row: 3; margin: 0; }
+    .ln-row .ln-move { grid-column: 3; grid-row: 3; justify-self: end; }
 }
 
 /* ---------- admin: software updates ---------- */

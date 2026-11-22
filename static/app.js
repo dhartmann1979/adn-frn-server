@@ -4,7 +4,7 @@
 const $ = id => document.getElementById(id);
 const S = { info: null, me: null, live: null, ws: null, wsOk: false, services: {}, lhRoom: 'all', liveRoom: '', tab: 'live',
             stats: { range: 'today', metric: 'duration', data: null, slots: {} },
-            admin: { tab: 'server', frn: null, room: null, logs: [], aclClients: [] }, chat: { room: 'all', entries: [] } };
+            admin: { tab: 'server', frn: null, room: null, logs: [], aclClients: [], linkItems: [], linkSettings: null, palettes: {} }, chat: { room: 'all', entries: [] } };
 
 // ---------------------------------------------------------------- helpers
 function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -67,8 +67,26 @@ async function loadPublicLinks() {
         const d = await api('GET', '/api/links');
         const pop = $('linksPop');
         if (!pop) return;
-        pop.innerHTML = (d.links || []).map(x => `<a role="menuitem" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.label)}</a>`).join('') || '<div class="links-loading">No links configured.</div>';
+        $('linksMenu').classList.toggle('hidden', !d.enabled || d.style === 'bar');
+        $('linksBar').hidden = !d.enabled || d.style !== 'bar';
+        $('linksMenu').querySelector('.links-label').textContent = d.label || '🔗 Links';
+        const markup = (d.links || []).map(x => `<a ${x.new_tab && !x.url.startsWith('#') ? 'target="_blank" rel="noopener noreferrer"' : ''} href="${esc(x.url)}">${linkSiteIcon(x)}<span>${esc(x.label)}</span></a>`).join('');
+        pop.innerHTML = markup ? markup.replaceAll('<a ', '<a role="menuitem" ') : '<div class="links-loading">No links configured.</div>';
+        $('linksBar').innerHTML = markup;
+        document.querySelectorAll('#linksPop img, #linksBar img').forEach(bindSiteIcon);
     } catch (e) { const pop = $('linksPop'); if (pop) pop.innerHTML = '<div class="links-loading">Links unavailable.</div>'; }
+}
+function bindSiteIcon(img) {
+    img.addEventListener('error', () => {
+        const tries = Number(img.dataset.retry || 0);
+        if (tries >= 2) { img.remove(); return; }
+        img.dataset.retry = String(tries + 1);
+        setTimeout(() => { if (img.isConnected) img.src = img.src.split('?')[0] + '?retry=' + img.dataset.retry; }, 3500);
+    });
+}
+function linkSiteIcon(item) {
+    const fallback = `<span class="site-icon-fallback">${esc(item.icon || '🔗')}</span>`;
+    return `<span class="site-icon-wrap">${fallback}${item.site_icon && item.site_icon_url ? `<img src="${esc(item.site_icon_url)}" alt="">` : ''}</span>`;
 }
 function toggleLinks(ev) {
     ev.stopPropagation();
@@ -76,12 +94,46 @@ function toggleLinks(ev) {
     menu.querySelector('.links-trigger')?.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
     if (menu.dataset.bound !== '1') { menu.dataset.bound = '1'; document.addEventListener('click', e => { if (!menu.contains(e.target)) menu.classList.remove('open'); }); }
 }
-function applyAccent(value) {
-    if (!/^#[0-9a-f]{6}$/i.test(value || '')) return;
-    document.documentElement.style.setProperty('--user-accent', value);
-    try { localStorage.setItem('frnadn-accent', value); } catch(e) {}
+function rgba(hex, alpha) {
+    const n = parseInt(String(hex || '').slice(1), 16);
+    if (!/^#[0-9a-f]{6}$/i.test(hex || '') || !Number.isFinite(n)) return `rgba(90,200,250,${alpha})`;
+    return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${alpha})`;
 }
-try { applyAccent(localStorage.getItem('frnadn-accent') || '#5ac8fa'); } catch(e) {}
+function darken(hex, factor) {
+    const n = parseInt(String(hex || '').slice(1), 16);
+    if (!/^#[0-9a-f]{6}$/i.test(hex || '') || !Number.isFinite(n)) return '#070b17';
+    return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(x => Math.round(x * factor).toString(16).padStart(2, '0')).join('');
+}
+function applyTheme(theme) {
+    if (!theme) return;
+    const root = document.documentElement, color = theme.accent || '#5ac8fa', page = theme.page || '#0b1224', panel = theme.panel || '#1c2740', text = theme.text || '#f5f7fb';
+    root.style.setProperty('--user-accent', color);
+    const accentN = parseInt(color.slice(1), 16);
+    root.style.setProperty('--accent-rgb', `${accentN >> 16}, ${(accentN >> 8) & 255}, ${accentN & 255}`);
+    root.style.setProperty('--user-text', text);
+    root.style.setProperty('--user-muted', rgba(text, .64));
+    root.style.setProperty('--theme-accent-soft', rgba(color, .18));
+    root.style.setProperty('--theme-accent-border', rgba(color, .38));
+    root.style.setProperty('--theme-accent-focus', rgba(color, .62));
+    root.style.setProperty('--theme-accent-shadow', rgba(color, .16));
+    root.style.setProperty('--theme-accent-glow', rgba(color, .35));
+    root.style.setProperty('--glass-bg', rgba(panel, .52));
+    root.style.setProperty('--glass-bg-strong', rgba(panel, .72));
+    root.style.setProperty('--glass-border', rgba(text, .14));
+    root.style.setProperty('--glass-highlight', rgba(text, .18));
+    root.style.setProperty('--theme-input-bg', rgba(panel, .54));
+    root.style.setProperty('--theme-input-border', rgba(text, .2));
+    root.style.setProperty('--theme-option-bg', panel);
+    root.style.setProperty('--theme-popover', rgba(panel, .985));
+    root.style.setProperty('--theme-page-top', darken(page, .62));
+    root.style.setProperty('--theme-page-bottom', page);
+    root.style.setProperty('--theme-header', rgba(panel, .84));
+    root.style.setProperty('--theme-glow-a', rgba(color, .29));
+    root.style.setProperty('--theme-glow-b', rgba(color, .15));
+    root.style.setProperty('--theme-glow-c', rgba(panel, .18));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = page;
+}
 function isAdmin() { return S.me && (S.me.role === 'admin' || S.me.role === 'superadmin'); }
 function bindSeg(id, fn) {
     $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('active', x === b)); fn(b.dataset.v); });
@@ -90,7 +142,8 @@ function bindSeg(id, fn) {
 // ---------------------------------------------------------------- boot
 async function boot() {
     try {
-        const info = await api('GET', '/api/info');
+        const [info, branding] = await Promise.all([api('GET', '/api/info'), api('GET', '/api/branding')]);
+        applyTheme(branding.theme);
         S.info = info; S.me = info.user || null;
         if (info.login_required && !S.me) { renderHeader(); if (!info.setup_needed) openLogin(true); return; }
         renderHeader(); renderUser(); loadPublicLinks();
@@ -569,14 +622,14 @@ function renderChat() {
 $('chatFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.chat.room = b.dataset.v; renderChat(); });
 
 // ---------------------------------------------------------------- admin
-const ADMIN_TABS = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'links', 'import', 'logs', 'audit'];
+const ADMIN_TABS = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit'];
 function showAdmin(a) {
     if (!ADMIN_TABS.includes(a)) a = 'settings';
     S.admin.tab = a;
     document.querySelectorAll('#adminTabs button').forEach(b => b.classList.toggle('active', b.dataset.a === a));
     ADMIN_TABS.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== a));
     ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
-       system: loadSystem, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
+       system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
     if (S.tab === 'admin') history.replaceState(null, '', '#admin/' + a);
 }
 $('adminTabs').addEventListener('click', e => { const b = e.target.closest('button[data-a]'); if (b) showAdmin(b.dataset.a); });
@@ -932,37 +985,157 @@ async function loadSystem() {
         <div class="tile"><h3>⬆️ Software updates</h3><div class="subt">Automatic check every full hour. Updates are only installed after an administrator action.</div>
             <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkAllUpdates(this)">↻ Check now</button><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button><button class="btn primary" id="upgradeGit" disabled onclick="upgradeNow('github', this)">Upgrade Dashboard now</button></div>
             <div class="dim" id="updInfo" style="font-size:12.5px;margin-top:8px">Not checked yet.</div></div>
-        <div class="tile"><h3>🎨 Appearance</h3><div class="subt">Choose the dashboard accent and upload your own PNG logo (max. 2 MB).</div>
-            <div class="actions"><label>Accent <input type="color" id="brandAccent" value="#5ac8fa" onchange="applyAccent(this.value)"></label><input type="file" id="brandLogo" accept="image/png"><button class="btn" onclick="saveBranding()">Save appearance</button></div></div></div>`;
+        </div>`;
     checkAllUpdates();
+}
+
+async function loadThemeAdmin() {
+    const d = await api('GET', '/api/branding');
+    S.admin.branding = d.theme; S.admin.palettes = d.palettes || {};
+    renderThemeAdmin();
+}
+function renderThemeAdmin() {
+    const t = S.admin.branding || { preset: 'midnight', accent: '#5ac8fa', page: '#0b1224', panel: '#1c2740', text: '#f5f7fb' };
+    const choices = Object.entries(S.admin.palettes).map(([id, p]) => `<option value="${esc(id)}" ${t.preset === id ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
+    const stamp = Date.now();
+    $('admin-theme').innerHTML = `<div class="tile theme-card">
+        <h3>🎨 Theme, logo &amp; site icon</h3>
+        <p class="subt">Brand the complete dashboard. Changes are saved globally in SQLite and shown to every visitor.</p>
+        <div class="theme-colors">
+            <label>Color preset<select id="themePreset" onchange="selectThemePreset()">${choices}</select></label>
+            <label>Accent<input type="color" id="themeAccent" value="${esc(t.accent)}" oninput="previewTheme()"></label>
+            <label>Page background<input type="color" id="themePage" value="${esc(t.page)}" oninput="previewTheme()"></label>
+            <label>Card / panel<input type="color" id="themePanel" value="${esc(t.panel)}" oninput="previewTheme()"></label>
+            <label>Text<input type="color" id="themeText" value="${esc(t.text)}" oninput="previewTheme()"></label>
+        </div>
+        <div class="theme-palette" id="themePalettePreview"></div>
+        <div class="theme-assets">
+            <div class="theme-asset"><div class="theme-asset-preview"><img id="logoPreview" src="/branding/logo?v=${stamp}" alt="Current dashboard logo"></div><div>
+                <b>Dashboard logo</b><p class="subt">PNG image, up to 2 MB. Shown in the header and sign-in dialog.</p>
+                <input type="file" id="themeLogoFile" accept="image/png"><label class="theme-toggle"><input type="checkbox" id="resetLogo"> Use default logo</label>
+            </div></div>
+            <div class="theme-asset"><div class="theme-asset-preview"><img id="siteIconPreview" src="/branding/site-icon?v=${stamp}" alt="Current site icon"></div><div>
+                <b>Site icon / favicon</b><p class="subt">PNG or ICO, up to 2 MB. Used in browser tabs and bookmarks.</p>
+                <input type="file" id="themeSiteIconFile" accept="image/png,.ico,image/x-icon"><label class="theme-toggle"><input type="checkbox" id="resetSiteIcon"> Use default site icon</label>
+            </div></div>
+        </div>
+        <div class="actions"><button class="btn" onclick="loadThemeAdmin()">Discard preview</button><button class="btn primary" onclick="saveBranding(this)">Save theme &amp; assets</button></div>
+        <div class="dim" id="themeInfo" role="status"></div>
+    </div>`;
+    const preview = $('themePalettePreview');
+    preview.innerHTML = [t.accent, t.page, t.panel, t.text].map(c => `<span title="${esc(c)}" style="background:${esc(c)}"></span>`).join('');
+    $('themeLogoFile').addEventListener('change', () => { $('resetLogo').checked = false; previewUpload('themeLogoFile', 'logoPreview'); });
+    $('themeSiteIconFile').addEventListener('change', () => { $('resetSiteIcon').checked = false; previewUpload('themeSiteIconFile', 'siteIconPreview'); });
+    $('resetLogo').addEventListener('change', () => { if ($('resetLogo').checked) { $('themeLogoFile').value = ''; $('logoPreview').src = '/static/adn-icon.svg'; } });
+    $('resetSiteIcon').addEventListener('change', () => { if ($('resetSiteIcon').checked) { $('themeSiteIconFile').value = ''; $('siteIconPreview').src = '/static/adn-icon.svg'; } });
+}
+function previewUpload(fileId, imageId) {
+    const file = $(fileId).files?.[0];
+    if (file) $(imageId).src = URL.createObjectURL(file);
+}
+function themeFormValue() {
+    return { preset: $('themePreset').value, accent: $('themeAccent').value, page: $('themePage').value,
+        panel: $('themePanel').value, text: $('themeText').value };
+}
+function selectThemePreset() {
+    const p = S.admin.palettes[$('themePreset').value];
+    if (!p) return;
+    for (const key of ['accent', 'page', 'panel', 'text']) $('theme' + key[0].toUpperCase() + key.slice(1)).value = p[key];
+    previewTheme();
+}
+function previewTheme() {
+    const theme = themeFormValue(); applyTheme(theme);
+    $('themePalettePreview').innerHTML = [theme.accent, theme.page, theme.panel, theme.text].map(c => `<span title="${esc(c)}" style="background:${esc(c)}"></span>`).join('');
+}
+function readFileData(file) {
+    return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); });
+}
+async function saveBranding(btn) {
+    const logo = $('themeLogoFile').files?.[0], icon = $('themeSiteIconFile').files?.[0];
+    if ((logo && logo.size > 2 * 1024 * 1024) || (icon && icon.size > 2 * 1024 * 1024)) { toast('Logo and site icon must each be no larger than 2 MB.', true); return; }
+    const payload = { theme: themeFormValue(), reset_logo: $('resetLogo').checked, reset_site_icon: $('resetSiteIcon').checked };
+    try {
+        if (logo) payload.logo = await readFileData(logo);
+        if (icon) payload.site_icon = await readFileData(icon);
+        if (btn) btn.disabled = true;
+        const d = await api('POST', '/api/admin/branding', payload);
+        S.admin.branding = d.theme; applyTheme(d.theme);
+        const stamp = Date.now();
+        document.querySelectorAll('.brand img, .logo').forEach(x => x.src = '/branding/logo?v=' + stamp);
+        document.querySelector('link[rel="icon"]').href = '/branding/site-icon?v=' + stamp;
+        $('themeInfo').textContent = 'Theme and branding saved for all visitors.';
+        toast('Theme saved.'); await loadThemeAdmin();
+    } catch (e) { $('themeInfo').textContent = e.message; toast(e.message, true); }
+    finally { if (btn) btn.disabled = false; }
 }
 
 async function loadLinksAdmin() {
     const d = await api('GET', '/api/admin/links');
-    const value = (d.links || []).map(x => x.label + ' | ' + x.url).join('\n');
+    S.admin.linkItems = (d.links || []).map(x => ({ ...x }));
+    S.admin.linkSettings = { enabled: d.enabled, label: d.label, style: d.style };
+    renderLinksAdmin();
+}
+function renderLinksAdmin() {
+    const s = S.admin.linkSettings || { enabled: true, label: '🔗 Links', style: 'menu' };
     $('admin-links').innerHTML = `<div class="tile links-editor">
         <h3>🔗 Dashboard link menu</h3>
-        <p class="subt">Edit the links shown in the top-right menu. One entry per line, formatted as <code>Label | https://example.org</code>. Only HTTP and HTTPS links are accepted.</p>
-        <label for="linksConfig">Links (one per line)</label>
-        <textarea id="linksConfig" rows="8" spellcheck="false">${esc(value)}</textarea>
-        <div class="actions"><button class="btn" onclick="loadLinksAdmin()">Reset changes</button><button class="btn primary" onclick="saveLinksAdmin(this)">Save link menu</button></div>
+        <p class="subt">Edit the link menu or button row. Website favicons are fetched securely and cached in the SQLite database.</p>
+        <div class="links-editor-options">
+            <label class="theme-toggle"><input type="checkbox" id="linksEnabled" ${s.enabled ? 'checked' : ''}> Show links on the dashboard</label>
+            <label>Menu button text<input type="text" id="linksLabel" maxlength="30" value="${esc(s.label)}"></label>
+            <label>Display<select id="linksStyle"><option value="menu" ${s.style === 'menu' ? 'selected' : ''}>Dropdown menu</option><option value="bar" ${s.style === 'bar' ? 'selected' : ''}>Row of buttons</option></select></label>
+        </div>
+        <div id="linkRows">${S.admin.linkItems.map((x, i) => linkEditorRow(x, i)).join('') || '<div class="empty">No links added.</div>'}</div>
+        <div class="actions"><button class="btn" data-link-add>＋ Add link</button><button class="btn" onclick="loadLinksAdmin()">Reset changes</button><button class="btn" onclick="saveLinksAdmin(this, true)">Save &amp; refresh site icons</button><button class="btn primary" onclick="saveLinksAdmin(this)">Save links</button></div>
         <div class="dim" id="linksInfo" role="status"></div>
     </div>`;
+    $('admin-links').querySelectorAll('.link-row-preview img').forEach(bindSiteIcon);
 }
-async function saveLinksAdmin(btn) {
-    const rows = $('linksConfig').value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-    const links = [];
-    for (const row of rows) {
-        const at = row.indexOf('|');
-        if (at < 1) { $('linksInfo').textContent = 'Invalid line: use Label | https://example.org'; return; }
-        links.push({label: row.slice(0, at).trim(), url: row.slice(at + 1).trim()});
+function linkEditorRow(x, i) {
+    return `<div class="link-editor-row" data-link-row="${i}">
+        <label>Name<input type="text" data-field="label" maxlength="50" required value="${esc(x.label || '')}"></label>
+        <label>Address<input type="text" data-field="url" maxlength="500" placeholder="https://example.org" required value="${esc(x.url || '')}"></label>
+        <label>Fallback icon<input type="text" data-field="icon" maxlength="8" value="${esc(x.icon || '🔗')}" title="Emoji used when the website has no cached icon"></label>
+        <div class="link-row-options"><label><input type="checkbox" data-field="site_icon" ${x.site_icon !== false ? 'checked' : ''}> Site icon</label><label><input type="checkbox" data-field="new_tab" ${x.new_tab !== false ? 'checked' : ''}> New tab</label></div>
+        <div class="link-row-actions"><span class="link-row-preview">${linkSiteIcon(x)}</span><button class="btn small" data-link-up title="Move up">↑</button><button class="btn small" data-link-down title="Move down">↓</button><button class="btn small danger" data-link-remove title="Remove">×</button></div>
+    </div>`;
+}
+$('admin-links').addEventListener('click', e => {
+    if (e.target.closest('[data-link-add], [data-link-remove], [data-link-up], [data-link-down]')) syncLinkEditor();
+    if (e.target.closest('[data-link-add]')) {
+        if (S.admin.linkItems.length >= 20) { toast('You can add up to 20 links.', true); return; }
+        S.admin.linkItems.push({ label: '', url: '', icon: '🔗', site_icon: true, new_tab: true }); renderLinksAdmin(); return;
     }
+    const row = e.target.closest('[data-link-row]');
+    if (!row) return;
+    const i = Number(row.dataset.linkRow);
+    if (e.target.closest('[data-link-remove]')) S.admin.linkItems.splice(i, 1);
+    else if (e.target.closest('[data-link-up]') && i > 0) [S.admin.linkItems[i - 1], S.admin.linkItems[i]] = [S.admin.linkItems[i], S.admin.linkItems[i - 1]];
+    else if (e.target.closest('[data-link-down]') && i < S.admin.linkItems.length - 1) [S.admin.linkItems[i + 1], S.admin.linkItems[i]] = [S.admin.linkItems[i], S.admin.linkItems[i + 1]];
+    else return;
+    renderLinksAdmin();
+});
+function syncLinkEditor() {
+    const root = $('linkRows');
+    if (!root) return;
+    S.admin.linkItems = [...root.querySelectorAll('[data-link-row]')].map(row => ({
+        label: row.querySelector('[data-field="label"]').value.trim(), url: row.querySelector('[data-field="url"]').value.trim(),
+        icon: row.querySelector('[data-field="icon"]').value.trim(), site_icon: row.querySelector('[data-field="site_icon"]').checked,
+        new_tab: row.querySelector('[data-field="new_tab"]').checked
+    }));
+}
+async function saveLinksAdmin(btn, refreshIcons = false) {
+    syncLinkEditor();
+    const items = S.admin.linkItems;
     if (btn) btn.disabled = true;
     try {
-        await api('POST', '/api/admin/links', {links});
-        $('linksInfo').textContent = 'Link menu saved.';
-        await loadPublicLinks();
-        toast('Link menu saved.');
+        const d = await api('POST', '/api/admin/links', { enabled: $('linksEnabled').checked, label: $('linksLabel').value,
+            style: $('linksStyle').value, items, refresh_icons: refreshIcons });
+        S.admin.linkItems = (d.links || []).map(x => ({ ...x }));
+        S.admin.linkSettings = { enabled: d.enabled, label: d.label, style: d.style };
+        renderLinksAdmin(); await loadPublicLinks();
+        $('linksInfo').textContent = refreshIcons ? 'Links saved and site icons refreshed into SQLite.' : 'Links saved. Site icons are cached in SQLite.';
+        toast(refreshIcons ? 'Links saved and site icons refreshed.' : 'Links saved.');
     } catch (e) { $('linksInfo').textContent = e.message; toast(e.message, true); }
     finally { if (btn) btn.disabled = false; }
 }
@@ -1015,17 +1188,6 @@ async function importProperties() {
 }
 
 
-async function saveBranding() {
-    const file = $('brandLogo')?.files?.[0];
-    const accent = $('brandAccent')?.value || '#5ac8fa';
-    const payload = {theme: accent};
-    if (file) {
-        if (file.size > 2 * 1024 * 1024) { toast('Logo is larger than 2 MB.', true); return; }
-        payload.logo = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); });
-    }
-    try { await api('POST', '/api/admin/branding', payload); applyAccent(accent); $('brandLogo').value = ''; document.querySelectorAll('.brand img, .logo').forEach(x => x.src = '/branding/logo?v=' + Date.now()); toast('Appearance saved.'); }
-    catch(e) { toast(e.message, true); }
-}
 async function restartApp() {
     if (!await confirmBox({ title: 'Restart the dashboard?', body: 'Only frn_adn starts again (a few seconds); the FRN server keeps running.' }, 'Restart')) return;
     try { await api('POST', '/api/admin/restart', {}); toast('Restarting …'); setTimeout(() => location.reload(), 6000); } catch (e) { toast(e.message, true); }
