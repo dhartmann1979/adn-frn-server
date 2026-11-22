@@ -21,7 +21,6 @@ import logging
 import os
 import re
 import shutil
-import subprocess
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -31,7 +30,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
-from . import __version__
+from . import __version__, links as linkstore, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
 from .frn.javasrv import JavaServer
@@ -409,25 +408,15 @@ async def server_properties(request: Request):
 
 
 # ---------------------------------------------------------------- updates and legacy configuration import
-GITHUB_REPO = os.environ.get("FRNADN_GITHUB_REPO", "dhartmann1979/adn-frn-server")
+GITHUB_REPO = os.environ.get("FRNADN_GITHUB_REPO", updater.DEFAULT_REPO)
+GITHUB_BRANCH = os.environ.get("FRNADN_GITHUB_BRANCH", "main")
 _update_state: Dict[str, Any] = {"checked": None, "github": None, "java": None}
 
 async def check_all_updates(force: bool = False) -> Dict[str, Any]:
-    import json, urllib.request
-    def github_check():
-        req = urllib.request.Request(f"https://api.github.com/repos/{GITHUB_REPO}/commits/main",
-            headers={"User-Agent": "frn-adn-update", "Accept": "application/vnd.github+json"})
-        with urllib.request.urlopen(req, timeout=12) as r: remote = json.loads(r.read(500000))
-        try:
-            local = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5)
-            local_sha = local.stdout.strip() if local.returncode == 0 else ""
-        except Exception: local_sha = ""
-        sha = remote.get("sha", "")
-        return {"ok": True, "repo": GITHUB_REPO, "local": local_sha, "latest": sha,
-                "update": bool(local_sha and sha and local_sha != sha),
-                "message": (remote.get("commit", {}).get("message", "").split("\n")[0])}
-    try: gh = await asyncio.to_thread(github_check)
-    except Exception as e: gh = {"ok": False, "error": str(e)[:200], "update": False}
+    """Dashboard (GitHub) and Java FRN server. Results are cached for ten minutes unless forced."""
+    if not force and _update_state["checked"] and time.time() - _update_state["checked"] < 600:
+        return dict(_update_state)
+    gh = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
     java = await ctx.java.check_update()
     _update_state.update(checked=time.time(), github=gh, java=java)
     return dict(_update_state)
@@ -447,60 +436,36 @@ def parse_java_properties(raw: str) -> Dict[str, str]:
     return values
 
 
-DEFAULT_LINKS = [
-    {"label": "FreeRadioNetwork", "url": "https://freeradionetwork.de/"},
-    {"label": "ADN FRN Server", "url": "https://github.com/dhartmann1979/adn-frn-server"},
-    {"label": "HBlink4-FreeRadioID", "url": "https://github.com/dhartmann1979/HBlink4-FreeRadioID"},
-    {"label": "frn_adn source", "url": "https://github.com/dhartmann1979/frn_adn"},
-]
+LINKS_FILE = DATA / "branding" / "links.json"
 
 
-def read_dashboard_links():
-    path = DATA / "branding" / "links.json"
-    if not path.exists():
-        return DEFAULT_LINKS
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data if isinstance(data, list) else DEFAULT_LINKS
-    except (OSError, ValueError):
-        return DEFAULT_LINKS
+def links_payload(cfg: Dict[str, Any]) -> Dict[str, Any]:
+    """`links` stays the plain item list (older clients); enabled, label and style are new."""
+    return {**cfg, "links": cfg["items"]}
 
 
 @app.get("/api/links")
 async def public_links():
-    return {"links": read_dashboard_links()}
+    return links_payload(linkstore.read(LINKS_FILE))
 
 
 @app.get("/api/admin/links")
 async def admin_get_links(request: Request):
     need_admin(request)
-    return {"links": read_dashboard_links()}
+    return links_payload(linkstore.read(LINKS_FILE))
 
 
 @app.post("/api/admin/links")
 async def admin_save_links(request: Request):
     u = need_admin(request)
     b = await body(request)
-    entries = b.get("links")
-    if not isinstance(entries, list) or len(entries) > 20:
-        raise HTTPError(400, "Please provide up to 20 links.")
-    clean = []
-    for item in entries:
-        if not isinstance(item, dict):
-            raise HTTPError(400, "Each link needs a label and URL.")
-        label, url = str(item.get("label", "")).strip(), str(item.get("url", "")).strip()
-        from urllib.parse import urlsplit
-        parsed = urlsplit(url)
-        if not label or len(label) > 50 or len(url) > 500 or parsed.scheme not in ("http", "https") or not parsed.netloc:
-            raise HTTPError(400, "Link labels must be 1–50 characters and URLs must use http:// or https://.")
-        clean.append({"label": label, "url": url})
-    folder = DATA / "branding"
-    folder.mkdir(parents=True, exist_ok=True)
-    tmp = folder / "links.json.tmp"
-    tmp.write_text(json.dumps(clean, ensure_ascii=False, indent=2), encoding="utf-8")
-    os.replace(tmp, folder / "links.json")
-    ctx.auth.audit("links_changed", u["username"], f"{len(clean)} dashboard links saved", ip_of(request))
-    return {"ok": True, "links": clean}
+    try:
+        cfg = linkstore.normalize(b if "items" in b or "style" in b or "enabled" in b else b.get("links"))
+    except ValueError as e:
+        raise HTTPError(400, str(e))
+    linkstore.write(LINKS_FILE, cfg)
+    ctx.auth.audit("links_changed", u["username"], f"{len(cfg['items'])} dashboard links saved ({cfg['style']})", ip_of(request))
+    return {"ok": True, **links_payload(cfg)}
 
 
 @app.get("/branding/logo")
@@ -540,24 +505,30 @@ async def updates_upgrade(request: Request):
     b = await body(request)
     target = str(b.get("target", "java"))
     if target == "java":
-        result = await ctx.java.install_update()
+        try:
+            result = await ctx.java.install_update()
+        except Exception as e:
+            log.exception("java update")
+            raise HTTPError(500, f"Java-Update fehlgeschlagen: {e}")
     elif target == "github":
-        if not _update_state.get("github", {}).get("update"):
-            raise HTTPError(400, "No checked GitHub update is available.")
-        def fast_forward():
-            dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"], capture_output=True, text=True, timeout=8)
-            if dirty.returncode or dirty.stdout.strip(): raise RuntimeError("Working tree is not clean; refusing to overwrite local changes.")
-            fetch = subprocess.run(["git", "-C", str(ROOT), "fetch", "--no-tags", "origin", "main"], capture_output=True, text=True, timeout=120)
-            if fetch.returncode: raise RuntimeError(fetch.stderr[-500:])
-            pull = subprocess.run(["git", "-C", str(ROOT), "merge", "--ff-only", "FETCH_HEAD"], capture_output=True, text=True, timeout=60)
-            if pull.returncode: raise RuntimeError(pull.stderr[-500:])
-            return {"ok": True, "output": pull.stdout[-1000:]}
-        result = await asyncio.to_thread(fast_forward)
-        result["restart_required"] = True
-        # systemd Restart=always brings the dashboard back on the updated code.
-        asyncio.get_running_loop().call_later(1.5, os._exit, 3)
-    else: raise HTTPError(400, "Unknown update target.")
-    ctx.auth.audit("upgrade_" + target, u["username"], str(result), ip_of(request))
+        gh = _update_state.get("github") or {}
+        expected = str(b.get("expected") or (gh.get("latest") or {}).get("commit") or "")
+        if not expected:
+            raise HTTPError(400, "Bitte zuerst nach Updates suchen.")
+        try:
+            result = await asyncio.to_thread(updater.install, GITHUB_BRANCH, expected)
+        except updater.UpdateError as e:
+            raise HTTPError(400, str(e))
+        if result.get("changed"):
+            # systemd (Restart=always) starts the dashboard again on the new code; without systemd the admin must do it.
+            result["restart_required"] = True
+            result["restarting"] = updater.under_systemd()
+            if result["restarting"]:
+                asyncio.get_running_loop().call_later(1.5, os._exit, 3)
+        _update_state["github"] = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
+    else:
+        raise HTTPError(400, "Unknown update target.")
+    ctx.auth.audit("upgrade_" + target, u["username"], str({k: v for k, v in result.items() if k not in ("files", "pip")}), ip_of(request))
     return result
 
 @app.post("/api/admin/server/properties/import")
@@ -930,13 +901,12 @@ async def visits(request: Request, limit: int = 200):
 
 # ---------------------------------------------------------------- background
 async def hourly_update_check() -> None:
-    # Run at each full local hour; never install automatically.
+    """One check shortly after start, then at every full hour. Never installs anything by itself."""
+    await asyncio.sleep(30)
     while True:
-        now = time.time()
-        wait = 3600 - (now % 3600)
-        await asyncio.sleep(wait)
         try: await check_all_updates(True)
-        except Exception: log.exception("hourly update check")
+        except Exception: log.exception("update check")
+        await asyncio.sleep(3600 - (time.time() % 3600) + 5)
 
 async def background() -> None:
     n = 0

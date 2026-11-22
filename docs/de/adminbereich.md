@@ -1,6 +1,6 @@
 # ⚙️ Admin-Portal
 
-[← Übersicht](../../readme.md) · [Installation](installation.md) · [Dashboard](dashboard.md) · **Admin-Portal** · [Konfiguration](konfiguration.md) · [Betrieb & Fehlersuche](betrieb.md)
+[← Übersicht](../../readme.md) · [Installation](installation.md) · [Dashboard](dashboard.md) · **Admin-Portal** · [Konfiguration](konfiguration.md) · [Betrieb & Fehlersuche](betrieb.md) · [Updates](updates.md) · [Anleitungen](anleitungen.md)
 
 Oben rechts **🔐 Login**, dann im Benutzer-Menü oder im Tab **⚙️ Admin**. Das Admin-Portal ersetzt das Bearbeiten von `server.properties`: alles wird in SQLite gespeichert, frn_adn schreibt die Datei daraus neu. Der Java-FRN-Server liest sie beim Start – nach einer Änderung erscheint oben **Restart now**.
 
@@ -94,21 +94,38 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 | 🔄 Restart FRN server | `systemctl restart frn-server` mit neu geschriebener `server.properties` – alle Stationen verbinden sich neu |
 | ♻️ Restart dashboard | nur frn_adn startet neu, der FRN-Server läuft weiter |
 | 🔄 Reboot / ⏻ Shut down | nur Superadmin |
-| ⬆️ Check FRN server | neue Version auf freeradionetwork.de? |
+| ↻ Check now | prüft Dashboard (GitHub) und Java-FRN-Server auf neue Versionen |
+| Upgrade Dashboard now / Upgrade Java now | installiert das jeweilige Update – Einzelheiten: [Updates](updates.md) |
 
-## 🔄 Updates, Import und Erscheinungsbild
+## 🔄 Updates, Links, Import und Erscheinungsbild
 
-<p align="center"><img src="../images/admin-system.png" alt="Systemverwaltung und Updatebereich" width="90%"></p>
+<p align="center"><img src="../images/admin-updates.png" alt="Software-Updates" width="70%"></p>
 
-Im Bereich **Admin → System** prüft das Dashboard automatisch zu jeder vollen Stunde auf neue Commits im GitHub-Repository und eine neue Version des Java-FRN-Servers. Die Prüfung installiert nichts automatisch. Mit **Check now** kann sie jederzeit manuell gestartet werden. Bei verfügbarer Version wird der passende Knopf **Upgrade Java now** oder **Upgrade Dashboard now** aktiv.
+### ⬆️ Software updates (System)
 
-- **Java-Upgrade:** lädt die vom FRN-Server bereitgestellte neue Version und ersetzt die installierte JAR nach dem vorgesehenen Updateablauf.
-- **Dashboard-Upgrade:** übernimmt ausschließlich einen Fast-Forward von GitHub. Bei lokalen Änderungen im Programmverzeichnis wird das Update aus Sicherheitsgründen abgebrochen. Nach erfolgreichem Update startet der Dashboard-Dienst neu.
-- **Import server.properties:** eigener Admin-Tab **📥 Import**. Hier kann nach der frischen Installation eine einzelne Konfigurationsdatei aus der früheren FRN-Installation ausgewählt und importiert werden. Es werden nur erkannte Properties und Raumdefinitionen in die neue SQLite-Konfiguration übernommen. Weder alte Installation, Datenbank, JAR, ACL-Dateien noch Passwort-XML werden übernommen. Vor dem Schreiben wird die bisherige `server.properties` mit Zeitstempel gesichert.
-- **Links:** eigener Admin-Tab **🔗 Links**. Ein Link pro Zeile im Format `Bezeichnung | https://adresse`. Nach dem Speichern wird das Menü oben rechts sofort aktualisiert. Es sind bis zu 20 HTTP-/HTTPS-Links möglich.
-- **Appearance:** setzt die Akzentfarbe und lädt ein eigenes PNG-Logo (maximal 2 MB) hoch. Das Logo wird im Datenverzeichnis gespeichert und bleibt bei Programmupdates erhalten.
+Das Dashboard prüft 30 Sekunden nach dem Start und danach zu **jeder vollen Stunde** auf neue Commits im GitHub-Repository und auf eine neue Version des Java-FRN-Servers. Nichts wird automatisch installiert. **↻ Check now** prüft sofort. Für jedes Programm zeigt die Karte die installierte und die neue Version; bei GitHub außerdem die neuen Commits und einen Vergleichslink.
 
-**Wichtig:** Vor einem Import sollte zusätzlich ein vollständiges Backup des Datenverzeichnisses erstellt werden. Nicht unterstützte oder unbekannte Properties werden nicht in die Einstellungen übernommen. Nach dem Import ist ein Neustart des Java-FRN-Servers erforderlich.
+- **Upgrade Java now:** lädt `FRN_Server.zip` von freeradionetwork.de, ersetzt die JAR und startet den Java-Server neu.
+- **Upgrade Dashboard now:** holt genau den angezeigten Stand per Fast-Forward, installiert geänderte Python-Pakete und startet das Dashboard neu; die Seite lädt sich danach selbst. Bei lokalen Änderungen im Programmverzeichnis oder fehlenden Schreibrechten ist der Knopf grau und die Karte nennt den Grund.
+
+Alle Meldungen und Lösungen: **[Updates](updates.md)**.
+
+### 🔗 Links
+
+<p align="center"><img src="../images/admin-links.png" alt="Link-Editor" width="90%"></p>
+
+Eigener Admin-Tab **🔗 Links**, aufgebaut wie bei HBlink4-FreeRadioID: Schalter *Show the link menu*, *Menu button text*, *Display* (Aufklapp-Menü oder Knopfreihe) und die Liste mit Symbol, Name, Adresse, **new tab**, ↑ ↓ 🗑 sowie Schnellstart-Knöpfen. Bis zu 20 Links; erlaubt sind `https://`, `http://`, `mailto:`, `#stats` / `#stations` (Tab wechseln) und `/pfad`. Schritt für Schritt: [Anleitungen → Link-Menü](anleitungen.md#-link-menü-einrichten).
+
+### 📥 Import
+
+Eigener Admin-Tab **📥 Import**. Hier kann nach der frischen Installation eine einzelne `server.properties` der früheren FRN-Installation ausgewählt werden. Übernommen werden nur erkannte Properties und Raumdefinitionen; Installation, Datenbank, JAR, ACL-Dateien und Passwort-XML nicht. Vor dem Schreiben wird die bisherige `server.properties` mit Zeitstempel gesichert.
+
+**Wichtig:** Vor einem Import zusätzlich das Datenverzeichnis sichern. Nicht unterstützte Properties werden nicht übernommen. Nach dem Import den Java-FRN-Server neu starten.
+
+### 🎨 Appearance
+
+Akzentfarbe und eigenes PNG-Logo (maximal 2 MB). Das Logo liegt im Datenverzeichnis und bleibt bei Programmupdates erhalten.
+
 ## 📜 Logs
 
 <p align="center"><img src="../images/admin-logs.png" alt="Logs" width="90%"></p>

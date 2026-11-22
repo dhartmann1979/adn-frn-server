@@ -8,6 +8,7 @@
     <link rel="icon" href="/branding/logo?v={{V}}">
     <link rel="apple-touch-icon" href="/static/adn-icon-192.png?v={{V}}">
     <link rel="stylesheet" href="/static/app.css?v={{V}}">
+    <link rel="stylesheet" href="/static/extras.css?v={{V}}">
 </head>
 <body>
 <div class="container">
@@ -19,14 +20,22 @@
                 <div class="sub" id="subtitle">&nbsp;</div>
             </div>
         </div>
+        <nav class="tabs" id="mainTabs">
+            <button data-tab="live" class="active">🎙️ Live</button>
+            <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
+            <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
+            <button data-tab="chat" id="tabChatBtn" class="hidden">💬 Chat</button>
+            <button data-tab="admin" id="tabAdminBtn" class="hidden">⚙️ Admin</button>
+        </nav>
         <div class="chips">
             <span class="chip" id="chipLive">Live data</span>
             <span class="chip" id="chipServer">Server</span>
             <span class="chip" id="chipOnline">Online</span>
             <span class="chip" id="chipAir">Quiet</span>
-            <div class="links-menu" id="linksMenu"><button class="btn links-trigger" type="button" aria-expanded="false" aria-controls="linksPop" onclick="toggleLinks(event)">🔗 Links <span aria-hidden="true">▾</span></button><div class="links-pop" id="linksPop" role="menu"><div class="links-loading">Links werden geladen …</div></div></div><span id="userArea"></span>
+            <div class="links-menu" id="linksMenu"><button class="btn links-trigger" type="button" aria-expanded="false" aria-controls="linksPop" onclick="toggleLinks(event)"><span class="links-label">🔗 Links</span> <span aria-hidden="true">▾</span></button><div class="links-pop" id="linksPop" role="menu"><div class="links-loading">Loading links …</div></div></div><span id="userArea"></span>
         </div>
     </header>
+    <nav class="links-bar" id="linksBar" hidden aria-label="Links"></nav>
 
     <div class="banner warn hidden" id="setupBanner">
         <span>🧭 <b>No superadmin yet.</b> Finish the guided installation on the server: <code>sudo ./scripts/install.sh</code> – or create one with <code>sudo frnadn set-superadmin NAME</code>.</span>
@@ -35,14 +44,6 @@
         <span>⚙️ <b>Configuration saved.</b> The FRN server uses the new server.properties after a restart (all stations reconnect by themselves).</span>
         <button class="btn primary" onclick="restartServer(this)">Restart now</button>
     </div>
-
-    <nav class="tabs" id="mainTabs">
-        <button data-tab="live" class="active">🎙️ Live</button>
-        <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
-        <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
-        <button data-tab="chat" id="tabChatBtn" class="hidden">💬 Chat</button>
-        <button data-tab="admin" id="tabAdminBtn" class="hidden">⚙️ Admin</button>
-    </nav>
 
     <!-- ================= LIVE ================= -->
     <section id="tab-live" class="live-page">
@@ -164,5 +165,6 @@
 <div class="tip" id="tip"></div>
 <div id="modalRoot"></div>
 <script src="/static/app.js?v={{V}}"></script>
+<script src="/static/extras.js?v={{V}}"></script>
 </body>
 </html>

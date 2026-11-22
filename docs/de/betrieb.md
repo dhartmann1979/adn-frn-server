@@ -1,6 +1,6 @@
 # 🩺 Betrieb & Fehlersuche
 
-[← Übersicht](../../readme.md) · [Installation](installation.md) · [Dashboard](dashboard.md) · [Admin-Portal](adminbereich.md) · [Konfiguration](konfiguration.md) · **Betrieb & Fehlersuche**
+[← Übersicht](../../readme.md) · [Installation](installation.md) · [Dashboard](dashboard.md) · [Admin-Portal](adminbereich.md) · [Konfiguration](konfiguration.md) · **Betrieb & Fehlersuche** · [Updates](updates.md) · [Anleitungen](anleitungen.md)
 
 ## Dienste
 
@@ -40,6 +40,9 @@ Sie stehen im Admin-Portal oben unter *Settings* und im Log:
 | Dashboard zeigt „No superadmin yet“ | `sudo frnadn set-superadmin NAME` |
 | Passwort vergessen | `sudo frnadn reset-password NAME` |
 | Java fehlt nach Systemupdate | `sudo apt install default-jre-headless` |
+| **Upgrade Dashboard now** ist grau oder meldet keine Updates | Dateirechte oder fehlender Git-Stand: einmal `cd /opt/adn-frn-server && sudo ./scripts/update.sh`, siehe [Updates](updates.md#wenn-etwas-nicht-klappt) |
+| Update-Prüfung: „rate limit“ oder „not reachable“ | GitHub begrenzt anonyme Abfragen bzw. der Server erreicht github.com nicht – später prüfen, Netz und DNS testen |
+| Link-Menü fehlt in der Kopfzeile | *Show the link menu* aus oder keine Links eingetragen: Admin → 🔗 Links |
 
 ## Sicherung
 

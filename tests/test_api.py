@@ -139,3 +139,29 @@ def test_https_settings_are_admin_configurable_and_require_dashboard_restart(cli
     assert saved.status_code == 200, saved.text
     assert saved.json()["dashboard_restart_needed"] is True
     assert saved.json()["restart_needed"] is False
+
+
+def test_link_menu_options_and_validation(client):
+    login(client)
+    cfg = {"enabled": True, "label": "Mehr", "style": "bar", "items": [
+        {"icon": "🌐", "label": "Website", "url": "https://example.org", "new_tab": True},
+        {"icon": "✉️", "label": "Kontakt", "url": "mailto:a@example.org", "new_tab": False},
+        {"label": "Stationen", "url": "#stations"}]}
+    saved = client.post("/api/admin/links", json=cfg, headers=H)
+    assert saved.status_code == 200, saved.text
+    got = client.get("/api/links").json()
+    assert got["style"] == "bar" and got["label"] == "Mehr" and got["enabled"] is True
+    assert got["items"] == cfg["items"] == got["links"]
+    assert client.post("/api/admin/links", json={**cfg, "style": "tiles"}, headers=H).status_code == 400
+    assert client.post("/api/admin/links", json={"items": [{"label": "x", "url": "//evil.example"}]}, headers=H).status_code == 400
+    assert client.post("/api/admin/links", json={"enabled": False, "items": []}, headers=H).status_code == 200
+    assert client.get("/api/links").json()["enabled"] is False
+
+
+def test_update_endpoints_need_admin_and_report_state(client):
+    assert client.get("/api/admin/updates").status_code in (401, 403)
+    assert client.post("/api/admin/updates/upgrade", json={"target": "github"}, headers=H).status_code in (401, 403)
+    login(client)
+    r = client.post("/api/admin/updates/upgrade", json={"target": "github"}, headers=H)
+    assert r.status_code == 400                       # nothing checked yet: refuses instead of guessing
+    assert client.post("/api/admin/updates/upgrade", json={"target": "nope"}, headers=H).status_code == 400
