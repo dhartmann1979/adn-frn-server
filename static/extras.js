@@ -161,23 +161,30 @@
     const when = ts => ts ? new Date(ts * 1000).toLocaleString() : '–';
     const short = s => html(String(s || '').slice(0, 7));
 
-    function dashboardRow(gh) {
-        if (!gh || gh.ok === undefined) return '';
-        const loc = gh.local || {}, lat = gh.latest || {};
-        const cur = `${loc.version ? 'v' + html(loc.version) : '?'}${loc.short ? ` <span class="mono">${short(loc.commit)}</span>` : ''}`;
-        let badge, detail = '';
-        if (!gh.ok) { badge = '<span class="upd-badge bad">check failed</span>'; detail = `<div class="upd-hint">${html(gh.error)}</div>`; }
-        else if (gh.error) { badge = '<span class="upd-badge warn">unknown state</span>'; detail = `<div class="upd-hint">${html(gh.error)}${gh.hint ? '<br>' + html(gh.hint) : ''}</div>`; }
-        else if (gh.update) {
-            badge = '<span class="upd-badge new">update available</span>';
-            const nv = gh.remote_version ? `v${html(gh.remote_version)} ` : '';
-            detail = `<div class="upd-new">→ <b>${nv}<span class="mono">${short(lat.commit)}</span></b> · ${gh.behind} new commit${gh.behind === 1 ? '' : 's'} · <a href="${html(gh.url)}" target="_blank" rel="noopener noreferrer">compare on GitHub</a></div>`
-                + `<ul class="upd-commits">${(gh.commits || []).map(c => `<li><span class="mono">${short(c.short)}</span> ${html(c.message)}</li>`).join('')}</ul>`
-                + (gh.hint ? `<div class="upd-hint">${html(gh.hint)}</div>` : '');
-        } else { badge = '<span class="upd-badge ok">up to date</span>'; detail = lat.message ? `<div class="upd-hint">Latest: ${html(lat.message)}</div>` : ''; }
-        return `<div class="upd-row"><div class="upd-top"><b>🖥️ Dashboard</b> <span class="dim">GitHub ${html(gh.repo)} · ${html(gh.branch)}</span>${badge}</div>
-            <div class="upd-ver">Installed: ${cur}</div>${detail}</div>`;
+    // N8 Kit state for the dashboard (GitHub): same banner, tile and progress as in the other N8schicht projects
+    function kitState(r) {
+        const gh = (r && r.github) || {}, loc = gh.local || {}, lat = gh.latest || {};
+        const cur = `${loc.version ? 'v' + loc.version : '?'}${loc.short ? ' · ' + loc.short : ''}`;
+        const latest = lat.commit ? `${gh.remote_version ? 'v' + gh.remote_version + ' · ' : ''}${String(lat.commit).slice(0, 7)}` : '';
+        const notes = (gh.commits || []).length ? '<ul>' + gh.commits.slice(0, 10).map(c => `<li><span class="mono">${short(c.short)}</span> ${html(c.message)}</li>`).join('') + '</ul>' : '';
+        return { available: !!(gh.ok && gh.update && lat.commit), current: cur, latest, notes, checked: r && r.checked,
+                 can_install: !!gh.can_upgrade, error: gh.ok === false ? (gh.error || 'check failed') : '', result: (r && r.result) || null,
+                 reason: gh.hint ? html(gh.hint) : '', extra: [['Repository', `${html(gh.repo || '')} · ${html(gh.branch || '')}`]] };
     }
+    function renderBanner(r) {
+        const el = byId('updateBanner'); if (!el) return;
+        const admin = typeof isAdmin === 'function' && isAdmin();
+        if (!admin) { el.hidden = true; return; }
+        N8Kit.update.banner(el, kitState(r), { app: 'frnadn', onInstall: () => window.upgradeNow('github'),
+            onDetails: () => showTab('admin', 'system') });
+    }
+    async function bannerCheck() {
+        if (!(typeof isAdmin === 'function' && isAdmin())) return renderBanner(null);
+        try { lastUpd = await api('GET', '/api/admin/updates'); renderBanner(lastUpd); } catch (e) { }
+    }
+    setTimeout(bannerCheck, 1500);
+    setInterval(bannerCheck, 10 * 60 * 1000);
+    window.addEventListener('n8:login', bannerCheck);
 
     function javaRow(j) {
         if (!j) return '';
@@ -193,18 +200,17 @@
     // opening System uses the cached result (max. 10 minutes old); "Check now" asks GitHub and freeradionetwork.de again
     window.checkAllUpdates = async function (btn, force) {
         const box = byId('updInfo');
-        if (btn) btn.disabled = true;
         if (box && !lastUpd) box.textContent = 'Checking …';
         try {
             const r = (btn || force) ? await api('POST', '/api/admin/updates/check', {}) : await api('GET', '/api/admin/updates');
             lastUpd = r;
-            const gh = r.github || {}, java = r.java || {};
-            if (box) box.innerHTML = dashboardRow(gh) + javaRow(java) + `<div class="upd-when">Last check: ${when(r.checked)} · automatic check every full hour</div>`;
-            const jb = byId('upgradeJava'), gb = byId('upgradeGit');
+            const java = r.java || {};
+            if (box) N8Kit.update.panel(box, kitState(r), { onCheck: () => window.checkAllUpdates(null, true), onInstall: () => window.upgradeNow('github') });
+            const jbox = byId('javaInfo'); if (jbox) jbox.innerHTML = javaRow(java);
+            const jb = byId('upgradeJava');
             if (jb) jb.disabled = !(java.ok && java.update);
-            if (gb) gb.disabled = !gh.can_upgrade;
+            renderBanner(r);
         } catch (e) { if (box) box.textContent = e.message; }
-        finally { if (btn) btn.disabled = false; }
     };
 
     function restartOverlay(text) {
@@ -232,23 +238,34 @@
     }
 
     window.upgradeNow = async function (target, btn) {
-        const gh = (lastUpd && lastUpd.github) || {}, java = (lastUpd && lastUpd.java) || {};
-        const isJava = target === 'java';
-        const title = isJava ? 'Upgrade Java FRN server?' : 'Upgrade dashboard from GitHub?';
-        const body = isJava
-            ? `FRN_Server.zip is loaded from freeradionetwork.de${java.latest ? ' (' + html(java.latest.version) + ')' : ''}, FRN_Server.jar is replaced and the Java server restarts. Stations reconnect by themselves.`
-            : `${html(gh.behind || 'New')} commit${gh.behind === 1 ? '' : 's'} will be applied${gh.remote_version ? ' (v' + html(gh.remote_version) + ')' : ''}. Changed Python packages are installed, then the FRN server and dashboard restart. Connected stations reconnect automatically, and this page reloads.`;
-        if (!await confirmBox({ title, body }, 'Upgrade')) return;
+        const java = (lastUpd && lastUpd.java) || {};
+        if (target !== 'java') {
+            const k = kitState(lastUpd), gh = (lastUpd && lastUpd.github) || {};
+            return N8Kit.update.run({
+                from: k.current, to: k.latest,
+                text: `${k.notes}<div class="dim">Changed Python packages are installed, then the FRN server and the dashboard restart. Connected stations reconnect by themselves.</div>`,
+                install: async () => {
+                    const r = await api('POST', '/api/admin/updates/upgrade', { target: 'github', expected: (gh.latest || {}).commit });
+                    byId('updateBanner').hidden = true;
+                    if (!r.changed) return { restart: false, message: 'Already up to date.' };
+                    if (r.frn_restart && !r.frn_restart.ok) toast('Dashboard updated, but the FRN server could not be restarted automatically. Please restart it from Admin → System.', true);
+                    if (!r.restarting) return { restart: false, message: 'FRN server restarted. Restart the dashboard to load the update: sudo systemctl restart frnadn' };
+                    return r;
+                },
+                version: async () => {
+                    const r = await fetch('/api/info', { cache: 'no-store', credentials: 'same-origin' });
+                    if (!r.ok) throw new Error(r.status);
+                    const b = (await r.json()).build || {};
+                    return `v${b.version || '?'} · ${b.commit || ''}`;
+                },
+            });
+        }
+        const body = `FRN_Server.zip is loaded from freeradionetwork.de${java.latest ? ' (' + html(java.latest.version) + ')' : ''}, FRN_Server.jar is replaced and the Java server restarts. Stations reconnect by themselves.`;
+        if (!await confirmBox({ title: 'Upgrade Java FRN server?', body }, 'Upgrade')) return;
         if (btn) btn.disabled = true;
         try {
-            const r = await api('POST', '/api/admin/updates/upgrade', isJava ? { target } : { target, expected: (gh.latest || {}).commit });
-            if (isJava) toast('Java FRN server upgraded' + (r.installed ? ' to ' + r.installed.version : '') + '.');
-            else if (!r.changed) toast('Already up to date.');
-            else if (r.restarting) {
-                if (r.frn_restart && !r.frn_restart.ok) alert('Dashboard updated, but the FRN server could not be restarted automatically. Please restart it from Admin → System.\n\n' + (r.frn_restart.out || 'Unknown error'));
-                await waitForDashboard(); return;
-            }
-            else toast('FRN server restarted. Restart the dashboard to load the update: sudo systemctl restart frnadn', true);
+            const r = await api('POST', '/api/admin/updates/upgrade', { target });
+            toast('Java FRN server upgraded' + (r.installed ? ' to ' + r.installed.version : '') + '.');
             await window.checkAllUpdates(null, true);
         } catch (e) { toast(e.message, true); if (btn) btn.disabled = false; }
     };

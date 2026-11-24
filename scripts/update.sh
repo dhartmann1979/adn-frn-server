@@ -33,6 +33,17 @@ if id "$SVC_USER" >/dev/null 2>&1; then
     chown -R "$SVC_USER:$SVC_USER" "$DIR"
 fi
 command -v frnadn >/dev/null && frnadn write-config >/dev/null || true
+# N8 update guard (ab 2.6.0): Rollback, wenn das Dashboard nach einem Update nicht hochkommt.
+# Fehlt die Zeile in der installierten Unit, wird sie ergänzt (Pfade aus der Unit selbst).
+UNIT=/etc/systemd/system/frnadn.service
+chmod 0755 "$DIR/scripts/"*.sh 2>/dev/null || true
+if [ -f "$UNIT" ] && ! grep -q "n8-update-guard" "$UNIT"; then
+    WD="$(sed -n 's/^WorkingDirectory=//p' "$UNIT" | head -n 1)"; WD="${WD:-$DIR}"
+    DD="$(sed -n 's/^Environment=FRNADN_DATA=//p' "$UNIT" | head -n 1)"; DD="${DD:-/var/lib/frnadn}"
+    sed -i "s#^ExecStart=#ExecStartPre=-/bin/sh ${WD}/scripts/n8-update-guard.sh ${WD} ${DD}\nExecStart=#" "$UNIT"
+    systemctl daemon-reload
+    echo "✓ Update-Prüfung mit Rollback in frnadn.service eingetragen"
+fi
 systemctl restart frn-server
 systemctl restart frnadn
 echo "✓ frn_adn $(sed -n 's/__version__ = "\(.*\)"/\1/p' frnadn/__init__.py) und FRN-Server neu gestartet. Daten (SQLite), Benutzer und Einstellungen bleiben erhalten."

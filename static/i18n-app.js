@@ -1,0 +1,130 @@
+/* adn-frn-server – German words for the dashboard and the admin portal (N8 Kit, base language English).
+ * Keys are the English texts without leading emoji and trailing punctuation; see n8-kit.js. */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        // header, strip, live
+        'Live data': 'Live-Daten', 'FRN server': 'FRN-Server', 'Online': 'Online', 'Quiet': 'Ruhe', 'Stations': 'Stationen', 'Chat': 'Chat',
+        'Online now': 'Jetzt online', 'Talks today': 'Durchgänge heute', 'Airtime today': 'Sprechzeit heute', 'Stations heard': 'Gehörte Stationen', 'Peak online': 'Höchststand online',
+        'On air': 'Auf Sendung', 'Last heard': 'Zuletzt gehört', 'Rooms': 'Räume', 'Room': 'Raum', 'Band': 'Band', 'Nothing heard yet.': 'Noch nichts gehört.',
+        'Show more': 'Mehr anzeigen', 'Last': 'Zuletzt', 'from freeradionetwork.de': 'von freeradionetwork.de', 'more': 'mehr', 'less': 'weniger', 'now': 'jetzt', 'online': 'online', 'Muted': 'Stumm', 'Blocked': 'Gesperrt', 'Operator': 'Operator',
+        'No superadmin yet.': 'Noch kein Superadmin.', 'Finish the guided installation on the server': 'Schließe die geführte Installation auf dem Server ab', 'or create one with': 'oder lege einen an mit',
+        'Server settings or ACLs saved.': 'Servereinstellungen oder ACLs gespeichert.', 'Restart the FRN server to apply the changes (connected stations reconnect by themselves).': 'Starte den FRN-Server neu, damit die Änderungen gelten (verbundene Stationen verbinden sich selbst wieder).',
+        'joined': 'kam in', 'left': 'ging aus', 'Talks': 'Durchgänge', 'Airtime': 'Sprechzeit',
+
+        // statistics
+        'Top stations': 'Top-Stationen', 'Activity per room': 'Aktivität pro Raum', 'Stations online': 'Stationen online', 'maximum, sampled every 5 minutes': 'Höchstwert, alle 5 Minuten gemessen',
+        'When is talked': 'Wann gesprochen wird', 'Share': 'Anteil', 'Most active stations': 'Aktivste Stationen', 'Mostly in': 'Meist in', 'Comings & goings': 'Kommen & Gehen',
+        'logins and logouts, live': 'Anmeldungen und Abmeldungen, live', 'by airtime': 'nach Sprechzeit', 'airtime, last 30 days': 'Sprechzeit, letzte 30 Tage', 'Daily totals': 'Tagessummen',
+        'Mon': 'Mo', 'Tue': 'Di', 'Wed': 'Mi', 'Thu': 'Do', 'Fri': 'Fr', 'Sat': 'Sa', 'Sun': 'So',
+
+        // stations directory
+        'Search: callsign, name, city or country': 'Suche: Rufzeichen, Name, Ort oder Land', 'Last seen': 'Zuletzt gesehen', 'Talked (30 d)': 'Gesprochen (30 T.)', 'Talks (30 d)': 'Durchgänge (30 T.)',
+        'Country': 'Land', 'City': 'Ort', 'Client type': 'Client-Art', 'Band / channel': 'Band / Kanal', 'Program': 'Programm', 'Since': 'Seit', 'Logins': 'Anmeldungen',
+        'Crosslink': 'Crosslink', 'Gateway': 'Gateway', 'Gateway (radio)': 'Gateway (Funk)', 'PC only': 'Nur PC', 'PC Only': 'Nur PC', 'PC / app': 'PC / App', 'Germany': 'Deutschland', 'Austria': 'Österreich',
+        'Switzerland': 'Schweiz', 'Netherlands': 'Niederlande', 'Belgium': 'Belgien', 'Poland': 'Polen', 'United Kingdom': 'Vereinigtes Königreich', 'United States': 'USA',
+
+        // chat
+        'Room chat': 'Raum-Chat', 'Chat messages': 'Chat-Nachrichten', 'Text messages written in the rooms': 'In den Räumen geschriebene Textnachrichten',
+
+        // admin: menu
+        'Admin': 'Admin', 'FRN rooms': 'FRN-Räume', 'Server lists': 'Server-Listen', 'Server access lists': 'Zugangslisten des Servers', 'FRN accounts': 'FRN-Konten', 'Admins': 'Admins',
+        'Theme': 'Aussehen', 'Sessions & log': 'Sitzungen & Protokoll', 'Change log': 'Änderungsprotokoll', 'Active sessions': 'Aktive Sitzungen', 'Events (live)': 'Ereignisse (live)',
+
+        // admin: settings
+        'Configuration': 'Konfiguration', 'Title, public view and what visitors see': 'Titel, öffentliche Ansicht und was Besucher sehen', 'Public view': 'Öffentliche Ansicht',
+        'On: everybody sees rooms and statistics without logging in': 'An: Jeder sieht Räume und Statistik ohne Anmeldung', 'Show hidden rooms publicly': 'Versteckte Räume öffentlich zeigen',
+        'Stations tab': 'Tab Stationen', 'With e-mail and address – only visible to admins.': 'Mit E-Mail und Adresse – nur für Admins sichtbar.', 'Login valid for (hours)': 'Anmeldung gilt (Stunden)',
+        'Registration at sysman.freeradionetwork.de or stand-alone': 'Anmeldung bei sysman.freeradionetwork.de oder eigenständig', 'Stand-alone (without SystemManager)': 'Eigenständig (ohne SystemManager)',
+        'On: the server runs on its own, passwords come from the own list (FRN accounts). Off: registered at the SystemManager': 'An: Der Server läuft für sich, Passwörter kommen aus der eigenen Liste (FRN-Konten). Aus: beim SystemManager registriert',
+        'Use the own password list (stand-alone)': 'Eigene Passwortliste verwenden (eigenständig)', 'Off: every FRN password is accepted in stand-alone mode': 'Aus: Im eigenständigen Betrieb wird jedes FRN-Passwort angenommen',
+        'Only for stand-alone, e.g. a server for the home network': 'Nur für eigenständigen Betrieb, z. B. einen Server fürs Heimnetz', 'stand-alone': 'eigenständig',
+        'Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.': 'Beim SystemManager registriert, steht der Server im FRN-System und prüft die Anmeldungen dort. Der SystemManager testet, ob Adresse und Port aus dem Internet erreichbar sind – richte vorher die Portweiterleitung ein.',
+        'SystemManager': 'SystemManager', 'SystemManager (sysman_server_addr)': 'SystemManager (sysman_server_addr)', 'sysman.freeradionetwork.de = alternative FRN system (DE)': 'sysman.freeradionetwork.de = alternatives FRN-System (DE)',
+        'Address, port and timeouts – written to server.properties': 'Adresse, Port und Zeitlimits – werden in server.properties geschrieben', 'Server address (server_addr)': 'Serveradresse (server_addr)',
+        'Hostname or public IP of this server, e.g. frn.die-n8schicht.de – the SystemManager checks that it is reachable': 'Hostname oder öffentliche IP dieses Servers, z. B. frn.die-n8schicht.de – der SystemManager prüft, ob er erreichbar ist',
+        'Port (server_port)': 'Port (server_port)', 'TCP port for the FRN clients; open it in router and firewall': 'TCP-Port für die FRN-Clients; im Router und in der Firewall öffnen',
+        'Backup server (backup_server_addr)': 'Ausweichserver (backup_server_addr)', 'Backup server port': 'Port des Ausweichservers', 'Sent to the clients: where to go if this server is down': 'Geht an die Clients: wohin, wenn dieser Server ausfällt',
+        'Client timeout (client_sotimeout, ms)': 'Client-Zeitlimit (client_sotimeout, ms)', 'A client that sends nothing for this long is disconnected': 'Ein Client, der so lange nichts sendet, wird getrennt',
+        'Voice timeout (client_txtimeout, ms)': 'Sprach-Zeitlimit (client_txtimeout, ms)', 'No voice for this long ends a transmission; 0 = off': 'So lange keine Sprache beendet einen Durchgang; 0 = aus',
+        'Default 180': 'Vorgabe 180', 'Default room (default_net)': 'Standardraum (default_net)', 'Clients that ask for a room that does not exist land here': 'Clients, die einen nicht vorhandenen Raum wünschen, landen hier',
+        'Owner e-mail (server_owner)': 'E-Mail des Besitzers (server_owner)', 'Server owner (gets OWNER rights in every room)': 'Serverbesitzer (bekommt OWNER-Rechte in jedem Raum)',
+        'Only one address; empty = the FRN account e-mail above. OWNER rights in every room': 'Nur eine Adresse; leer = die FRN-Konto-E-Mail oben. OWNER-Rechte in jedem Raum',
+        'FRN account e-mail (sysman_auth_emailaddr)': 'E-Mail des FRN-Kontos (sysman_auth_emailaddr)', 'FRN account password (sysman_auth_password)': 'Passwort des FRN-Kontos (sysman_auth_password)',
+        'E-mail of your FRN user account at the SystemManager': 'E-Mail deines FRN-Benutzerkontos beim SystemManager', 'The password of this FRN account (as sent by the SystemManager)': 'Das Passwort dieses FRN-Kontos (wie vom SystemManager geschickt)',
+        'Sent to the SystemManager and shown on the dashboard': 'Geht an den SystemManager und steht im Dashboard', 'Shown on the dashboard': 'Steht im Dashboard',
+        'HTTPS & web': 'HTTPS & Web', 'Enable HTTPS with Let\'s Encrypt': 'HTTPS mit Let\'s Encrypt einschalten', 'Automatic HTTPS certificates with Let’s Encrypt (requires public DNS and ports 80/443)': 'Automatische HTTPS-Zertifikate mit Let’s Encrypt (braucht öffentliches DNS und die Ports 80/443)',
+        'Public domain': 'Öffentliche Domain', 'Example: dashboard.example.org. Do not enter http:// or a path.': 'Beispiel: dashboard.example.org. Ohne http:// und ohne Pfad.', 'Certificate e-mail': 'E-Mail für das Zertifikat',
+        'Let\'s Encrypt expiry and important certificate notices.': 'Ablauf und wichtige Hinweise von Let\'s Encrypt.', 'Use test certificates (staging)': 'Testzertifikate verwenden (Staging)',
+        'For testing only; browsers do not trust staging certificates.': 'Nur zum Testen; Browser vertrauen Staging-Zertifikaten nicht.', 'HTTPS port': 'HTTPS-Port', 'Public HTTPS port. Standard is 443.': 'Öffentlicher HTTPS-Port. Standard ist 443.',
+        'HTTP challenge / redirect port': 'HTTP-Port für Challenge / Weiterleitung', 'Public TCP port used by HTTP-01 challenge and HTTP → HTTPS redirect.': 'Öffentlicher TCP-Port für die HTTP-01-Challenge und die Weiterleitung HTTP → HTTPS.',
+        'Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn.': 'Braucht einen öffentlichen DNS-Namen, der auf diesen Server zeigt, und eingehende TCP-Ports 80 und 443. Speichern, dann frnadn neu starten.',
+        'Database': 'Datenbank', 'How long talks and logins are kept': 'Wie lange Durchgänge und Anmeldungen aufgehoben werden', 'Keep single talks (days)': 'Einzelne Durchgänge aufheben (Tage)',
+        'Keep logins (days)': 'Anmeldungen aufheben (Tage)', 'Keep chat messages (days)': 'Chat-Nachrichten aufheben (Tage)', 'Daily totals are kept for ever, they are small': 'Tagessummen bleiben für immer, sie sind klein',
+        'Discard changes': 'Änderungen verwerfen', 'unsaved': 'nicht gespeichert', 'from profile': 'aus dem Profil', 'built-in': 'eingebaut', 'empty': 'leer', 'always': 'immer',
+
+        // admin: rooms
+        'New room': 'Neuer Raum', 'Name (net00)': 'Name (net00)', 'Emoji in front of the name': 'Emoji vor dem Namen', 'Room is open (_enable)': 'Raum ist offen (_enable)', 'Off: the server does not offer this room': 'Aus: Der Server bietet diesen Raum nicht an',
+        'Hidden on the dashboard': 'Im Dashboard versteckt', 'Only after login on the dashboard (the FRN clients still see it)': 'Erst nach Anmeldung im Dashboard (die FRN-Clients sehen ihn trotzdem)',
+        'Room owners (_owner)': 'Raumbesitzer (_owner)', 'E-mails, comma separated; NETOWNER rights in this room. Empty = server owner': 'E-Mails, kommagetrennt; NETOWNER-Rechte in diesem Raum. Leer = Serverbesitzer',
+        'Crosslinks allowed (_acl_cl)': 'Crosslinks erlaubt (_acl_cl)', 'Gateways allowed (_acl_gw)': 'Gateways erlaubt (_acl_gw)', 'Empty = all, none = no crosslinks, or e-mails': 'Leer = alle, none = keine Crosslinks, oder E-Mails',
+        'Empty = all, none = no gateways, or e-mails': 'Leer = alle, none = keine Gateways, oder E-Mails', 'Message for refused crosslinks/gateways (_acl_info)': 'Meldung für abgewiesene Crosslinks/Gateways (_acl_info)',
+        'Max. transmission (_tot, s)': 'Max. Durchgang (_tot, s)', 'Unmute after (_unmute, min)': 'Stumm aufheben nach (_unmute, min)', '0 = muted until unmuted': '0 = stumm bis zum Aufheben',
+        'No voice to muted PC-only clients': 'Keine Sprache an stumme Nur-PC-Clients', 'No voice to muted crosslinks': 'Keine Sprache an stumme Crosslinks', 'No voice to muted gateways': 'Keine Sprache an stumme Gateways',
+        'Speech pause (_speechpause, ms)': 'Sprechpause (_speechpause, ms)', 'Speech pause message': 'Meldung zur Sprechpause', 'Sent to PC-only clients; {callsign} is replaced': 'Geht an Nur-PC-Clients; {callsign} wird ersetzt',
+        'Parrot / echo test': 'Papagei / Echotest', 'Parrot start/stop (_parrot_startstop_enable)': 'Papagei an/aus (_parrot_startstop_enable)', 'The parrot can be switched on and off by text message': 'Der Papagei lässt sich per Textnachricht an- und ausschalten',
+        'Telegram bot (_tgbot_params)': 'Telegram-Bot (_tgbot_params)', 'min. transmission ms;min. idle ms;bot token;channel ID – e.g. 6000;30000;123:ABC;-100123': 'min. Durchgang ms;min. Pause ms;Bot-Token;Kanal-ID – z. B. 6000;30000;123:ABC;-100123',
+        'Info message (_show_infomessage)': 'Infomeldung (_show_infomessage)', 'Require talk permission': 'Sprecherlaubnis nötig', 'Can transmit': 'Darf senden', 'Move up': 'Nach oben', 'Move down': 'Nach unten',
+        'Order on the dashboard; the FRN clients see the rooms sorted by name. ⭐ = default room, 🦜 = net00, the test/parrot room.': 'Reihenfolge im Dashboard; die FRN-Clients sehen die Räume nach Namen sortiert. ⭐ = Standardraum, 🦜 = net00, der Test-/Papageienraum.',
+
+        // admin: lists, accounts, users
+        'Access list': 'Zugangsliste', 'Only allow entries on the access list': 'Nur Einträge der Zugangsliste zulassen', 'Access message': 'Zugangsmeldung', 'Who sees the info message of the access list': 'Wer die Infomeldung der Zugangsliste sieht',
+        'Everybody': 'Alle', 'only clients affected by the access list': 'nur Clients, die die Zugangsliste betrifft', 'Block pattern (_bl_regexp)': 'Sperrmuster (_bl_regexp)', 'Regular expression on name, e-mail and city': 'Regulärer Ausdruck auf Name, E-Mail und Ort',
+        'Message for blocked clients (_bl_info)': 'Meldung für gesperrte Clients (_bl_info)', 'Allow a LAN address (allowLANAddr)': 'LAN-Adresse erlauben (allowLANAddr)', 'Save access settings': 'Zugangseinstellungen speichern',
+        'Add entry': 'Eintrag hinzufügen', 'Add to list': 'Zur Liste hinzufügen', 'No entries in this list.': 'Keine Einträge in dieser Liste.', 'Copy an online station': 'Eine Online-Station übernehmen', 'Select a connected station…': 'Verbundene Station wählen …',
+        'Lists are stored in SQLite and written in the FRN server\'s XML format. Existing XML entries are imported automatically. Changes take effect after restarting the FRN server; original XML files are backed up before replacement.': 'Listen stehen in SQLite und werden im XML-Format des FRN-Servers geschrieben. Vorhandene XML-Einträge werden automatisch übernommen. Änderungen gelten nach einem Neustart des FRN-Servers; die Original-XML-Dateien werden vorher gesichert.',
+        'FRN owners and admins can still change these lists in the FRN client. The dashboard imports changes from the XML files before displaying or editing them.': 'FRN-Besitzer und -Admins können diese Listen weiterhin im FRN-Client ändern. Das Dashboard übernimmt Änderungen aus den XML-Dateien, bevor es sie zeigt oder bearbeitet.',
+        'New FRN account': 'Neues FRN-Konto', 'No accounts yet.': 'Noch keine Konten.', 'E-mail (login of the FRN client)': 'E-Mail (Login des FRN-Clients)', 'FRN password': 'FRN-Passwort', 'FRN client ID': 'FRN-Client-ID',
+        'The password list of the server for': 'Die Passwortliste des Servers für den', 'mode (acl/FRNPasswd.xml).': '-Betrieb (acl/FRNPasswd.xml).', 'on this server.': 'auf diesem Server.',
+        'The server is registered at the SystemManager: logins are checked there, this list is not used.': 'Der Server ist beim SystemManager registriert: Anmeldungen werden dort geprüft, diese Liste wird nicht benutzt.',
+        'The server needs the password itself in FRNPasswd.xml (file readable only by the service).': 'Der Server braucht das Passwort selbst in FRNPasswd.xml (Datei nur für den Dienst lesbar).',
+        'New user': 'Neuer Benutzer', 'Password (min. 10)': 'Passwort (mind. 10)', 'New password (min. 10)': 'Neues Passwort (mind. 10)', 'Repeat': 'Wiederholen', 'Create': 'Anlegen', 'Admins only': 'Nur Admins',
+        'Superadmin: everything, also admins. Admins: everything except other admins. Users: see the dashboard also when it is private, and hidden rooms.': 'Superadmin: alles, auch Admins. Admins: alles außer anderen Admins. Benutzer: sehen das Dashboard auch, wenn es privat ist, und versteckte Räume.',
+        'My account': 'Mein Konto', 'superadmin': 'Superadmin', 'Logged-in users': 'Angemeldete Benutzer', 'Who': 'Wer', 'What': 'Was', 'From': 'Von', 'End': 'Beenden', 'installation / command line': 'Installation / Kommandozeile',
+
+        // admin: system
+        'Machine': 'Rechner', 'Host': 'Host', 'Load': 'Last', 'Memory': 'Speicher', 'Disk': 'Festplatte', 'Reboot': 'Neu starten', 'Shut down': 'Herunterfahren', 'Service': 'Dienst', 'running': 'läuft',
+        'Running since': 'Läuft seit', 'Restart FRN server': 'FRN-Server neu starten', 'Restart dashboard': 'Dashboard neu starten', 'Journal frn-server': 'Journal frn-server', 'Journal frnadn': 'Journal frnadn',
+        'Java FRN server': 'Java-FRN-Server', 'Java FRN server by': 'Java-FRN-Server von', 'Upgrade Java now': 'Java jetzt aktualisieren', 'Installed: unknown': 'Installiert: unbekannt', 'Installed version': 'Installierte Version',
+        'update available': 'Update verfügbar', 'Repository': 'Repository', 'Data': 'Daten', 'Data (SQLite)': 'Daten (SQLite)', 'Statistics cache': 'Statistik-Zwischenspeicher', 'server.log of the FRN server': 'server.log des FRN-Servers',
+        'Show server.properties': 'server.properties anzeigen', 'Up': 'Läuft', 'Down': 'Aus',
+        'Import legacy server.properties': 'Alte server.properties importieren', 'Import server.properties': 'server.properties importieren', 'Select the old server.properties file': 'Alte server.properties-Datei wählen',
+        'Optional: import settings from the previous FRN installation into this fresh installation. Only supported properties and room definitions are transferred. The old database, Java JAR, ACL lists and password XML files are not copied.': 'Optional: Einstellungen der bisherigen FRN-Installation in diese neue übernehmen. Übertragen werden nur unterstützte Eigenschaften und Raumdefinitionen. Alte Datenbank, Java-JAR, ACL-Listen und Passwort-XML-Dateien werden nicht kopiert.',
+
+        // admin: theme, logo, links
+        'Colour profile': 'Farbprofil', 'Pick a colour profile, then change any colour you like – or build a completely own scheme. The whole page shows it right away; it only stays after': 'Wähle ein Farbprofil und ändere dann jede Farbe nach Wunsch – oder baue ein ganz eigenes Schema. Die ganze Seite zeigt es sofort; bleiben tut es erst nach',
+        '. Same colour engine as HBlink4-FreeRadioID and N8-HotSpot.': '. Gleiche Farbtechnik wie HBlink4-FreeRadioID und N8-HotSpot.', 'Own colours': 'Eigene Farben',
+        'Click a colour to change it; ↺ takes it from the profile again.': 'Farbe anklicken zum Ändern; ↺ nimmt sie wieder aus dem Profil.', 'Back to the profile colour': 'Zurück zur Profilfarbe', 'Accent': 'Akzent', 'Accent 2': 'Akzent 2',
+        'Background': 'Hintergrund', 'Page colour behind everything': 'Seitenfarbe hinter allem', 'Buttons, numbers, active tabs': 'Schaltflächen, Zahlen, aktive Tabs', 'Second colour of buttons and the title': 'Zweite Farbe von Schaltflächen und Titel',
+        'Glow top left': 'Leuchten oben links', 'Glow top right': 'Leuchten oben rechts', 'Glow bottom': 'Leuchten unten', 'Card tint': 'Kartentönung', 'Colour mixed into the glass cards': 'In die Glaskarten gemischte Farbe',
+        'Card brightness': 'Kartenhelligkeit', 'How strongly the glass cards stand out': 'Wie stark die Glaskarten hervortreten', 'Glass blur': 'Glasunschärfe', 'Background glow': 'Hintergrundleuchten', '0 = flat background': '0 = flacher Hintergrund',
+        'Roundness': 'Rundung', 'Corners of cards and buttons': 'Ecken von Karten und Schaltflächen', 'Off = faster on old phones': 'Aus = schneller auf alten Handys', 'Readable (contrast 18.3 : 1)': 'Gut lesbar (Kontrast 18,3 : 1)', 'N8 standard': 'N8-Standard',
+        'Logo & site icon': 'Logo & Seitensymbol', 'Dashboard logo': 'Dashboard-Logo', 'Current dashboard logo': 'Aktuelles Dashboard-Logo', 'Use default logo': 'Standard-Logo verwenden', 'Site icon / favicon': 'Seitensymbol / Favicon',
+        'Current site icon': 'Aktuelles Seitensymbol', 'Use default site icon': 'Standard-Seitensymbol verwenden', 'PNG image, up to 2 MB. Shown in the header and sign-in dialog.': 'PNG-Bild, bis 2 MB. Steht in der Kopfzeile und im Anmeldefenster.',
+        'PNG or ICO, up to 2 MB. Used in browser tabs and bookmarks.': 'PNG oder ICO, bis 2 MB. Für Browser-Tabs und Lesezeichen.', 'Save colours, logo & icon': 'Farben, Logo & Symbol speichern', 'Empty = suits the background automatically': 'Leer = passt sich automatisch dem Hintergrund an',
+        'Client logos': 'Client-Logos', 'Stations show the software or network they come from as their avatar – detected from band, description and client type (crosslink, gateway, PC). The built-in pictures are simple badges. You can replace each one with your own image (PNG, JPEG, WebP, GIF, ICO or plain SVG, max. 512 KB) – for example an official logo, if you are allowed to use it.': 'Stationen zeigen als Avatar die Software oder das Netz, aus dem sie kommen – erkannt an Band, Beschreibung und Client-Art (Crosslink, Gateway, PC). Die eingebauten Bilder sind einfache Abzeichen. Du kannst jedes durch ein eigenes Bild ersetzen (PNG, JPEG, WebP, GIF, ICO oder einfaches SVG, max. 512 KB) – etwa ein offizielles Logo, wenn du es verwenden darfst.',
+        'Icon': 'Symbol', 'Link menu': 'Link-Menü', 'Show the link menu': 'Link-Menü anzeigen', 'Menu button text': 'Text der Menü-Schaltfläche', 'Button with drop-down menu': 'Schaltfläche mit Aufklappmenü', 'Row of buttons below the header': 'Reihe von Schaltflächen unter der Kopfzeile',
+        '(order = order in the menu)': '(Reihenfolge = Reihenfolge im Menü)', 'Name, e.g. Website': 'Name, z. B. Webseite', 'Open in a new browser tab': 'In neuem Browser-Tab öffnen', 'new tab': 'neuer Tab', 'Add link': 'Link hinzufügen', 'Save links': 'Links speichern',
+        'Save & refresh site icons': 'Speichern & Seitensymbole neu laden', "Show this website's cached favicon": 'Zwischengespeichertes Favicon dieser Webseite zeigen', 'site icon': 'Seitensymbol', 'Simple HTML': 'Einfaches HTML',
+        'Your own links in the header: website, chat group, wiki, donation page … Everyone sees them, also without login.': 'Eigene Links in der Kopfzeile: Webseite, Chatgruppe, Wiki, Spendenseite … Jeder sieht sie, auch ohne Login.',
+        'Website': 'Webseite', 'E-mail': 'E-Mail', 'Address': 'Adresse', 'Copy settings from': 'Einstellungen übernehmen von', 'Do not record': 'Nicht aufzeichnen', '(switches to that tab) and': '(wechselt in diesen Tab) und',
+    },
+    rules: [
+        [/^(\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\/parrot room of the server$/, '$1 Stationen online · der FRN-Server übernimmt Änderungen nach einem Neustart · net00 ist immer der Test-/Papageienraum des Servers'],
+        [/^Show all (\d+)$/, 'Alle $1 anzeigen'], [/^(\d+) min ago$/, 'vor $1 Min.'], [/^in (.+) · (.+) · (\d+) min ago$/, 'in $1 · $2 · vor $3 Min.'],
+        [/^(.+) of (.+)$/, (m, a, b) => /^[\d.,]+ ?[KMGT]?B$/.test(a) ? `${a} von ${b}` : m],
+        [/^port (\d+) · (\d+) stations · since (.+)$/, 'Port $1 · $2 Stationen · seit $3'], [/^since (.+)$/, 'seit $1'],
+        [/^(.+) · up (\S+) · (\d+) browsers?$/, '$1 · läuft $2 · $3 Browser'], [/^(\d+) hits · (\d+) computed$/, '$1 Treffer · $2 berechnet'],
+        [/^(.+) · no e-mail · (.+)$/, '$1 · keine E-Mail · $2'], [/^(.+) – my account$/, '$1 – mein Konto'],
+    ],
+});

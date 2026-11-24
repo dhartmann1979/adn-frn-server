@@ -2,6 +2,40 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.6.0 – 2026-11-24
+
+Sprache **DE | EN**, ein Update-System wie in N8 Crosslink und strengere Sicherheits-Header – mit dem **N8 Kit**, das jetzt in
+adn-frn-server, HBlink4-FreeRadioID, N8-HotSpot und N8 Crosslink gleich ist. Wechselst du zwischen den Oberflächen, sehen Sprache,
+Update-Hinweis, Updates-Kachel und Fortschritt überall gleich aus. Ausführlich: [docs/de/sicherheit.md](docs/de/sicherheit.md).
+
+### 🌐 Sprache DE | EN
+- Umschalter **DE | EN** in der Kopfzeile zwischen 🔗 Links und Anmeldung, **Standard Deutsch**. Umschalten ohne Neuladen; die Wahl
+  gilt per Cookie (`n8_lang`) für alle N8schicht-Oberflächen auf dem Server. `?lang=en` für Links.
+- Deutsche Texte für Kopfzeile, Statusleiste, Live, Statistik, Stationen, Chat und das ganze Admin-Portal (Settings, Rooms, ACL-Listen,
+  FRN-Konten, Benutzer, System, Theme, Client-Logos, Links, Import, Logs) in `static/i18n-app.js`. Rückfragen folgen der Sprache.
+
+### ⬆️ Updates wie in N8 Crosslink
+- **Neuer Hinweis** unter der Statusleiste für angemeldete Admins: *Update verfügbar: alt → neu* mit **Was ist neu?**, **Jetzt aktualisieren**,
+  **Details** und **Später** (einen Tag). Geprüft wird weiter jede volle Stunde; die Seite holt das Ergebnis alle 10 Minuten.
+- **Admin → System → ⬆️ Updates** im N8-Kit-Stil: installiert, GitHub, zuletzt geprüft, automatische Prüfung, letztes Update, Repository,
+  Neuerungen, **↻ Jetzt prüfen**, **⬆️ Update jetzt installieren**. Der Java-FRN-Server bleibt darunter mit eigenem Knopf.
+- **Fortschritt:** Fenster mit Neuerungen, dann *geladen und eingespielt → Dienst startet neu → Weboberfläche wird geprüft*; die Seite
+  lädt danach neu (ersetzt das bisherige Overlay „restarting …“).
+- **Rollback:** Vor dem Neustart wird der alte Stand gemerkt (`update.pending` im Datenverzeichnis). Die neue Version prüft ihre eigene
+  Weboberfläche; antwortet sie nicht, setzt `scripts/n8-update-guard.sh` (neu als `ExecStartPre` in `frnadn.service`) nach drei Starts
+  auf den alten Commit zurück. Ergebnis unter *Letztes Update*. `scripts/update.sh` trägt die Zeile in bestehende Units ein und setzt
+  die Rechte der Skripte.
+
+### 🔐 Sicherheit
+- Neue Header: `Content-Security-Policy` (nur eigene Skripte, Styles, Schriften und Verbindungen; `object-src 'none'`, `base-uri`,
+  `form-action`, `frame-ancestors`), `Strict-Transport-Security` über HTTPS (auch hinter einem Proxy), `Permissions-Policy`,
+  `Cross-Origin-Opener-Policy`/`-Resource-Policy`. Kein `server: uvicorn` mehr. Die API-Doku war schon aus; zum Entwickeln jetzt `N8_API_DOCS=1`.
+- Doku mit Beispielen für **Caddy** und **nginx** als Reverse-Proxy.
+
+### 🧪 Tests
+- `tests/test_security.py`: API-Doku aus, alle Header, HSTS hinter Proxy, kein `server`-Header, Rollback nach drei Starts, Bestätigung
+  nach erfolgreichem Start, Unit und `update.sh` mit Guard, Kit-Dateien eingebunden.
+
 ## 2.5.0 – 2026-11-22
 
 Neue Kopfzeile: **ein Menü** statt Status-Chips plus Reiter, darunter eine schmale **Statusleiste** – derselbe Aufbau wie in

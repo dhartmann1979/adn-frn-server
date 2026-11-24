@@ -32,6 +32,8 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
+from . import n8_security as _sec
+from . import n8_update_guard as _guard
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
@@ -95,7 +97,7 @@ class Ctx:
 
 
 ctx: Optional[Ctx] = None
-app = FastAPI(title="frn_adn", docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title="frn_adn", **{"docs_url": None, "redoc_url": None, "openapi_url": None, **_sec.FASTAPI_KWARGS})
 app.add_middleware(GZipMiddleware, minimum_size=800)
 
 
@@ -125,9 +127,7 @@ async def _mw(request: Request, call_next):
             and request.headers.get("x-n8") != "1":
         return JSONResponse({"error": "Missing X-N8 header."}, status_code=403)
     resp = await call_next(request)
-    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
-    resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
-    resp.headers.setdefault("Referrer-Policy", "same-origin")
+    _sec.headers(resp, https=_sec.is_https(request))
     if request.url.path.startswith("/api/"):
         resp.headers.setdefault("Cache-Control", "no-store")
     elif request.url.path.startswith("/static/"):
@@ -430,11 +430,11 @@ _update_state: Dict[str, Any] = {"checked": None, "github": None, "java": None}
 async def check_all_updates(force: bool = False) -> Dict[str, Any]:
     """Dashboard (GitHub) and Java FRN server. Results are cached for ten minutes unless forced."""
     if not force and _update_state["checked"] and time.time() - _update_state["checked"] < 600:
-        return dict(_update_state)
+        return {**_update_state, "result": _guard.last_result(DATA)}
     gh = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
     java = await ctx.java.check_update()
     _update_state.update(checked=time.time(), github=gh, java=java)
-    return dict(_update_state)
+    return {**_update_state, "result": _guard.last_result(DATA)}
 
 def parse_java_properties(raw: str) -> Dict[str, str]:
     values: Dict[str, str] = {}
@@ -694,6 +694,14 @@ async def updates_upgrade(request: Request):
             result["restart_required"] = True
             result["restarting"] = updater.under_systemd()
             if result["restarting"]:
+                # N8 update guard: the new code checks its web interface; scripts/n8-update-guard.sh
+                # (ExecStartPre) goes back to the old commit after three starts without an answer
+                try:
+                    v_old = f"v{(_update_state.get('github') or {}).get('local', {}).get('version', '?')} · {result['old'][:7]}"
+                    v_new = f"v{result.get('version') or '?'} · {result['new'][:7]}"
+                    _guard.mark_pending(DATA, result["old"], result["new"], v_old, v_new)
+                except (OSError, KeyError) as e:
+                    log.warning(f"update guard not armed: {e}")
                 asyncio.get_running_loop().call_later(1.5, os._exit, 3)
         _update_state["github"] = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
     else:
@@ -1166,6 +1174,8 @@ async def _startup() -> None:
     await ctx.server.start()
     ctx.tasks.append(asyncio.ensure_future(background()))
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
+    if _guard.pending(DATA):
+        ctx.tasks.append(asyncio.ensure_future(_guard.startup_check(DATA, _guard.local_url(_SELF["host"], _SELF["port"], "/api/info"))))
     ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
 
 
@@ -1208,11 +1218,17 @@ class _Server:
         kwargs.setdefault("loop", "asyncio")
         kwargs.setdefault("proxy_headers", True)
         kwargs.setdefault("forwarded_allow_ips", "127.0.0.1")
+        for k, v in _sec.UVICORN_KWARGS.items():
+            kwargs.setdefault(k, v)          # no "server: uvicorn" header
         return Server(uvicorn.Config(app_, **kwargs))
+
+
+_SELF = {"host": "127.0.0.1", "port": 8090}
 
 
 async def _serve(host: str, port: int) -> None:
     """Run the dashboard and (when enabled) the ACME HTTP listener + HTTPS server."""
+    _SELF.update(host=host, port=port)
     import signal
     global ctx, _tls_manager
     if ctx is None:

@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="/static/n8-live.css?v={{V}}">
     <link rel="stylesheet" href="/static/n8-light.css?v={{V}}">
     <link rel="stylesheet" href="/static/n8-header.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-kit.css?v={{V}}">
+    <script src="/static/n8-kit.js?v={{V}}"></script>
+    <script src="/static/i18n-app.js?v={{V}}"></script>
 </head>
 <body>
 <div class="container">
@@ -47,6 +50,8 @@
     </div>
     </div><!-- /n8-topbar -->
     <nav class="links-bar" id="linksBar" hidden aria-label="Links"></nav>
+    <!-- update notice (N8 Kit): admins only, when GitHub has a newer dashboard -->
+    <div class="n8-upd" id="updateBanner" hidden></div>
 
     <div class="banner warn hidden" id="setupBanner">
         <span>🧭 <b>No superadmin yet.</b> Finish the guided installation on the server: <code>sudo ./scripts/install.sh</code> – or create one with <code>sudo frnadn set-superadmin NAME</code>.</span>
@@ -180,5 +185,9 @@
 <div id="modalRoot"></div>
 <script src="/static/app.js?v={{V}}"></script>
 <script src="/static/extras.js?v={{V}}"></script>
+<script>
+    // N8 Kit: DE | EN next to Links and the login (the same switch in all N8schicht pages)
+    N8Kit.langSwitch(document.querySelector('header .chips'), { before: document.getElementById('userArea') });
+</script>
 </body>
 </html>

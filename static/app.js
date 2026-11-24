@@ -248,6 +248,7 @@ function renderUser() {
     const name = esc(S.me.display_name || S.me.username);
     el.innerHTML = `<span class="n8-user"><button class="btn" onclick="openAccount()" title="${name} · ${esc(S.me.role)} – my account">👤<span class="u-name">&nbsp;${name}</span></button>
         <button class="btn n8-logout" onclick="logout()" title="Log out" aria-label="Log out">⏻</button></span>`;
+    window.dispatchEvent(new Event('n8:login'));   // update notice for admins (N8 Kit)
 }
 function userMenu(ev) {
     ev.stopPropagation(); closeModal();
@@ -1078,9 +1079,11 @@ async function loadSystem() {
             <div class="k">Disk</div><div class="v">${fmtBytes(i.disk_total - i.disk_free)} of ${fmtBytes(i.disk_total)}</div>
             <div class="k">Uptime</div><div class="v">${fmtDur(i.uptime, true)}</div></div>
             ${sa ? '<div class="actions"><button class="btn" onclick="power(\'reboot\')">🔄 Reboot</button><button class="btn danger" onclick="power(\'poweroff\')">⏻ Shut down</button></div>' : ''}</div>
-        <div class="tile"><h3>⬆️ Software updates</h3><div class="subt">Automatic check every full hour. Updates are only installed after an administrator action.</div>
-            <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="checkAllUpdates(this)">↻ Check now</button><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button><button class="btn primary" id="upgradeGit" disabled onclick="upgradeNow('github', this)">Upgrade Dashboard now</button></div>
-            <div class="dim" id="updInfo" style="font-size:12.5px;margin-top:8px">Not checked yet.</div></div>
+        <div class="tile"><h3>⬆️ Updates</h3>
+            <div id="updInfo" style="font-size:12.5px">Not checked yet.</div>
+            <div class="n8-sub">☕ Java FRN server</div>
+            <div id="javaInfo" style="font-size:12.5px">–</div>
+            <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button></div></div>
         </div>`;
     checkAllUpdates();
 }

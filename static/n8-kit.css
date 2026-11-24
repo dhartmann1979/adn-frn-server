@@ -1,0 +1,75 @@
+/*
+ * N8 Kit 1.0 – shared by the N8schicht web interfaces (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
+ * Same file in every repository. Uses the N8 Theme 2 variables (--accent, --accent-rgb, --glass-*, --text, --text-dim).
+ */
+
+/* ---------- language switch DE | EN (header, next to Links / Login) ---------- */
+.n8-lang { display: inline-flex; align-items: center; flex: none; height: 30px; padding: 2px; gap: 2px; border-radius: 999px;
+           background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); }
+.n8-lang button { all: unset; cursor: pointer; padding: 0 9px; height: 24px; line-height: 24px; border-radius: 999px;
+                  font: 700 11.5px/24px inherit; letter-spacing: .04em; color: var(--text-dim, rgba(235, 240, 250, .62)); }
+.n8-lang button:hover { color: var(--text, #f5f7fb); }
+.n8-lang button.on { color: #fff; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff)));
+                     box-shadow: 0 2px 8px rgba(var(--accent-rgb, 90, 200, 250), .35); }
+.n8-lang button:focus-visible { outline: 2px solid var(--accent, #5ac8fa); outline-offset: 1px; }
+html[data-theme-mode=light] .n8-lang { background: rgba(0, 0, 0, .05); }
+@media (max-width: 600px) { .n8-lang { height: 26px; } .n8-lang button { padding: 0 6px; height: 20px; line-height: 20px; font-size: 10.5px; } }
+
+/* ---------- buttons, badges, key/value list used by the kit ---------- */
+.n8-btn { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font: 650 13px/1.2 inherit;
+          color: var(--text, #f5f7fb); background: rgba(255, 255, 255, .08); border: 1px solid var(--glass-border, rgba(255, 255, 255, .16)); }
+.n8-btn:hover:not(:disabled) { background: rgba(var(--accent-rgb, 90, 200, 250), .18); border-color: rgba(var(--accent-rgb, 90, 200, 250), .5); }
+.n8-btn.primary { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); }
+.n8-btn.ghost { background: none; }
+.n8-btn:disabled { opacity: .45; cursor: default; }
+html[data-theme-mode=light] .n8-btn:not(.primary) { background: rgba(0, 0, 0, .05); }
+.n8-badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: rgba(142, 142, 147, .22); color: var(--text-dim, #aab); }
+.n8-badge.ok { background: rgba(48, 209, 88, .18); color: #30d158; }
+.n8-badge.bad { background: rgba(255, 69, 58, .18); color: #ff6b61; }
+.n8-badge.warn { background: rgba(255, 214, 10, .18); color: #ffd60a; }
+.n8-kv { display: grid; grid-template-columns: minmax(130px, max-content) 1fr; gap: 7px 18px; font-size: 13.5px; align-items: baseline; }
+.n8-kv .k { color: var(--text-dim, rgba(235, 240, 250, .62)); }
+.n8-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.n8-help { margin-top: 10px; font-size: 12.5px; color: var(--text-dim, rgba(235, 240, 250, .62)); line-height: 1.5; }
+.n8-sub { margin: 16px 0 6px; font-size: 12px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim, rgba(235, 240, 250, .62)); }
+.n8-log { margin: 0; max-height: 320px; overflow: auto; padding: 10px 12px; border-radius: 12px; font: 11.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+          white-space: pre-wrap; color: var(--text-dim, rgba(235, 240, 250, .7)); background: rgba(0, 0, 0, .25); border: 1px solid var(--glass-border, rgba(255, 255, 255, .1)); }
+html[data-theme-mode=light] .n8-log { background: rgba(0, 0, 0, .04); }
+
+/* ---------- update banner (directly under the status strip, same in every app) ---------- */
+.n8-upd { margin: 0 0 14px; padding: 9px 14px; border-radius: 14px; font-size: 13.5px;
+          background: rgba(var(--accent-rgb, 90, 200, 250), .12); border: 1px solid rgba(var(--accent-rgb, 90, 200, 250), .38); }
+.n8-upd[hidden] { display: none !important; }
+.n8-upd-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.n8-upd-ico { font-size: 18px; }
+.n8-upd-txt { flex: 1 1 240px; }
+.n8-upd-txt b { color: var(--accent, #5ac8fa); }
+.n8-upd-act { display: flex; gap: 6px; flex-wrap: wrap; }
+.n8-upd-act .n8-btn { padding: 4px 12px; font-size: 12.5px; }
+.n8-upd-notes { display: none; margin-top: 8px; font-size: 12.5px; }
+.n8-upd.open .n8-upd-notes { display: block; }
+.n8-upd ul, .n8-upd-panel ul { margin: 4px 0 4px 18px; padding: 0; } .n8-upd li, .n8-upd-panel li { margin: 2px 0; }
+
+/* ---------- update progress ---------- */
+.n8-upd-ov { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 16px;
+             background: rgba(5, 8, 18, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.n8-upd-box { width: min(460px, 100%); padding: 20px 22px; border-radius: 20px; color: var(--text, #f5f7fb);
+              background: var(--card-solid, rgba(18, 24, 44, .96)); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); box-shadow: 0 20px 60px rgba(0, 0, 0, .5); }
+html[data-theme-mode=light] .n8-upd-box { background: rgba(255, 255, 255, .97); }
+.n8-upd-box h3 { margin: 0 0 12px; font-size: 17px; }
+.n8-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
+.n8-steps li { display: flex; align-items: center; gap: 10px; color: var(--text-dim, rgba(235, 240, 250, .6)); }
+.n8-steps li::before { content: ''; flex: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(142, 142, 147, .6); box-sizing: border-box; }
+.n8-steps li.run { color: var(--text, #f5f7fb); }
+.n8-steps li.run::before { border-color: var(--accent, #5ac8fa); border-top-color: transparent; animation: n8-spin .9s linear infinite; }
+.n8-steps li.done { color: var(--text, #f5f7fb); }
+.n8-steps li.done::before { content: '✓'; border: 0; background: #30d158; color: #fff; font: 800 10px/16px inherit; text-align: center; }
+.n8-steps li.bad::before { content: '✕'; border: 0; background: #ff453a; color: #fff; font: 800 10px/16px inherit; text-align: center; }
+.n8-upd-msg { margin-top: 14px; font-size: 13.5px; }
+.n8-upd-msg.ok { color: #30d158; } .n8-upd-msg.bad { color: #ff6b61; }
+@keyframes n8-spin { to { transform: rotate(360deg); } }
+.n8-upd-text { max-height: 260px; overflow: auto; margin-bottom: 6px; font-size: 13px; }
+.n8-pw { width: 100%; box-sizing: border-box; margin-top: 12px; padding: 9px 12px; border-radius: 12px; font: inherit; color: var(--text, #f5f7fb);
+         background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-border, rgba(255, 255, 255, .16)); }
+html[data-theme-mode=light] .n8-pw { background: #fff; color: #111; }
+.n8-steps[hidden], .n8-upd-ask[hidden] { display: none; }

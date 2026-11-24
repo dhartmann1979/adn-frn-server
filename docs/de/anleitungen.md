@@ -32,8 +32,8 @@ Auf dem Smartphone klappt das Menü unter dem Knopf auf:
 
 ## ⬆️ Dashboard aktualisieren
 
-1. **⚙️ Admin → 🖥️ System → ⬆️ Software updates → ↻ Check now**.
-2. Steht dort *update available*: **Upgrade Dashboard now**.
+1. **⚙️ Admin → 🖥️ System → ⬆️ Updates → ↻ Jetzt prüfen** (oder der Hinweis *Update verfügbar* unter der Statusleiste).
+2. Steht dort *Update verfügbar*: **⬆️ Update jetzt installieren** und im Fenster **Jetzt aktualisieren**.
 3. Warten, bis sich die Seite neu lädt.
 
 Ist der Knopf grau, steht der Grund auf der Karte. Meist hilft einmalig `sudo ./scripts/update.sh` – Einzelheiten und alle Meldungen: **[Updates](updates.md)**.

@@ -22,6 +22,7 @@
   <a href="docs/de/anleitungen.md">Anleitungen</a> ·
   <a href="docs/de/konfiguration.md">Konfiguration</a> ·
   <a href="docs/de/betrieb.md">Betrieb &amp; Fehlersuche</a> ·
+  <a href="docs/de/sicherheit.md">Sicherheit</a> ·
   <a href="CHANGELOG.md">Änderungen</a>
 </p>
 
@@ -79,7 +80,7 @@ Jede Frage hat eine Vorgabe, die du mit Enter übernimmst. Danach öffnest du da
 
 Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, wenn er schon eine FRN-Datenbank, eine `server.properties` oder einen laufenden FRN-Dienst findet.
 
-> **Nach der Installation einmal** `cd /opt/adn-frn-server && sudo ./scripts/update.sh` ausführen. Das installiert zugleich den aktuellen Stand und stellt die Dateirechte so ein, dass sich das Dashboard später selbst aus dem Admin-Portal aktualisieren kann. Für das öffentliche Standard-Repository ist kein GitHub-Token nötig. Siehe [Updates](docs/de/updates.md#upgrade-dashboard-now-einmalig-freischalten).
+> **Nach der Installation einmal** `cd /opt/adn-frn-server && sudo ./scripts/update.sh` ausführen. Das installiert zugleich den aktuellen Stand und stellt die Dateirechte so ein, dass sich das Dashboard später selbst aus dem Admin-Portal aktualisieren kann. Für das öffentliche Standard-Repository ist kein GitHub-Token nötig. Siehe [Updates](docs/de/updates.md#update-funktion-einmalig-freischalten).
 
 ➡️ Ausführlich: **[Installation](docs/de/installation.md)**
 
@@ -122,6 +123,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 |---|---|
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
+| 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
 | ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, System, Theme, Updates, Links, Import, Logs |
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
@@ -131,7 +133,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 
 ## Aktualisieren
 
-Am einfachsten im Admin-Portal: **⚙️ Admin → 🖥️ System → ⬆️ Software updates → ↻ Check now → Upgrade Dashboard now**. Oder auf der Konsole:
+Am einfachsten im Admin-Portal: der Hinweis **Update verfügbar → Jetzt aktualisieren** unter der Statusleiste, oder **⚙️ Admin → 🖥️ System → ⬆️ Updates → ⬆️ Update jetzt installieren**. Antwortet das Dashboard danach nicht, wird automatisch auf den alten Stand zurückgesetzt. Oder auf der Konsole:
 
 ```bash
 cd /opt/adn-frn-server
