@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.0 – shared by the N8schicht web interfaces
+ * N8 Kit 1.0.1 – shared by the N8schicht web interfaces
  * (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -73,9 +73,15 @@
         if (s == null) return s;
         s = String(s);
         if (!packs.some(p => p.to === lang) || !/\p{L}/u.test(s)) return s;
-        if (s.indexOf('\n') >= 0) return s.split('\n').map(t).join('\n');
         const key = lang + '\u0000' + s;
         if (cache.has(key)) return cache.get(key);
+        if (s.indexOf('\n') >= 0) {
+            // a paragraph written over several source lines counts as one text; otherwise line by line
+            const whole = lookup(norm(s));
+            const out = whole != null ? s.match(/^\s*/)[0] + whole + s.match(/\s*$/)[0] : s.split('\n').map(t).join('\n');
+            cache.set(key, out);
+            return out;
+        }
         let out = s;
         const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0];
         const n = norm(s);
@@ -459,7 +465,7 @@
     });
 
     window.N8Kit = {
-        version: '1.0.0',
+        version: '1.0.1',
         lang: () => lang, setLang, t, langSwitch, esc, fmtTime,
         i18n: { add, retranslate: () => { cache.clear(); retranslate(); }, t },
         update: { banner, panel, run },
