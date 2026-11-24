@@ -22,6 +22,16 @@ gehört, Stationen) und verwaltet ihn mit einem **API-Token** (Admin → Users �
 Meldet das Portal *„API-Token abgelehnt“*, wurde der Token hier widerrufen oder falsch kopiert – neuen anlegen und im Portal eintragen.
 Läuft das Portal auf einem anderen Rechner, muss es die Adresse dieses Dashboards erreichen (Firewall/Reverse-Proxy).
 
+**Portal auf diesem Rechner installieren** (empfohlen, ab 2.7.1): Der Installer des Portals findet das Dashboard und stellt es mit einer
+Frage hinter das Portal – eigenes HTTPS aus (`python -m frnadn behind-proxy`), lauscht nur noch auf `127.0.0.1:8090` (Drop-in
+`/etc/systemd/system/frnadn.service.d/hobbyradioportal.conf`), Token per `python -m frnadn api-token HobbyRadioPortal`. nginx des Portals
+übernimmt Port 80/443 und die Domain des Dashboards samt Zertifikat. Der FRN-Server (Port 10024) bleibt, wie er ist. Danach holt der
+Web-Installer des Portals auf Wunsch auch HBlink4 und N8 Crosslink auf diesen Rechner – siehe
+[Umzug ins Portal](https://github.com/dhartmann1979/HobbyRadioPortal/blob/main/docs/UMZUG.md).
+
+Rückgängig: `sudo rm /etc/systemd/system/frnadn.service.d/hobbyradioportal.conf && sudo systemctl daemon-reload && sudo systemctl restart frnadn`,
+dann *Admin → Settings → HTTPS & web* wieder einschalten (und nginx des Portals vorher stoppen).
+
 ## Fehlermeldungen des SystemManagers
 
 Sie stehen im Admin-Portal oben unter *Settings* und im Log:

@@ -2,6 +2,28 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.7.1 – 2026-11-24
+
+**Für den Installer des HobbyRadioPortals: das Portal kann jetzt auf diesem FRN-Server installiert werden und stellt das Dashboard
+dabei selbst hinter sich.** Ausführlich: [docs/de/betrieb.md](docs/de/betrieb.md#im-hobbyradioportal) und die
+[Umzugsanleitung des Portals](https://github.com/dhartmann1979/HobbyRadioPortal/blob/main/docs/UMZUG.md).
+
+### ⌨️ Zwei neue Befehle
+- `python -m frnadn behind-proxy` – schaltet das eigene HTTPS (Let's Encrypt auf Port 80/443) aus und gibt Domain, E-Mail und Titel als
+  JSON aus. Der Portal-Installer übernimmt damit Domain und Zertifikat in sein nginx.
+- `python -m frnadn api-token NAME` – legt einen API-Token für das Portal an und gibt ihn einmal aus (wie *Admin → Users → Portal-Zugang*).
+
+### 🔀 Was der Portal-Installer damit macht
+- Er fragt einmal: *FRN-Dashboard hinter das Portal stellen?* – dann lauscht das Dashboard nur noch auf **127.0.0.1:8090**
+  (Drop-in `/etc/systemd/system/frnadn.service.d/hobbyradioportal.conf` mit `FRNADN_BIND`/`FRNADN_PORT`, übersteht Updates),
+  nginx des Portals übernimmt **Port 80/443**, die Domain (z. B. `frn.auf-der-nachtschicht.de`) und holt das Zertifikat neu.
+- Der **FRN-Server selbst (Port 10024)** und alle Einstellungen, Räume, Listen und Statistiken bleiben unverändert. Das Dashboard
+  bleibt unter seiner Domain erreichbar – jetzt über das Portal.
+- Zurück: Drop-in löschen, `systemctl daemon-reload && systemctl restart frnadn`, HTTPS unter *Admin → Settings → HTTPS & web* wieder an.
+
+### 🧪 Tests
+- `tests/test_api_tokens.py`: `behind-proxy` schaltet HTTPS aus und meldet Domain/E-Mail, `api-token` gibt einen `frn_…`-Token aus.
+
 ## 2.7.0 – 2026-11-24
 
 **Portal-Zugang per API-Token:** Das **HobbyRadioPortal** (Plugin *FRN*, ab Portal 0.8.0) kann den FRN-Server jetzt aus seinem eigenen
