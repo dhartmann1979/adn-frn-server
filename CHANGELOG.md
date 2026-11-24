@@ -39,6 +39,10 @@ Ausführlich: [docs/de/adminbereich.md](docs/de/adminbereich.md#-backup--wiederh
 - Beim Einspielen nur Einträge unter `data/` und `frn/`, keine absoluten Pfade, kein `..`, keine Links, höchstens 20 000 Dateien / 4 GiB;
   Downloads mit `Cache-Control: no-store`.
 
+### 🛠️ Rechte
+- `install.sh` und `update.sh` prüfen und korrigieren jetzt auch die Rechte der Daten: `backups/` und `before-restore-*` 700,
+  Backup-Dateien und Datenbank 600, alles im Besitz des Dienstbenutzers.
+
 ### 🧪 Tests
 - `tests/test_backup.py`: Backup → falsches Passwort → Prüfen → Einspielen samt Sicherung des alten Stands, Sitzungen gelöscht,
   Logs bleiben; unsicheres Archiv abgewiesen; Einspielen beim Start (`restore.pending.tar`). Zusätzlich Ende-zu-Ende gegen ein laufendes

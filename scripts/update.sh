@@ -32,6 +32,14 @@ if id "$SVC_USER" >/dev/null 2>&1; then
     # Ohne diese Rechte kann das Dashboard seinen eigenen git-Stand weder lesen noch aktualisieren
     chown -R "$SVC_USER:$SVC_USER" "$DIR"
 fi
+# Rechte der Daten prüfen und korrigieren (Backups enthalten alle Zugangsdaten)
+DATA_DIR="$(sed -n 's/^Environment=FRNADN_DATA=//p' /etc/systemd/system/frnadn.service 2>/dev/null | head -n 1)"; DATA_DIR="${DATA_DIR:-/var/lib/frnadn}"
+if [ -d "$DATA_DIR" ] && id "$SVC_USER" >/dev/null 2>&1; then
+    chown -R "$SVC_USER:$SVC_USER" "$DATA_DIR"; chmod 750 "$DATA_DIR"
+    install -d -m 700 -o "$SVC_USER" -g "$SVC_USER" "$DATA_DIR/backups"
+    find "$DATA_DIR/backups" -type f -exec chmod 600 {} + 2>/dev/null || true
+    find "$DATA_DIR" -maxdepth 1 -name 'before-restore-*' -type d -exec chmod 700 {} + 2>/dev/null || true
+fi
 command -v frnadn >/dev/null && frnadn write-config >/dev/null || true
 # N8 update guard (ab 2.6.0): Rollback, wenn das Dashboard nach einem Update nicht hochkommt.
 # Fehlt die Zeile in der installierten Unit, wird sie ergänzt (Pfade aus der Unit selbst).

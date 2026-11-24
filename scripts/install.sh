@@ -155,6 +155,10 @@ ok "Python-Umgebung mit FastAPI und uvicorn"
 for g in systemd-journal adm; do getent group "$g" >/dev/null && usermod -aG "$g" "$SVC_USER"; done
 chown -R "$SVC_USER:$SVC_USER" "$DATA"
 chmod 750 "$DATA" "$FRN_HOME"
+# Backups enthalten alle Zugangsdaten: Ordner 700, Dateien 600 (auch bei einer Neuinstallation über einen alten Stand)
+install -d -m 700 -o "$SVC_USER" -g "$SVC_USER" "$DATA/backups"
+find "$DATA/backups" -type f -exec chmod 600 {} + 2>/dev/null || true
+for f in "$DATA"/frnadn.db*; do [ -e "$f" ] && chmod 600 "$f"; done
 ok "Benutzer ${SVC_USER} · Daten in ${DATA} (SQLite) · Konfiguration des FRN-Servers in ${FRN_HOME}"
 
 SC="$(command -v systemctl)"
