@@ -2,6 +2,18 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.8.1 – 2026-11-25
+
+**Installer: `FRNADN_BEHIND_PROXY=1`** – schaltet direkt nach dem Einspielen eines Backups (oder einer Einrichtung) das eigene HTTPS aus,
+bevor die Dienste starten. So kollidiert ein neu aufgesetztes Dashboard nicht mit nginx des HobbyRadioPortals auf Port 80/443 – der
+Web-Installer des Portals (ab 0.10.0, *FRN → 📦 aus einem Backup*) nutzt das zusammen mit `FRNADN_RESTORE`. Die Domain und das
+Zertifikat übernimmt danach das Portal.
+
+```bash
+sudo FRNADN_YES=1 FRNADN_PORT=8090 FRNADN_RESTORE=/root/frn-backup-….frnbak FRNADN_RESTORE_PASSWORD_FILE=/root/frn.pw \
+     FRNADN_BEHIND_PROXY=1 ./scripts/install.sh
+```
+
 ## 2.8.0 – 2026-11-25
 
 **💾 Backup & Wiederherstellen – im Dashboard, auf der Konsole, beim Installieren und im HobbyRadioPortal.** Eine einzige,

@@ -25,6 +25,7 @@
 #    FRNADN_YES=1                 keine Fragen, Vorgaben übernehmen
 #    FRNADN_RESTORE=/pfad/x.frnbak          statt Einrichtung ein Backup einspielen (ohne Fragen)
 #    FRNADN_RESTORE_PASSWORD_FILE=/pfad     Passwort des Backups (erste Zeile) – z. B. für den HobbyRadioPortal-Installer
+#    FRNADN_BEHIND_PROXY=1                  eigenes HTTPS aus (das Portal/nginx übernimmt Port 80/443 und die Domain)
 # =============================================================================
 set -euo pipefail
 
@@ -197,6 +198,9 @@ if [ -n "${FRNADN_RESTORE:-}" ]; then
     rm -f "$DATA/restore-install.frnbak"; unset BKPW
     [ "$RESTORED" = 1 ] || fail "Backup nicht eingespielt (Passwort falsch oder Datei beschädigt)"
     ok "Backup eingespielt – Einstellungen, Räume, Listen, FRN-Konten, Benutzer, Statistik und Branding übernommen"
+fi
+if [ "${FRNADN_BEHIND_PROXY:-0}" = 1 ]; then
+    run_app behind-proxy >/dev/null && ok "Eigenes HTTPS aus – Port 80/443 und die Domain übernimmt der Reverse-Proxy (HobbyRadioPortal)"
 fi
 
 if [ "$RESTORED" = 1 ]; then

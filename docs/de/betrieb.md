@@ -87,7 +87,8 @@ sudo FRNADN_RESTORE=/root/frn-backup-….frnbak FRNADN_RESTORE_PASSWORD_FILE=/ro
 rm /root/frn.pw
 ```
 
-Danach HTTPS unter *Admin → Settings → HTTPS & web* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
+Mit `FRNADN_BEHIND_PROXY=1` bleibt das eigene HTTPS dabei aus (für einen Reverse-Proxy wie das HobbyRadioPortal).
+Sonst danach HTTPS unter *Admin → Settings → HTTPS & web* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
 im **HobbyRadioPortal** machen (*Web-Installer → FRN → 📦 aus einem Backup*).
 
 ## Testen ohne Funk
