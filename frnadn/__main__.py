@@ -6,6 +6,8 @@ Current values:     python -m frnadn show-settings                  (JSON, used 
 Apply setup:        python -m frnadn apply-setup FILE.json          (JSON from install.sh)
 Write config:       python -m frnadn write-config                   (server.properties etc. from SQLite)
 FRN account:        python -m frnadn add-account EMAIL CALLSIGN     (stand-alone password list; asks for the password)
+Portal token:       python -m frnadn api-token NAME                 (API token for the HobbyRadioPortal, printed once)
+Behind the portal:  python -m frnadn behind-proxy                   (own HTTPS off; prints domain/e-mail as JSON)
 
 Passwords can also come from the environment variable FRNADN_PASSWORD (scripts).
 """
@@ -100,6 +102,24 @@ def main() -> int:
         c.store.account_save(args[1], args[2], " ".join(args[3:]), _password(f"FRN password for {args[1]} (min. 4): ", 4))
         c.java.write_config()
         print(f"{G}✓{N} FRN account {args[1]} saved – restart the FRN server to use it.")
+        return 0
+    if cmd == "api-token" and len(args) > 1:
+        c = _ctx()
+        try:
+            print(c.auth.create_api_token(" ".join(args[1:]), "installer", "")["token"])
+        except Exception as e:   # AuthError / ValueError: name or limit
+            print(e, file=sys.stderr)
+            return 2
+        return 0
+    if cmd == "behind-proxy":
+        # Used by the HobbyRadioPortal installer: nginx of the portal takes ports 80/443 and the domain, the dashboard
+        # then listens on 127.0.0.1 (FRNADN_BIND/FRNADN_PORT in a systemd drop-in written by the portal).
+        c = _ctx()
+        before = {"https_was": bool(c.settings.get("https.enabled")), "domain": c.settings.get("https.domain") or "",
+                  "email": c.settings.get("https.email") or "", "title": c.settings.get("dashboard.title") or ""}
+        if before["https_was"]:
+            c.settings.update({"https.enabled": False}, "hobbyradioportal")
+        print(json.dumps(before))
         return 0
     if cmd == "write-config":
         c = _ctx()

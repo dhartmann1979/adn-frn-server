@@ -47,3 +47,20 @@ def test_revoke(client):
     assert client.delete(f"/api/admin/api-tokens/{tid}", headers=H).json()["ok"]
     client.cookies.clear()
     assert client.get("/api/admin/settings", headers=T).status_code == 401
+
+
+def test_cli_for_the_portal_installer(tmp_path, monkeypatch, capsys):
+    """HobbyRadioPortal-Installer: Token per CLI, eigenes HTTPS aus (nginx des Portals übernimmt 80/443)."""
+    import json, sys
+    monkeypatch.setenv("FRNADN_DATA", str(tmp_path))
+    from frnadn import __main__ as m
+    c = m._ctx()
+    c.settings.update({"https.enabled": True, "https.domain": "frn.example.org", "https.email": "a@example.org"}, "test")
+    monkeypatch.setattr(sys, "argv", ["frnadn", "behind-proxy"])
+    assert m.main() == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["https_was"] and out["domain"] == "frn.example.org"
+    assert m._ctx().settings.get("https.enabled") is False
+    monkeypatch.setattr(sys, "argv", ["frnadn", "api-token", "HobbyRadioPortal"])
+    assert m.main() == 0
+    assert capsys.readouterr().out.strip().startswith("frn_")
