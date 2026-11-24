@@ -15,6 +15,13 @@ Beide Dienste laufen als Benutzer `frnadn` ohne Root-Rechte. frn_adn darf per su
 
 `frn-server` startet nach einem Absturz nach **60 Sekunden** neu. Der Java-Server beendet sich bei schweren SystemManager-Fehlern selbst; die Wartezeit verhindert, dass er den SystemManager mit Anmeldeversuchen überflutet.
 
+## Im HobbyRadioPortal
+
+Das [HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) zeigt diesen Server im Plugin *FRN* (Räume als Tabs, Zuletzt
+gehört, Stationen) und verwaltet ihn mit einem **API-Token** (Admin → Users → *Portal-Zugang*, siehe [Admin-Portal](adminbereich.md#-portal-zugang-api-token)).
+Meldet das Portal *„API-Token abgelehnt“*, wurde der Token hier widerrufen oder falsch kopiert – neuen anlegen und im Portal eintragen.
+Läuft das Portal auf einem anderen Rechner, muss es die Adresse dieses Dashboards erreichen (Firewall/Reverse-Proxy).
+
 ## Fehlermeldungen des SystemManagers
 
 Sie stehen im Admin-Portal oben unter *Settings* und im Log:

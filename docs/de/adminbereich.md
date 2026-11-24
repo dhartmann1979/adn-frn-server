@@ -88,6 +88,21 @@ Der Java-Server braucht die Passwörter im Klartext in seiner Datei; frn_adn leg
 
 Benutzer des Dashboards (nicht zu verwechseln mit FRN-Konten). Den Superadmin kann hier niemand ändern oder löschen; Admins bearbeitet nur der Superadmin.
 
+## 🔌 Portal-Zugang (API-Token)
+
+<p align="center"><img src="../images/admin-api-tokens.png" alt="Portal-Zugang (API-Token)" width="90%"></p>
+
+Unter **Users** liegt die Kachel *Portal-Zugang (API-Token)*. Mit einem Token verwaltet das
+[HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) (Plugin *FRN*) diesen Server aus seinem eigenen Admin-Bereich:
+**Einstellungen, Räume, Zugriffslisten und Start/Stopp** des Java-Servers.
+
+1. Als Admin anmelden → **Users** → *Portal-Zugang* → Name eingeben (z. B. `HobbyRadioPortal`) → **➕ Token anlegen**.
+2. Den angezeigten Token (`frn_…`) **sofort kopieren** – er erscheint nur einmal.
+3. Im Portal: **Admin → Dienste & Plugins → FRN** → Adresse dieses Dashboards und **API-Token** eintragen → Speichern.
+
+Ein Token darf **nie** Benutzer, Sitzungen, Tokens, FRN-Konten, Updates, System, Theme, Links, Import, Logs oder HTTPS ändern – das bleibt
+hier im Dashboard. **Widerrufen** sperrt ihn sofort. Im Protokoll stehen Änderungen aus dem Portal als `api:<Token-Name> (<Portal-Benutzer>)`.
+
 ## 🖥️ System
 
 <p align="center"><img src="../images/admin-system.png" alt="System" width="90%"></p>

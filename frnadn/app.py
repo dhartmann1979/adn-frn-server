@@ -140,8 +140,34 @@ def ip_of(conn) -> str:
     return conn.client.host if conn.client else ""
 
 
+# What an API token (HobbyRadioPortal) may reach besides the public data: settings, rooms, the lists (ACL),
+# starting/stopping the FRN server and the change log. Never users, sessions, tokens, accounts, updates, system or HTTPS.
+API_TOKEN_EXACT = {"/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
+                   "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart"}
+API_TOKEN_LOCKED = ("https.",)
+
+
+def _token_path_ok(path: str) -> bool:
+    if path.startswith("/api/admin/"):
+        return path in API_TOKEN_EXACT or bool(re.fullmatch(r"/api/admin/rooms/\d+", path))
+    return path.startswith("/api/") and not path.startswith("/api/auth/")
+
+
 def user_of(conn) -> Optional[Dict[str, Any]]:
-    return ctx.auth.session_user(conn.cookies.get(COOKIE))
+    u = ctx.auth.session_user(conn.cookies.get(COOKIE))
+    if u:
+        return u
+    auth = conn.headers.get("authorization") or ""
+    if auth[:7].lower() == "bearer " and _token_path_ok(conn.url.path):
+        return ctx.auth.token_user(auth[7:].strip(), ip_of(conn), conn.headers.get("x-portal-user", ""))
+    return None
+
+
+def need_human_admin(request: Request) -> Dict[str, Any]:
+    u = need_admin(request)
+    if u.get("api"):
+        raise HTTPError(403, "Not with an API token.")
+    return u
 
 
 def is_admin(u) -> bool:
@@ -363,6 +389,8 @@ async def save_settings(request: Request):
     changes = b.get("changes") or {}
     if not isinstance(changes, dict):
         raise HTTPError(400, "Invalid request.")
+    if u.get("api") and any(str(k).startswith(API_TOKEN_LOCKED) for k in changes):
+        raise HTTPError(403, "HTTPS settings cannot be changed with an API token.")
     if "frn.default_room" in changes and changes["frn.default_room"] and \
             changes["frn.default_room"] not in [r["name"] for r in ctx.store.rooms()]:
         raise HTTPError(400, "Default room: this room does not exist.")
@@ -979,6 +1007,33 @@ async def accounts_delete(email: str, request: Request):
 
 
 # ---------------------------------------------------------------- admin: users & sessions
+# ---------------------------------------------------------------- admin: API tokens (HobbyRadioPortal)
+@app.get("/api/admin/api-tokens")
+async def api_tokens_get(request: Request):
+    need_human_admin(request)
+    return {"tokens": ctx.auth.api_tokens(), "paths": sorted(API_TOKEN_EXACT) + ["/api/admin/rooms/{id}"]}
+
+
+@app.post("/api/admin/api-tokens")
+async def api_tokens_create(request: Request):
+    u = need_human_admin(request)
+    b = await body(request)
+    try:
+        return {"token": ctx.auth.create_api_token(str(b.get("name") or ""), u["username"], ip_of(request))}
+    except AuthError as e:
+        raise HTTPError(400, str(e))
+
+
+@app.delete("/api/admin/api-tokens/{tid}")
+async def api_tokens_delete(tid: int, request: Request):
+    u = need_human_admin(request)
+    try:
+        ctx.auth.revoke_api_token(tid, u["username"], ip_of(request))
+    except AuthError as e:
+        raise HTTPError(404, str(e))
+    return {"ok": True}
+
+
 @app.get("/api/admin/users")
 async def users(request: Request):
     need_admin(request)

@@ -4,6 +4,11 @@ N8Kit.i18n.add({
     base: 'en',
     de: {
         // header, strip, live
+        'Portal access (API tokens)': 'Portal-Zugang (API-Token)', 'Token name': 'Name des Tokens', 'Create token': 'Token anlegen', 'No token yet': 'Noch kein Token',
+        'Revoke': 'Widerrufen', 'Revoke this token?': 'Token widerrufen?', 'The service loses access at once': 'Der Dienst verliert sofort den Zugang',
+        'Token revoked': 'Token widerrufen', 'Last used': 'Zuletzt benutzt', 'Copy': 'Kopieren', 'Copied': 'Kopiert', 'Token': 'Token',
+        'Copy the token now – it is shown only once:': 'Token jetzt kopieren – er wird nur einmal angezeigt:', 'API token': 'API-Token', 'API token revoked': 'API-Token widerrufen', 'Lists': 'Listen',
+        'For the HobbyRadioPortal: it manages settings, rooms, the access lists and start/stop of the FRN server with the role admin – never users, sessions, tokens, FRN accounts, updates, system or HTTPS. The token is shown only once; enter it in the portal under Services & plugins → FRN → API token.': 'Für das HobbyRadioPortal: Es verwaltet damit Einstellungen, Räume, die Zugriffslisten und Start/Stopp des FRN-Servers mit der Rolle Admin – nie Benutzer, Sitzungen, Token, FRN-Konten, Updates, System oder HTTPS. Der Token wird nur einmal angezeigt; im Portal unter Dienste & Plugins → FRN → API-Token eintragen.',
         'Live data': 'Live-Daten', 'FRN server': 'FRN-Server', 'Online': 'Online', 'Quiet': 'Ruhe', 'Stations': 'Stationen', 'Chat': 'Chat',
         'Online now': 'Jetzt online', 'Talks today': 'Durchgänge heute', 'Airtime today': 'Sprechzeit heute', 'Stations heard': 'Gehörte Stationen', 'Peak online': 'Höchststand online',
         'On air': 'Auf Sendung', 'Last heard': 'Zuletzt gehört', 'Rooms': 'Räume', 'Room': 'Raum', 'Band': 'Band', 'Nothing heard yet.': 'Noch nichts gehört.',

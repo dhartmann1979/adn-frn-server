@@ -40,6 +40,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
 | ⚙️ **Admin-Portal statt Config-Dateien** | Alle Einstellungen, Räume und FRN-Konten liegen in SQLite; frn_adn schreibt daraus `server.properties`. Server starten, stoppen und neu starten per Knopf. |
 | 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu Sitzungen und ein Protokoll aller Änderungen. |
+| 🔌 **HobbyRadioPortal** | Mit einem **API-Token** (Admin → Users) zeigt und verwaltet das [HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) diesen Server: Einstellungen, Räume, Zugriffslisten, Start/Stopp – Benutzer, Updates und HTTPS bleiben hier. |
 | 🧭 **Ein Menü + Statusleiste** | Kopfzeile mit Logo, Reitern, Links und Login ganz rechts (ohne Aufklappmenü, **⚙️ Admin** nach dem Login als Menüpunkt); darunter eine schmale Statusleiste für Live-Daten, FRN-Server, Stationen online und On air |
 | 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit den **Favicons der verlinkten Seiten** (in SQLite zwischengespeichert), „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
 | ⬆️ **Updates mit Vorschau** | Zu jeder vollen Stunde und auf Knopfdruck: neue Commits für das Dashboard (GitHub) und neue Versionen des Java-Servers. Zwei getrennte Knöpfe, nie automatisch. |
@@ -124,7 +125,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
 | 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
-| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, System, Theme, Updates, Links, Import, Logs |
+| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, Portal-Token, System, Theme, Updates, Links, Import, Logs |
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |

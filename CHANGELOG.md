@@ -2,6 +2,38 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.7.0 – 2026-11-24
+
+**Portal-Zugang per API-Token:** Das **HobbyRadioPortal** (Plugin *FRN*, ab Portal 0.8.0) kann den FRN-Server jetzt aus seinem eigenen
+Admin-Bereich verwalten – Einstellungen, Räume, Zugriffslisten und Start/Stopp des Java-Servers. Dafür gibt es eigene Tokens statt
+eines Admin-Passworts im Portal. Ausführlich: [docs/de/adminbereich.md](docs/de/adminbereich.md#-portal-zugang-api-token) und
+[docs/de/sicherheit.md](docs/de/sicherheit.md#portal-zugang-api-token).
+
+### 🔌 Admin → Users → Portal-Zugang (API-Token)
+- Neue Kachel unter den Benutzern: **Name** eingeben, **➕ Token anlegen**. Der Token (`frn_…`) wird **nur einmal** angezeigt
+  (mit **📋 Kopieren**); gespeichert wird nur sein SHA-256-Hash.
+- Liste mit Name, Token-Ende, angelegt (wann/von wem), zuletzt benutzt (wann/von welcher IP) und **Widerrufen** – sofort wirksam.
+- Anlegen und Widerrufen stehen im Protokoll (*Sessions & log*: „API-Token angelegt/widerrufen“).
+
+### 🛡️ Was ein Token darf – und was nicht
+- Er wirkt wie ein **Admin**, aber nur auf einer festen Liste von Adressen: `/api/admin/settings`, `/api/admin/rooms` (inkl. Reihenfolge
+  und einzelne Räume), `/api/admin/acl`, `/api/admin/audit`, `/api/admin/server/start|stop|restart` und die öffentlichen Lese-APIs
+  (Live, Statistik, Stationen, Client-Logos).
+- **Nie:** Benutzer, Sitzungen, Tokens selbst, FRN-Konten, Updates, System, Theme, Links, Import, Logs, Anmeldung. **HTTPS-Einstellungen**
+  (`https.*`) lehnt der Server für Tokens mit 403 ab.
+- Im Protokoll erscheint der Portal-Benutzer mit: `api:HobbyRadioPortal (lutz)` – man sieht also, wer im Portal geklickt hat.
+- Tokens gehen nur als `Authorization: Bearer …`, nie per Cookie oder Adresse; die CSRF-Regel (`X-N8`) gilt auch für sie.
+
+### 🌐 Sprache
+- Deutsche Texte für die Token-Kachel und die neuen Protokoll-Einträge (`static/i18n-app.js`).
+
+### 🧪 Tests
+- `tests/test_api_tokens.py`: erlaubte und gesperrte Adressen, HTTPS-Sperre, Widerruf, Token-Verwaltung nur für Menschen.
+
+### ⬆️ Update
+- Wie immer über **Admin → System → ⬆️ Updates** oder `sudo ./update.sh`. Nichts zu tun, wenn du das Portal nicht nutzt – ohne Token
+  ändert sich nichts.
+
 ## 2.6.1 – 2026-11-24
 
 ### 🌐 N8 Kit 1.0.1

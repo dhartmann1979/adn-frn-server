@@ -985,6 +985,28 @@ async function loadAccounts() {
             <div class="row"><label>FRN password</label><input type="password" name="password" required minlength="4" autocomplete="new-password"><div class="help">The server needs the password itself in FRNPasswd.xml (file readable only by the service).</div></div>
             <div class="actions"><button class="btn primary">Create</button></div></form></div>`;
 }
+// Portal access: API tokens for the HobbyRadioPortal (settings, rooms, lists, start/stop – never users, accounts, updates or HTTPS)
+async function loadApiTokens(fresh) {
+    let d; try { d = await api('GET', '/api/admin/api-tokens'); } catch (e) { $('apiTokens').innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
+    $('apiTokens').innerHTML = `<h3>🔌 Portal access (API tokens)</h3>
+        <div class="subt">For the HobbyRadioPortal: it manages settings, rooms, the access lists and start/stop of the FRN server with the role admin – never users, sessions, tokens, FRN accounts, updates, system or HTTPS. The token is shown only once; enter it in the portal under Services &amp; plugins → FRN → API token.</div>
+        ${d.tokens.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Token</th><th class="hide-sm">Created</th><th>Last used</th><th></th></tr></thead><tbody>
+        ${d.tokens.map(t => `<tr><td><b>${esc(t.name)}</b></td><td class="mono">frn_…${esc(t.hint)}</td><td class="hide-sm">${fmtDate(t.created_at)} · ${esc(t.created_by || '')}</td>
+            <td>${t.last_used ? fmtDate(t.last_used) : '–'}${t.last_ip ? ` <span class="dim mono">${esc(t.last_ip)}</span>` : ''}</td>
+            <td class="num"><button class="btn small" onclick="revokeApiToken(${t.id})">Revoke</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No token yet.</div>'}
+        <form onsubmit="event.preventDefault(); createApiToken(this)" style="margin-top:10px"><div class="row"><label>Token name</label><input type="text" name="name" placeholder="HobbyRadioPortal" maxlength="40"></div>
+        <div class="actions"><button class="btn primary">➕ Create token</button></div></form>
+        ${fresh ? `<div class="notice-box" style="margin-top:10px">🔑 Copy the token now – it is shown only once:<br><code class="mono" style="user-select:all;word-break:break-all">${esc(fresh)}</code>
+            <div class="actions"><button class="btn small" type="button" onclick="navigator.clipboard.writeText('${esc(fresh)}');toast('Copied')">📋 Copy</button></div></div>` : ''}`;
+}
+async function createApiToken(f) {
+    try { const r = await api('POST', '/api/admin/api-tokens', { name: f.name.value.trim() || 'HobbyRadioPortal' }); loadApiTokens(r.token.token); }
+    catch (e) { toast(e.message, true); }
+}
+async function revokeApiToken(id) {
+    if (!await confirmBox({ title: 'Revoke this token?', body: 'The service loses access at once.' }, 'Revoke')) return;
+    try { await api('DELETE', `/api/admin/api-tokens/${id}`); toast('Token revoked'); loadApiTokens(); } catch (e) { toast(e.message, true); }
+}
 async function saveAccountEntry(f, close) {
     try { const r = await api('POST', '/api/admin/accounts', { email: f.email.value, callsign: f.callsign.value, name: f.name.value, password: f.password.value, disabled: f.disabled ? f.disabled.checked : false });
         if (close) closeModal(); setRestart(r.restart_needed); toast('Saved'); loadAccounts(); } catch (e) { toast(e.message, true); }
@@ -1018,7 +1040,9 @@ async function loadUsers() {
             <div class="row"><label>Name</label><input type="text" name="display_name"></div>
             <div class="row"><label>Password (min. 10)</label><input type="password" name="password" required minlength="10" autocomplete="new-password"></div>
             <div class="row"><label>Role</label><select name="role"><option value="user">User</option>${sa ? '<option value="admin">Admin</option>' : ''}</select></div>
-            <div class="actions"><button class="btn primary">Create</button></div></form></div>`;
+            <div class="actions"><button class="btn primary">Create</button></div></form></div>
+        <div class="grid" style="margin-top:14px"><div class="tile" id="apiTokens"><div class="empty">Loading …</div></div></div>`;
+    loadApiTokens();
 }
 async function createUser(f) {
     try { await api('POST', '/api/admin/users', { username: f.username.value, display_name: f.display_name.value, password: f.password.value, role: f.role.value }); toast('User created'); loadUsers(); }
@@ -1318,7 +1342,8 @@ async function loadAudit() {
     const lbl = { login: '🔓 Login', login_failed: '⛔ Login failed', settings_changed: '⚙️ Dashboard settings', frn_config: '🛰️ server.json', service: '🔄 Service',
         user_created: '➕ User', user_changed: '✏️ User', user_deleted: '🗑️ User', password_changed: '🔑 Password', reboot: '🔄 Reboot', poweroff: '⏻ Shutdown',
         session_revoked: '🚫 Session', update: '⬆️ Update', frn_start: '▶ FRN server', frn_stop: '⏹ FRN server', frn_restart: '🔄 FRN server',
-        frn_update: '⬆️ FRN update', rooms: '🏠 Rooms', frn_account: '🔑 FRN account', app_restart: '♻️ Dashboard' };
+        frn_update: '⬆️ FRN update', rooms: '🏠 Rooms', frn_account: '🔑 FRN account', app_restart: '♻️ Dashboard',
+        api_token_created: '🔌 API token', api_token_revoked: '🔌 API token revoked', acl: '🚦 Lists' };
     $('admin-audit').innerHTML = `<div class="grid g2">
         <div class="tile"><h3>🔑 Active sessions</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>User</th><th>IP</th><th class="hide-sm">Since</th><th></th></tr></thead><tbody>
         ${s.sessions.map(x => `<tr><td>${esc(x.username)}</td><td class="mono">${esc(x.ip)}</td><td class="hide-sm">${fmtDate(x.created_at)}</td><td class="num"><button class="btn small" onclick="revokeS('${x.id}')">End</button></td></tr>`).join('')}

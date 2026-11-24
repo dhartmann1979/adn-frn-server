@@ -40,6 +40,18 @@ Rufzeichen, Namen, Orte, Band und Beschreibung schicken die FRN-Clients selbst; 
 
 Sitzungs-Cookie `HttpOnly`, `SameSite`, über HTTPS `Secure`; jede schreibende Anfrage braucht den Header `X-N8` (CSRF-Schutz); Fehlversuche werden gebremst. IP-Adressen sehen nur Admins.
 
+### Portal-Zugang (API-Token)
+
+Für das HobbyRadioPortal gibt es eigene **API-Tokens** (Admin → Users). Gespeichert wird nur der SHA-256-Hash; der Token selbst erscheint
+beim Anlegen einmal. Er gilt nur als `Authorization: Bearer`-Header und nur für eine feste Liste von Adressen:
+
+| erlaubt | gesperrt |
+|---|---|
+| `/api/admin/settings` (ohne `https.*`), `/api/admin/rooms…`, `/api/admin/acl`, `/api/admin/audit`, `/api/admin/server/start\|stop\|restart`, öffentliche Lese-APIs | Benutzer, Sitzungen, Tokens, FRN-Konten, Updates, System, Theme, Links, Import, Logs, `/api/auth/*` |
+
+Tokens verwalten nur angemeldete Menschen (Admin/Superadmin) – ein Token kann keine weiteren Tokens anlegen. Jede Änderung steht im
+Protokoll mit dem Token-Namen und dem Portal-Benutzer, der sie ausgelöst hat. Ein verlorener Token: **Widerrufen**, neuen anlegen.
+
 ## Reverse-Proxy davor (empfohlen)
 
 Das Dashboard kann HTTPS mit Let's Encrypt selbst. Läuft auf dem Server ohnehin ein Webserver, ist ein **Reverse-Proxy** davor die sauberste Lösung: Zertifikate, Header und Protokolle an einer Stelle. Das Dashboard lauscht dann nur lokal (Admin → Settings → HTTPS & web: HTTPS **aus**; in `frnadn.service` z. B. `Environment=FRNADN_PORT=8090`). Die Weiterleitungs-Header nimmt frn_adn von `127.0.0.1` an (`proxy_headers`).

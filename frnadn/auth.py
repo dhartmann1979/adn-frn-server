@@ -128,6 +128,43 @@ class Auth:
                          "WHERE s.token_hash = ? AND s.expires_at > ? AND u.disabled = 0", (_th(token), time.time()))
         return self.public(rows[0]) if rows else None
 
+    # ------------------------------------------------------------ API tokens (HobbyRadioPortal)
+    def create_api_token(self, name: str, created_by: str = "", ip: str = "") -> Dict[str, Any]:
+        name = (name or "").strip()
+        if not re.fullmatch(r"[A-Za-z0-9 ._@-]{2,40}", name):
+            raise AuthError("Name: 2–40 letters, digits, spaces or . _ @ -")
+        if self.db.q("SELECT COUNT(*) AS n FROM api_tokens")[0]["n"] >= 20:
+            raise AuthError("At most 20 tokens.")
+        token = "frn_" + secrets.token_urlsafe(32)
+        tid = self.db.x("INSERT INTO api_tokens (name, token_hash, hint, created_at, created_by) VALUES (?,?,?,?,?)",
+                        (name, _th(token), token[-4:], time.time(), created_by)).lastrowid
+        self.audit("api_token_created", created_by, name, ip)
+        return {"id": tid, "name": name, "hint": token[-4:], "token": token}
+
+    def api_tokens(self) -> List[Dict[str, Any]]:
+        return [dict(r) for r in self.db.q("SELECT id, name, hint, created_at, created_by, last_used, last_ip FROM api_tokens ORDER BY id")]
+
+    def revoke_api_token(self, tid: int, actor: str = "", ip: str = "") -> None:
+        rows = self.db.q("SELECT name FROM api_tokens WHERE id=?", (int(tid),))
+        if not rows:
+            raise AuthError("Token not found.")
+        self.db.x("DELETE FROM api_tokens WHERE id=?", (int(tid),))
+        self.audit("api_token_revoked", actor, rows[0]["name"], ip)
+
+    def token_user(self, token: Optional[str], ip: str = "", on_behalf: str = "") -> Optional[Dict[str, Any]]:
+        """Pseudo user (role admin) of a valid API token, or None."""
+        if not token or not token.startswith("frn_") or len(token) > 100:
+            return None
+        rows = self.db.q("SELECT * FROM api_tokens WHERE token_hash=?", (_th(token),))
+        if not rows:
+            return None
+        r = rows[0]
+        if not r["last_used"] or time.time() - r["last_used"] > 60 or r["last_ip"] != ip:
+            self.db.x("UPDATE api_tokens SET last_used=?, last_ip=? WHERE id=?", (time.time(), ip, r["id"]))
+        who = re.sub(r"[^A-Za-z0-9._@-]", "", on_behalf or "")[:40]
+        return {"id": -r["id"], "username": f"api:{r['name']}" + (f" ({who})" if who else ""), "role": "admin", "display_name": r["name"],
+                "disabled": False, "default_pw": False, "created_at": r["created_at"], "last_login": r["last_used"], "api": True}
+
     def logout(self, token: Optional[str]) -> None:
         if token:
             self.db.x("DELETE FROM sessions WHERE token_hash = ?", (_th(token),))
