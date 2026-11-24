@@ -8,6 +8,8 @@ Write config:       python -m frnadn write-config                   (server.prop
 FRN account:        python -m frnadn add-account EMAIL CALLSIGN     (stand-alone password list; asks for the password)
 Portal token:       python -m frnadn api-token NAME                 (API token for the HobbyRadioPortal, printed once)
 Behind the portal:  python -m frnadn behind-proxy                   (own HTTPS off; prints domain/e-mail as JSON)
+Backup:             python -m frnadn backup [DIR]                   (encrypted .frnbak; asks for a password, min. 10)
+Restore:            python -m frnadn restore FILE.frnbak            (stop frnadn first; asks for the backup password)
 
 Passwords can also come from the environment variable FRNADN_PASSWORD (scripts).
 """
@@ -103,6 +105,35 @@ def main() -> int:
         c.java.write_config()
         print(f"{G}✓{N} FRN account {args[1]} saved – restart the FRN server to use it.")
         return 0
+    if cmd in ("backup", "restore"):
+        from pathlib import Path
+        from . import backup as bk
+        data = Path(os.environ.get("FRNADN_DATA", Path(__file__).resolve().parent.parent / "data"))
+        home = Path(os.environ.get("FRNADN_FRN_HOME", data / "frn"))
+        try:
+            if cmd == "backup":
+                pw = _password("Password for the backup (min. 10): ", bk.MIN_PASSWORD)
+                p = bk.create(data, home, pw, "cli", Path(args[1]) if len(args) > 1 else None)
+                print(f"{G}✓{N} {p} ({p.stat().st_size // 1024} KB) – keep the password, without it the backup cannot be opened.")
+                return 0
+            if len(args) < 2:
+                print("usage: python -m frnadn restore FILE.frnbak", file=sys.stderr)
+                return 2
+            pw = os.environ.get("FRNADN_PASSWORD")
+            if pw is None:
+                pw = getpass.getpass("Password of the backup: ")
+            tmp = data / "restore-cli.tar"
+            try:
+                m = bk.open_backup(Path(args[1]), pw, tmp)
+                res = bk.apply(tmp, data, home)
+            finally:
+                tmp.unlink(missing_ok=True)
+            print(f"{G}✓{N} Backup from {m.get('host')} ({m.get('version')}) restored – previous state in {res['kept']}.")
+            print("  Start the dashboard again (systemctl start frnadn); it writes the FRN configuration and you log in again.")
+            return 0
+        except bk.BackupError as e:
+            print(f"{R}✗{N} {e}", file=sys.stderr)
+            return 2
     if cmd == "api-token" and len(args) > 1:
         c = _ctx()
         try:

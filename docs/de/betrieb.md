@@ -63,14 +63,32 @@ Sie stehen im Admin-Portal oben unter *Settings* und im Log:
 
 ## Sicherung
 
-Alles Wichtige steckt in `/var/lib/frnadn`:
+Am einfachsten im Dashboard: *Admin → System → 💾 Backup* – siehe [Backup & Wiederherstellen](adminbereich.md#-backup--wiederherstellen-nur-superadmin).
+Dasselbe auf der Konsole (z. B. für einen Cronjob):
 
 ```bash
-sudo sqlite3 /var/lib/frnadn/frnadn.db ".backup '/root/frnadn-$(date +%F).db'"
-sudo tar czf /root/frnadn-acl-$(date +%F).tgz -C /var/lib/frnadn/frn acl
+# Backup – Passwort aus der Umgebung oder interaktiv; landet in /var/lib/frnadn/backups/
+sudo -u frnadn FRNADN_PASSWORD='…' /opt/adn-frn-server/.venv/bin/python -m frnadn backup
+sudo -u frnadn /opt/adn-frn-server/.venv/bin/python -m frnadn backup /var/lib/frnadn/backups   # fragt nach dem Passwort
+
+# Wiederherstellen – Dienste stoppen, einspielen, starten
+sudo systemctl stop frnadn
+sudo -u frnadn /opt/adn-frn-server/.venv/bin/python -m frnadn restore /pfad/frn-backup-….frnbak
+sudo systemctl start frnadn && sudo systemctl restart frn-server
 ```
 
-Zurückspielen: Dienste stoppen, Datei nach `/var/lib/frnadn/frnadn.db` kopieren, `chown frnadn:frnadn`, `sudo frnadn write-config`, Dienste starten.
+`restore` legt den alten Stand nach `/var/lib/frnadn/before-restore-<datum>/` und nennt den Ordner.
+
+**Neuer Server aus einem Backup** – der Installer spielt es gleich mit ein:
+
+```bash
+echo 'Backup-Passwort' > /root/frn.pw && chmod 600 /root/frn.pw
+sudo FRNADN_RESTORE=/root/frn-backup-….frnbak FRNADN_RESTORE_PASSWORD_FILE=/root/frn.pw ./scripts/install.sh
+rm /root/frn.pw
+```
+
+Danach HTTPS unter *Admin → Settings → HTTPS & web* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
+im **HobbyRadioPortal** machen (*Web-Installer → FRN → 📦 aus einem Backup*).
 
 ## Testen ohne Funk
 

@@ -2,6 +2,48 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.8.0 – 2026-11-25
+
+**💾 Backup & Wiederherstellen – im Dashboard, auf der Konsole, beim Installieren und im HobbyRadioPortal.** Eine einzige,
+passwortverschlüsselte Datei (`.frnbak`) enthält alles, was den Server ausmacht; damit zieht er auf eine neue Maschine oder ins Portal um.
+Ausführlich: [docs/de/adminbereich.md](docs/de/adminbereich.md#-backup--wiederherstellen-nur-superadmin).
+
+### 💾 Admin → System → Backup (nur Superadmin)
+- Passwort zweimal eingeben (mind. 10 Zeichen) → **Backup erstellen** → der Browser lädt `frn-backup-<host>-<datum>.frnbak` herunter.
+- Die letzten **5** Backups bleiben in `/var/lib/frnadn/backups/` (700/600) und lassen sich erneut herunterladen oder löschen.
+- **Inhalt:** die komplette Datenbank (konsistent über die SQLite-Backup-API, auch im laufenden Betrieb) – Einstellungen, Benutzer,
+  Räume, FRN-Konten, Stationen, Statistik, Chat, Protokoll, Client-Logos, API-Tokens –, `branding/` (Logo, Site-Icons, Links) und vom
+  FRN-Server `server.properties`, `log4j.xml` und die Zugriffslisten `acl/`, dazu ein `manifest.json` mit Host, Version, Titel und Zählern.
+- **Nicht drin:** Sitzungen, Let's-Encrypt-Zertifikate (werden neu geholt), Logdateien, ältere Backups.
+- **Verschlüsselung:** Format `N8MIG1` – scrypt-Schlüssel, SHAKE-256-Schlüsselstrom, HMAC-SHA256 über alles (encrypt-then-MAC), nur
+  Python-Standardbibliothek. Dasselbe Format nutzt der Umzug von HBlink4 ins HobbyRadioPortal, das Portal kann die Datei also selbst prüfen.
+
+### ♻️ Admin → System → Wiederherstellen
+- `.frnbak` wählen, Passwort, **🔍 Prüfen**: Hochladen (gestreamt, bis 4 GiB), Probe-Entschlüsselung und eine Vorschau mit Host, Datum,
+  Version, Räumen, Benutzern, FRN-Konten, Stationen und Durchgängen. Falsches Passwort oder eine fremde Datei wird hier abgewiesen.
+- `RESTORE` eintippen → **Jetzt wiederherstellen**: Das Dashboard startet neu und spielt das Backup **vor** dem Öffnen der Datenbank ein.
+  Der bisherige Stand wandert nach `before-restore-<datum>/`; schlägt etwas fehl (z. B. Integritätsprüfung der Datenbank), kommt er
+  automatisch zurück. Danach schreibt es `server.properties` neu und **startet den FRN-Server neu**.
+- Alle melden sich mit den Konten aus dem Backup neu an. Die Kachel zeigt *Letzte Wiederherstellung* (Zeit, Host, Version oder Fehler).
+- Protokoll: *💾 Backup created / downloaded / deleted*, *♻️ Restore started*, *♻️ Backup restored*.
+
+### ⌨️ Konsole und Installer
+- `python -m frnadn backup [ORDNER]` – Passwort aus `FRNADN_PASSWORD` oder per Abfrage (für Cronjobs).
+- `python -m frnadn restore DATEI` – spielt ein Backup bei gestopptem Dienst ein und nennt den Ordner mit dem alten Stand.
+- `install.sh` mit `FRNADN_RESTORE=/pfad/…frnbak` und `FRNADN_RESTORE_PASSWORD_FILE=/pfad/pw` richtet einen neuen Server direkt
+  aus einem Backup ein (statt der Fragen zu Server und Admin-Konto). Das nutzt auch der Web-Installer des **HobbyRadioPortals**
+  (ab 0.10.0: *FRN → 📦 aus einem Backup*).
+
+### 🔐 Sicherheit
+- Nur der Superadmin – kein Admin, kein API-Token – kann Backups anlegen, laden, löschen oder einspielen.
+- Beim Einspielen nur Einträge unter `data/` und `frn/`, keine absoluten Pfade, kein `..`, keine Links, höchstens 20 000 Dateien / 4 GiB;
+  Downloads mit `Cache-Control: no-store`.
+
+### 🧪 Tests
+- `tests/test_backup.py`: Backup → falsches Passwort → Prüfen → Einspielen samt Sicherung des alten Stands, Sitzungen gelöscht,
+  Logs bleiben; unsicheres Archiv abgewiesen; Einspielen beim Start (`restore.pending.tar`). Zusätzlich Ende-zu-Ende gegen ein laufendes
+  Demo-Dashboard (Anlegen, Herunterladen, Hochladen, Prüfen, Einspielen nach Neustart).
+
 ## 2.7.1 – 2026-11-24
 
 **Für den Installer des HobbyRadioPortals: das Portal kann jetzt auf diesem FRN-Server installiert werden und stellt das Dashboard

@@ -117,6 +117,42 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 | ↻ Jetzt prüfen | prüft Dashboard (GitHub) und Java-FRN-Server auf neue Versionen |
 | ⬆️ Update jetzt installieren / Upgrade Java now | installiert das jeweilige Update – Einzelheiten: [Updates](updates.md) |
 
+### 💾 Backup & Wiederherstellen (nur Superadmin)
+
+<p align="center"><img src="../images/admin-backup.png" alt="Backup und Wiederherstellen" width="90%"></p>
+
+Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten. API-Tokens (Portal-Zugang)
+haben hier keinen Zugriff.
+
+**💾 Backup** – Passwort zweimal eingeben (mindestens 10 Zeichen), **Backup erstellen**. Der Browser lädt die Datei
+`frn-backup-<host>-<datum>.frnbak` sofort herunter; die letzten **5** Backups bleiben zusätzlich in `/var/lib/frnadn/backups/`
+(nur `frnadn` lesbar, 600) und lassen sich dort erneut herunterladen oder löschen.
+
+| im Backup | nicht im Backup |
+|---|---|
+| Datenbank (Einstellungen, Benutzer, Räume, FRN-Konten, Stationen, Statistik, Chat, Protokoll, Client-Logos, API-Tokens) | Sitzungen (alle melden sich neu an) |
+| `branding/` (Logo, Site-Icons, Links) | Zertifikate `letsencrypt/` – werden neu geholt |
+| `frn/` des FRN-Servers: `server.properties`, `log4j.xml`, Zugriffslisten `acl/` | Logdateien `frn/logs/`, alte Backups |
+
+Die Datei ist mit dem Passwort **verschlüsselt und gegen Veränderung gesichert** (scrypt + SHAKE-256 + HMAC-SHA256, Format `N8MIG1` –
+dasselbe wie beim Umzug von HBlink4 ins Portal). Ohne Passwort ist sie wertlos – auch für dich: Passwort in den Passwortsafe.
+
+**♻️ Wiederherstellen** – `.frnbak` wählen, Passwort, **🔍 Prüfen**. Das Dashboard lädt die Datei hoch, entschlüsselt sie zur Probe und zeigt,
+was drin ist (Host, Datum, Version, Räume, Benutzer, FRN-Konten, Stationen, Durchgänge). Dann `RESTORE` eintippen und **Jetzt wiederherstellen**:
+
+1. Das Dashboard legt das entschlüsselte Archiv als `restore.pending.tar` ab und startet neu.
+2. Beim Start – bevor die Datenbank geöffnet wird – wandert der bisherige Stand nach `/var/lib/frnadn/before-restore-<datum>/`
+   (Datenbank, `branding/`, `frn/` ohne Logs), dann wird das Backup eingespielt und die Datenbank geprüft. Geht etwas schief,
+   kommt der alte Stand automatisch zurück.
+3. `server.properties` wird neu geschrieben und der **FRN-Server neu gestartet** – verbundene Stationen verbinden sich selbst wieder.
+4. Anmelden mit den Konten **aus dem Backup**. Die Kachel zeigt *Letzte Wiederherstellung* mit Zeit, Host und Version.
+
+Das Protokoll vermerkt *💾 Backup created/downloaded/deleted*, *♻️ Restore started* und *♻️ Backup restored*.
+
+> **Im HobbyRadioPortal:** Dieselbe `.frnbak` lässt sich beim Einrichten des Portals einspielen (*Web-Installer → FRN → 📦 aus einem Backup*).
+> Das Portal installiert dann adn-frn-server neu, spielt das Backup ein und stellt das Dashboard hinter sich –
+> siehe [Umzugsanleitung des Portals](https://github.com/dhartmann1979/HobbyRadioPortal/blob/main/docs/UMZUG.md#aus-backups-wiederherstellen).
+
 ## 🔄 Updates, Links und Import
 
 <p align="center"><img src="../images/admin-updates.png" alt="Software-Updates" width="70%"></p>

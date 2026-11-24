@@ -34,6 +34,7 @@ from starlette.middleware.gzip import GZipMiddleware
 
 from . import n8_security as _sec
 from . import n8_update_guard as _guard
+from . import backup as fbackup
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
@@ -97,6 +98,7 @@ class Ctx:
 
 
 ctx: Optional[Ctx] = None
+_RESTORED: Dict[str, Any] = {}
 app = FastAPI(title="frn_adn", **{"docs_url": None, "redoc_url": None, "openapi_url": None, **_sec.FASTAPI_KWARGS})
 app.add_middleware(GZipMiddleware, minimum_size=800)
 
@@ -1098,6 +1100,120 @@ async def system(request: Request):
             "uptime": time.time() - ctx.system.started, "restart_needed": ctx.restart_needed}
 
 
+# ---------------------------------------------------------------- backup & restore (superadmin, never with an API token)
+def need_superadmin(request: Request) -> Dict[str, Any]:
+    u = need_human_admin(request)
+    if u["role"] != "superadmin":
+        raise HTTPError(403, "Backups contain all access data – superadmin only.")
+    return u
+
+
+BACKUPS = DATA / "backups"
+UPLOAD = DATA / "restore-upload.frnbak"
+_BK_NAME = re.compile(r"^frn-backup-[A-Za-z0-9._-]+-\d{8}-\d{6}\.frnbak$")
+
+
+@app.get("/api/admin/backups")
+async def backups_list(request: Request):
+    need_superadmin(request)
+    try:
+        last = json.loads((DATA / fbackup.DONE).read_text())
+    except (OSError, ValueError):
+        last = None
+    return {"backups": fbackup.listing(BACKUPS), "last_restore": last, "min_password": fbackup.MIN_PASSWORD,
+            "uploaded": UPLOAD.is_file(), "keep": fbackup.KEEP}
+
+
+@app.post("/api/admin/backups")
+async def backups_create(request: Request):
+    u = need_superadmin(request)
+    b = await body(request)
+    try:
+        p = await asyncio.to_thread(fbackup.create, DATA, FRN_HOME, str(b.get("password") or ""), u["username"])
+    except fbackup.BackupError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("backup_created", u["username"], p.name, ip_of(request))
+    return {"name": p.name, "size": p.stat().st_size}
+
+
+@app.get("/api/admin/backups/{name}")
+async def backups_download(name: str, request: Request):
+    u = need_superadmin(request)
+    p = BACKUPS / name
+    if not _BK_NAME.match(name) or not p.is_file():
+        raise HTTPError(404, "Backup not found.")
+    ctx.auth.audit("backup_downloaded", u["username"], name, ip_of(request))
+    return FileResponse(p, media_type="application/octet-stream", filename=name, headers={"Cache-Control": "no-store"})
+
+
+@app.delete("/api/admin/backups/{name}")
+async def backups_delete(name: str, request: Request):
+    u = need_superadmin(request)
+    p = BACKUPS / name
+    if not _BK_NAME.match(name) or not p.is_file():
+        raise HTTPError(404, "Backup not found.")
+    p.unlink()
+    ctx.auth.audit("backup_deleted", u["username"], name, ip_of(request))
+    return {"ok": True}
+
+
+@app.post("/api/admin/restore/upload")
+async def restore_upload(request: Request):
+    need_superadmin(request)
+    size = 0
+    tmp = UPLOAD.with_suffix(".tmp")
+    with open(tmp, "wb") as f:
+        os.chmod(tmp, 0o600)
+        async for chunk in request.stream():
+            size += len(chunk)
+            if size > fbackup.MAX_BYTES:
+                f.close()
+                tmp.unlink(missing_ok=True)
+                raise HTTPError(413, "The file is too large.")
+            f.write(chunk)
+    with open(tmp, "rb") as f:
+        if f.read(7) != fbackup.n8mig.MAGIC:
+            tmp.unlink(missing_ok=True)
+            raise HTTPError(400, "This is not a backup of adn-frn-server (.frnbak).")
+    tmp.replace(UPLOAD)
+    return {"ok": True, "size": size}
+
+
+async def _open_upload(password: str, dest) -> Dict[str, Any]:
+    if not UPLOAD.is_file():
+        raise HTTPError(400, "Please upload the backup file first.")
+    try:
+        return await asyncio.to_thread(fbackup.open_backup, UPLOAD, password, dest)
+    except fbackup.BackupError as e:
+        await asyncio.sleep(1)
+        raise HTTPError(400, str(e))
+
+
+@app.post("/api/admin/restore/check")
+async def restore_check(request: Request):
+    need_superadmin(request)
+    b = await body(request)
+    tmp = DATA / "restore-check.tar"
+    try:
+        manifest = await _open_upload(str(b.get("password") or ""), tmp)
+    finally:
+        tmp.unlink(missing_ok=True)
+    return {"manifest": manifest}
+
+
+@app.post("/api/admin/restore")
+async def restore_apply(request: Request):
+    u = need_superadmin(request)
+    b = await body(request)
+    if b.get("confirmation") != "RESTORE":
+        raise HTTPError(400, "Please type RESTORE to confirm.")
+    manifest = await _open_upload(str(b.get("password") or ""), DATA / fbackup.PENDING)
+    UPLOAD.unlink(missing_ok=True)
+    ctx.auth.audit("backup_restore", u["username"], f"{manifest.get('host')} · {manifest.get('version')}", ip_of(request))
+    asyncio.get_running_loop().call_later(1.0, os._exit, 3)     # systemd starts us again; the start applies the backup
+    return {"ok": True, "manifest": manifest, "relogin": True}
+
+
 @app.post("/api/admin/restart")
 async def restart_app(request: Request):
     """Restart the whole program; systemd starts it again (Restart=always)."""
@@ -1226,6 +1342,9 @@ async def _startup() -> None:
         log.error("cannot write the FRN server configuration: %s", e)
     if ctx.java.direct:
         await ctx.java.control("start")
+    elif _RESTORED.get("ok"):
+        await ctx.java.control("restart")             # the FRN server reads the restored configuration
+        ctx.auth.audit("backup_restored", "system", (_RESTORED.get("manifest") or {}).get("created_by", ""), "")
     await ctx.server.start()
     ctx.tasks.append(asyncio.ensure_future(background()))
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
@@ -1287,6 +1406,10 @@ async def _serve(host: str, port: int) -> None:
     import signal
     global ctx, _tls_manager
     if ctx is None:
+        res = fbackup.apply_pending(DATA, FRN_HOME)      # restore prepared in the web interface: before the DB opens
+        if res:
+            _RESTORED.update(res)
+            log.warning("Backup restored: %s", "ok" if res.get("ok") else res.get("error"))
         ctx = Ctx()
     https_cfg = {
         "enabled": ctx.settings.get("https.enabled"),

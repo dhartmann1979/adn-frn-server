@@ -52,6 +52,15 @@ beim Anlegen einmal. Er gilt nur als `Authorization: Bearer`-Header und nur für
 Tokens verwalten nur angemeldete Menschen (Admin/Superadmin) – ein Token kann keine weiteren Tokens anlegen. Jede Änderung steht im
 Protokoll mit dem Token-Namen und dem Portal-Benutzer, der sie ausgelöst hat. Ein verlorener Token: **Widerrufen**, neuen anlegen.
 
+### Backups
+
+Backups (*Admin → System → 💾 Backup*, `frnadn backup`) enthalten alle Zugangsdaten und sind deshalb **nur für den Superadmin** – kein
+Admin und kein API-Token kommt an Anlegen, Herunterladen, Löschen oder Wiederherstellen. Die Datei ist mit einem eigenen Passwort
+verschlüsselt (scrypt n=2¹⁴, SHAKE-256-Schlüsselstrom, HMAC-SHA256 über alles – encrypt-then-MAC); eine veränderte oder falsch entschlüsselte
+Datei wird abgewiesen, bevor etwas entpackt wird. Beim Einspielen werden nur Einträge unter `data/` und `frn/` angenommen – keine absoluten
+Pfade, kein `..`, keine Links –, höchstens 20 000 Dateien und 4 GiB. Auf dem Server liegen Backups mit Rechten 600 in einem 700-Ordner.
+Downloads kommen mit `Cache-Control: no-store`.
+
 ## Reverse-Proxy davor (empfohlen)
 
 Das Dashboard kann HTTPS mit Let's Encrypt selbst. Läuft auf dem Server ohnehin ein Webserver, ist ein **Reverse-Proxy** davor die sauberste Lösung: Zertifikate, Header und Protokolle an einer Stelle. Das Dashboard lauscht dann nur lokal (Admin → Settings → HTTPS & web: HTTPS **aus**; in `frnadn.service` z. B. `Environment=FRNADN_PORT=8090`). Die Weiterleitungs-Header nimmt frn_adn von `127.0.0.1` an (`proxy_headers`).

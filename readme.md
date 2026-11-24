@@ -45,6 +45,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit den **Favicons der verlinkten Seiten** (in SQLite zwischengespeichert), „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
 | ⬆️ **Updates mit Vorschau** | Zu jeder vollen Stunde und auf Knopfdruck: neue Commits für das Dashboard (GitHub) und neue Versionen des Java-Servers. Zwei getrennte Knöpfe, nie automatisch. |
 | 🎨 **Eigenes Aussehen** | N8 Theme wie bei HBlink4-FreeRadioID und N8-Hotspot: 7 Profile inkl. hellem *Daylight*, jede Farbe frei wählbar, dazu Dashboard-Logo, Site-Icon und Client-Logos. |
+| 💾 **Backup & Wiederherstellen** | Alles in einer passwortverschlüsselten `.frnbak` – Datenbank, Branding, Konfiguration und Zugriffslisten des FRN-Servers. Einspielen per Knopf (mit Vorschau und automatischem Rückweg), per `frnadn restore`, beim Installieren oder direkt im **HobbyRadioPortal**. Nur Superadmin. |
 | 📥 **Import** | Eine alte `server.properties` nach der Neuinstallation übernehmen; nichts anderes wird kopiert. |
 | 🔒 **HTTPS** | Let's-Encrypt-Zertifikat, automatisch geholt und erneuert. |
 | 🧭 **Geführte Installation** | `scripts/install.sh` fragt alles ab, richtet beide Dienste ein und prüft am Ende das Ergebnis. |
@@ -116,6 +117,9 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 <td><img src="docs/images/admin-rooms.png" alt="Räume"><br><b>🏠 Rooms</b>: Räume net00 … net63 mit allen Parametern.</td>
 <td><img src="docs/images/admin-settings.png" alt="Einstellungen"><br><b>⚙️ Settings</b>: Server, SystemManager, Operator, Dashboard und Daten.</td>
 </tr>
+<tr>
+<td colspan="2"><img src="docs/images/admin-backup.png" alt="Backup und Wiederherstellen"><br><b>💾 Backup & ♻️ Wiederherstellen</b>: verschlüsselte <code>.frnbak</code> anlegen und herunterladen; ein Backup prüfen (Inhalt vorab sehen) und mit <code>RESTORE</code> einspielen – auch im HobbyRadioPortal.</td>
+</tr>
 </table>
 
 ## Dokumentation
@@ -129,7 +133,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |
-| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | Dienste, SystemManager-Fehler, typische Probleme, Sicherung, Testen ohne Funk |
+| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | Dienste, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
 | 🏷️ [Änderungen](CHANGELOG.md) | Was sich in welcher Version geändert hat |
 
 ## Aktualisieren

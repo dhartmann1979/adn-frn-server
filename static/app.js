@@ -1108,8 +1108,79 @@ async function loadSystem() {
             <div class="n8-sub">☕ Java FRN server</div>
             <div id="javaInfo" style="font-size:12.5px">–</div>
             <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button></div></div>
-        </div>`;
+        </div>
+        ${sa ? '<div class="grid g2" style="margin-top:14px" id="backupTiles"><div class="tile"><div class="empty">Loading …</div></div></div>' : ''}`;
     checkAllUpdates();
+    if (sa) loadBackups();
+}
+
+// ---------------------------------------------------------------- backup & restore (superadmin)
+// Encrypted .frnbak with its own password; also restorable in the HobbyRadioPortal (web installer → FRN → from a backup)
+async function loadBackups(manifest) {
+    const el = $('backupTiles'); if (!el) return;
+    let d; try { d = await api('GET', '/api/admin/backups'); } catch (e) { el.innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`; return; }
+    const lr = d.last_restore;
+    el.innerHTML = `<form class="tile" onsubmit="event.preventDefault(); createBackup(this)"><h3>💾 Backup</h3>
+        <div class="subt">Everything in one encrypted file (.frnbak): settings, users, rooms, access lists, FRN accounts, statistics, chat,
+        client logos, branding and the configuration of the FRN server. Choose a password – without it the backup cannot be opened, keep it in your password safe.
+        The latest backups stay on the server. The file can also be restored in the HobbyRadioPortal (web installer → FRN → from a backup).</div>
+        <div class="row"><label>Password for the backup (min. 10 characters)</label><input type="password" name="pw" minlength="${d.min_password}" required autocomplete="new-password"></div>
+        <div class="row"><label>Repeat</label><input type="password" name="pw2" required autocomplete="new-password"></div>
+        <div class="actions"><button class="btn primary">💾 Create backup</button></div>
+        ${d.backups.length ? `<div class="tbl-wrap" style="margin-top:10px"><table class="tbl"><thead><tr><th>Backup</th><th class="num">Size</th><th></th></tr></thead><tbody>
+            ${d.backups.map(b => `<tr><td>${fmtDate(b.created)}<br><span class="dim mono" style="font-size:11px">${esc(b.name)}</span></td><td class="num">${fmtBytes(b.size)}</td>
+            <td class="num"><a class="btn small" style="text-decoration:none" href="/api/admin/backups/${encodeURIComponent(b.name)}" download>⬇️ Download</a> <button type="button" class="btn small danger" onclick="deleteBackup('${esc(b.name)}')">✕</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No backups yet.</div>'}</form>
+      <form class="tile" onsubmit="event.preventDefault(); restoreBackup(this)"><h3>♻️ Restore</h3>
+        <div class="subt">Replaces database, branding and FRN configuration with the backup. The dashboard restarts, applies the backup and then
+        restarts the FRN server – connected stations reconnect by themselves. The current state is kept in before-restore-… in the data directory.
+        Afterwards you log in with the accounts from the backup.</div>
+        ${lr ? `<div class="notice-box"><span>${lr.ok ? '✅ Last restore' : '⚠️ Last restore failed'}</span>: <span>${fmtDate(lr.applied)}</span> · <span class="mono">${esc(lr.ok ? ((lr.manifest || {}).host || '') + ' ' + ((lr.manifest || {}).version || '') : lr.error || '')}</span></div>` : ''}
+        <div class="row"><label>Backup file (.frnbak)</label><input type="file" name="file" accept=".frnbak"></div>
+        <div class="row"><label>Password of the backup</label><input type="password" name="pw" autocomplete="off"></div>
+        <div id="restoreInfo">${manifest ? restoreInfo(manifest) : ''}</div>
+        ${manifest ? '<div class="row"><label>Type RESTORE to confirm</label><input type="text" name="confirm" autocomplete="off"></div>' : ''}
+        <div class="actions"><button type="button" class="btn" onclick="checkRestore(this.form)">🔍 Check</button>${manifest ? '<button class="btn danger">♻️ Restore now</button>' : ''}</div></form>`;
+}
+function restoreInfo(m) {
+    const c = m.counts || {};
+    return `<div class="kv" style="margin:8px 0"><div class="k">Backup</div><div class="v"><span class="mono">${esc([m.title, m.host, m.created_by].filter(Boolean).join(' · '))}</span> · ${fmtDate(m.created)}</div>
+        <div class="k">Version</div><div class="v">adn-frn-server ${esc(m.version || '')}</div>
+        <div class="k">Rooms</div><div class="v">${num(c.rooms)}</div><div class="k">Users</div><div class="v">${num(c.users)}</div>
+        <div class="k">FRN accounts</div><div class="v">${num(c.accounts)}</div><div class="k">Stations</div><div class="v">${num(c.stations)}</div>
+        <div class="k">Talks</div><div class="v">${num(c.talks)}</div></div>`;
+}
+async function createBackup(f) {
+    if (f.pw.value !== f.pw2.value) { toast('The passwords differ.', true); return; }
+    const b = f.querySelector('button.primary'); b.disabled = true;
+    try { const r = await api('POST', '/api/admin/backups', { password: f.pw.value }); toast('Backup created'); await loadBackups();
+          location.href = '/api/admin/backups/' + encodeURIComponent(r.name); }
+    catch (e) { toast(e.message, true); } finally { b.disabled = false; }
+}
+async function deleteBackup(name) {
+    if (!await confirmBox({ title: 'Delete this backup?', body: name }, 'Delete', 'danger')) return;
+    try { await api('DELETE', '/api/admin/backups/' + encodeURIComponent(name)); loadBackups(); } catch (e) { toast(e.message, true); }
+}
+async function checkRestore(f) {
+    const file = f.file.files[0];
+    try {
+        if (file) {
+            const r = await fetch('/api/admin/restore/upload', { method: 'POST', body: file, credentials: 'same-origin', headers: { 'X-N8': '1', 'Content-Type': 'application/octet-stream' } });
+            if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || j.detail || 'Upload failed'); }
+        }
+        const pw = f.pw.value;
+        const d = await api('POST', '/api/admin/restore/check', { password: pw });
+        S.admin.restorePw = pw;
+        await loadBackups(d.manifest);
+        const nf = $('backupTiles').querySelectorAll('form')[1]; nf.pw.value = pw;
+    } catch (e) { toast(e.message, true); }
+}
+async function restoreBackup(f) {
+    if (!await confirmBox({ title: 'Restore this backup now?', body: 'The dashboard restarts and replaces all data with the backup; the FRN server restarts too.' }, 'Restore', 'danger')) return;
+    try {
+        await api('POST', '/api/admin/restore', { password: f.pw.value, confirmation: (f.confirm || {}).value || '' });
+        toast('Restoring – the dashboard restarts …');
+        setTimeout(() => location.reload(), 6000);
+    } catch (e) { toast(e.message, true); }
 }
 
 async function loadThemeAdmin() {
@@ -1343,7 +1414,7 @@ async function loadAudit() {
         user_created: '➕ User', user_changed: '✏️ User', user_deleted: '🗑️ User', password_changed: '🔑 Password', reboot: '🔄 Reboot', poweroff: '⏻ Shutdown',
         session_revoked: '🚫 Session', update: '⬆️ Update', frn_start: '▶ FRN server', frn_stop: '⏹ FRN server', frn_restart: '🔄 FRN server',
         frn_update: '⬆️ FRN update', rooms: '🏠 Rooms', frn_account: '🔑 FRN account', app_restart: '♻️ Dashboard',
-        api_token_created: '🔌 API token', api_token_revoked: '🔌 API token revoked', acl: '🚦 Lists' };
+        api_token_created: '🔌 API token', api_token_revoked: '🔌 API token revoked', acl: '🚦 Lists', backup_created: '💾 Backup created', backup_downloaded: '💾 Backup downloaded', backup_deleted: '💾 Backup deleted', backup_restore: '♻️ Restore started', backup_restored: '♻️ Backup restored' };
     $('admin-audit').innerHTML = `<div class="grid g2">
         <div class="tile"><h3>🔑 Active sessions</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>User</th><th>IP</th><th class="hide-sm">Since</th><th></th></tr></thead><tbody>
         ${s.sessions.map(x => `<tr><td>${esc(x.username)}</td><td class="mono">${esc(x.ip)}</td><td class="hide-sm">${fmtDate(x.created_at)}</td><td class="num"><button class="btn small" onclick="revokeS('${x.id}')">End</button></td></tr>`).join('')}

@@ -23,6 +23,8 @@
 #    FRN_DIR=/opt/frn-server      Verzeichnis für FRN_Server.jar
 #    FRN_ZIP=/pfad/FRN_Server.zip vorhandenes Paket statt Download
 #    FRNADN_YES=1                 keine Fragen, Vorgaben übernehmen
+#    FRNADN_RESTORE=/pfad/x.frnbak          statt Einrichtung ein Backup einspielen (ohne Fragen)
+#    FRNADN_RESTORE_PASSWORD_FILE=/pfad     Passwort des Backups (erste Zeile) – z. B. für den HobbyRadioPortal-Installer
 # =============================================================================
 set -euo pipefail
 
@@ -178,6 +180,27 @@ CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
 cget() { python3 -c "import json,sys; d=json.loads(sys.argv[1] or '{}'); v=d.get(sys.argv[2], ''); print(', '.join(v) if isinstance(v, list) else v)" "$CUR" "$1" 2>/dev/null || true; }
 cdef() { local v; v="$(cget "$1")"; echo "${v:-$2}"; }
 
+RESTORED=0
+if [ -n "${FRNADN_RESTORE:-}" ]; then
+    [ -f "$FRNADN_RESTORE" ] || fail "Backup nicht gefunden: $FRNADN_RESTORE"
+    [ -f "${FRNADN_RESTORE_PASSWORD_FILE:-}" ] || fail "FRNADN_RESTORE_PASSWORD_FILE fehlt (Passwort des Backups)"
+    systemctl stop frnadn 2>/dev/null || true
+    install -m 600 -o "$SVC_USER" -g "$SVC_USER" "$FRNADN_RESTORE" "$DATA/restore-install.frnbak"
+    BKPW="$(head -n1 "$FRNADN_RESTORE_PASSWORD_FILE")"
+    if (cd "$DIR" && sudo -u "$SVC_USER" env FRNADN_DATA="$DATA" FRNADN_FRN_HOME="$FRN_HOME" FRNADN_PASSWORD="$BKPW" "$PY" -m frnadn restore "$DATA/restore-install.frnbak"); then
+        RESTORED=1; YES=1
+    fi
+    rm -f "$DATA/restore-install.frnbak"; unset BKPW
+    [ "$RESTORED" = 1 ] || fail "Backup nicht eingespielt (Passwort falsch oder Datei beschädigt)"
+    ok "Backup eingespielt – Einstellungen, Räume, Listen, FRN-Konten, Benutzer, Statistik und Branding übernommen"
+fi
+
+if [ "$RESTORED" = 1 ]; then
+step 5 "Superadmin für das Admin-Portal"; ok "aus dem Backup übernommen – Anmeldung mit den Konten des alten Servers"
+step 6 "FRN-Server einrichten"; run_app write-config >/dev/null && ok "server.properties und Zugriffslisten aus dem Backup geschrieben"
+CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
+FPORT="$(cdef frn.port 10024)"
+else
 # ---------------------------------------------------------------------------
 step 5 "Superadmin für das Admin-Portal"
 SA_USER=""; SA_PASS=""; SA_NEW=1
@@ -277,6 +300,7 @@ rm -f /tmp/frnadn-setup.json
 unset SA_PASS SA_REP SM_PASS
 CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
 FPORT="$(cdef frn.port 10024)"
+fi   # neu einrichten
 
 # ---------------------------------------------------------------------------
 step 7 "Dienste frn-server und frnadn"
