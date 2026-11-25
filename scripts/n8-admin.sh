@@ -148,6 +148,7 @@ ck_mode() {   # ck_mode Bereich Pfad besitzer:gruppe modus Text
 }
 prune_args() {   # find-Ausschlüsse: beschreibbare Ordner im Programmverzeichnis
   local d; PRUNE=(); for d in "${N8_DATA_DIRS[@]}" "${N8_WRITABLE_IN_APP[@]}"; do [[ "$d" == "$APP"/* ]] && PRUNE+=(-path "$d" -prune -o); done
+  return 0   # set -e: sonst beendet der letzte nicht passende Ordner das ganze Skript (fix-perms brach nach „korrigiere …“ ab)
 }
 check_perms() {
   local -; set +e +o pipefail

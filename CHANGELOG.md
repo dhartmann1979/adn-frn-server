@@ -2,6 +2,18 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.13.1 – 2026-11-25
+
+### 🐛 Fix: `n8-admin.sh fix-perms` brach nach „korrigiere …“ ohne Meldung ab
+- Im gemeinsamen N8 Admin-Kit endete die Hilfsfunktion für die Ausschlüsse im Programmordner (`prune_args`) mit dem Status des
+  letzten Vergleichs. Unter `set -e` beendete das das ganze Skript – **ohne Fehlermeldung**, direkt nach „korrigiere …“.
+  Betroffen waren `fix-perms`, „Korrigieren“ im Webinterface und **jedes Update** (Abbruch nach der Zeile „Version: …“, also vor
+  Rechten, sudo, Neustart und Prüfung). Die Funktion gibt jetzt immer 0 zurück; im Test korrigiert `fix-perms` alle Fehler und prüft erneut.
+- `n8-admin.conf`: Werte aus der Unit (`grep … | cut`) brechen nicht mehr ab, wenn die Zeile fehlt (z. B. kein eigener Port eingetragen).
+
+> **Auf bestehenden Servern einmalig** (das laufende alte Skript kann sich nicht selbst reparieren):
+> `sudo git -c safe.directory=/opt/adn-frn-server -C /opt/adn-frn-server pull --ff-only && sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms`
+
 ## 2.13.0 – 2026-11-25
 
 **🧩 Gleiches Update-System wie N8 Crosslink – mit Berechtigungsprüfer, sudo-Einrichtung und schlanker Dienste-Übersicht. HobbyRadioPortal-Anbindung entfernt.**
