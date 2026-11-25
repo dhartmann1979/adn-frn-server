@@ -148,19 +148,9 @@
 
     <!-- ================= ADMIN ================= -->
     <section id="tab-admin" class="hidden">
-        <nav class="tabs sub" id="adminTabs">
-            <button data-a="settings" class="active">⚙️ Settings</button>
-            <button data-a="rooms">🏠 Rooms</button>
-            <button data-a="lists">🛡️ Server lists</button>
-            <button data-a="accounts">🔑 FRN accounts</button>
-            <button data-a="users">👥 Users</button>
-            <button data-a="system">🖥️ System</button>
-            <button data-a="theme">🎨 Theme</button>
-            <button data-a="links">🔗 Links</button>
-            <button data-a="import">📥 Import</button>
-            <button data-a="logs">📜 Logs</button>
-            <button data-a="audit">🔐 Sessions &amp; log</button>
-        </nav>
+        <div class="n8-admin">
+        <nav id="adminNav" aria-label="Admin"></nav>
+        <div class="n8-admin-main">
         <div id="admin-settings"></div>
         <div id="admin-rooms" class="hidden"></div>
         <div id="admin-lists" class="hidden"></div>
@@ -172,6 +162,8 @@
         <div id="admin-import" class="hidden"></div>
         <div id="admin-logs" class="hidden"></div>
         <div id="admin-audit" class="hidden"></div>
+        <div id="admin-sys" class="hidden"></div>
+        </div></div>
     </section>
 
     <footer class="site-footer" id="siteFooter">

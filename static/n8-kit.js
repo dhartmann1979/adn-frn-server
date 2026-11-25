@@ -1,6 +1,6 @@
 /*
- * N8 Kit 1.0.1 – shared by the N8schicht web interfaces
- * (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
+ * N8 Kit 1.1.0 – shared by the N8schicht web interfaces
+ * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
  *   N8Kit.lang()                 'de' | 'en'   (cookie n8_lang, valid for every port of the host → all four pages)
@@ -11,6 +11,8 @@
  *   N8Kit.update.banner(el, state, handlers)   update banner under the status strip
  *   N8Kit.update.panel(el, state, handlers)    Admin → Updates
  *   N8Kit.update.run(opts)                     install with progress, health check and reload
+ *   N8Kit.nav.tree(el, groups, opts)           admin menu as a tree on the left (same structure in every N8 system)
+ *   N8Kit.sys.view(el, name, opts)             the same System views everywhere: update, services, perms, keepalive
  *
  * Translation works on the finished page: text nodes and the attributes title, placeholder, aria-label
  * and alt are looked up in the dictionary of the page language (exact text, then without leading
@@ -408,6 +410,178 @@
         });
     }
 
+
+    // ============================================================ admin menu as a tree (1.1.0)
+    // groups: [{ id, label, items: [{ id, label, hidden }] }] – labels with a leading emoji. opts: { active, onSelect(id), key }
+    // The same groups in every N8 system: Betrieb · Benutzer & Zugang · Darstellung · Netz & Domains · System.
+    function tree(el, groups, opts) {
+        opts = opts || {};
+        const key = 'n8nav:' + (opts.key || location.pathname);
+        let closed = {};
+        try { closed = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { closed = {}; }
+        const act = opts.active;
+        const items = groups.map(g => ({ ...g, items: (g.items || []).filter(i => !i.hidden) })).filter(g => g.items.length);
+        const cur = items.flatMap(g => g.items).find(i => i.id === act);
+        el.classList.add('n8-tree');
+        el.innerHTML = `<button type="button" class="n8-tree-toggle">☰ <span>${esc(cur ? cur.label : 'Menü')}</span></button>
+            <div class="n8-tree-body">${items.map(g => {
+                const open = !closed[g.id] || g.items.some(i => i.id === act);
+                return `<div class="n8-tree-g ${open ? 'open' : ''}" data-g="${esc(g.id)}">
+                    <button type="button" class="n8-tree-gh"><span class="n8-tree-car">▸</span>${esc(g.label)}</button>
+                    <div class="n8-tree-items">${g.items.map(i => `<button type="button" class="n8-tree-i ${i.id === act ? 'on' : ''}" data-i="${esc(i.id)}">${esc(i.label)}${i.badge ? `<span class="n8-badge ${esc(i.badgeClass || '')}">${esc(i.badge)}</span>` : ''}</button>`).join('')}</div></div>`;
+            }).join('')}</div>`;
+        el.querySelector('.n8-tree-toggle').onclick = () => el.classList.toggle('open');
+        el.querySelectorAll('.n8-tree-gh').forEach(b => b.onclick = () => {
+            const g = b.parentElement; g.classList.toggle('open'); closed[g.dataset.g] = !g.classList.contains('open');
+            try { localStorage.setItem(key, JSON.stringify(closed)); } catch (e) { /* private mode */ }
+        });
+        el.querySelectorAll('.n8-tree-i').forEach(b => b.onclick = () => {
+            el.querySelectorAll('.n8-tree-i').forEach(x => x.classList.toggle('on', x === b));
+            el.querySelector('.n8-tree-toggle span').textContent = t(b.textContent.trim());
+            el.classList.remove('open');
+            if (opts.onSelect) opts.onSelect(b.dataset.i);
+        });
+        retranslateEl(el);
+    }
+    function retranslateEl(el) { try { walk(el); } catch (e) { /* not started yet */ } }
+
+    // ============================================================ System views (1.1.0) – identical in every N8 system
+    // opts.req(method, url, body) → JSON (the page's own fetch with its CSRF header); endpoints are the same everywhere:
+    //   /api/admin/services · /api/admin/services/<unit>/<action> · /api/admin/perms · /api/admin/perms/fix
+    //   /api/admin/keepalive · /api/admin/update-log
+    // opts.update = { load(force) → state for update.panel, install() → result, version() → string } for the view 'update'
+    //   (or onInstall(state) to open the project's own N8Kit.update.run dialog). Updates never ask for a password.
+    // opts.console = 'sudo /opt/…/scripts/n8-admin.sh' (shown in hints); opts.extra(el) appends project-specific content
+    const SVC = { active: 'läuft', inactive: 'gestoppt', failed: 'Fehler', activating: 'startet', deactivating: 'stoppt', reloading: 'lädt neu' };
+    const AREA = { user: '👤 Dienstbenutzer', prog: '📦 Programm', data: '💾 Daten', systemd: '⚙️ systemd', sudo: '🛡️ sudo', hw: '🔌 Hardware',
+                   source: '🧬 Quellordner', usb: '🔌 USB-Vocoder', https: '🔒 Domains & HTTPS' };
+    const fmt = ts => ts ? new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
+    function card(title, body, badge) {
+        return `<section class="n8-card"><h3>${esc(title)}${badge ? ' ' + badge : ''}</h3>${body}</section>`;
+    }
+    async function view(el, name, o) {
+        o = o || {};
+        const req = o.req, cons = o.console || 'sudo scripts/n8-admin.sh';
+        const msg = (e) => `<div class="n8-help">⚠️ ${esc(e && e.message ? e.message : String(e))}</div>`;
+        el.classList.add('n8-sys');
+        el.innerHTML = '<div class="n8-help">…</div>';
+        const paint = (html) => { el.innerHTML = html; retranslateEl(el); };
+        if (name === 'update') {
+            paint(`<div class="n8-sys-grid">${card('⬆️ Update', '<div class="n8-upd-panel"></div>')}${card('📜 Update-Protokoll', '<div class="n8-sys-log">…</div>')}</div><div class="n8-sys-extra"></div>`);
+            const box = el.querySelector('.n8-upd-panel');
+            const load = async (force) => {
+                let st; try { st = await o.update.load(force); } catch (e) { box.innerHTML = msg(e); return; }
+                if (!st) { box.innerHTML = msg(t('Keine Antwort')); return; }
+                panel(box, st, { onCheck: () => load(true), onInstall: () => o.update.onInstall ? o.update.onInstall(st) : run({
+                    from: st.current, to: st.latest, text: st.notes || '', password: false, timeout: 600000,
+                    install: () => o.update.install(), version: () => o.update.version() }) });
+            };
+            await load(false);
+            const logEl = el.querySelector('.n8-sys-log');
+            const loadLog = async () => {
+                let d; try { d = await req('GET', '/api/admin/update-log'); } catch (e) { logEl.innerHTML = msg(e); return; }
+                const r = d.result;
+                logEl.innerHTML = `${r ? `<div class="n8-kv"><span>${esc(t('Letztes Update'))}</span><span><span class="n8-badge ${r.ok ? 'ok' : 'bad'}">${esc(t(r.ok ? 'erfolgreich' : 'zurückgenommen'))}</span> ${esc(r.from || '')} → ${esc(r.to || '')} · ${fmt(r.time)}</span>${r.message ? `<span>${esc(t('Meldung'))}</span><span>${esc(r.message)}</span>` : ''}</div>` : ''}
+                    <pre class="n8-log">${esc(d.log || t('Noch kein Update über die Weboberfläche.'))}</pre>
+                    <div class="n8-actions"><button type="button" class="n8-btn" data-a="reload">↻ ${esc(t('Neu laden'))}</button></div>`;
+                logEl.querySelector('[data-a=reload]').onclick = loadLog;
+                if (d.running || d.pending) setTimeout(() => { if (document.body.contains(logEl)) loadLog(); }, 3000);
+            };
+            loadLog();
+            if (o.extra) o.extra(el.querySelector('.n8-sys-extra'));
+            return;
+        }
+        if (name === 'services') {
+            const load = async () => {
+                let d; try { d = await req('GET', '/api/admin/services'); } catch (e) { paint(card('🧩 Dienste', msg(e))); return; }
+                const units = (d.units || []).filter(u => !u.hidden);
+                const can = (u, a) => (u.actions || []).includes(a);
+                const rows = units.map(u => {
+                    const st = u.active === 'active' ? 'ok' : u.active === 'failed' ? 'bad' : 'warn';
+                    const btn = (a, ic, ti) => can(u, a) ? `<button type="button" class="n8-btn sm ${a === 'stop' ? 'danger' : ''}" title="${esc(t(ti))}" data-u="${esc(u.unit)}" data-a="${a}">${ic}</button>` : '';
+                    return `<div class="n8-svc"><div class="n8-svc-n"><b>${esc(u.label || u.unit)}</b><code>${esc(u.unit)}</code></div>
+                        <span class="n8-badge ${st}">${esc(t(SVC[u.active] || u.active))}</span>
+                        <span class="n8-svc-a">${can(u, 'enable') || can(u, 'disable') ? `<label class="n8-sw"><input type="checkbox" data-auto="${esc(u.unit)}" ${u.enabled === 'enabled' ? 'checked' : ''}><i></i> ${esc(t('Autostart'))}</label>` : `<span class="n8-dim">${esc(t(u.enabled === 'enabled' ? 'Autostart an' : u.enabled || ''))}</span>`}</span>
+                        <span class="n8-svc-b">${u.active === 'active' ? btn('restart', '↻', 'Neu starten') + btn('stop', '■', 'Stoppen') : btn('start', '▶', 'Starten')}</span></div>`;
+                }).join('');
+                paint(card('🧩 Dienste', `<p class="n8-help">${esc(t('Zustand, Autostart beim Booten und Starten · Stoppen · Neu starten – nur, was dieses System freigibt. Ein hier gestoppter Dienst wird vom Keep-Alive nicht wieder gestartet.'))}</p>
+                    ${units.length ? `<div class="n8-svc-list">${rows}</div>` : `<div class="n8-help">${esc(t('Noch nicht eingerichtet – einmal auf der Konsole:'))} <code>${esc(cons)} fix-perms</code></div>`}`));
+                el.querySelectorAll('[data-a]').forEach(b => b.onclick = async () => {
+                    const u = b.dataset.u, a = b.dataset.a;
+                    if (a === 'stop' && !confirm(t('Dienst stoppen?') + '\n' + u)) return;
+                    b.disabled = true;
+                    try { await req('POST', `/api/admin/services/${encodeURIComponent(u)}/${a}`, {}); } catch (e) { alert(e.message); }
+                    setTimeout(load, a === 'stop' ? 500 : 1500);
+                });
+                el.querySelectorAll('[data-auto]').forEach(c => c.onchange = async () => {
+                    const a = c.checked ? 'enable' : 'disable';
+                    if (a === 'disable' && !confirm(t('Autostart ausschalten? Nach einem Neustart des Servers startet der Dienst dann nicht mehr von selbst.'))) { c.checked = true; return; }
+                    try { await req('POST', `/api/admin/services/${encodeURIComponent(c.dataset.auto)}/${a}`, {}); } catch (e) { alert(e.message); }
+                    load();
+                });
+            };
+            return load();
+        }
+        if (name === 'perms') {
+            const show = (d, out) => {
+                const rows = d.checks || [];
+                const badge = !rows.length ? `<span class="n8-badge warn">${esc(t('nicht geprüft'))}</span>` : d.bad ? `<span class="n8-badge bad">${d.bad} ${esc(t('Fehler'))}</span>` : `<span class="n8-badge ok">${esc(t('alles in Ordnung'))}</span>`;
+                const areas = [...new Set(rows.map(c => c.area))];
+                const bad = rows.filter(c => c.status !== 'ok');
+                paint(card('🔐 Berechtigungen & sudo', `<p class="n8-help">${esc(t('Prüft Dienstbenutzer, Programm (root, für den Dienst schreibgeschützt), Daten und Passwörter, systemd-Dienste, „Update jetzt“, Keep-Alive und die sudo-Freigaben. Korrigieren repariert, was falsch ist, und prüft erneut.'))}
+                        <br>${esc(t('Konsole:'))} <code>${esc(cons)} check-perms</code> · <code>fix-perms</code></p>
+                    ${!rows.length ? `<div class="n8-help">${esc(d.message || '–')}</div>` : `
+                    ${bad.length ? `<div class="n8-perm">${bad.map(c => `<div class="n8-perm-r">${c.status === 'warn' ? '⚠️' : '❌'}<b>${esc(t(AREA[c.area] || c.area))}</b><span>${esc(c.text)}</span></div>`).join('')}</div>` : ''}
+                    <details class="n8-perm-ok"><summary>${rows.length - bad.length} ${esc(t('Prüfungen in Ordnung'))}</summary><div class="n8-perm">${areas.map(a => rows.filter(c => c.area === a && c.status === 'ok').map(c => `<div class="n8-perm-r">✅<b>${esc(t(AREA[a] || a))}</b><span>${esc(c.text)}</span></div>`).join('')).join('')}</div></details>`}
+                    ${out ? `<pre class="n8-log">${esc(out)}</pre>` : ''}
+                    <div class="n8-actions"><button type="button" class="n8-btn" data-a="check">🔍 ${esc(t('Erneut prüfen'))}</button><button type="button" class="n8-btn primary" data-a="fix">🛠️ ${esc(t('Korrigieren'))}</button></div>`, badge));
+                el.querySelector('[data-a=check]').onclick = load;
+                el.querySelector('[data-a=fix]').onclick = async (e) => {
+                    e.target.disabled = true; e.target.textContent = t('Korrigiere …');
+                    try { const r = await req('POST', '/api/admin/perms/fix', {}); show(r.check || {}, (r.message || '').replace(/\x1b\[[0-9;]*m/g, '')); }
+                    catch (x) { alert(x.message); load(); }
+                };
+            };
+            const load = async () => {
+                paint(card('🔐 Berechtigungen & sudo', `<div class="n8-help">${esc(t('Prüfe …'))}</div>`));
+                try { show(await req('GET', '/api/admin/perms')); } catch (e) { paint(card('🔐 Berechtigungen & sudo', msg(e))); }
+            };
+            return load();
+        }
+        if (name === 'keepalive') {
+            const load = async () => {
+                let d; try { d = await req('GET', '/api/admin/keepalive'); } catch (e) { paint(card('💓 Keep-Alive', msg(e))); return; }
+                const c = d.conf || {}, paused = c.paused_until && c.paused_until * 1000 > Date.now();
+                const badge = !d.ready ? `<span class="n8-badge warn">${esc(t('nicht eingerichtet'))}</span>` : !c.enabled ? `<span class="n8-badge">${esc(t('aus'))}</span>`
+                    : paused ? `<span class="n8-badge warn">${esc(t('pausiert'))}</span>` : d.stale ? `<span class="n8-badge bad">${esc(t('läuft nicht'))}</span>` : `<span class="n8-badge ok">${esc(t('aktiv'))}</span>`;
+                const ic = st => ({ ok: '✅', hold: '⏸️', restarted: '🔄', giveup: '❌' }[st] || '⚠️');
+                paint(card('💓 Keep-Alive', `<p class="n8-help">${esc(t('Jede Minute als root: prüft jeden Dienst wirklich (Weboberfläche und Verbindungen der Protokolle), startet kranke Dienste nach ein paar Minuten neu (höchstens 4× je Stunde), erkennt Internet-Ausfälle und startet danach die Netzdienste neu, und meldet sich bei einer Heartbeat-Adresse (Uptime Kuma „Push“, Healthchecks.io …). Ein von Hand gestoppter Dienst bleibt gestoppt.'))}</p>
+                    ${d.ready ? `<div class="n8-kv"><span>🌐 ${esc(t('Internet'))}</span><span>${d.net ? `<span class="n8-badge ok">${esc(t('erreichbar'))}</span>` : `<span class="n8-badge bad">${esc(t('weg seit'))} ${fmt(d.net_down_since)}</span>`}</span>
+                        <span>${esc(t('Letzte Prüfung'))}</span><span>${d.age != null && d.age < 120 ? esc(t('gerade eben')) : fmt(d.time)}</span>
+                        ${c.heartbeat_url ? `<span>${esc(t('Heartbeat'))}</span><span>${esc(d.heartbeat || '–')}</span>` : ''}</div>
+                      <div class="n8-perm" style="margin-top:10px">${(d.checks || []).map(x => `<div class="n8-perm-r">${ic(x.state)}<b>${esc(x.label)}</b><span><span>${esc(t(x.state === 'ok' ? 'gesund' : x.state === 'hold' ? 'von Hand gestoppt – Keep-Alive wartet' : ''))}</span>${x.state !== 'ok' && x.state !== 'hold' ? esc(x.why || '') : ''}${x.restarts ? ` · <span>${x.restarts}× ${esc(t('neu gestartet'))}</span>, ${fmt(x.last_restart)}` : ''}</span></div>`).join('')}</div>`
+                      : `<div class="n8-help">${esc(t('Einmal auf der Konsole einrichten:'))} <code>${esc(cons)} fix-perms</code></div>`}
+                    <form class="n8-form">
+                      <label class="n8-sw"><input type="checkbox" name="enabled" ${c.enabled ? 'checked' : ''}><i></i> ${esc(t('Keep-Alive an'))}</label>
+                      <label class="n8-sw"><input type="checkbox" name="net_restart" ${c.net_restart ? 'checked' : ''}><i></i> ${esc(t('Netzdienste nach einem Internet-Ausfall neu starten'))}</label>
+                      <label>${esc(t('Heartbeat-Adresse'))}<input name="heartbeat_url" value="${esc(c.heartbeat_url || '')}" placeholder="https://hc-ping.com/… · https://kuma…/api/push/…"></label>
+                      <label>${esc(t('Heartbeat bei Fehlern (optional)'))}<input name="heartbeat_fail_url" value="${esc(c.heartbeat_fail_url || '')}" placeholder="https://hc-ping.com/…/fail"></label>
+                      <div class="n8-actions"><button type="button" class="n8-btn" data-a="pause">${esc(t(paused ? '▶ Fortsetzen' : '⏸ 1 h pausieren (Wartung)'))}</button><button class="n8-btn primary">💾 ${esc(t('Speichern'))}</button></div></form>
+                    ${d.log ? `<details class="n8-perm-ok"><summary>${esc(t('Keep-Alive-Protokoll'))}</summary><pre class="n8-log">${esc(d.log)}</pre></details>` : ''}`, badge));
+                const f = el.querySelector('form');
+                f.onsubmit = async (e) => { e.preventDefault();
+                    try { await req('POST', '/api/admin/keepalive', { enabled: f.enabled.checked, net_restart: f.net_restart.checked, heartbeat_url: f.heartbeat_url.value.trim(), heartbeat_fail_url: f.heartbeat_fail_url.value.trim() }); load(); }
+                    catch (x) { alert(x.message); } };
+                f.querySelector('[data-a=pause]').onclick = async () => { try { await req('POST', '/api/admin/keepalive', { pause_minutes: paused ? 0 : 60 }); load(); } catch (x) { alert(x.message); } };
+            };
+            return load();
+        }
+    }
+
+    // the menu structure every N8 system uses (projects fill in their items)
+    const GROUPS = { betrieb: '📡 Betrieb', zugang: '👥 Benutzer & Zugang', darstellung: '🎨 Darstellung', netz: '🌐 Netz & Domains', system: '🖥️ System' };
+    const SYS_ITEMS = [['sys-update', '⬆️ Update'], ['sys-services', '🧩 Dienste'], ['sys-perms', '🔐 Berechtigungen & sudo'], ['sys-keepalive', '💓 Keep-Alive']];
+
     // ------------------------------------------------------------ the kit's own words
     add({
         base: 'de', en: {
@@ -430,6 +604,33 @@
             'Der Dienst antwortet noch nicht. Bitte in ein paar Minuten neu laden oder das Update-Protokoll ansehen.': 'The service does not answer yet. Reload in a few minutes or look at the update log.',
             'Sprache / Language': 'Language / Sprache',
             'immer': 'always', 'aus': 'off', 'nie': 'never',
+            // 1.1.0: menu tree and System views
+            'Menü': 'Menu', '📡 Betrieb': '📡 Operation', '👥 Benutzer & Zugang': '👥 Users & access', '🎨 Darstellung': '🎨 Appearance',
+            '🌐 Netz & Domains': '🌐 Network & domains', '🖥️ System': '🖥️ System', '⬆️ Update': '⬆️ Update', '🧩 Dienste': '🧩 Services',
+            '🔐 Berechtigungen & sudo': '🔐 Permissions & sudo', '💓 Keep-Alive': '💓 Keep-alive', 'Betrieb': 'Operation', 'Benutzer & Zugang': 'Users & access',
+            'Darstellung': 'Appearance', 'Netz & Domains': 'Network & domains', 'Dienste': 'Services', 'Berechtigungen & sudo': 'Permissions & sudo',
+            'läuft': 'running', 'gestoppt': 'stopped', 'Fehler': 'errors', 'startet': 'starting', 'stoppt': 'stopping', 'lädt neu': 'reloading',
+            'Autostart': 'Autostart', 'Autostart an': 'autostart on', 'Neu starten': 'Restart', 'Stoppen': 'Stop', 'Starten': 'Start', 'Dienst stoppen?': 'Stop the service?',
+            'Zustand, Autostart beim Booten und Starten · Stoppen · Neu starten – nur, was dieses System freigibt. Ein hier gestoppter Dienst wird vom Keep-Alive nicht wieder gestartet.':
+                'State, autostart at boot and start · stop · restart – only what this system allows. A service stopped here is not started again by the keep-alive.',
+            'Noch nicht eingerichtet – einmal auf der Konsole:': 'Not set up yet – run once on the console:',
+            'Autostart ausschalten? Nach einem Neustart des Servers startet der Dienst dann nicht mehr von selbst.': 'Switch off autostart? After a reboot the service does not start by itself.',
+            'nicht geprüft': 'not checked', 'alles in Ordnung': 'all fine', 'Konsole:': 'Console:', 'Prüfungen in Ordnung': 'checks fine', 'Erneut prüfen': 'Check again',
+            'Korrigieren': 'Fix', 'Korrigiere …': 'Fixing …', 'Prüfe …': 'Checking …',
+            'Prüft Dienstbenutzer, Programm (root, für den Dienst schreibgeschützt), Daten und Passwörter, systemd-Dienste, „Update jetzt“, Keep-Alive und die sudo-Freigaben. Korrigieren repariert, was falsch ist, und prüft erneut.':
+                'Checks the service user, program (root, read-only for the service), data and passwords, systemd services, “Update now”, keep-alive and the sudo rules. Fix repairs what is wrong and checks again.',
+            '👤 Dienstbenutzer': '👤 Service user', '📦 Programm': '📦 Program', '💾 Daten': '💾 Data', '🔌 Hardware': '🔌 Hardware', '🧬 Quellordner': '🧬 Source folder',
+            '🔌 USB-Vocoder': '🔌 USB vocoder', '🔒 Domains & HTTPS': '🔒 Domains & HTTPS',
+            'nicht eingerichtet': 'not set up', 'pausiert': 'paused', 'läuft nicht': 'not running', 'aktiv': 'active', 'Internet': 'Internet', 'erreichbar': 'reachable',
+            'weg seit': 'down since', 'Letzte Prüfung': 'Last check', 'gerade eben': 'just now', 'Heartbeat': 'Heartbeat', 'gesund': 'healthy',
+            'von Hand gestoppt – Keep-Alive wartet': 'stopped by hand – keep-alive waits', 'neu gestartet': 'restarted', 'Einmal auf der Konsole einrichten:': 'Set up once on the console:',
+            'Keep-Alive an': 'Keep-alive on', 'Netzdienste nach einem Internet-Ausfall neu starten': 'Restart network services after an internet outage',
+            'Heartbeat-Adresse': 'Heartbeat address', 'Heartbeat bei Fehlern (optional)': 'Heartbeat on errors (optional)', '▶ Fortsetzen': '▶ Resume',
+            '⏸ 1 h pausieren (Wartung)': '⏸ Pause 1 h (maintenance)', 'Speichern': 'Save', 'Keep-Alive-Protokoll': 'Keep-alive log',
+            'Jede Minute als root: prüft jeden Dienst wirklich (Weboberfläche und Verbindungen der Protokolle), startet kranke Dienste nach ein paar Minuten neu (höchstens 4× je Stunde), erkennt Internet-Ausfälle und startet danach die Netzdienste neu, und meldet sich bei einer Heartbeat-Adresse (Uptime Kuma „Push“, Healthchecks.io …). Ein von Hand gestoppter Dienst bleibt gestoppt.':
+                'Every minute as root: checks every service for real (web interface and the connections of the protocols), restarts sick services after a few minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address (Uptime Kuma “push”, Healthchecks.io …). A service stopped by hand stays stopped.',
+            'Meldung': 'Message', 'Noch kein Update über die Weboberfläche.': 'No update through the web interface yet.', 'Neu laden': 'Reload',
+            '📜 Update-Protokoll': '📜 Update log',
         }
     });
     add({
@@ -465,10 +666,12 @@
     });
 
     window.N8Kit = {
-        version: '1.0.1',
+        version: '1.1.0',
         lang: () => lang, setLang, t, langSwitch, esc, fmtTime,
         i18n: { add, retranslate: () => { cache.clear(); retranslate(); }, t },
         update: { banner, panel, run },
+        nav: { tree, GROUPS, SYS_ITEMS },
+        sys: { view },
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();

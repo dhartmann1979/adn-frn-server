@@ -176,7 +176,7 @@
         const admin = typeof isAdmin === 'function' && isAdmin();
         if (!admin) { el.hidden = true; return; }
         N8Kit.update.banner(el, kitState(r), { app: 'frnadn', onInstall: () => window.upgradeNow('github'),
-            onDetails: () => showTab('admin', 'system') });
+            onDetails: () => showTab('admin', 'sys-update') });
     }
     async function bannerCheck() {
         if (!(typeof isAdmin === 'function' && isAdmin())) return renderBanner(null);
@@ -196,6 +196,20 @@
         return `<div class="upd-row"><div class="upd-top"><b>☕ Java FRN server</b> <span class="dim">freeradionetwork.de</span>${badge}</div>
             <div class="upd-ver">Installed: ${inst}</div>${detail}</div>`;
     }
+
+    // Admin → System → Update (N8 Kit view): state for the panel, the Java FRN server below it
+    window.adnUpdate = {
+        load: async (force) => {
+            const r = force ? await api('POST', '/api/admin/updates/check', {}) : await api('GET', '/api/admin/updates');
+            lastUpd = r; renderBanner(r); return kitState(r);
+        },
+        java: (box) => {
+            const java = (lastUpd && lastUpd.java) || {};
+            box.innerHTML = `<section class="n8-card"><h3>☕ Java FRN server</h3>${javaRow(java)}
+                <div class="n8-actions"><button type="button" class="n8-btn primary" id="upgradeJava" ${java.ok && java.update ? '' : 'disabled'}>⬆️ Upgrade Java now</button></div></section>`;
+            byId('upgradeJava').onclick = (e) => window.upgradeNow('java', e.target);
+        },
+    };
 
     // opening System uses the cached result (max. 10 minutes old); "Check now" asks GitHub and freeradionetwork.de again
     window.checkAllUpdates = async function (btn, force) {
@@ -266,7 +280,7 @@
         try {
             const r = await api('POST', '/api/admin/updates/upgrade', { target });
             toast('Java FRN server upgraded' + (r.installed ? ' to ' + r.installed.version : '') + '.');
-            await window.checkAllUpdates(null, true);
+            if (typeof loadSysView === 'function' && S.admin.tab === 'sys-update') loadSysView('update'); else await window.checkAllUpdates(null, true);
         } catch (e) { toast(e.message, true); if (btn) btn.disabled = false; }
     };
 

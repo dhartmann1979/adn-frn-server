@@ -3,6 +3,8 @@
 N8Kit.i18n.add({
     base: 'en',
     de: {
+        // 2.14.0: admin menu tree
+        'Server & data': 'Server & Daten', 'Upgrade Java now': 'Java jetzt aktualisieren', 'Java FRN server': 'Java-FRN-Server',
         // 2.14.0: Keep-Alive (N8 Admin-Kit)
         'Every minute as root: checks each service for real (dashboard, Java FRN server running and accepting stations), restarts sick ones after 3 minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address.': 'Jede Minute als root: prüft jeden Dienst wirklich (Dashboard, Java-FRN-Server läuft und nimmt Stationen an), startet kranke Dienste nach 3 Minuten neu (höchstens 4× je Stunde), erkennt Internet-Ausfälle und startet danach die Netzdienste neu, und meldet sich bei einer Heartbeat-Adresse.',
         'Keep-Alive': 'Keep-Alive', 'active': 'aktiv', 'off': 'aus', 'paused': 'pausiert', 'not running': 'läuft nicht', 'healthy': 'gesund',

@@ -746,17 +746,37 @@ function renderChat() {
 $('chatFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.chat.room = b.dataset.v; renderChat(); });
 
 // ---------------------------------------------------------------- admin
-const ADMIN_TABS = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit'];
+// Admin menu: the same tree in every N8 system (N8 Kit) – Betrieb · Benutzer & Zugang · Darstellung · System
+const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys'];
+function adminGroups() {
+    const G = N8Kit.nav.GROUPS;
+    return [
+        { id: 'betrieb', label: G.betrieb, items: [{ id: 'settings', label: '⚙️ Settings' }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
+            { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
+        { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Users' }, { id: 'audit', label: '🔐 Sessions & log' }] },
+        { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
+        { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label }))] },
+    ];
+}
 function showAdmin(a) {
-    if (!ADMIN_TABS.includes(a)) a = 'settings';
+    if (!adminGroups().some(g => g.items.some(i => i.id === a))) a = 'settings';
     S.admin.tab = a;
-    document.querySelectorAll('#adminTabs button').forEach(b => b.classList.toggle('active', b.dataset.a === a));
-    ADMIN_TABS.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== a));
-    ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
+    N8Kit.nav.tree($('adminNav'), adminGroups(), { active: a, key: 'frnadn-admin', onSelect: showAdmin });
+    const pane = a.startsWith('sys-') ? 'sys' : a;
+    ADMIN_PANES.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== pane));
+    if (pane === 'sys') loadSysView(a.slice(4));
+    else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
        system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
     if (S.tab === 'admin') history.replaceState(null, '', '#admin/' + a);
 }
-$('adminTabs').addEventListener('click', e => { const b = e.target.closest('button[data-a]'); if (b) showAdmin(b.dataset.a); });
+// Admin → System: update, services, permissions & sudo, keep-alive – the N8 Kit views, identical in every N8 system
+function loadSysView(name) {
+    N8Kit.sys.view($('admin-sys'), name, {
+        req: api, console: 'sudo /opt/adn-frn-server/scripts/n8-admin.sh',
+        update: window.adnUpdate ? { load: window.adnUpdate.load, onInstall: () => window.upgradeNow('github') } : undefined,
+        extra: box => { if (window.adnUpdate) window.adnUpdate.java(box); },
+    });
+}
 function setRestart(on) { $('restartBanner').classList.toggle('hidden', !on); }
 async function serverCtl(action, btn) {
     const txt = { restart: ['Restart the FRN server?', 'All stations are disconnected and reconnect by themselves after a few seconds. The new configuration is used.', 'Restart'],
@@ -1107,79 +1127,9 @@ async function loadSystem() {
             <div class="k">Disk</div><div class="v">${fmtBytes(i.disk_total - i.disk_free)} of ${fmtBytes(i.disk_total)}</div>
             <div class="k">Uptime</div><div class="v">${fmtDur(i.uptime, true)}</div></div>
             ${sa ? '<div class="actions"><button class="btn" onclick="power(\'reboot\')">🔄 Reboot</button><button class="btn danger" onclick="power(\'poweroff\')">⏻ Shut down</button></div>' : ''}</div>
-        <div class="tile"><h3>⬆️ Updates</h3>
-            <div id="updInfo" style="font-size:12.5px">Not checked yet.</div>
-            <div class="n8-sub">☕ Java FRN server</div>
-            <div id="javaInfo" style="font-size:12.5px">–</div>
-            <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button>
-                <button class="btn" onclick="showUpdateLog(this)">📜 Update log</button></div>
-            <pre class="term hidden" id="updLog" style="height:260px;margin-top:10px"></pre></div>
-        </div>
-        <div class="grid g2" style="margin-top:14px">
-        <div class="tile"><h3>🧩 Services</h3><div class="subt">Status, autostart at boot and start, stop, restart – only the services released for this dashboard.</div>
-            <div id="svcList"><div class="dim">loading …</div></div></div>
-        <div class="tile"><h3>🔐 Permissions &amp; sudo <span id="permBadge"></span></h3>
-            <div class="subt">Checks the service user, program and data permissions, systemd units and the sudo rules. <b>Fix</b> repairs what is wrong and checks again. Console: <span class="mono">sudo scripts/n8-admin.sh check-perms</span> / <span class="mono">fix-perms</span>.</div>
-            <div id="permList"><div class="dim">checking …</div></div>
-            <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="loadPerms()">🔍 Check again</button><button class="btn primary" id="permFix" onclick="fixPerms(this)">🛠️ Fix</button></div>
-            <pre class="term hidden" id="permOut" style="height:220px;margin-top:10px"></pre></div>
-        <div class="tile ka-tile" id="kaTile" style="grid-column:1/-1"><h3>💓 Keep-Alive</h3><div class="empty">…</div></div>
         </div>
         ${sa ? '<div class="grid g2" style="margin-top:14px" id="backupTiles"><div class="tile"><div class="empty">Loading …</div></div></div>' : ''}`;
-    checkAllUpdates();
-    loadServices(); loadPerms(); loadKeepalive();
     if (sa) loadBackups();
-}
-
-// ---------------------------------------------------------------- services, permissions & sudo, update log (scripts/n8-admin.sh)
-const SVC_STATE = { active: 'running', inactive: 'stopped', failed: 'failed', activating: 'starting', deactivating: 'stopping' };
-function renderServices(d) {
-    const el = $('svcList'); if (!el) return;
-    if (!d.units.length) { el.innerHTML = '<div class="notice-box">Not set up yet – run once on the console: <span class="mono">sudo scripts/n8-admin.sh fix-perms</span></div>'; return; }
-    const cls = a => a === 'active' ? 'ok' : a === 'failed' ? 'bad' : 'warn';
-    const b = (u, a, icon, title) => u.actions.includes(a) ? `<button class="btn small" title="${title}" onclick="svcAction('${esc(u.unit)}','${a}',this)">${icon}</button>` : '';
-    el.innerHTML = `<div class="tbl-wrap"><table class="tbl"><tbody>${d.units.map(u => `<tr>
-        <td><span class="dot ${u.active === 'active' ? 'on' : 'off'}"></span> <b>${esc(u.label)}</b><div class="dim mono" style="font-size:11.5px">${esc(u.unit)}</div></td>
-        <td><span class="pill ${cls(u.active)}">${esc(SVC_STATE[u.active] || u.active)}</span></td>
-        <td>${u.actions.includes('enable') ? `<label class="switch" style="display:inline-block;vertical-align:middle" title="Autostart at boot"><input type="checkbox" ${u.enabled === 'enabled' ? 'checked' : ''} onchange="svcAction('${esc(u.unit)}', this.checked ? 'enable' : 'disable', this)"><span></span></label> <span class="dim">Autostart</span>` : `<span class="dim">${esc(u.enabled)}</span>`}</td>
-        <td class="num" style="white-space:nowrap">${u.active === 'active' ? b(u, 'restart', '🔄', 'Restart') + b(u, 'stop', '⏹', 'Stop') : b(u, 'start', '▶', 'Start')}</td></tr>`).join('')}</tbody></table></div>`;
-}
-async function loadServices() { try { renderServices(await api('GET', '/api/admin/services')); } catch (e) { const el = $('svcList'); if (el) el.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; } }
-async function svcAction(unit, action, el) {
-    if (['stop', 'disable'].includes(action)) {
-        const self = unit === 'frnadn.service';
-        if (!await confirmBox({ title: `${action === 'stop' ? 'Stop' : 'Disable autostart of'} ${unit}?`, body: self && action === 'stop' ? 'The dashboard is gone afterwards – start it again on the console: sudo systemctl start frnadn' : 'Stations on this server may lose the connection.' }, action === 'stop' ? 'Stop' : 'Disable', 'danger')) { if (el && el.type === 'checkbox') el.checked = true; return; }
-    }
-    if (el) el.disabled = true;
-    try { const r = await api('POST', `/api/admin/services/${encodeURIComponent(unit)}/${action}`, {}); toast('✓ ' + (r.message || action)); renderServices(r); }
-    catch (e) { toast(e.message, true); loadServices(); }
-}
-async function loadPerms() {
-    const el = $('permList'); if (!el) return;
-    el.innerHTML = '<div class="dim">checking …</div>';
-    let d; try { d = await api('GET', '/api/admin/perms'); } catch (e) { el.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
-    renderPerms(d);
-}
-const PERM_AREA = { user: '👤 Service user', prog: '📦 Program', data: '💾 Data', systemd: '⚙️ systemd', sudo: '🛡️ sudo' };
-function renderPerms(d) {
-    const el = $('permList'), rows = d.checks || [];
-    $('permBadge').innerHTML = !rows.length ? '<span class="pill warn">not checked</span>' : d.bad ? `<span class="pill bad">${d.bad} errors</span>` : '<span class="pill ok">all fine</span>';
-    if (!rows.length) { el.innerHTML = `<div class="notice-box">${esc(d.message || '–')}</div>`; return; }
-    const areas = [...new Set(rows.map(c => c.area))];
-    el.innerHTML = `<div class="tbl-wrap" style="max-height:340px;overflow:auto"><table class="tbl"><tbody>${areas.map(a => rows.filter(c => c.area === a).map((c, i) =>
-        `<tr><td style="width:130px">${i ? '' : `<b>${esc(PERM_AREA[a] || a)}</b>`}</td><td style="width:24px">${c.status === 'ok' ? '✅' : c.status === 'warn' ? '⚠️' : '❌'}</td>
-         <td class="${c.status === 'bad' ? '' : 'dim'}" style="white-space:normal">${esc(c.text)}</td></tr>`).join('')).join('')}</tbody></table></div>`;
-}
-async function fixPerms(btn) {
-    btn.disabled = true; const out = $('permOut'); out.classList.remove('hidden'); out.textContent = 'checking and fixing …';
-    try { const r = await api('POST', '/api/admin/perms/fix', {}); out.textContent = r.message || ''; if (r.check) renderPerms(r.check); toast(r.ok ? 'Permissions are fine' : 'Not everything could be fixed', !r.ok); loadServices(); }
-    catch (e) { out.textContent = e.message; toast(e.message, true); }
-    btn.disabled = false;
-}
-async function showUpdateLog(btn) {
-    const el = $('updLog'); el.classList.toggle('hidden'); if (el.classList.contains('hidden')) return;
-    try { const d = await api('GET', '/api/admin/update-log'); el.textContent = d.log || 'No update from the dashboard yet.'; el.scrollTop = el.scrollHeight; }
-    catch (e) { el.textContent = e.message; }
 }
 
 // ---------------------------------------------------------------- backup & restore (superadmin)
@@ -1542,40 +1492,3 @@ boot();
     setTimeout(fit, 300);
 })();
 
-// ---------------------------------------------------------------- Keep-Alive (N8 Admin-Kit): Dienste-Wächter, Internet, Heartbeat
-async function loadKeepalive() {
-    const el = $('kaTile'); if (!el) return;
-    let d;
-    try { d = await api('GET', '/api/admin/keepalive'); } catch (e) { el.innerHTML = `<h3>💓 Keep-Alive</h3><div class="empty">${esc(e.message)}</div>`; return; }
-    const c = d.conf || {};
-    const paused = c.paused_until && c.paused_until * 1000 > Date.now();
-    const badge = !d.ready ? '<span class="pill warn">not set up</span>' : !c.enabled ? '<span class="pill">off</span>' : paused ? '<span class="pill warn">paused</span>'
-        : d.stale ? '<span class="pill bad">not running</span>' : '<span class="pill ok">active</span>';
-    const icon = st => ({ ok: '<span class="pill ok">✓</span>', hold: '<span class="pill">⏸</span>', restarted: '<span class="pill warn">↻</span>', giveup: '<span class="pill bad">✕</span>' }[st] || '<span class="pill warn">!</span>');
-    const rows = (d.checks || []).map(x => `<div class="perm-row">${icon(x.state)}<div><b>${esc(x.label)}</b> <span class="mono dim">${esc(x.unit)}</span>
-        <div class="dim"><span>${x.state === 'ok' ? 'healthy' : x.state === 'hold' ? 'stopped by hand – Keep-Alive waits' : esc(x.why || '')}</span>${x.fails ? ` · <span>${x.fails} min</span>` : ''}${x.restarts ? ` · <span>${x.restarts}× restarted</span>${x.last_restart ? ` · <span>${fmtDate(x.last_restart)}</span>` : ''}` : ''}</div></div></div>`).join('');
-    el.innerHTML = `<h3>💓 Keep-Alive ${badge}</h3>
-        <div class="subt">Every minute as root: checks each service for real (dashboard, Java FRN server running and accepting stations), restarts sick ones after 3 minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address.</div>
-        ${d.ready ? `<div class="kv"><div class="k">Internet</div><div class="v">${d.net ? '<span class="pill ok">reachable</span>' : `<span class="pill bad">down since ${fmtDate(d.net_down_since)}</span>`}</div>
-            <div class="k">Last check</div><div class="v">${d.age != null ? (d.age < 120 ? 'just now' : fmtDate(d.time)) : '–'}</div>
-            ${c.heartbeat_url ? `<div class="k">Heartbeat</div><div class="v">${esc(d.heartbeat || '–')}</div>` : ''}</div>
-            <div class="perm-list">${rows}</div>` : '<div class="help">Set up once on the console: <code>sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms</code></div>'}
-        <form class="ka-form" onsubmit="event.preventDefault(); saveKeepalive(this)">
-            <div class="row"><label for="kaOn">Keep-Alive on</label><label class="switch"><input type="checkbox" id="kaOn" name="enabled" ${c.enabled ? 'checked' : ''}><span></span></label></div>
-            <div class="row"><label for="kaNet">Restart network services after an internet outage</label><label class="switch"><input type="checkbox" id="kaNet" name="net_restart" ${c.net_restart ? 'checked' : ''}><span></span></label></div>
-            <div class="row"><label for="kaHb">Heartbeat address</label><input type="text" id="kaHb" name="heartbeat_url" value="${esc(c.heartbeat_url || '')}" placeholder="https://hc-ping.com/… or https://kuma…/api/push/…">
-                <div class="help">Called every minute while everything is fine (Uptime Kuma “Push”, Healthchecks.io …) – it alerts you when the calls stop.</div></div>
-            <div class="row"><label for="kaHbF">Heartbeat on errors (optional)</label><input type="text" id="kaHbF" name="heartbeat_fail_url" value="${esc(c.heartbeat_fail_url || '')}" placeholder="https://hc-ping.com/…/fail"></div>
-            <div class="actions"><button type="button" class="btn" onclick="pauseKeepalive(${paused ? 0 : 60})">${paused ? '▶ Resume' : '⏸ Pause 1 h (maintenance)'}</button><button class="btn primary">Save</button></div>
-        </form>
-        ${d.log ? `<details class="perm-ok"><summary>Keep-Alive log</summary><pre class="term" style="max-height:220px">${esc(d.log)}</pre></details>` : ''}`;
-}
-async function saveKeepalive(f) {
-    try { await api('POST', '/api/admin/keepalive', { enabled: f.enabled.checked, net_restart: f.net_restart.checked, heartbeat_url: f.heartbeat_url.value.trim(), heartbeat_fail_url: f.heartbeat_fail_url.value.trim() });
-          toast('Keep-Alive saved'); loadKeepalive(); }
-    catch (e) { toast(e.message, true); }
-}
-async function pauseKeepalive(min) {
-    try { await api('POST', '/api/admin/keepalive', { pause_minutes: min }); toast(min ? 'Keep-Alive paused for 1 hour' : 'Keep-Alive active again'); loadKeepalive(); }
-    catch (e) { toast(e.message, true); }
-}
