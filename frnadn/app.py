@@ -489,12 +489,18 @@ def _account_tag() -> str:
 
 def _me() -> Dict[str, Any]:
     """Was jeder Server bei jeder Anfrage/Antwort über sich mitschickt: Kennung seines FRN-Kontos."""
-    return {"account": _account_tag(), "standalone": bool(ctx.settings.get("frn.standalone")), "role": ctx.settings.get("cluster.role")}
+    s = ctx.settings.all()
+    return {"account": _account_tag(), "standalone": bool(s["frn.standalone"]), "role": s["cluster.role"],
+            # zur Anzeige im Kasten Master & Backup (nur über die verschlüsselte Verbindung, nur für Admins sichtbar)
+            "email": s["sysman.email"] or "", "password_set": bool(s["sysman.password"]), "host": s["frn.address"] or "",
+            "sysman": s["sysman.host"] or ""}
 
 
 def _remember_peer(d: Dict[str, Any]) -> None:
     if isinstance(d, dict) and "account" in d:
         _cluster_set("cluster.peer_account", {"tag": str(d.get("account") or ""), "standalone": bool(d.get("standalone")),
+                                              "email": str(d.get("email") or "")[:200], "password_set": bool(d.get("password_set")),
+                                              "host": str(d.get("host") or "")[:200], "role": str(d.get("role") or ""),
                                               "time": time.time()})
 
 
@@ -549,7 +555,7 @@ async def cluster_hello(request: Request):
     return _cluster_answer(msg, {"ok": True, "role": ctx.settings.get("cluster.role"), "version": __version__,
             "title": ctx.settings.get("dashboard.title"), "frn": _frn_state(), "time": time.time(),
             "maintenance": bool(_cluster_get("cluster.maintenance")), "last": _cluster_get("cluster.last"),
-            "account": _account_tag(), "standalone": ctx.settings.get("frn.standalone")})
+            **_me()})
 
 
 @app.post("/api/cluster/export")
@@ -663,6 +669,15 @@ async def cluster_status(request: Request):
         out["guard"] = _cluster_get("cluster.guard")
         # beide Server mit demselben FRN-Konto: der SystemManager lässt nur einen online (der andere: „wrong credentials“)
         out["same_account"] = account_conflict()
+    # FRN-Konten beider Server beim SystemManager (bleiben beim Abgleich unangetastet)
+    me, peer = _me(), _cluster_get("cluster.peer_account")
+    own = {"email": me["email"], "password_set": me["password_set"], "standalone": me["standalone"], "host": me["host"], "self": True}
+    other = {"email": peer.get("email", ""), "password_set": peer.get("password_set"), "standalone": peer.get("standalone"),
+             "host": peer.get("host", ""), "time": peer.get("time")} if peer else None
+    if s["cluster.role"] == "master":
+        out["accounts"] = {"master": own, "backup": other}
+    elif s["cluster.role"] == "backup":
+        out["accounts"] = {"master": other, "backup": own}
     return out
 
 

@@ -22,13 +22,26 @@ Konfiguration des Masters **zu jeder vollen Stunde** und auf Knopfdruck. Die bei
    **🎲 Neuer Schlüssel** → Schlüssel kopieren → **Speichern**.
 2. **Auf dem Backup:** Rolle **Backup**, *Dashboard des Partners* = `https://frn.auf-der-nachtschicht.de`, denselben
    **Sync-Schlüssel** einfügen, *Jede volle Stunde abgleichen* an → **Speichern** → **🔄 Jetzt abgleichen**.
-3. In beiden Kästen steht jetzt beim *Partner* ein grüner Haken mit Name, Rolle, Version und Stationen. Im Kopfbereich steht
+3. Auf beiden Servern unter **🔑 FRN-Konten** das jeweils **eigene** FRN-Konto eintragen (für das Backup vorher mit
+   **📧 FRN-Passwort Backup** und einer anderen E-Mail anfordern).
+4. In beiden Kästen steht jetzt beim *Partner* ein grüner Haken mit Name, Rolle, Version und Stationen. Im Kopfbereich steht
    hinter dem Titel **[Master]** bzw. **[Backup]** (ohne Rolle: **[Standalone]**).
 
 Beide Server müssen dieselbe Version haben (mindestens 2.17.0). Die Uhren müssen stimmen (± 5 Minuten), sonst lehnt der
 Partner die Anfrage ab.
 
 <p align="center"><img src="../images/admin-cluster-backup.png" alt="Master & Backup auf dem Backup" width="90%"></p>
+
+## 🔑 FRN-Konten von Master und Backup
+
+Im Kasten *Master & Backup* steht unter **🔑 FRN-Konten beim SystemManager**, mit welchem Konto jeder der beiden Server beim
+SystemManager angemeldet ist: E-Mail, ob ein Passwort gesetzt ist, und die Serveradresse. Den Partner zeigt er, sobald einmal
+abgeglichen oder der Status abgerufen wurde. Steht dort zweimal dieselbe E-Mail, wird sie rot.
+
+Darunter trägst du direkt das **FRN-Konto dieses Servers** ein (E-Mail und Passwort, **💾 Konto speichern**). Das ist dasselbe Feld
+wie unter *Einstellungen → SystemManager*. Am besten richtest du das Konto ein, **bevor** du die Rolle setzt und das erste Mal
+abgleichst. Der Abgleich fasst die FRN-Konten **nie** an: Jeder Server behält sein eigenes, auch beim stündlichen Abgleich und
+nach einer Übergabe. Die E-Mail des Partners nimmt das Feld nicht an.
 
 ## 🔒 Schutz: nie zwei Server mit demselben FRN-Konto
 

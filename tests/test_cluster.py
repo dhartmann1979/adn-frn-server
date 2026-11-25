@@ -206,3 +206,17 @@ def test_master_refuses_backups_account(client, monkeypatch):
     client.get("/api/admin/cluster")
     assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "backup@example.org"}}, headers=H).status_code == 400
     assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "neu@example.org"}}, headers=H).status_code == 200
+
+
+def test_accounts_of_both_shown(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org",
+                           "sysman.email": "master@example.org", "sysman.password": "geheim", "frn.standalone": False}, "t")
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "account": "x", "standalone": False,
+                                                          "email": "backup@example.org", "password_set": False})
+    acc = client.get("/api/admin/cluster").json()["accounts"]
+    assert acc["master"]["email"] == "master@example.org" and acc["master"]["password_set"] and acc["master"]["self"]
+    assert acc["backup"]["email"] == "backup@example.org" and acc["backup"]["password_set"] is False
+    # the sync never touches them
+    from frnadn.cluster import shared_keys
+    assert "sysman.email" not in shared_keys() and "sysman.password" not in shared_keys()

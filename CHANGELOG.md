@@ -2,6 +2,19 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.20.0 – 2026-11-25
+
+### 🔑 FRN-Konten von Master und Backup im Kasten Master & Backup
+- Neuer Abschnitt **🔑 FRN-Konten beim SystemManager**: für Master **und** Backup die E-Mail des FRN-Kontos, ob ein Passwort gesetzt
+  ist, und die Serveradresse – das eigene direkt, das des Partners über die verschlüsselte Verbindung (bei jedem Abgleich und
+  Statusabruf aktualisiert). Gleiche E-Mail auf beiden wird rot markiert.
+- **Eigenes FRN-Konto direkt hier einstellen:** E-Mail und Passwort dieses Servers mit **💾 Konto speichern** (dasselbe wie unter
+  *Einstellungen → SystemManager*, mit derselben Prüfung: die E-Mail des Partners wird abgelehnt). So lässt es sich vor dem ersten
+  Abgleich einrichten.
+- Klar gekennzeichnet: **Der Abgleich fasst die FRN-Konten nie an** – `sysman.email` und `sysman.password` gehören zu den Werten,
+  die jeder Server für sich behält (Test sichert das ab).
+- Doku: Einrichtung um „eigenes FRN-Konto auf beiden“ ergänzt, neuer Abschnitt „FRN-Konten von Master und Backup“, Screenshots.
+
 ## 2.19.0 – 2026-11-25
 
 ### 🔒 Schutz: Master und Backup nie wieder mit demselben FRN-Konto

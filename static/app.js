@@ -905,10 +905,31 @@ async function loadCluster() {
             ${d.role === 'master' ? (m ? '<button type="button" class="btn small" onclick="clusterMaint(false, this)">↩️ Take back from the backup</button>'
                                        : '<button type="button" class="btn small" onclick="clusterMaint(true, this)">🛠️ Hand over to the backup</button>') : ''}
         </div>`;
-    box.innerHTML = same + rows + `<div class="actions" style="justify-content:flex-start">
+    const acc = (a, who) => !a ? `<span class="dim">unknown – sync or open the partner once</span>`
+        : a.standalone ? '<span class="dim">stand-alone (no SystemManager)</span>'
+        : a.email ? `<span class="mono">${esc(a.email)}</span> <span class="dim">· <span>${a.password_set ? '🔑 password set' : '⚠️ no password'}</span>${a.host ? ' · ' + esc(a.host) : ''}</span>`
+        : '<span class="cl-bad">no FRN account entered</span>';
+    const accounts = d.accounts ? `<div class="cl-acc"><div class="cl-acc-h">🔑 <b>FRN accounts at the SystemManager</b> <span class="dim">– never touched by the sync, every server keeps its own</span></div>
+        <div class="cl-grid"><span>Master</span><div class="${d.same_account ? 'cl-bad' : ''}">${acc(d.accounts.master)}</div>
+        <span>Backup</span><div class="${d.same_account ? 'cl-bad' : ''}">${acc(d.accounts.backup)}</div></div>
+        <div class="cl-own">
+            <div class="cl-own-l">FRN account of this server (${d.role === 'master' ? 'Master' : 'Backup'})</div>
+            <input type="text" inputmode="email" name="sysman.email" data-skip="1" placeholder="E-mail" value="${esc(d.accounts[d.role] ? d.accounts[d.role].email || '' : '')}" autocomplete="off" spellcheck="false">
+            <input type="password" name="sysman.password" data-skip="1" placeholder="${d.accounts[d.role] && d.accounts[d.role].password_set ? '•••••••• (unchanged)' : 'FRN password'}" autocomplete="new-password">
+            <button type="button" class="btn small primary" onclick="clusterOwnAccount(this.closest('.cl-own'))">💾 Save account</button></div></div>` : '';
+    box.innerHTML = same + rows + accounts + `<div class="actions" style="justify-content:flex-start">
         <span class="dim" style="font-size:12.5px">Every server needs its own FRN account:</span>
         <button type="button" class="btn small" onclick="openFrnPassword('master')">📧 FRN password Master</button>
         <button type="button" class="btn small" onclick="openFrnPassword('backup')">📧 FRN password Backup</button></div>`;
+}
+async function clusterOwnAccount(f) {
+    const ch = {}; const e = f.querySelector('[name="sysman.email"]').value.trim(), p = f.querySelector('[name="sysman.password"]').value;
+    ch['sysman.email'] = e; if (p) ch['sysman.password'] = p;
+    try {
+        const r = await api('POST', '/api/admin/settings', { changes: ch });
+        toast(r.changed.length ? 'FRN account saved – restart the FRN server to log in with it' : 'No changes'); setRestart(r.restart_needed);
+    } catch (x) { toast(x.message, true); }
+    loadCluster();
 }
 async function clusterSync(btn) {
     btn.disabled = true; toast('Syncing …');
