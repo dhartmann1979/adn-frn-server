@@ -2,6 +2,29 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.17.1 – 2026-11-25
+
+### 🌐 Web-Port bei der Installation: HTTP 8080
+- Das Dashboard lauscht bei einer **neuen Installation** auf **HTTP-Port 8080** (bisher 80). So bleiben 80/443 frei für das
+  eigene HTTPS mit Let's Encrypt (Port 80 nur für die Prüfung und die Weiterleitung) oder einen Reverse-Proxy.
+- Der Installer **fragt** den Web-Port (Vorgabe 8080), prüft die Portnummer und warnt, wenn der Port schon belegt ist
+  (mit Programmname). `FRNADN_PORT=…` setzt ihn ohne Frage.
+- **Vorhandene Installationen behalten ihren Port**: Der Installer liest ihn aus `frnadn.service`, Updates ändern ihn nie.
+  Behoben dabei: Das Ersetzen des Ports in der Dienst-Vorlage war nicht verankert (`FRNADN_PORT=80` hätte in `…=8080` gepasst).
+- Vorgaben im Programm, in der Dienst-Vorlage und im Keep-Alive/Health-Check auf 8080; ufw gibt Dashboard-Port, FRN-Port und 80/443 frei.
+
+### 📦 Systempakete werden bei jedem Update geprüft und nachinstalliert
+- `n8-admin.sh update` (auch „⬆️ Update jetzt“) prüft vor allem anderen, ob alles da ist, was der Installer einrichtet:
+  **certbot** (HTTPS mit Let's Encrypt), **Java** (`default-jre-headless`, falls kein `java`), `python3`, `python3-venv`,
+  `python3-pip`, `sudo`, `curl`, `unzip`, `ca-certificates`. Fehlendes wird per apt nachinstalliert (wartet höchstens 2 Minuten
+  auf eine laufende Paketinstallation, bricht das Update bei einem Fehler nicht ab, nennt dann den Befehl im Update-Protokoll).
+  Ist alles da, steht im Protokoll eine Zeile mit den Versionen von certbot, Java und Python.
+- **Admin → System → 🔐 Berechtigungen & sudo** zeigt fehlende Pakete unter *📦 Programm* („certbot fehlt – HTTPS mit
+  Let's Encrypt geht nicht“), **Korrigieren** installiert sie nach.
+- Der Installer bricht jetzt mit einer klaren Meldung ab, wenn apt die Pakete nicht installieren kann, und zeigt die
+  certbot-Version an.
+- Doku: Installation (Web-Port 8080), Updates (Paketprüfung).
+
 ## 2.17.0 – 2026-11-25
 
 ### 🔁 Neu: Master & Backup – zweiter FRN-Server mit derselben Konfiguration

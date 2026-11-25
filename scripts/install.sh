@@ -17,7 +17,7 @@
 #
 #  Umgebungsvariablen (optional):
 #    FRNADN_DIR=/opt/adn-frn-server Programmverzeichnis des Dashboards
-#    FRNADN_PORT=80               Web-Port des Dashboards
+#    FRNADN_PORT=8080             Web-Port des Dashboards (HTTP); eine vorhandene Installation behält ihren Port
 #    FRNADN_DATA=/var/lib/adn-frn-server   neues, leeres Datenverzeichnis
 #    FRNADN_FRN_HOME=/var/lib/adn-frn-server/frn  FRN-Konfiguration/Logs
 #    FRN_DIR=/opt/frn-server      Verzeichnis für FRN_Server.jar
@@ -30,7 +30,10 @@
 set -euo pipefail
 
 DIR="${FRNADN_DIR:-/opt/adn-frn-server}"
-PORT="${FRNADN_PORT:-80}"
+# Web-Port (HTTP): Vorgabe 8080 – Port 80/443 bleiben frei für HTTPS (Let's Encrypt) oder einen Reverse-Proxy.
+# Eine vorhandene Installation behält ihren Port (aus dem systemd-Dienst), FRNADN_PORT=… setzt ihn ausdrücklich.
+OLD_PORT="$(sed -n 's/^Environment=FRNADN_PORT=//p' /etc/systemd/system/frnadn.service 2>/dev/null | head -1 | tr -dc 0-9 || true)"
+PORT="${FRNADN_PORT:-${OLD_PORT:-8080}}"
 FRN_DIR="${FRN_DIR:-/opt/frn-server}"
 DATA="${FRNADN_DATA:-/var/lib/frnadn}"
 FRN_HOME="${FRNADN_FRN_HOME:-$DATA/frn}"
@@ -97,7 +100,9 @@ command -v apt-get >/dev/null || fail "Dieses Skript ist für Debian, Ubuntu und
 step 2 "Pakete: Python und Java"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq >/dev/null
-apt-get install -y -q --no-install-recommends python3 python3-venv python3-pip sudo curl unzip ca-certificates certbot >/dev/null
+apt-get install -y -q --no-install-recommends python3 python3-venv python3-pip sudo curl unzip ca-certificates certbot >/dev/null \
+    || fail "Pakete ließen sich nicht installieren (apt) – Log: apt-get install python3-venv certbot …"
+command -v certbot >/dev/null && ok "certbot $(certbot --version 2>&1 | awk '{print $2}') (Let's Encrypt)" || warn "certbot fehlt – HTTPS mit Let's Encrypt geht erst nach: apt install certbot"
 if ! command -v java >/dev/null; then
     info "Java wird installiert (der FRN-Server ist ein Java-Programm) …"
     apt-get install -y -q --no-install-recommends default-jre-headless >/dev/null || fail "Java (default-jre-headless) ließ sich nicht installieren."
@@ -304,9 +309,16 @@ fi   # neu einrichten
 
 # ---------------------------------------------------------------------------
 step 7 "Dienste frn-server und frnadn"
+if [ -z "${FRNADN_PORT:-}" ] && [ -z "$OLD_PORT" ]; then
+    ask PORT "Web-Port des Dashboards (HTTP)" "$PORT"
+fi
+[[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" -ge 1 ] && [ "$PORT" -le 65535 ] || fail "Web-Port „$PORT“ ist keine gültige Portnummer."
+if [ "$PORT" != "${OLD_PORT:-}" ] && command -v ss >/dev/null && ss -Hltn "sport = :$PORT" 2>/dev/null | grep -q .; then
+    warn "Port $PORT ist schon belegt ($(ss -Hltnp "sport = :$PORT" 2>/dev/null | grep -o 'users:(("[^"]*' | head -1 | cut -d'"' -f2)) – das Dashboard startet dort nicht. Anderen Port mit FRNADN_PORT=… wählen."
+fi
 sed -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" -e "s#/var/lib/frnadn#${DATA}#g" -e "s#/opt/frn-server#${FRN_DIR}#g" -e "s#/usr/bin/java#${JAVA}#" \
     "$DIR/systemd/frn-server.service" > /etc/systemd/system/frn-server.service
-sed -e "s#/opt/frnadn#${DIR}#g" -e "s#FRNADN_PORT=80#FRNADN_PORT=${PORT}#" -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" \
+sed -e "s#/opt/frnadn#${DIR}#g" -e "s#^Environment=FRNADN_PORT=.*#Environment=FRNADN_PORT=${PORT}#" -e "s#/var/lib/frnadn/frn#${FRN_HOME}#g" \
     -e "s#/var/lib/frnadn#${DATA}#g" -e "s#/opt/frn-server#${FRN_DIR}#g" "$DIR/systemd/frnadn.service" > /etc/systemd/system/frnadn.service
 systemctl daemon-reload
 systemctl enable -q frn-server frnadn
@@ -318,7 +330,7 @@ chmod 755 "$DIR/scripts/n8-admin.sh"
 "$DIR/scripts/n8-admin.sh" fix-perms || warn "Berechtigungen: siehe oben – später: sudo $DIR/scripts/n8-admin.sh fix-perms"
 if command -v ufw >/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
     ufw allow "$PORT/tcp" >/dev/null; ufw allow "$FPORT/tcp" >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
-    ok "Firewall (ufw): Port ${PORT} (Dashboard) und ${FPORT} (FRN) freigegeben"
+    ok "Firewall (ufw): Port ${PORT} (Dashboard), ${FPORT} (FRN) sowie 80/443 (HTTPS) freigegeben"
 fi
 
 # ---------------------------------------------------------------------------

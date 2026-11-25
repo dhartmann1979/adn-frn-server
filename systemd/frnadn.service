@@ -11,10 +11,10 @@ WorkingDirectory=/opt/frnadn
 Environment=FRNADN_DATA=/var/lib/frnadn
 Environment=FRNADN_FRN_HOME=/var/lib/frnadn/frn
 Environment=FRNADN_FRN_JAR=/opt/frn-server/FRN_Server.jar
-Environment=FRNADN_PORT=80
+Environment=FRNADN_PORT=8080
 Environment=PYTHONUNBUFFERED=1
 ExecStart=/opt/frnadn/venv/bin/python -m frnadn
-# web port 80 without root
+# ports 80/443 (HTTPS, Let's Encrypt) without root
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 # the admin portal restarts the dashboard by exiting; systemd starts it again
 Restart=always

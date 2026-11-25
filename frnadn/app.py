@@ -9,7 +9,7 @@ Environment:
   FRNADN_FRN_JAR   FRN_Server.jar, default /opt/frn-server/FRN_Server.jar
   FRNADN_FRN_DIRECT 1 = run the FRN server as a child process instead of frn-server.service
   FRNADN_BIND      web listen address, default 0.0.0.0
-  FRNADN_PORT      web port, default 80
+  FRNADN_PORT      web port (HTTP), default 8080
   FRNADN_DEMO      1 = demo mode (simulated system values)
 """
 from __future__ import annotations
@@ -1455,7 +1455,7 @@ _PORT_GROUPS = [
 
 
 def _web_port() -> int:
-    return int(os.environ.get("FRNADN_PORT", "80") or 80)
+    return int(os.environ.get("FRNADN_PORT", "8080") or 8080)
 
 
 @app.get("/api/admin/ports")
@@ -2069,6 +2069,6 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     try:
         asyncio.run(_serve(os.environ.get("FRNADN_BIND", "0.0.0.0"),
-                           int(os.environ.get("FRNADN_PORT", "80"))))
+                           int(os.environ.get("FRNADN_PORT", "8080"))))
     except KeyboardInterrupt:
         pass

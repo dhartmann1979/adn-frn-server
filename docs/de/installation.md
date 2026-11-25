@@ -38,12 +38,12 @@ Jede Frage hat eine Vorgabe in `[Klammern]`, Enter übernimmt sie.
 | Schritt | Was passiert |
 |---|---|
 | **1 System prüfen** | Betriebssystem, Architektur, systemd, apt |
-| **2 Pakete** | Python, venv, curl, unzip, **Certbot** (für Let's Encrypt) und **Java** |
+| **2 Pakete** | Python, venv, curl, unzip, **Certbot** (für Let's Encrypt) und **Java**. Fehlt später eines, installiert jedes Update es nach |
 | **3 FRN-Server** | lädt `FRN_Server.zip` von **freeradionetwork.de**, entpackt `FRN_Server.jar` nach `/opt/frn-server`. Der Installer lädt das Java-FRN-Paket für die neue Installation herunter. Eine bereits vorhandene JAR wird nicht übernommen; bei erkannter Altinstallation bricht der Installer vorher ab |
 | **4 Dashboard** | kopiert das Dashboard nach `/opt/adn-frn-server`, legt die Python-Umgebung, den Dienstbenutzer `frnadn` und den Befehl `frnadn` an |
 | **5 Superadmin** | Benutzername und Passwort (mind. 10 Zeichen, zweimal) – gespeichert als scrypt-Hash |
 | **6 FRN-Server einrichten** | Betriebsart, Serveradresse, Port, Besitzer, Räume, Titel |
-| **7 Dienste** | richtet `frn-server.service` und `frnadn.service` ein, startet beide, öffnet die Ports in `ufw` |
+| **7 Dienste** | fragt den **Web-Port des Dashboards (HTTP, Vorgabe 8080)**, richtet `frn-server.service` und `frnadn.service` ein, startet beide, öffnet die Ports in `ufw` (Dashboard, FRN, 80/443 für HTTPS) |
 | **8 Prüfen** | wartet, bis der FRN-Server lauscht, und zeigt Fehlermeldungen des SystemManagers verständlich an |
 
 <p align="center"><img src="../images/install-2.png" alt="Installation Schritt 5–8" width="85%"></p>
@@ -84,7 +84,15 @@ Danach im Admin-Portal unter **Settings** Serveradresse und SystemManager-Konto 
 Hinter einem Reverse-Proxy zusätzlich `FRNADN_PORT=8090 FRNADN_BEHIND_PROXY=1` (eigenes HTTPS aus). Aus einem Backup ohne Fragen:
 `FRNADN_RESTORE=/pfad/x.frnbak FRNADN_RESTORE_PASSWORD_FILE=/pfad/pw`.
 
-Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_DATA` (Vorgabe `/var/lib/frnadn`), `FRNADN_FRN_HOME` (Vorgabe `$FRNADN_DATA/frn`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
+Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_DATA` (Vorgabe `/var/lib/frnadn`), `FRNADN_FRN_HOME` (Vorgabe `$FRNADN_DATA/frn`), `FRNADN_PORT` (Web-Port, Vorgabe **8080**; eine vorhandene Installation behält ihren Port), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
+
+### Web-Port 8080
+
+Das Dashboard lauscht seit 2.17.1 standardmäßig auf **HTTP-Port 8080**: `http://<IP-des-Servers>:8080`. So bleiben die Ports
+80 und 443 frei, für das eigene HTTPS mit Let's Encrypt (Prüfung auf Port 80, Dashboard dann unter `https://<domain>`) oder für
+einen Reverse-Proxy. Ist der Port belegt, warnt der Installer. Ändern: neu installieren mit `FRNADN_PORT=…` oder in
+`/etc/systemd/system/frnadn.service` die Zeile `Environment=FRNADN_PORT=…` anpassen und `systemctl daemon-reload &&
+systemctl restart frnadn`. Updates ändern den Port nie.
 
 Am Ende richtet der Installer mit `scripts/n8-admin.sh fix-perms` Besitzer und Rechte, die sudo-Freigaben und „Update jetzt“ ein.
 

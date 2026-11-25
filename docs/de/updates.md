@@ -26,7 +26,10 @@ Seit 2.13.0 läuft das Update wie in N8 Crosslink und den anderen N8schicht-Proj
 1. **⬆️ Update jetzt installieren** legt nur die Datei `/var/lib/frnadn/update.request` an.
 2. Die systemd-Path-Unit `frnadn-update.path` sieht sie und startet `frnadn-update.service` als root:
    `n8-admin.sh update --auto`.
-3. Der Helfer spult nur vor (nie über von Hand geänderte Dateien oder eigene Commits), installiert die Python-Pakete, schreibt die
+3. Der Helfer spult nur vor (nie über von Hand geänderte Dateien oder eigene Commits), **prüft die Systempakete und installiert
+   fehlende nach** (seit 2.17.1: `certbot` für Let's Encrypt, Java, `python3-venv`, `python3-pip`, `curl`, `unzip`, `sudo`,
+   `ca-certificates` – apt wartet höchstens 2 Minuten auf eine laufende Paketinstallation; klappt es nicht, steht der Befehl
+   im Update-Protokoll), installiert die Python-Pakete, schreibt die
    Konfiguration des FRN-Servers, **prüft und korrigiert Berechtigungen und sudo**, startet FRN-Server und Dashboard neu und ruft die
    Weboberfläche auf.
 4. Antwortet sie nicht innerhalb von 90 Sekunden, setzt er auf den alten Stand zurück und startet erneut. Das Ergebnis steht unter
@@ -39,6 +42,9 @@ sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms
 ```
 
 Das richtet Besitzer und Rechte, die sudo-Freigaben und den Update-Auslöser ein. Danach geht alles im Adminbereich.
+
+Fehlende Systempakete zeigt auch **Admin → System → 🔐 Berechtigungen & sudo** unter *📦 Programm* (z. B. „certbot fehlt – HTTPS
+mit Let's Encrypt geht nicht“); **Korrigieren** installiert sie nach.
 
 ## Wann wird geprüft?
 
