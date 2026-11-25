@@ -1,7 +1,6 @@
-"""N8 migration package – encrypted transfer of a whole installation to the HobbyRadioPortal (standard library only).
+"""N8 backup/migration format – encrypted package of a whole installation (standard library only).
 
-The same file is part of HBlink4-FreeRadioID (dashboard/n8mig.py) and the HobbyRadioPortal (portal/n8mig.py); a test
-in the portal checks that both copies are identical.
+The same file is part of HBlink4-FreeRadioID (dashboard/n8mig.py) and the other N8schicht projects.
 
 Umzugscode (one-time migration code), shown once on the old server:
 

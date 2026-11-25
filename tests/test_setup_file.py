@@ -1,4 +1,4 @@
-"""Ohne Fragen neu einrichten: install.sh FRNADN_SETUP_FILE → frnadn apply-setup (so richtet der HobbyRadioPortal-Installer FRN neu ein)."""
+"""Einrichtung aus JSON: frnadn apply-setup (install.sh schreibt das JSON aus den Antworten)."""
 import json
 import os
 import sqlite3
@@ -28,7 +28,7 @@ def test_apply_setup_file_creates_rooms_settings_and_superadmin(tmp_path):
     assert (data / "frn" / "server.properties").is_file()
 
 
-def test_install_sh_knows_setup_file():
+def test_install_sh_uses_apply_setup():
     s = (ROOT / "scripts" / "install.sh").read_text()
-    assert 'elif [ -n "${FRNADN_SETUP_FILE:-}" ]' in s and "run_app apply-setup /tmp/frnadn-setup.json" in s
+    assert "FRNADN_SETUP_FILE" not in s and "run_app apply-setup /tmp/frnadn-setup.json" in s
     assert subprocess.run(["bash", "-n", str(ROOT / "scripts" / "install.sh")]).returncode == 0

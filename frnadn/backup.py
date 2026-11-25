@@ -1,11 +1,11 @@
-"""Full backup and restore of adn-frn-server – also restorable in the HobbyRadioPortal.
+"""Full backup and restore of adn-frn-server.
 
 A backup (``*.frnbak``) is a tar.gz, encrypted with a password of your choice (format ``n8mig``: scrypt + SHAKE-256 +
-HMAC-SHA-256, standard library only – see n8mig.py; the HobbyRadioPortal and HBlink4 use the same file):
+HMAC-SHA-256, standard library only – see n8mig.py; HBlink4-FreeRadioID uses the same format):
 
     manifest.json            app, format, version, time, host, title, counts
     data/frnadn.db           the whole SQLite database (consistent copy via the SQLite backup API): settings, users,
-                             rooms, access lists, FRN accounts, statistics, chat, client logos, API tokens …
+                             rooms, access lists, FRN accounts, statistics, chat, client logos …
     data/branding/…          logo, site icon, link menu
     frn/…                    configuration of the Java FRN server: server.properties, log4j.xml, acl/ (no logs)
 
@@ -15,7 +15,6 @@ Restore
     • web:     Admin → System → Backup & restore – the upload is checked, then the dashboard restarts and applies it
                before it opens the database (``restore.pending.tar``), writes the FRN configuration and restarts the FRN server
     • console: ``frnadn restore FILE`` (service stopped) – also used by ``scripts/install.sh`` (FRNADN_RESTORE=…)
-    • HobbyRadioPortal: web installer → 📻 FRN → “from a backup” – installs adn-frn-server and restores the file
 The current state is kept in ``<data>/before-restore-<time>/`` first.
 """
 import io

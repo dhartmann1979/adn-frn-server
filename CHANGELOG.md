@@ -2,6 +2,45 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.13.0 – 2026-11-25
+
+**🧩 Gleiches Update-System wie N8 Crosslink – mit Berechtigungsprüfer, sudo-Einrichtung und schlanker Dienste-Übersicht. HobbyRadioPortal-Anbindung entfernt.**
+
+### ⬆️ Update über den Root-Helfer `scripts/n8-admin.sh`
+- Neuer gemeinsamer Helfer der N8schicht-Projekte (dieselbe Datei in allen Repositorys, Projektdaten in `scripts/n8-admin.conf`).
+- **Update jetzt installieren** legt nur `update.request` im Datenordner an; die Path-Unit `frnadn-update.path` startet
+  `frnadn-update.service` als root → `n8-admin.sh update --auto`: nur vorspulen (nie über von Hand geänderte Dateien oder eigene Commits),
+  Python-Pakete, FRN-Konfiguration, Berechtigungen und sudo prüfen/korrigieren, FRN-Server und Dashboard neu starten, Weboberfläche prüfen –
+  antwortet sie 90 s nicht, **zurück auf den alten Stand**. Ergebnis unter *Letztes Update*, Protokoll per **📜 Update log**.
+- `scripts/update.sh` macht von der Konsole genau dasselbe. Der alte *N8 update guard* (`n8-update-guard.sh`, `ExecStartPre` in der Unit,
+  `n8_update_guard.py`) entfällt; das Update entfernt die Zeile aus der installierten Unit.
+- **Das Programmverzeichnis gehört jetzt root** und ist für den Dienst schreibgeschützt (vorher gehörte es `frnadn`, damit das Dashboard sich
+  selbst per git aktualisieren konnte). Nur Datenordner und der Ordner des Java-Servers gehören `frnadn`.
+
+### 🔐 Berechtigungen & sudo (Admin → System)
+- Prüfliste mit Abzeichen und **🛠️ Korrigieren** (prüfen → korrigieren → erneut prüfen): Dienstbenutzer und Gruppen (`systemd-journal`, `adm`),
+  Programm root-eigen und nicht beschreibbar, Skripte 755, venv, Datenordner 750, Datenbank und Backups 600, systemd-Units root 644,
+  Update-Auslöser aktiv, sudo installiert/eingebunden/gültig/aktuell/wirksam, `n8-admin.json` aktuell. Konsole:
+  `sudo scripts/n8-admin.sh check-perms` bzw. `fix-perms`. Root-Aufgaben verlassen dabei die Dienst-Sandbox per `systemd-run`.
+- sudo-Freigaben jetzt in `/etc/sudoers.d/frnadn-n8admin` (die alte `/etc/sudoers.d/frnadn` wird beim Update entfernt), alles exakte Befehle.
+
+### 🧩 Dienste (Admin → System)
+- Schlanke Liste von `frnadn.service`, `frn-server.service` und dem Update-Auslöser: Status, **Autostart**-Schalter, **▶ / 🔄 / ⏹**.
+  Stoppen und Autostart aus fragen nach. API: `GET /api/admin/services`, `POST /api/admin/services/{unit}/{action}`, `GET /api/admin/perms`,
+  `POST /api/admin/perms/fix`, `GET /api/admin/update-log`. Alles im Audit-Log.
+
+### 🧹 HobbyRadioPortal entfernt
+- Keine lokale Portal-Schnittstelle mehr (`X-HobbyRadioPortal`, `FRNADN_PORTAL_LOCAL`, Pseudo-Benutzer „portal“); alle Admin-Adressen brauchen
+  eine Anmeldung. Installer ohne `FRNADN_SETUP_FILE`; Portal-Hinweise in Benutzer-, Backup- und SystemManager-Bereich und in der Doku entfernt.
+  `FRNADN_RESTORE` (Backup ohne Fragen) und `FRNADN_BEHIND_PROXY` bleiben.
+
+### ⚠️ Einmalig nach dem Update
+- Wer von 2.12 oder älter kommt: einmal `sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms` – richtet Besitzer, sudo und „Update jetzt“ ein.
+
+### Doku & Tests
+- updates.md (neuer Ablauf), betrieb.md (Dienste & Berechtigungen), installation.md, sicherheit.md, adminbereich.md, README; Screenshots
+  `admin-services.png`, `admin-system.png`. Tests für die neue API, die Verdrahtung und ohne die Portal-Tests.
+
 ## 2.12.0 – 2026-11-25
 
 **📋 Öffentliches FRN-Fehlerprotokoll eingebaut.** Der FRN-SystemManager von freeradionetwork.de schreibt jede abgelehnte Anmeldung in ein

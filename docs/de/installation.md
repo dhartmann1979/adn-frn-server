@@ -81,27 +81,12 @@ sudo frnadn set-superadmin admin              # Superadmin anlegen
 ```
 
 Danach im Admin-Portal unter **Settings** Serveradresse und SystemManager-Konto eintragen und den FRN-Server neu starten.
-
-**Komplett ohne Fragen, mit allen Angaben** (ab 2.9.0) – die Antworten als JSON, genau das Format von `frnadn apply-setup`.
-So richtet auch der Web-Installer des [HobbyRadioPortals](https://github.com/dhartmann1979/HobbyRadioPortal) einen FRN-Server neu ein:
-
-```bash
-cat > /root/frn-setup.json <<'JSON'
-{"settings": {"frn.standalone": false, "sysman.email": "sysop@example.org", "sysman.password": "…",
-              "frn.address": "frn.example.org", "frn.port": 10024, "frn.owner_callsign": "DO1ABC", "frn.owner_name": "Dirk",
-              "dashboard.title": "Auf der NachtSchicht", "dashboard.public": true},
- "test_room": "Test", "rooms": ["Nachtschicht", "World"],
- "superadmin": {"username": "sysop", "password": "mindestens-10-Zeichen"}}
-JSON
-chmod 600 /root/frn-setup.json
-sudo FRNADN_YES=1 FRNADN_SETUP_FILE=/root/frn-setup.json ./scripts/install.sh
-rm /root/frn-setup.json
-```
-
-Hinter einem Reverse-Proxy zusätzlich `FRNADN_PORT=8090 FRNADN_BEHIND_PROXY=1` (eigenes HTTPS aus).
+Hinter einem Reverse-Proxy zusätzlich `FRNADN_PORT=8090 FRNADN_BEHIND_PROXY=1` (eigenes HTTPS aus). Aus einem Backup ohne Fragen:
+`FRNADN_RESTORE=/pfad/x.frnbak FRNADN_RESTORE_PASSWORD_FILE=/pfad/pw`.
 
 Weitere Variablen: `FRNADN_DIR` (Vorgabe `/opt/adn-frn-server`), `FRNADN_DATA` (Vorgabe `/var/lib/frnadn`), `FRNADN_FRN_HOME` (Vorgabe `$FRNADN_DATA/frn`), `FRNADN_PORT` (Web-Port, 80), `FRN_DIR` (`/opt/frn-server`), `FRN_ZIP=/pfad/FRN_Server.zip` (vorhandenes Paket statt Download).
 
+Am Ende richtet der Installer mit `scripts/n8-admin.sh fix-perms` Besitzer und Rechte, die sudo-Freigaben und „Update jetzt“ ein.
 
 ## Neuinstallation auf einem Rechner mit einer alten FRN-Installation
 
@@ -182,7 +167,7 @@ sudo journalctl -u frnadn -n 80 --no-pager
 | Was | Wie |
 |---|---|
 | Java-FRN-Server | Admin-Portal → **System → Upgrade Java now** (lädt von freeradionetwork.de und startet den Dienst neu) |
-| Dashboard | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` – Dashboard und FRN-Server starten danach neu; Stationen verbinden sich automatisch wieder |
+| Dashboard | **⬆️ Update jetzt installieren** im Adminbereich oder `sudo /opt/adn-frn-server/scripts/update.sh` – Dashboard und FRN-Server starten danach neu; Stationen verbinden sich automatisch wieder |
 
 `install.sh` ist ausschließlich für eine frische Installation vorgesehen. Es bricht ab, wenn bereits eine FRN-Datenbank, eine vorhandene `server.properties` oder ein laufender FRN-Dienst erkannt wird. Für Updates ist `scripts/update.sh` vorgesehen; `install.sh` nicht erneut auf einem installierten System ausführen.
 

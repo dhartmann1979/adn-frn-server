@@ -13,8 +13,6 @@ Environment=FRNADN_FRN_HOME=/var/lib/frnadn/frn
 Environment=FRNADN_FRN_JAR=/opt/frn-server/FRN_Server.jar
 Environment=FRNADN_PORT=80
 Environment=PYTHONUNBUFFERED=1
-# N8 update guard: back to the previous commit if the dashboard does not come up after an update
-ExecStartPre=-/bin/sh /opt/frnadn/scripts/n8-update-guard.sh /opt/frnadn /var/lib/frnadn
 ExecStart=/opt/frnadn/venv/bin/python -m frnadn
 # web port 80 without root
 AmbientCapabilities=CAP_NET_BIND_SERVICE

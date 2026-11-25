@@ -33,7 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
 from . import n8_security as _sec
-from . import n8_update_guard as _guard
+from .n8_admin import N8Admin
 from . import backup as fbackup
 from . import sysman as fsysman
 from . import frn_errorlog
@@ -76,6 +76,15 @@ class Ctx:
         self.live.server = self.server
         self.live.chat_mode = self.settings.get("dashboard.chat")
         self.system = System(demo=DEMO)
+        self.n8 = N8Admin(DATA, demo=DEMO)      # Dienste, Berechtigungen, „Update jetzt“ über scripts/n8-admin.sh
+        if DEMO and not (DATA / "n8-admin.json").exists():   # Demo: was scripts/n8-admin.sh sudo-setup schreiben würde
+            all5 = ["start", "stop", "restart", "enable", "disable"]
+            (DATA / "n8-admin.json").write_text(json.dumps({"version": 1, "name": "ADN-FRN-Server", "id": "frnadn", "systemctl": "/usr/bin/systemctl",
+                "self": str(ROOT / "scripts" / "n8-admin.sh"), "update_unit": "frnadn-update.service", "request": str(DATA / "update.request"),
+                "log": str(DATA / "update.log"), "result": str(DATA / "update.result"), "units": [
+                    {"unit": "frnadn.service", "label": "Dashboard (frnadn)", "actions": all5},
+                    {"unit": "frn-server.service", "label": "Java-FRN-Server", "actions": all5},
+                    {"unit": "frnadn-update.path", "label": "Update-Auslöser („Update jetzt“)", "actions": all5}]}), "utf-8")
         self.sockets: Dict[WebSocket, Dict[str, Any]] = {}
         self.restart_needed = False
         self.dashboard_restart_needed = False
@@ -144,53 +153,12 @@ def ip_of(conn) -> str:
     return conn.client.host if conn.client else ""
 
 
-# HobbyRadioPortal on the same server (no token, since 2.11.0): what it may reach besides the public data – settings, rooms,
-# the lists (ACL), starting/stopping the FRN server and the change log. Never users, sessions, accounts, updates, system or HTTPS.
-PORTAL_PATHS = {"/api/admin/frn-errorlog", "/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
-                   "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart", "/api/admin/frn-password"}
-PORTAL_LOCKED = ("https.",)
-# Only a *direct* call from this machine counts: loopback peer, Host is loopback, the portal's marker header and **no** proxy
-# header. Requests through nginx/Caddy also arrive from 127.0.0.1, but every proxy of the N8schicht projects adds
-# X-Forwarded-For – and uvicorn (proxy_headers) then even reports the real client address. Switch off: FRNADN_PORTAL_LOCAL=0.
-PORTAL_LOCAL = os.environ.get("FRNADN_PORTAL_LOCAL", "1") != "0"
-_LOOPBACK = {"127.0.0.1", "::1", "localhost"}
-_PROXY_HEADERS = ("x-forwarded-for", "x-real-ip", "forwarded", "x-forwarded-host", "x-forwarded-proto", "via",
-                  "cf-connecting-ip", "true-client-ip", "x-client-ip")
-
-
-def portal_local(conn) -> bool:
-    """Is this the HobbyRadioPortal calling directly on this server?"""
-    if not PORTAL_LOCAL or conn.headers.get("x-hobbyradioportal") != "1":
-        return False
-    if (conn.client.host if conn.client else "") not in _LOOPBACK:
-        return False
-    if any(h in conn.headers for h in _PROXY_HEADERS):
-        return False
-    host = conn.headers.get("host", "")
-    host = host[1:host.find("]")] if host.startswith("[") else host.rsplit(":", 1)[0]
-    return host in _LOOPBACK
-
-
-def _token_path_ok(path: str) -> bool:   # paths the HobbyRadioPortal may use
-    if path.startswith("/api/admin/"):
-        return path in PORTAL_PATHS or bool(re.fullmatch(r"/api/admin/rooms/\d+", path))
-    return path.startswith("/api/") and not path.startswith("/api/auth/")
-
-
 def user_of(conn) -> Optional[Dict[str, Any]]:
-    u = ctx.auth.session_user(conn.cookies.get(COOKIE))
-    if u:
-        return u
-    if _token_path_ok(conn.url.path) and portal_local(conn):
-        return ctx.auth.portal_user(conn.headers.get("x-portal-user", ""))
-    return None
+    return ctx.auth.session_user(conn.cookies.get(COOKIE))
 
 
 def need_human_admin(request: Request) -> Dict[str, Any]:
-    u = need_admin(request)
-    if u.get("api"):
-        raise HTTPError(403, "Not for the HobbyRadioPortal – log in to the dashboard.")
-    return u
+    return need_admin(request)
 
 
 def is_admin(u) -> bool:
@@ -412,8 +380,6 @@ async def save_settings(request: Request):
     changes = b.get("changes") or {}
     if not isinstance(changes, dict):
         raise HTTPError(400, "Invalid request.")
-    if u.get("api") and any(str(k).startswith(PORTAL_LOCKED) for k in changes):
-        raise HTTPError(403, "HTTPS settings cannot be changed with an API token.")
     if "frn.default_room" in changes and changes["frn.default_room"] and \
             changes["frn.default_room"] not in [r["name"] for r in ctx.store.rooms()]:
         raise HTTPError(400, "Default room: this room does not exist.")
@@ -506,11 +472,16 @@ _update_state: Dict[str, Any] = {"checked": None, "github": None, "java": None}
 async def check_all_updates(force: bool = False) -> Dict[str, Any]:
     """Dashboard (GitHub) and Java FRN server. Results are cached for ten minutes unless forced."""
     if not force and _update_state["checked"] and time.time() - _update_state["checked"] < 600:
-        return {**_update_state, "result": _guard.last_result(DATA)}
-    gh = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
+        return {**_update_state, "result": ctx.n8.update_state()["result"]}
+    gh = dict(await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True))
+    # installiert wird als root über scripts/n8-admin.sh („Update jetzt“ → update.request → frnadn-update.service)
+    ready = ctx.n8.update_state()["ready"]
+    gh["can_upgrade"] = bool(gh.get("update") and ready and not str(gh.get("hint", "")).startswith("This dashboard has its own commits"))
+    if gh.get("hint", "").startswith("Run once as root") or (gh.get("update") and not ready):
+        gh["hint"] = "" if ready else f"Run once as root: sudo {updater.ROOT}/scripts/n8-admin.sh fix-perms (sets up “Update now”, permissions and sudo)."
     java = await ctx.java.check_update()
     _update_state.update(checked=time.time(), github=gh, java=java)
-    return {**_update_state, "result": _guard.last_result(DATA)}
+    return {**_update_state, "result": ctx.n8.update_state()["result"]}
 
 def parse_java_properties(raw: str) -> Dict[str, str]:
     values: Dict[str, str] = {}
@@ -750,36 +721,11 @@ async def updates_upgrade(request: Request):
             log.exception("java update")
             raise HTTPError(500, f"Java-Update fehlgeschlagen: {e}")
     elif target == "github":
-        gh = _update_state.get("github") or {}
-        expected = str(b.get("expected") or (gh.get("latest") or {}).get("commit") or "")
-        if not expected:
-            raise HTTPError(400, "Bitte zuerst nach Updates suchen.")
-        try:
-            result = await asyncio.to_thread(updater.install, GITHUB_BRANCH, expected)
-        except updater.UpdateError as e:
-            raise HTTPError(400, str(e))
-        if result.get("changed"):
-            # Restart FRN as well: the dashboard's site status is derived from the server's live log stream.
-            try:
-                frn_restart = await ctx.java.control("restart")
-                result["frn_restart"] = {"ok": frn_restart.get("rc") == 0, **frn_restart}
-            except Exception as e:
-                log.exception("FRN restart after dashboard update")
-                result["frn_restart"] = {"ok": False, "out": str(e)}
-            # systemd (Restart=always) starts the dashboard again on the new code; without systemd the admin must do it.
-            result["restart_required"] = True
-            result["restarting"] = updater.under_systemd()
-            if result["restarting"]:
-                # N8 update guard: the new code checks its web interface; scripts/n8-update-guard.sh
-                # (ExecStartPre) goes back to the old commit after three starts without an answer
-                try:
-                    v_old = f"v{(_update_state.get('github') or {}).get('local', {}).get('version', '?')} · {result['old'][:7]}"
-                    v_new = f"v{result.get('version') or '?'} · {result['new'][:7]}"
-                    _guard.mark_pending(DATA, result["old"], result["new"], v_old, v_new)
-                except (OSError, KeyError) as e:
-                    log.warning(f"update guard not armed: {e}")
-                asyncio.get_running_loop().call_later(1.5, os._exit, 3)
-        _update_state["github"] = await asyncio.to_thread(updater.check, GITHUB_REPO, GITHUB_BRANCH, True)
+        # als root über scripts/n8-admin.sh update --auto: vorspulen, Pakete, Rechte, Neustart, Prüfung, sonst Rückfall
+        ok, msg = ctx.n8.request_update()
+        if not ok:
+            raise HTTPError(400, msg)
+        result = {"changed": True, "requested": True, "restarting": True, "message": msg}
     else:
         raise HTTPError(400, "Unknown update target.")
     ctx.auth.audit("upgrade_" + target, u["username"], str({k: v for k, v in result.items() if k not in ("files", "pip")}), ip_of(request))
@@ -1256,6 +1202,46 @@ async def power(request: Request):
     return {"ok": r["rc"] == 0}
 
 
+# ---------------------------------------------------------------- Dienste, Berechtigungen & sudo, Update-Protokoll (scripts/n8-admin.sh)
+@app.get("/api/admin/services")
+async def services_list(request: Request):
+    need_admin(request)
+    return {"ready": ctx.n8.ready, "units": await ctx.n8.units()}
+
+
+@app.post("/api/admin/services/{unit}/{action}")
+async def services_action(unit: str, action: str, request: Request):
+    u = need_admin(request)
+    ok, out = await ctx.n8.unit_action(unit, action)
+    ctx.auth.audit("service", u["username"], f"{action} {unit}: {'ok' if ok else out[:120]}", ip_of(request))
+    if not ok:
+        raise HTTPError(400, out or "failed")
+    if unit == "frn-server.service":
+        await asyncio.sleep(1.5)
+        await ctx.server.poll_service()
+    return {"ok": ok, "message": out, "units": await ctx.n8.units()}
+
+
+@app.get("/api/admin/perms")
+async def perms_check(request: Request):
+    need_admin(request)
+    return await ctx.n8.check_perms()
+
+
+@app.post("/api/admin/perms/fix")
+async def perms_fix(request: Request):
+    u = need_admin(request)
+    ok, out = await ctx.n8.fix_perms()
+    ctx.auth.audit("perms_fix", u["username"], "ok" if ok else "errors remain", ip_of(request))
+    return {"ok": ok, "message": out, "check": await ctx.n8.check_perms()}
+
+
+@app.get("/api/admin/update-log")
+async def update_log(request: Request):
+    need_admin(request)
+    return ctx.n8.update_state()
+
+
 @app.get("/api/admin/logs")
 async def logs(request: Request):
     need_admin(request)
@@ -1430,8 +1416,6 @@ async def _startup() -> None:
     await ctx.server.start()
     ctx.tasks.append(asyncio.ensure_future(background()))
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
-    if _guard.pending(DATA):
-        ctx.tasks.append(asyncio.ensure_future(_guard.startup_check(DATA, _guard.local_url(_SELF["host"], _SELF["port"], "/api/info"))))
     ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
 
 

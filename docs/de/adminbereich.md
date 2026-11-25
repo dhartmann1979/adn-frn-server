@@ -73,8 +73,7 @@ Danach E-Mail und Passwort oben eintragen, speichern, FRN-Server neu starten.
 | ✅ *Angefordert* | Der SystemManager hat die Anfrage angenommen – das Passwort kommt per E-Mail |
 | ⚠️ *Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen* | Rufzeichen + Name sind schon registriert. Für einen zweiten Server einen anderen Namen wählen, z. B. `DO1ABC, Server Test`, und eine andere E-Mail |
 
-Höchstens eine Anfrage pro Minute; jede steht im Protokoll (*FRN-Passwort angefordert*). Auch das **HobbyRadioPortal** kann den Knopf nutzen
-(vom HobbyRadioPortal auf demselben Rechner, *Admin → Dienste → FRN → FRN-Server*).
+Höchstens eine Anfrage pro Minute; jede steht im Protokoll (*FRN-Passwort angefordert*).
 
 ## 🏠 Rooms
 
@@ -110,20 +109,6 @@ Der Java-Server braucht die Passwörter im Klartext in seiner Datei; frn_adn leg
 
 Benutzer des Dashboards (nicht zu verwechseln mit FRN-Konten). Den Superadmin kann hier niemand ändern oder löschen; Admins bearbeitet nur der Superadmin.
 
-## 🔌 HobbyRadioPortal auf diesem Server
-
-Ab 2.11.0 gibt es **keine API-Tokens** mehr. Läuft das [HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) auf
-**demselben Rechner**, verwaltet es diesen Server direkt aus seinem Admin-Panel (*Dienste → FRN*): **Einstellungen, Räume,
-Zugriffslisten und Start/Stopp** des Java-Servers. Nichts eintragen, nichts kopieren. Unter **Users** steht dazu ein kurzer Hinweis.
-
-Als Portal gilt nur ein **direkter Aufruf auf diesem Rechner**: Absender `127.0.0.1`/`::1`, Adresse `http://127.0.0.1:…`, die
-Kennung `X-HobbyRadioPortal: 1` – und **keine** Proxy-Kopfzeile (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `Via` …). Anfragen über
-nginx/Caddy (die auch von 127.0.0.1 kommen) oder von anderen Rechnern sind damit nie „das Portal“. Abschalten: `FRNADN_PORTAL_LOCAL=0`
-in der Umgebung des Dienstes.
-
-Das Portal darf **nie** Benutzer, Sitzungen, FRN-Konten, Updates, System, Theme, Links, Import, Logs oder HTTPS ändern – das bleibt hier
-im Dashboard. Im Protokoll stehen Änderungen aus dem Portal als `portal (<Portal-Benutzer>)`.
-
 ## 🖥️ System
 
 <p align="center"><img src="../images/admin-system.png" alt="System" width="90%"></p>
@@ -142,8 +127,7 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 
 <p align="center"><img src="../images/admin-backup.png" alt="Backup und Wiederherstellen" width="90%"></p>
 
-Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten. Das HobbyRadioPortal
-haben hier keinen Zugriff.
+Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten.
 
 **💾 Backup** – Passwort zweimal eingeben (mindestens 10 Zeichen), **Backup erstellen**. Der Browser lädt die Datei
 `frn-backup-<host>-<datum>.frnbak` sofort herunter; die letzten **5** Backups bleiben zusätzlich in `/var/lib/frnadn/backups/`
@@ -170,9 +154,6 @@ was drin ist (Host, Datum, Version, Räume, Benutzer, FRN-Konten, Stationen, Dur
 
 Das Protokoll vermerkt *💾 Backup created/downloaded/deleted*, *♻️ Restore started* und *♻️ Backup restored*.
 
-> **Im HobbyRadioPortal:** Dieselbe `.frnbak` lässt sich beim Einrichten des Portals einspielen (*Web-Installer → FRN → 📦 aus einem Backup*).
-> Das Portal installiert dann adn-frn-server neu, spielt das Backup ein und stellt das Dashboard hinter sich –
-> siehe [Umzugsanleitung des Portals](https://github.com/dhartmann1979/HobbyRadioPortal/blob/main/docs/UMZUG.md#aus-backups-wiederherstellen).
 
 ## 🔄 Updates, Links und Import
 

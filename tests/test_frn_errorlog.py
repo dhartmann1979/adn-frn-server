@@ -60,6 +60,3 @@ def test_watch_reports_once(client):
     assert len([e for e in A.ctx.live.events if e["kind"] == "frnlog"]) == 1
 
 
-def test_portal_may_read():
-    from frnadn.app import _token_path_ok
-    assert _token_path_ok("/api/admin/frn-errorlog")

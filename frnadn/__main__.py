@@ -134,13 +134,12 @@ def main() -> int:
             print(f"{R}✗{N} {e}", file=sys.stderr)
             return 2
     if cmd == "behind-proxy":
-        # Used by the HobbyRadioPortal installer: nginx of the portal takes ports 80/443 and the domain, the dashboard
-        # then listens on 127.0.0.1 (FRNADN_BIND/FRNADN_PORT in a systemd drop-in written by the portal).
+        # Behind a reverse proxy (FRNADN_BEHIND_PROXY=1 in install.sh): nginx takes ports 80/443 and the domain.
         c = _ctx()
         before = {"https_was": bool(c.settings.get("https.enabled")), "domain": c.settings.get("https.domain") or "",
                   "email": c.settings.get("https.email") or "", "title": c.settings.get("dashboard.title") or ""}
         if before["https_was"]:
-            c.settings.update({"https.enabled": False}, "hobbyradioportal")
+            c.settings.update({"https.enabled": False}, "install")
         print(json.dumps(before))
         return 0
     if cmd == "write-config":

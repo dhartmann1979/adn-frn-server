@@ -1,11 +1,11 @@
-"""Hardening (N8 security), N8 update guard and N8 Kit files."""
+"""Hardening (N8 security), N8 Admin (update, permissions, sudo, services) and N8 Kit files."""
 import asyncio
 import subprocess
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from frnadn import n8_security, n8_update_guard as guard
+from frnadn import n8_security
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -35,46 +35,37 @@ def test_uvicorn_without_server_header(app_mod):
     assert n8_security.UVICORN_KWARGS == {"server_header": False}
 
 
-def _repo(tmp_path):
-    r = tmp_path / "repo"
-    subprocess.run(["git", "init", "-q", str(r)], check=True)
-    g = ["git", "-C", str(r), "-c", "user.name=t", "-c", "user.email=t@t"]
-    subprocess.run(g + ["commit", "-q", "--allow-empty", "-m", "a"], check=True)
-    old = subprocess.check_output(["git", "-C", str(r), "rev-parse", "HEAD"], text=True).strip()
-    (r / "f").write_text("x")
-    subprocess.run(["git", "-C", str(r), "add", "f"], check=True)
-    subprocess.run(g + ["commit", "-q", "-m", "b"], check=True)
-    new = subprocess.check_output(["git", "-C", str(r), "rev-parse", "HEAD"], text=True).strip()
-    return r, old, new
+def test_n8_admin_wired():
+    """Update, Rechte-Check und sudo laufen über scripts/n8-admin.sh – ohne den alten update guard."""
+    unit = (ROOT / "systemd" / "frnadn.service").read_text()
+    assert "n8-update-guard" not in unit
+    upd = (ROOT / "scripts" / "update.sh").read_text()
+    assert 'n8-admin.sh" update' in upd
+    conf = (ROOT / "scripts" / "n8-admin.conf").read_text()
+    assert "N8_ID=frnadn" in conf and "frn-server.service" in conf
+    for f in ("n8-admin.sh", "update.sh", "install.sh"):
+        assert subprocess.run(["bash", "-n", str(ROOT / "scripts" / f)]).returncode == 0
+    assert 'n8-admin.sh" fix-perms' in (ROOT / "scripts" / "install.sh").read_text()
 
 
-def test_guard_rolls_back_after_three_starts(tmp_path):
-    r, old, new = _repo(tmp_path)
-    st = tmp_path / "state"
-    guard.mark_pending(st, old, new, "v2.5.0 · a", "v2.6.0 · b")
-    for _ in range(4):
-        subprocess.run(["sh", str(ROOT / "scripts" / "n8-update-guard.sh"), str(r), str(st)], check=True, capture_output=True)
-    assert subprocess.check_output(["git", "-C", str(r), "rev-parse", "HEAD"], text=True).strip() == old
-    res = guard.last_result(st)
-    assert res["ok"] is False and res["to"] == "v2.6.0 · b" and not guard.pending(st)
-
-
-def test_guard_confirms_when_web_answers(tmp_path):
-    import http.server
-    import threading
-    srv = http.server.HTTPServer(("127.0.0.1", 0), http.server.SimpleHTTPRequestHandler)
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
-    try:
-        guard.mark_pending(tmp_path, "a" * 40, "b" * 40)
-        res = asyncio.run(guard.startup_check(tmp_path, guard.local_url("0.0.0.0", srv.server_port), timeout=10, delay=0))
-        assert res["ok"] and not guard.pending(tmp_path)
-    finally:
-        srv.shutdown()
-
-
-def test_unit_and_update_script_use_the_guard():
-    assert "ExecStartPre=-/bin/sh /opt/frnadn/scripts/n8-update-guard.sh /opt/frnadn /var/lib/frnadn" in (ROOT / "systemd" / "frnadn.service").read_text()
-    assert "n8-update-guard" in (ROOT / "scripts" / "update.sh").read_text()
+def test_services_and_perms_api(app_mod, tmp_path):
+    import json
+    data = app_mod.DATA
+    (data / "n8-admin.json").write_text(json.dumps({"self": "/x/n8-admin.sh", "systemctl": "/bin/systemctl", "request": str(data / "update.request"),
+        "log": str(data / "update.log"), "result": str(data / "update.result"),
+        "units": [{"unit": "frnadn.service", "label": "Dashboard", "actions": ["start", "stop", "restart", "enable", "disable"]}]}))
+    app_mod.ctx.auth.set_superadmin("chef", "chef-passwort-1")
+    with TestClient(app_mod.app) as c:
+        assert c.get("/api/admin/services").status_code in (401, 403)
+        assert c.post("/api/auth/login", json={"username": "chef", "password": "chef-passwort-1"}, headers={"X-N8": "1"}).status_code == 200
+        d = c.get("/api/admin/services").json()
+        assert d["units"][0]["unit"] == "frnadn.service" and d["units"][0]["active"] == "active"      # Demo
+        r = c.post("/api/admin/services/frnadn.service/stop", headers={"X-N8": "1"}).json()
+        assert r["ok"] and r["units"][0]["active"] == "inactive"
+        assert c.post("/api/admin/services/sshd.service/stop", headers={"X-N8": "1"}).status_code == 400
+        assert c.post("/api/admin/services/frnadn.service/mask", headers={"X-N8": "1"}).status_code == 400
+        assert c.get("/api/admin/perms").json()["ok"]
+        assert c.get("/api/admin/update-log").json()["ready"]
 
 
 def test_kit_files_loaded():

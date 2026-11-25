@@ -40,26 +40,10 @@ Rufzeichen, Namen, Orte, Band und Beschreibung schicken die FRN-Clients selbst; 
 
 Sitzungs-Cookie `HttpOnly`, `SameSite`, über HTTPS `Secure`; jede schreibende Anfrage braucht den Header `X-N8` (CSRF-Schutz); Fehlversuche werden gebremst. IP-Adressen sehen nur Admins.
 
-### HobbyRadioPortal auf diesem Server (ohne Token)
-
-Seit 2.11.0 gibt es keine API-Tokens mehr (die Tabelle wird beim Start gelöscht). Das HobbyRadioPortal auf **demselben Rechner** gilt als
-Admin – aber nur bei einem **direkten** Aufruf: Absender und `Host` sind Loopback (`127.0.0.1`, `::1`, `localhost`), Kopfzeile
-`X-HobbyRadioPortal: 1`, **keine** Proxy-Kopfzeile (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `X-Forwarded-Host/-Proto`, `Via`,
-`CF-Connecting-IP`, `True-Client-IP`, `X-Client-IP`). nginx des Portals und eigene Reverse-Proxys setzen `X-Forwarded-For` – über sie
-kommt niemand an die Verwaltung. **Eigener Reverse-Proxy vor dem Dashboard:** `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
-gehört dazu (Vorlagen der N8schicht-Projekte haben es). Jedes Programm auf diesem Rechner könnte sich als Portal ausgeben – wer das nicht
-will: `FRNADN_PORTAL_LOCAL=0`. Erlaubt sind nur feste Adressen:
-
-| erlaubt | gesperrt |
-|---|---|
-| `/api/admin/settings` (ohne `https.*`), `/api/admin/rooms…`, `/api/admin/acl`, `/api/admin/audit`, `/api/admin/server/start\|stop\|restart`, öffentliche Lese-APIs | Benutzer, Sitzungen, FRN-Konten, Updates, System, Theme, Links, Import, Logs, `/api/auth/*` |
-
-Jede Änderung steht im Protokoll als `portal (<Portal-Benutzer>)`. Schreibende Aufrufe brauchen weiter den CSRF-Kopf `X-N8`.
-
 ### Backups
 
 Backups (*Admin → System → 💾 Backup*, `frnadn backup`) enthalten alle Zugangsdaten und sind deshalb **nur für den Superadmin** – kein
-Admin und auch das HobbyRadioPortal kommt nicht an Anlegen, Herunterladen, Löschen oder Wiederherstellen. Die Datei ist mit einem eigenen Passwort
+Admin kommt nicht an Anlegen, Herunterladen, Löschen oder Wiederherstellen. Die Datei ist mit einem eigenen Passwort
 verschlüsselt (scrypt n=2¹⁴, SHAKE-256-Schlüsselstrom, HMAC-SHA256 über alles – encrypt-then-MAC); eine veränderte oder falsch entschlüsselte
 Datei wird abgewiesen, bevor etwas entpackt wird. Beim Einspielen werden nur Einträge unter `data/` und `frn/` angenommen – keine absoluten
 Pfade, kein `..`, keine Links –, höchstens 20 000 Dateien und 4 GiB. Auf dem Server liegen Backups mit Rechten 600 in einem 700-Ordner.
@@ -118,7 +102,7 @@ Gemeinsame Bausteine für **HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot und 
 | `static/n8-kit.js` | Sprache DE/EN, Übersetzung, Sprachumschalter, Update-Hinweis, Updates-Kachel, Update-Fortschritt |
 | `static/n8-kit.css` | Aussehen dieser Bausteine, auf Basis der N8-Theme-2-Farben |
 | `frnadn/n8_security.py` | Sicherheits-Header, API-Doku aus, kein `server`-Header |
-| `frnadn/n8_update_guard.py` + `scripts/n8-update-guard.sh` | Prüfung nach dem Update und automatisches Zurücksetzen |
+| `scripts/n8-admin.sh` + `frnadn/n8_admin.py` | Update mit Prüfung und Zurücksetzen, Berechtigungsprüfer mit Korrektur, sudo-Freigaben, Dienste |
 | `static/i18n-app.js` | die deutschen Texte dieses Dashboards (eigene Datei je Projekt) |
 
 ### Sprache DE | EN
@@ -140,7 +124,7 @@ Gemeinsame Bausteine für **HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot und 
 | Hinweis | unter der Statusleiste, nur für Admins: *Update verfügbar: alt → neu* · Was ist neu? · Jetzt aktualisieren · Details · Später (ein Tag) |
 | Installieren | Fenster mit Neuerungen, dann drei Schritte mit Fortschritt; die Seite lädt danach neu |
 | Prüfung danach | die neue Version ruft ihre eigene Weboberfläche auf |
-| Rollback | antwortet sie nicht, startet der Dienst neu; nach drei Starts ohne Antwort setzt `n8-update-guard.sh` auf den alten Stand zurück (`update.sh` trägt die Zeile in bestehende Units ein) |
+| Rollback | antwortet die Weboberfläche 90 s nach dem Update nicht, setzt `n8-admin.sh` auf den alten Stand zurück und startet erneut |
 | Ergebnis | *Letztes Update* in Admin → System: erfolgreich oder zurückgenommen, mit Zeit |
 | Java-FRN-Server | bleibt eigener Knopf **Upgrade Java now** unter der Kachel |
 

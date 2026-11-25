@@ -128,13 +128,6 @@ class Auth:
                          "WHERE s.token_hash = ? AND s.expires_at > ? AND u.disabled = 0", (_th(token), time.time()))
         return self.public(rows[0]) if rows else None
 
-    # ------------------------------------------------------------ API tokens (HobbyRadioPortal)
-    def portal_user(self, on_behalf: str = "") -> Dict[str, Any]:
-        """Pseudo user (role admin) for the HobbyRadioPortal on this server – see app.portal_local()."""
-        who = re.sub(r"[^A-Za-z0-9._@-]", "", on_behalf or "")[:40]
-        return {"id": 0, "username": "portal" + (f" ({who})" if who else ""), "role": "admin", "display_name": "HobbyRadioPortal",
-                "disabled": False, "default_pw": False, "created_at": 0, "last_login": None, "api": True}
-
     def logout(self, token: Optional[str]) -> None:
         if token:
             self.db.x("DELETE FROM sessions WHERE token_hash = ?", (_th(token),))

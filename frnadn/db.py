@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     ip         TEXT NOT NULL DEFAULT '',
     user_agent TEXT NOT NULL DEFAULT ''
 );
-DROP TABLE IF EXISTS api_tokens;               -- until 2.10: tokens for the HobbyRadioPortal (now: same server, no token)
+DROP TABLE IF EXISTS api_tokens;               -- until 2.10: old API tokens, no longer used
 CREATE TABLE IF NOT EXISTS audit (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     ts       REAL NOT NULL,

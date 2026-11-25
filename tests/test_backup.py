@@ -1,4 +1,4 @@
-"""Backup and restore of adn-frn-server (also used by the HobbyRadioPortal)."""
+"""Backup and restore of adn-frn-server."""
 import json
 import sqlite3
 import tarfile

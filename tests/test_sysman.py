@@ -61,6 +61,3 @@ def test_rate_limit():
         sysman.register("127.0.0.1", FORM, port=port)
 
 
-def test_portal_token_may_request():
-    from frnadn.app import _token_path_ok
-    assert _token_path_ok("/api/admin/frn-password") and not _token_path_ok("/api/admin/users")

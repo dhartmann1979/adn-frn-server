@@ -17,18 +17,28 @@ Zu finden unter **⚙️ Admin → 🖥️ System → ⬆️ Updates**. Hinweis,
 
 Gibt es ein neues Dashboard, sehen **angemeldete Admins** direkt unter der Statusleiste den Hinweis *Update verfügbar: v2.6.0 · … → v2.7.0 · …* mit **Was ist neu?** (Commit-Liste), **Jetzt aktualisieren**, **Details** (öffnet Admin → System) und **Später** (blendet den Hinweis für diese Version einen Tag aus). Besucher ohne Anmeldung sehen ihn nie.
 
-## Update-Funktion einmalig freischalten
+## Wie das Update läuft (N8 Admin)
 
-Für die Standardinstallation sind keine zusätzlichen Einstellungen und kein GitHub-Token nötig: Das Repository `dhartmann1979/adn-frn-server` ist öffentlich; die Update-Prüfung und der Download funktionieren ohne Anmeldung. Das Dashboard muss als Git-Checkout mit `origin` auf `main` installiert sein. Nur für ein anderes öffentliches Repository oder einen anderen Branch sind die optionalen Variablen `FRNADN_GITHUB_REPO` und `FRNADN_GITHUB_BRANCH` nötig (siehe unten).
+Seit 2.13.0 läuft das Update wie in N8 Crosslink und den anderen N8schicht-Projekten über den Root-Helfer
+**`scripts/n8-admin.sh`**. Das Programmverzeichnis gehört **root** und ist für den Dienst `frnadn` schreibgeschützt; nur die Daten
+(`/var/lib/frnadn`) und der Ordner des Java-Servers gehören `frnadn`.
 
-Der Dienst läuft als Benutzer `frnadn`. Dieser braucht Schreibrechte auf das Programmverzeichnis **einschließlich `.git`**, damit er den neuen Stand holen und einsetzen kann. Nach einer Neuinstallation gehört das Verzeichnis zunächst `root`. Führe deshalb einmalig als root aus:
+1. **⬆️ Update jetzt installieren** legt nur die Datei `/var/lib/frnadn/update.request` an.
+2. Die systemd-Path-Unit `frnadn-update.path` sieht sie und startet `frnadn-update.service` als root:
+   `n8-admin.sh update --auto`.
+3. Der Helfer spult nur vor (nie über von Hand geänderte Dateien oder eigene Commits), installiert die Python-Pakete, schreibt die
+   Konfiguration des FRN-Servers, **prüft und korrigiert Berechtigungen und sudo**, startet FRN-Server und Dashboard neu und ruft die
+   Weboberfläche auf.
+4. Antwortet sie nicht innerhalb von 90 Sekunden, setzt er auf den alten Stand zurück und startet erneut. Das Ergebnis steht unter
+   *Letztes Update*, das Protokoll unter **📜 Update-Protokoll** (`/var/lib/frnadn/update.log`).
+
+Einmalig nach dem Update von 2.12 oder älter (dort gehörte das Programm noch dem Dienst):
 
 ```bash
-cd /opt/adn-frn-server
-sudo ./scripts/update.sh
+sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms
 ```
 
-> **Hinweis:** Dieser einmalige Schritt installiert zugleich den aktuellen Stand, stellt die Dateirechte ein und startet das Dashboard neu. Danach kann **Update jetzt installieren** im Admin-Portal verwendet werden. `update.sh` trägt dabei auch die Update-Prüfung mit Rollback (`ExecStartPre=… n8-update-guard.sh`) in die installierte Unit `frnadn.service` ein. Bei einem anderen Installationspfad ersetze `/opt/adn-frn-server` entsprechend.
+Das richtet Besitzer und Rechte, die sudo-Freigaben und den Update-Auslöser ein. Danach geht alles im Adminbereich.
 
 ## Wann wird geprüft?
 
@@ -57,7 +67,7 @@ wird automatisch neu geprüft. Die Uhrzeit der letzten Prüfung steht unten in d
 2. **⬆️ Update jetzt installieren** (oder **Jetzt aktualisieren** im Hinweis). Das Fenster zeigt die Neuerungen; **⬆️ Jetzt aktualisieren** startet.
 3. Drei Schritte mit Fortschritt: **Update wird geladen und eingespielt** (genau der Stand, den du gesehen hast, per Fast-Forward, dazu geänderte Python-Pakete) → **Dienst startet neu** (erst der FRN-Server für einen frischen Live-Status, dann das Dashboard) → **Weboberfläche wird geprüft**. Danach lädt die Seite von selbst neu. Einstellungen, Benutzer und Datenbank bleiben unberührt.
 
-**Automatisch zurück:** Vor dem Neustart merkt sich das Dashboard den alten Stand (`/var/lib/frnadn/update.pending`). Die neue Version ruft nach dem Start ihre eigene Weboberfläche auf. Antwortet sie nicht, beendet sie sich; nach **drei erfolglosen Starts** setzt `scripts/n8-update-guard.sh` (läuft als `ExecStartPre` vor jedem Start von `frnadn`) das Programmverzeichnis auf den alten Commit zurück. Das Ergebnis steht in der Kachel unter **Letztes Update** (*erfolgreich* oder *zurückgenommen*) und in `/var/lib/frnadn/update.result`.
+**Automatisch zurück:** Antwortet die Weboberfläche nach dem Neustart nicht, setzt `n8-admin.sh` auf den alten Stand zurück (siehe oben).
 
 Der Knopf ist grau, wenn das Upgrade so nicht möglich ist; die Kachel nennt den Grund (siehe unten).
 
@@ -68,7 +78,7 @@ cd /opt/adn-frn-server
 sudo ./scripts/update.sh
 ```
 
-`update.sh` holt den neuen Stand, installiert die Python-Pakete, stellt die Dateirechte ein und startet zuerst den FRN-Server und danach das Dashboard neu. Verbundene Stationen verbinden sich automatisch wieder.
+`update.sh` ruft `scripts/n8-admin.sh update` auf – genau dasselbe wie der Knopf, mit Ausgabe auf der Konsole. Verbundene Stationen verbinden sich automatisch wieder.
 
 ## Java-FRN-Server aktualisieren
 
@@ -78,17 +88,16 @@ sudo ./scripts/update.sh
 
 | Anzeige | Ursache | Lösung |
 |---|---|---|
-| **Update jetzt installieren** ist grau, Hinweis „Run once as root …“ | Dem Dienstbenutzer fehlen Schreibrechte im Programmverzeichnis | `cd /opt/adn-frn-server && sudo ./scripts/update.sh` |
+| **Update jetzt installieren** ist grau, Hinweis „Run once as root …“ | Update-Auslöser oder sudo noch nicht eingerichtet | `sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms` |
 | **unknown state** · „No git checkout …“ | Das Dashboard wurde ohne `.git`-Ordner kopiert | neu von GitHub klonen oder den Stand von Hand einspielen und `update.sh` ausführen |
 | **update available**, aber „own commits“ | Im Programmverzeichnis gibt es eigene Commits | von Hand aktualisieren: `git pull --rebase` oder neu klonen |
-| Fehler „Files were changed by hand (…)“ | Dateien im Programmverzeichnis wurden verändert | Änderungen sichern, `git stash`, dann erneut |
+| Protokoll: „von Hand geänderte Dateien“ | Dateien im Programmverzeichnis wurden verändert | Änderungen sichern, `git -C /opt/adn-frn-server stash`, dann erneut |
 | **check failed** · „rate limit“ | GitHub begrenzt anonyme Abfragen | später noch einmal prüfen |
 | **check failed** · „not reachable“ | Der Server erreicht github.com nicht | Netz, DNS und Proxy prüfen |
 | „The code is updated, but the Python packages are not …“ | `pip install` ist gescheitert (z. B. kein Netz) | `sudo ./scripts/update.sh` |
-| Fortschritt endet mit „Der Dienst antwortet noch nicht“ | Dashboard startet nicht | `sudo journalctl -u frnadn -n 80 --no-pager`; nach drei Starts setzt der Guard automatisch zurück |
+| Fortschritt endet mit „Der Dienst antwortet noch nicht“ | Dashboard startet nicht | 📜 Update-Protokoll ansehen, `sudo journalctl -u frnadn -n 80 --no-pager`; der Helfer setzt nach 90 s automatisch zurück |
 | **Letztes Update: zurückgenommen** | Die neue Version kam nicht hoch, der alte Stand läuft wieder | Log ansehen (`journalctl -u frnadn`), Fehler melden; der Hinweis bietet das Update weiter an |
 
-> Läuft das Dashboard **nicht** unter systemd (z. B. zum Testen mit `python3 -m frnadn`), beendet es sich nach einem Upgrade nicht selbst. Die Meldung sagt dann, dass du es von Hand neu starten sollst.
 
 ## Eigenes Repository oder anderer Branch
 

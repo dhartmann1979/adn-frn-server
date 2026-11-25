@@ -24,10 +24,8 @@
 #    FRN_ZIP=/pfad/FRN_Server.zip vorhandenes Paket statt Download
 #    FRNADN_YES=1                 keine Fragen, Vorgaben übernehmen
 #    FRNADN_RESTORE=/pfad/x.frnbak          statt Einrichtung ein Backup einspielen (ohne Fragen)
-#    FRNADN_RESTORE_PASSWORD_FILE=/pfad     Passwort des Backups (erste Zeile) – z. B. für den HobbyRadioPortal-Installer
-#    FRNADN_BEHIND_PROXY=1                  eigenes HTTPS aus (das Portal/nginx übernimmt Port 80/443 und die Domain)
-#    FRNADN_SETUP_FILE=/pfad/setup.json     ohne Fragen neu einrichten – {"settings": {…}, "test_room": "Test", "rooms": […],
-#                                           "superadmin": {"username", "password"}} wie "frnadn apply-setup" (mit FRNADN_YES=1)
+#    FRNADN_RESTORE_PASSWORD_FILE=/pfad     Passwort des Backups (erste Zeile)
+#    FRNADN_BEHIND_PROXY=1                  eigenes HTTPS aus (ein Reverse-Proxy wie nginx übernimmt Port 80/443 und die Domain)
 # =============================================================================
 set -euo pipefail
 
@@ -141,7 +139,7 @@ if [ "$GET" = 1 ]; then
     rm -rf "$TMP"
     ok "installiert: Java FRN_Server $(ver_of < "$FRN_DIR/releasenotes.txt") nach ${FRN_DIR}"
 fi
-chown -R "$SVC_USER:$SVC_USER" "$FRN_DIR"           # frn_adn installiert Updates aus dem Admin-Portal
+chown -R "$SVC_USER:$SVC_USER" "$FRN_DIR"           # frn_adn installiert Java-Updates aus dem Admin-Portal (als frnadn, nie root)
 
 # ---------------------------------------------------------------------------
 step 4 "Dashboard frn_adn nach ${DIR}"
@@ -164,14 +162,6 @@ find "$DATA/backups" -type f -exec chmod 600 {} + 2>/dev/null || true
 for f in "$DATA"/frnadn.db*; do [ -e "$f" ] && chmod 600 "$f"; done
 ok "Benutzer ${SVC_USER} · Daten in ${DATA} (SQLite) · Konfiguration des FRN-Servers in ${FRN_HOME}"
 
-SC="$(command -v systemctl)"
-cat > /etc/sudoers.d/frnadn <<EOF
-# frn_adn: the dashboard controls the FRN server; only the superadmin may reboot or shut down
-$SVC_USER ALL=(root) NOPASSWD: $SC start frn-server.service, $SC stop frn-server.service, $SC restart frn-server.service, \\
-    $SC reboot, $SC poweroff
-EOF
-chmod 440 /etc/sudoers.d/frnadn
-visudo -cq -f /etc/sudoers.d/frnadn || fail "sudoers-Regel fehlerhaft"
 
 cat > /usr/local/bin/frnadn <<EOF
 #!/bin/sh
@@ -202,25 +192,12 @@ if [ -n "${FRNADN_RESTORE:-}" ]; then
     ok "Backup eingespielt – Einstellungen, Räume, Listen, FRN-Konten, Benutzer, Statistik und Branding übernommen"
 fi
 if [ "${FRNADN_BEHIND_PROXY:-0}" = 1 ]; then
-    run_app behind-proxy >/dev/null && ok "Eigenes HTTPS aus – Port 80/443 und die Domain übernimmt der Reverse-Proxy (HobbyRadioPortal)"
+    run_app behind-proxy >/dev/null && ok "Eigenes HTTPS aus – Port 80/443 und die Domain übernimmt der Reverse-Proxy"
 fi
 
 if [ "$RESTORED" = 1 ]; then
 step 5 "Superadmin für das Admin-Portal"; ok "aus dem Backup übernommen – Anmeldung mit den Konten des alten Servers"
 step 6 "FRN-Server einrichten"; run_app write-config >/dev/null && ok "server.properties und Zugriffslisten aus dem Backup geschrieben"
-CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
-FPORT="$(cdef frn.port 10024)"
-elif [ -n "${FRNADN_SETUP_FILE:-}" ]; then
-# Ohne Fragen neu einrichten (z. B. Web-Installer des HobbyRadioPortals): dasselbe JSON, das sonst aus den Fragen entsteht
-[ -f "$FRNADN_SETUP_FILE" ] || fail "FRNADN_SETUP_FILE nicht gefunden: $FRNADN_SETUP_FILE"
-step 5 "Superadmin für das Admin-Portal"
-step 6 "FRN-Server einrichten"
-umask 077
-install -m 600 -o "$SVC_USER" -g "$SVC_USER" "$FRNADN_SETUP_FILE" /tmp/frnadn-setup.json
-umask 022
-run_app apply-setup /tmp/frnadn-setup.json || { rm -f /tmp/frnadn-setup.json; fail "Einrichtung fehlgeschlagen (FRNADN_SETUP_FILE)"; }
-rm -f /tmp/frnadn-setup.json
-ok "Einstellungen, Räume und Superadmin aus $(basename "$FRNADN_SETUP_FILE") übernommen"
 CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
 FPORT="$(cdef frn.port 10024)"
 else
@@ -336,6 +313,9 @@ systemctl enable -q frn-server frnadn
 systemctl restart frn-server
 systemctl restart frnadn
 ok "frn-server und frnadn laufen und starten beim Booten"
+# Programm gehört root, Daten dem Dienst; sudo-Freigaben, „Update jetzt“ und Prüfung – dasselbe wie im Adminbereich
+chmod 755 "$DIR/scripts/n8-admin.sh"
+"$DIR/scripts/n8-admin.sh" fix-perms || warn "Berechtigungen: siehe oben – später: sudo $DIR/scripts/n8-admin.sh fix-perms"
 if command -v ufw >/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
     ufw allow "$PORT/tcp" >/dev/null; ufw allow "$FPORT/tcp" >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
     ok "Firewall (ufw): Port ${PORT} (Dashboard) und ${FPORT} (FRN) freigegeben"

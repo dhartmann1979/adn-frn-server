@@ -1046,8 +1046,7 @@ async function loadUsers() {
             <div class="row"><label>Password (min. 10)</label><input type="password" name="password" required minlength="10" autocomplete="new-password"></div>
             <div class="row"><label>Role</label><select name="role"><option value="user">User</option>${sa ? '<option value="admin">Admin</option>' : ''}</select></div>
             <div class="actions"><button class="btn primary">Create</button></div></form></div>
-        <div class="grid" style="margin-top:14px"><div class="tile"><h3>🔌 HobbyRadioPortal</h3>
-            <div class="subt">No token needed: an HobbyRadioPortal on this server manages settings, rooms, the access lists and start/stop of the FRN server directly – never users, sessions, FRN accounts, updates, system or HTTPS. Requests through a proxy or from other machines never count as the portal. Switch off: FRNADN_PORTAL_LOCAL=0 in the service.</div></div></div>`;
+`;
 }
 async function createUser(f) {
     try { await api('POST', '/api/admin/users', { username: f.username.value, display_name: f.display_name.value, password: f.password.value, role: f.role.value }); toast('User created'); loadUsers(); }
@@ -1112,15 +1111,78 @@ async function loadSystem() {
             <div id="updInfo" style="font-size:12.5px">Not checked yet.</div>
             <div class="n8-sub">☕ Java FRN server</div>
             <div id="javaInfo" style="font-size:12.5px">–</div>
-            <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button></div></div>
+            <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="upgradeJava" disabled onclick="upgradeNow('java', this)">Upgrade Java now</button>
+                <button class="btn" onclick="showUpdateLog(this)">📜 Update log</button></div>
+            <pre class="term hidden" id="updLog" style="height:260px;margin-top:10px"></pre></div>
+        </div>
+        <div class="grid g2" style="margin-top:14px">
+        <div class="tile"><h3>🧩 Services</h3><div class="subt">Status, autostart at boot and start, stop, restart – only the services released for this dashboard.</div>
+            <div id="svcList"><div class="dim">loading …</div></div></div>
+        <div class="tile"><h3>🔐 Permissions &amp; sudo <span id="permBadge"></span></h3>
+            <div class="subt">Checks the service user, program and data permissions, systemd units and the sudo rules. <b>Fix</b> repairs what is wrong and checks again. Console: <span class="mono">sudo scripts/n8-admin.sh check-perms</span> / <span class="mono">fix-perms</span>.</div>
+            <div id="permList"><div class="dim">checking …</div></div>
+            <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="loadPerms()">🔍 Check again</button><button class="btn primary" id="permFix" onclick="fixPerms(this)">🛠️ Fix</button></div>
+            <pre class="term hidden" id="permOut" style="height:220px;margin-top:10px"></pre></div>
         </div>
         ${sa ? '<div class="grid g2" style="margin-top:14px" id="backupTiles"><div class="tile"><div class="empty">Loading …</div></div></div>' : ''}`;
     checkAllUpdates();
+    loadServices(); loadPerms();
     if (sa) loadBackups();
 }
 
+// ---------------------------------------------------------------- services, permissions & sudo, update log (scripts/n8-admin.sh)
+const SVC_STATE = { active: 'running', inactive: 'stopped', failed: 'failed', activating: 'starting', deactivating: 'stopping' };
+function renderServices(d) {
+    const el = $('svcList'); if (!el) return;
+    if (!d.units.length) { el.innerHTML = '<div class="notice-box">Not set up yet – run once on the console: <span class="mono">sudo scripts/n8-admin.sh fix-perms</span></div>'; return; }
+    const cls = a => a === 'active' ? 'ok' : a === 'failed' ? 'bad' : 'warn';
+    const b = (u, a, icon, title) => u.actions.includes(a) ? `<button class="btn small" title="${title}" onclick="svcAction('${esc(u.unit)}','${a}',this)">${icon}</button>` : '';
+    el.innerHTML = `<div class="tbl-wrap"><table class="tbl"><tbody>${d.units.map(u => `<tr>
+        <td><span class="dot ${u.active === 'active' ? 'on' : 'off'}"></span> <b>${esc(u.label)}</b><div class="dim mono" style="font-size:11.5px">${esc(u.unit)}</div></td>
+        <td><span class="pill ${cls(u.active)}">${esc(SVC_STATE[u.active] || u.active)}</span></td>
+        <td>${u.actions.includes('enable') ? `<label class="switch" style="display:inline-block;vertical-align:middle" title="Autostart at boot"><input type="checkbox" ${u.enabled === 'enabled' ? 'checked' : ''} onchange="svcAction('${esc(u.unit)}', this.checked ? 'enable' : 'disable', this)"><span></span></label> <span class="dim">Autostart</span>` : `<span class="dim">${esc(u.enabled)}</span>`}</td>
+        <td class="num" style="white-space:nowrap">${u.active === 'active' ? b(u, 'restart', '🔄', 'Restart') + b(u, 'stop', '⏹', 'Stop') : b(u, 'start', '▶', 'Start')}</td></tr>`).join('')}</tbody></table></div>`;
+}
+async function loadServices() { try { renderServices(await api('GET', '/api/admin/services')); } catch (e) { const el = $('svcList'); if (el) el.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; } }
+async function svcAction(unit, action, el) {
+    if (['stop', 'disable'].includes(action)) {
+        const self = unit === 'frnadn.service';
+        if (!await confirmBox({ title: `${action === 'stop' ? 'Stop' : 'Disable autostart of'} ${unit}?`, body: self && action === 'stop' ? 'The dashboard is gone afterwards – start it again on the console: sudo systemctl start frnadn' : 'Stations on this server may lose the connection.' }, action === 'stop' ? 'Stop' : 'Disable', 'danger')) { if (el && el.type === 'checkbox') el.checked = true; return; }
+    }
+    if (el) el.disabled = true;
+    try { const r = await api('POST', `/api/admin/services/${encodeURIComponent(unit)}/${action}`, {}); toast('✓ ' + (r.message || action)); renderServices(r); }
+    catch (e) { toast(e.message, true); loadServices(); }
+}
+async function loadPerms() {
+    const el = $('permList'); if (!el) return;
+    el.innerHTML = '<div class="dim">checking …</div>';
+    let d; try { d = await api('GET', '/api/admin/perms'); } catch (e) { el.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
+    renderPerms(d);
+}
+const PERM_AREA = { user: '👤 Service user', prog: '📦 Program', data: '💾 Data', systemd: '⚙️ systemd', sudo: '🛡️ sudo' };
+function renderPerms(d) {
+    const el = $('permList'), rows = d.checks || [];
+    $('permBadge').innerHTML = !rows.length ? '<span class="pill warn">not checked</span>' : d.bad ? `<span class="pill bad">${d.bad} errors</span>` : '<span class="pill ok">all fine</span>';
+    if (!rows.length) { el.innerHTML = `<div class="notice-box">${esc(d.message || '–')}</div>`; return; }
+    const areas = [...new Set(rows.map(c => c.area))];
+    el.innerHTML = `<div class="tbl-wrap" style="max-height:340px;overflow:auto"><table class="tbl"><tbody>${areas.map(a => rows.filter(c => c.area === a).map((c, i) =>
+        `<tr><td style="width:130px">${i ? '' : `<b>${esc(PERM_AREA[a] || a)}</b>`}</td><td style="width:24px">${c.status === 'ok' ? '✅' : c.status === 'warn' ? '⚠️' : '❌'}</td>
+         <td class="${c.status === 'bad' ? '' : 'dim'}" style="white-space:normal">${esc(c.text)}</td></tr>`).join('')).join('')}</tbody></table></div>`;
+}
+async function fixPerms(btn) {
+    btn.disabled = true; const out = $('permOut'); out.classList.remove('hidden'); out.textContent = 'checking and fixing …';
+    try { const r = await api('POST', '/api/admin/perms/fix', {}); out.textContent = r.message || ''; if (r.check) renderPerms(r.check); toast(r.ok ? 'Permissions are fine' : 'Not everything could be fixed', !r.ok); loadServices(); }
+    catch (e) { out.textContent = e.message; toast(e.message, true); }
+    btn.disabled = false;
+}
+async function showUpdateLog(btn) {
+    const el = $('updLog'); el.classList.toggle('hidden'); if (el.classList.contains('hidden')) return;
+    try { const d = await api('GET', '/api/admin/update-log'); el.textContent = d.log || 'No update from the dashboard yet.'; el.scrollTop = el.scrollHeight; }
+    catch (e) { el.textContent = e.message; }
+}
+
 // ---------------------------------------------------------------- backup & restore (superadmin)
-// Encrypted .frnbak with its own password; also restorable in the HobbyRadioPortal (web installer → FRN → from a backup)
+// Encrypted .frnbak with its own password (same format as the other N8schicht projects)
 async function loadBackups(manifest) {
     const el = $('backupTiles'); if (!el) return;
     let d; try { d = await api('GET', '/api/admin/backups'); } catch (e) { el.innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`; return; }
@@ -1128,7 +1190,7 @@ async function loadBackups(manifest) {
     el.innerHTML = `<form class="tile" onsubmit="event.preventDefault(); createBackup(this)"><h3>💾 Backup</h3>
         <div class="subt">Everything in one encrypted file (.frnbak): settings, users, rooms, access lists, FRN accounts, statistics, chat,
         client logos, branding and the configuration of the FRN server. Choose a password – without it the backup cannot be opened, keep it in your password safe.
-        The latest backups stay on the server. The file can also be restored in the HobbyRadioPortal (web installer → FRN → from a backup).</div>
+        The latest backups stay on the server.</div>
         <div class="row"><label>Password for the backup (min. 10 characters)</label><input type="password" name="pw" minlength="${d.min_password}" required autocomplete="new-password"></div>
         <div class="row"><label>Repeat</label><input type="password" name="pw2" required autocomplete="new-password"></div>
         <div class="actions"><button class="btn primary">💾 Create backup</button></div>

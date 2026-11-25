@@ -4,6 +4,12 @@
 
 ## Dienste
 
+**Admin → System → 🧩 Dienste** zeigt `frnadn`, `frn-server` und den Update-Auslöser schlank mit Status, **Autostart**-Schalter
+und **▶ Starten / 🔄 Neu starten / ⏹ Stoppen**. Daneben **🔐 Berechtigungen & sudo**: alle Prüfungen von `scripts/n8-admin.sh`, mit
+**🛠️ Korrigieren** (prüfen → korrigieren → erneut prüfen). Konsole: `sudo /opt/adn-frn-server/scripts/n8-admin.sh check-perms` bzw. `fix-perms`.
+
+<p align="center"><img src="../images/admin-services.png" alt="Dienste und Berechtigungen" width="90%"></p>
+
 ```bash
 systemctl status frn-server frnadn     # laufen sie?
 journalctl -u frn-server -f            # Java-FRN-Server
@@ -14,23 +20,6 @@ tail -f /var/lib/frnadn/frn/logs/server.log
 Beide Dienste laufen als Benutzer `frnadn` ohne Root-Rechte. frn_adn darf per sudoers-Regel (`/etc/sudoers.d/frnadn`) genau `frn-server` starten, stoppen, neu starten sowie *Reboot* und *Shut down* auslösen – sonst nichts.
 
 `frn-server` startet nach einem Absturz nach **60 Sekunden** neu. Der Java-Server beendet sich bei schweren SystemManager-Fehlern selbst; die Wartezeit verhindert, dass er den SystemManager mit Anmeldeversuchen überflutet.
-
-## Im HobbyRadioPortal
-
-Das [HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) zeigt diesen Server im Plugin *FRN* (Räume als Tabs, Zuletzt
-gehört, Stationen). **Läuft das Portal auf demselben Rechner, verwaltet es den Server ohne Token** (ab 2.11.0): Einstellungen, Räume,
-Zugriffslisten und Start/Stopp – siehe [Admin-Portal](adminbereich.md#-hobbyradioportal-auf-diesem-server). Läuft das Portal auf einem
-anderen Rechner, zeigt es nur die Live-Daten; verwaltet wird dann hier im Dashboard.
-
-**Portal auf diesem Rechner installieren** (empfohlen, ab 2.7.1): Der Installer des Portals findet das Dashboard und stellt es mit einer
-Frage hinter das Portal – eigenes HTTPS aus (`python -m frnadn behind-proxy`), lauscht nur noch auf `127.0.0.1:8090` (Drop-in
-`/etc/systemd/system/frnadn.service.d/hobbyradioportal.conf`). nginx des Portals
-übernimmt Port 80/443 und die Domain des Dashboards samt Zertifikat. Der FRN-Server (Port 10024) bleibt, wie er ist. Danach holt der
-Web-Installer des Portals auf Wunsch auch HBlink4 und N8 Crosslink auf diesen Rechner – siehe
-[Umzug ins Portal](https://github.com/dhartmann1979/HobbyRadioPortal/blob/main/docs/UMZUG.md).
-
-Rückgängig: `sudo rm /etc/systemd/system/frnadn.service.d/hobbyradioportal.conf && sudo systemctl daemon-reload && sudo systemctl restart frnadn`,
-dann *Admin → Settings → HTTPS & web* wieder einschalten (und nginx des Portals vorher stoppen).
 
 ## 📋 Bei Problemen immer zuerst: das öffentliche FRN-Fehlerprotokoll
 
@@ -84,7 +73,7 @@ Sie stehen im Admin-Portal oben unter *Settings* und im Log – den ausführlich
 | Dashboard zeigt „No superadmin yet“ | `sudo frnadn set-superadmin NAME` |
 | Passwort vergessen | `sudo frnadn reset-password NAME` |
 | Java fehlt nach Systemupdate | `sudo apt install default-jre-headless` |
-| **Update jetzt installieren** ist grau oder meldet keine Updates | Dateirechte oder fehlender Git-Stand: einmal `cd /opt/adn-frn-server && sudo ./scripts/update.sh`, siehe [Updates](updates.md#wenn-etwas-nicht-klappt) |
+| **Update jetzt installieren** ist grau oder meldet keine Updates | Update-Auslöser/sudo nicht eingerichtet oder fehlender Git-Stand: einmal `sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms` – alt: `cd /opt/adn-frn-server && sudo ./scripts/update.sh`, siehe [Updates](updates.md#wenn-etwas-nicht-klappt) |
 | Update-Prüfung: „rate limit“ oder „not reachable“ | GitHub begrenzt anonyme Abfragen bzw. der Server erreicht github.com nicht – später prüfen, Netz und DNS testen |
 | Link-Menü fehlt in der Kopfzeile | *Show the link menu* aus oder keine Links eingetragen: Admin → 🔗 Links |
 
@@ -114,9 +103,8 @@ sudo FRNADN_RESTORE=/root/frn-backup-….frnbak FRNADN_RESTORE_PASSWORD_FILE=/ro
 rm /root/frn.pw
 ```
 
-Mit `FRNADN_BEHIND_PROXY=1` bleibt das eigene HTTPS dabei aus (für einen Reverse-Proxy wie das HobbyRadioPortal).
+Mit `FRNADN_BEHIND_PROXY=1` bleibt das eigene HTTPS dabei aus (für einen Reverse-Proxy wie nginx).
 Sonst danach HTTPS unter *Admin → Settings → HTTPS & web* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
-im **HobbyRadioPortal** machen (*Web-Installer → FRN → 📦 aus einem Backup*).
 
 ## Testen ohne Funk
 
