@@ -265,6 +265,33 @@ function userMenu(ev) {
 }
 
 // ---------------------------------------------------------------- modals
+// Request an FRN password from the SystemManager (like "Get Password" in the FRN client)
+async function openFrnPassword() {
+    let d = {}; try { d = await api('GET', '/api/admin/frn-password'); } catch (e) { toast(e.message, true); return; }
+    modal(`<h2>📧 Request FRN password</h2>
+        <p class="dim" style="margin:0 0 4px">The SystemManager e-mails a password for a new FRN account.</p>
+        <p class="dim" style="margin:0 0 4px">Afterwards enter e-mail and password above under SystemManager and save. For a second server use a different name (e.g. “Server Test”) – callsign and name together must be new.</p>
+        <p class="dim mono" style="margin:0 0 10px;font-size:12px">${esc(d.host)}:10025</p>
+        <form onsubmit="event.preventDefault(); sendFrnPassword(this)">
+            <div class="row"><label>Callsign</label><input name="callsign" value="${esc(d.callsign)}" required></div>
+            <div class="row"><label>Name</label><input name="name" value="${esc(d.name)}" required></div>
+            <div class="row"><label>E-mail (the password is sent there)</label><input type="email" name="email" value="${esc(d.email)}" required></div>
+            <div class="row"><label>Band / channel</label><input name="band" value="${esc(d.band)}" placeholder="PC Only, Crosslink or 438.950FM CTC71.9"></div>
+            <div class="row"><label>Description</label><input name="description" value="${esc(d.description)}"></div>
+            <div class="row"><label>Country</label><input name="country" value="${esc(d.country)}" required></div>
+            <div class="row"><label>City - part</label><input name="city" value="${esc(d.city)}" placeholder="Minden - JO42" required></div>
+            <div class="err" id="frnPwErr"></div><div class="notice-box" id="frnPwOk" style="display:none"></div>
+            <div class="actions"><button type="button" class="btn" onclick="closeModal()">Close</button><button class="btn primary">📧 Request password</button></div>
+        </form>`, false, true);
+}
+async function sendFrnPassword(f) {
+    const b = f.querySelector('button.primary'); b.disabled = true; $('frnPwErr').textContent = '';
+    try {
+        const r = await api('POST', '/api/admin/frn-password', Object.fromEntries(new FormData(f)));
+        const ok = $('frnPwOk'); ok.style.display = ''; ok.textContent = (r.ok ? '✅ ' : '⚠️ ') + r.message;
+        if (r.ok) toast('FRN password requested');
+    } catch (e) { $('frnPwErr').textContent = e.message; } finally { b.disabled = false; }
+}
 function modal(html, locked, wide) {
     $('modalRoot').innerHTML = `<div class="overlay" id="ov"><div class="modal ${wide ? 'wide' : ''}">${html}</div></div>`;
     if (!locked) $('ov').addEventListener('click', e => { if (e.target.id === 'ov') closeModal(); });
@@ -777,7 +804,7 @@ async function loadSettings() {
             <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
         <div class="tiles">${d.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
-            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div>' : ''}
+            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div>' : ''}
             ${sec.fields.map(fieldHtml).join('')}<div class="actions"><button class="btn primary">Save</button></div></form>`).join('')}</div>`;
 }
 async function saveSettings(form) {
@@ -1413,7 +1440,7 @@ async function loadAudit() {
     const lbl = { login: '🔓 Login', login_failed: '⛔ Login failed', settings_changed: '⚙️ Dashboard settings', frn_config: '🛰️ server.json', service: '🔄 Service',
         user_created: '➕ User', user_changed: '✏️ User', user_deleted: '🗑️ User', password_changed: '🔑 Password', reboot: '🔄 Reboot', poweroff: '⏻ Shutdown',
         session_revoked: '🚫 Session', update: '⬆️ Update', frn_start: '▶ FRN server', frn_stop: '⏹ FRN server', frn_restart: '🔄 FRN server',
-        frn_update: '⬆️ FRN update', rooms: '🏠 Rooms', frn_account: '🔑 FRN account', app_restart: '♻️ Dashboard',
+        frn_update: '⬆️ FRN update', frn_password_request: '📧 FRN password requested', rooms: '🏠 Rooms', frn_account: '🔑 FRN account', app_restart: '♻️ Dashboard',
         api_token_created: '🔌 API token', api_token_revoked: '🔌 API token revoked', acl: '🚦 Lists', backup_created: '💾 Backup created', backup_downloaded: '💾 Backup downloaded', backup_deleted: '💾 Backup deleted', backup_restore: '♻️ Restore started', backup_restored: '♻️ Backup restored' };
     $('admin-audit').innerHTML = `<div class="grid g2">
         <div class="tile"><h3>🔑 Active sessions</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>User</th><th>IP</th><th class="hide-sm">Since</th><th></th></tr></thead><tbody>

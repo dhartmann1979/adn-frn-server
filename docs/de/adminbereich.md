@@ -54,6 +54,26 @@ Der Listener auf HTTP beantwortet ACME-Challenges und leitet sonst mit HTTP 301 
 
 Voraussetzung sind ein korrekt auf den Server zeigender öffentlicher DNS-Eintrag und eingehend freigegebene Ports TCP 80 und 443. Wenn die erste Zertifikatsausstellung scheitert, bleibt das Dashboard vorübergehend auf HTTP-Port 8080 erreichbar (sofern Port 80 für den ACME-Listener verwendet wird); die Ursache steht im Journal.
 
+### 📧 FRN-Passwort anfordern
+
+<p align="center"><img src="../images/admin-sysman.png" alt="SystemManager mit Knopf FRN-Passwort anfordern" width="48%"> <img src="../images/admin-frn-password.png" alt="FRN-Passwort anfordern" width="48%"></p>
+
+Jeder FRN-Server braucht ein **eigenes FRN-Konto**. Laufen zwei Server (z. B. Live und Test) mit derselben E-Mail und demselben Passwort,
+lehnt der SystemManager den zweiten ab: *SystemManager: the same credentials are already online on another server* – der Server bleibt offline.
+
+*Settings → 🌐 SystemManager → 📧 FRN-Passwort anfordern* macht dasselbe wie **„Get Password“ im FRN-Client**: Rufzeichen, Name, E-Mail,
+Band/Kanal (für einen Server `PC Only`), Beschreibung, Land und *Ort - Ortsteil* eintragen → **Passwort anfordern**. Das Dashboard schickt
+die Anfrage an den eingestellten SystemManager (TCP-Port 10025), der das Passwort **per E-Mail** schickt (auch im Spam-Ordner nachsehen).
+Danach E-Mail und Passwort oben eintragen, speichern, FRN-Server neu starten.
+
+| Antwort | Bedeutung |
+|---|---|
+| ✅ *Angefordert* | Der SystemManager hat die Anfrage angenommen – das Passwort kommt per E-Mail |
+| ⚠️ *Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen* | Rufzeichen + Name sind schon registriert. Für einen zweiten Server einen anderen Namen wählen, z. B. `DO1ABC, Server Test`, und eine andere E-Mail |
+
+Höchstens eine Anfrage pro Minute; jede steht im Protokoll (*FRN-Passwort angefordert*). Auch das **HobbyRadioPortal** kann den Knopf nutzen
+(per API-Token, *Admin → FRN-Server → Server*).
+
 ## 🏠 Rooms
 
 <p align="center"><img src="../images/admin-rooms.png" alt="Rooms" width="90%"></p>

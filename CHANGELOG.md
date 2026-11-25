@@ -2,6 +2,33 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.10.0 – 2026-11-25
+
+**📧 FRN-Passwort anfordern – direkt beim Server.** Wie *„Get Password“* im FRN-Client, nur im Dashboard: Ein neues FRN-Konto für
+diesen Server beantragen, das Passwort kommt per E-Mail. Ausführlich: [docs/de/adminbereich.md](docs/de/adminbereich.md#-frn-passwort-anfordern).
+
+### Warum
+- Jeder FRN-Server braucht ein **eigenes** FRN-Konto. Mit derselben E-Mail und demselben Passwort auf zwei Servern (z. B. Live und Test)
+  lehnt der SystemManager den zweiten ab – *„the same credentials are already online on another server“* – und der Server bleibt offline.
+
+### 📧 Settings → 🌐 SystemManager → FRN-Passwort anfordern
+- Hinweis mit Knopf im Abschnitt SystemManager; der Dialog ist mit Rufzeichen und Name des Besitzers, der Konto-E-Mail, `PC Only` und
+  dem Titel vorbelegt.
+- Die Anfrage geht an den eingestellten SystemManager (`sysman.host`, TCP 10025) – im selben Format wie SvxLinks `frn-register`:
+  `IG:<ON>Rufzeichen, Name</ON><EA>…</EA><BC>…</BC><DS>…</DS><NN>…</NN><CT>Ort - Ortsteil</CT>`.
+- Antworten: **OK** (Passwort kommt per E-Mail), **NU** (Rufzeichen + Name gibt es schon – mit Tipp für einen zweiten Server), sonst der Code.
+- Eingaben werden geprüft (Rufzeichen, E-Mail, Band/Kanal wie im FRN-Client, *Ort - Ortsteil*); `<`, `>` und Zeilenumbrüche werden
+  entfernt, damit niemand weitere Felder in die Anfrage schmuggeln kann.
+- Höchstens eine Anfrage pro Minute und SystemManager; jede Anfrage steht im Protokoll (*📧 FRN-Passwort angefordert*).
+
+### 🔌 API
+- `GET /api/admin/frn-password` (Vorbelegung) und `POST /api/admin/frn-password` – für Admins und den **API-Token des HobbyRadioPortals**,
+  damit das Portal den Knopf in seiner FRN-Verwaltung anbieten kann.
+
+### 🧪 Tests
+- `tests/test_sysman.py`: Format der Anfrage, Prüfungen, Schutz gegen eingeschmuggelte Felder, Antworten OK/NU/Fehler gegen einen
+  nachgebauten SystemManager, Begrenzung auf eine Anfrage pro Minute, Freigabe für den Portal-Token.
+
 ## 2.9.0 – 2026-11-25
 
 **Installer: komplett ohne Fragen neu einrichten – mit `FRNADN_SETUP_FILE`.** Damit kann der Web-Installer des HobbyRadioPortals

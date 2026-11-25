@@ -35,6 +35,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from . import n8_security as _sec
 from . import n8_update_guard as _guard
 from . import backup as fbackup
+from . import sysman as fsysman
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
@@ -145,7 +146,7 @@ def ip_of(conn) -> str:
 # What an API token (HobbyRadioPortal) may reach besides the public data: settings, rooms, the lists (ACL),
 # starting/stopping the FRN server and the change log. Never users, sessions, tokens, accounts, updates, system or HTTPS.
 API_TOKEN_EXACT = {"/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
-                   "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart"}
+                   "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart", "/api/admin/frn-password"}
 API_TOKEN_LOCKED = ("https.",)
 
 
@@ -409,6 +410,31 @@ async def save_settings(request: Request):
         await push({"type": "info"})
         await push({"type": "rooms"})
     return {"changed": keys, "restart_needed": ctx.restart_needed, "dashboard_restart_needed": ctx.dashboard_restart_needed}
+
+
+# Request an FRN password from the SystemManager ("Get Password" of the FRN client) – e.g. for an own account of this server
+@app.get("/api/admin/frn-password")
+async def frn_password_defaults(request: Request):
+    need_admin(request)
+    g = ctx.settings.get
+    return {"host": g("sysman.host") or "sysman.freeradionetwork.de", "callsign": g("frn.owner_callsign") or "",
+            "name": g("frn.owner_name") or "", "email": g("sysman.email") or "", "band": "PC Only",
+            "description": (g("dashboard.title") or "FRN server")[:60], "country": "Germany", "city": ""}
+
+
+@app.post("/api/admin/frn-password")
+async def frn_password_request(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    host = ctx.settings.get("sysman.host") or "sysman.freeradionetwork.de"
+    try:
+        r = await asyncio.to_thread(fsysman.register, host, b)
+    except fsysman.SysmanError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("frn_password_request", u["username"], f"{r['account']} <{r['email']}> → {r['code']}", ip_of(request))
+    if r["ok"] and b.get("use_email") and not ctx.settings.get("sysman.email"):
+        ctx.settings.update({"sysman.email": r["email"]}, u["username"])
+    return r
 
 
 @app.post("/api/admin/server/{action}")

@@ -3,6 +3,13 @@
 N8Kit.i18n.add({
     base: 'en',
     de: {
+        // FRN password request
+        "📧 Request FRN password": "📧 FRN-Passwort anfordern", "Request FRN password": "FRN-Passwort anfordern", "📧 Request password": "📧 Passwort anfordern",
+        "FRN password requested": "FRN-Passwort angefordert", "📧 FRN password requested": "📧 FRN-Passwort angefordert", "Callsign": "Rufzeichen", "E-mail (the password is sent there)": "E-Mail (dorthin kommt das Passwort)",
+        "Band / channel": "Band / Kanal", "Country": "Land", "City - part": "Ort - Ortsteil", "Close": "Schließen",
+        "🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”).": "🔑 Jeder FRN-Server braucht ein eigenes FRN-Konto – dieselbe E-Mail mit demselben Passwort auf zwei Servern lehnt der SystemManager ab („the same credentials are already online on another server“).",
+        "Afterwards enter e-mail and password above under SystemManager and save. For a second server use a different name (e.g. “Server Test”) – callsign and name together must be new.": "Danach E-Mail und Passwort oben unter SystemManager eintragen und speichern. Für einen zweiten Server einen anderen Namen nehmen (z. B. „Server Test“) – Rufzeichen und Name zusammen müssen neu sein.",
+        "The SystemManager e-mails a password for a new FRN account.": "Der SystemManager schickt das Passwort für ein neues FRN-Konto per E-Mail.",
         // backup & restore
         "Size": "Größe",
         "Backup downloaded": "Backup heruntergeladen", "Backup deleted": "Backup gelöscht", "Restore started": "Wiederherstellung gestartet", "Backup restored": "Backup wiederhergestellt",
@@ -165,6 +172,8 @@ N8Kit.i18n.add({
         'Website': 'Webseite', 'E-mail': 'E-Mail', 'Address': 'Adresse', 'Copy settings from': 'Einstellungen übernehmen von', 'Do not record': 'Nicht aufzeichnen', '(switches to that tab) and': '(wechselt in diesen Tab) und',
     },
     rules: [
+        [/^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\S+)\. Also check the spam folder\.?$/, '$1Angefordert – der SystemManager schickt das Passwort an $2. Auch im Spam-Ordner nachsehen.'],
+        [/^(⚠️ )?There is already an FRN account with this callsign and name\./, '$1Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen. Das Passwort kam damals per E-Mail – für einen zweiten Server einen anderen Namen nehmen (z. B. „DO1ABC, Server Test“).'],
         [/^(\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\/parrot room of the server$/, '$1 Stationen online · der FRN-Server übernimmt Änderungen nach einem Neustart · net00 ist immer der Test-/Papageienraum des Servers'],
         [/^Show all (\d+)$/, 'Alle $1 anzeigen'], [/^(\d+) min ago$/, 'vor $1 Min.'], [/^in (.+) · (.+) · (\d+) min ago$/, 'in $1 · $2 · vor $3 Min.'],
         [/^(.+) of (.+)$/, (m, a, b) => /^[\d.,]+ ?[KMGT]?B$/.test(a) ? `${a} von ${b}` : m],
