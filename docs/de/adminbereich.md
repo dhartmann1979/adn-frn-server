@@ -37,7 +37,7 @@ Passwörter: mindestens 10 Zeichen, gespeichert als scrypt-Hash. Nach 5 Fehlvers
 
 Oben der **Java-FRN-Server**: Zustand, Port, Stationen, Version, mit **▶ Start / ⏹ Stop / 🔄 Restart**, **⬆️ Check for update** (vergleicht mit freeradionetwork.de und installiert auf Wunsch) und **🧾 Show server.properties** (die erzeugte Datei, Passwort maskiert). Meldet der SystemManager einen Fehler, steht er hier im Klartext.
 
-Darunter fünf Karten, jede mit eigenem *Save*:
+Darunter sechs Karten, jede mit eigenem *Save*:
 
 | Karte | Inhalt | landet in |
 |---|---|---|
@@ -46,6 +46,7 @@ Darunter fünf Karten, jede mit eigenem *Save*:
 | 👤 Operator | Besitzer-E-Mail (`server_owner`), Rufzeichen, Name, Website | `server.properties` / Dashboard |
 | 🖥️ Dashboard | Titel, Untertitel, öffentliche Ansicht, versteckte Räume, Chat, Login-Dauer | nur SQLite |
 | 🗄️ Data | Aufbewahrung von Durchgängen, Logins, Chat | nur SQLite |
+| 🔁 Master & Backup | Rolle (Einzelserver/Master/Backup), Dashboard des Partners, Sync-Schlüssel, stündlicher Abgleich; Status, **🔄 Jetzt abgleichen**, **🛠️ Übergeben / ↩️ Zurückholen**, **📧 FRN-Passwort Master/Backup**. Siehe [Master & Backup](master-backup.md) | nur SQLite |
 
 ## 🌐 Netz, Ports & Domains
 

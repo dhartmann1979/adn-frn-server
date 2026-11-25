@@ -39,6 +39,7 @@ SECTIONS: List[Tuple[str, str, str]] = [
     ("owner", "👤 Operator", "Server owner (gets OWNER rights in every room)"),
     ("dashboard", "🖥️ Dashboard", "Title, public view and what visitors see"),
     ("data", "🗄️ Data", "How long talks and logins are kept"),
+    ("cluster", "🔁 Master & Backup", "Second FRN server with the same configuration – sync every full hour and by button"),
     ("https", "🔒 HTTPS & web", "Automatic HTTPS certificates with Let’s Encrypt (requires public DNS and ports 80/443)"),
 ]
 
@@ -51,7 +52,7 @@ FIELDS: List[Field] = [
           min=1, max=65535),
     Field("frn.default_room", "server", "Default room (default_net)", "text", "",
           "Clients that ask for a room that does not exist land here"),
-    Field("frn.backup_host", "server", "Backup server (backup_server_addr)", "text", "", "Sent to the clients: where to go if this server is down"),
+    Field("frn.backup_host", "server", "Backup server (backup_server_addr)", "text", "", "Sent to the clients: where to go if this server is down. Empty with Master & Backup = the partner"),
     Field("frn.backup_port", "server", "Backup server port", "int", 0, "0 = none", min=0, max=65535),
     Field("frn.client_timeout", "server", "Client timeout (client_sotimeout, ms)", "int", 8000,
           "A client that sends nothing for this long is disconnected", min=2000, max=120000),
@@ -92,6 +93,17 @@ FIELDS: List[Field] = [
           "Daily totals are kept for ever, they are small", min=7, max=3650),
     Field("data.visit_days", "data", "Keep logins (days)", "int", 180, min=7, max=3650),
     Field("data.chat_days", "data", "Keep chat messages (days)", "int", 30, min=1, max=3650),
+    # Master & Backup (cluster.py) – never synced, every server has its own
+    Field("cluster.role", "cluster", "Role of this server", "choice", "off",
+          "Master: rooms, lists and accounts are edited here. Backup: takes them over from the master",
+          choices=[("off", "Single server"), ("master", "Master"), ("backup", "Backup")]),
+    Field("cluster.peer_url", "cluster", "Dashboard of the partner", "text", "",
+          "On the master the backup, on the backup the master, e.g. https://frn-backup.example.org",
+          pattern=r"https?://[A-Za-z0-9.\-\[\]:]+/?"),
+    Field("cluster.key", "cluster", "Sync key", "password", "",
+          "Encrypts every transfer between the two servers – the same on both (at least 24 characters); “🎲 New key” creates one"),
+    Field("cluster.hourly", "cluster", "Sync every full hour", "bool", True,
+          "The backup fetches the configuration of the master at every full hour – the difference is at most one hour"),
     # HTTPS – applied by the dashboard process on its next restart
     Field("https.enabled", "https", "Enable HTTPS with Let's Encrypt", "bool", False,
           "Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn."),
@@ -146,6 +158,10 @@ def validate(f: Field, raw: Any) -> Any:
         raise SettingsError(f"{f.label}: too long.")
     if f.pattern and v and not re.fullmatch(f.pattern, v):   # leer = nicht gesetzt (z. B. Domain entfernt)
         raise SettingsError(f"{f.label}: '{v}' is not valid.")
+    if f.key == "cluster.key" and v and len(v) < 24:
+        raise SettingsError(f"{f.label}: at least 24 characters.")
+    if f.key == "cluster.peer_url":
+        v = v.rstrip("/")
     if f.key == "frn.owner_callsign":
         v = v.upper()
     if f.key in ("frn.owner_email", "sysman.email", "https.email"):

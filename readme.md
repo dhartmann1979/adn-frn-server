@@ -18,6 +18,7 @@
   <a href="docs/de/installation.md">Installation</a> ·
   <a href="docs/de/dashboard.md">Dashboard</a> ·
   <a href="docs/de/adminbereich.md">Admin-Portal</a> ·
+  <a href="docs/de/master-backup.md">Master &amp; Backup</a> ·
   <a href="docs/de/updates.md">Updates</a> ·
   <a href="docs/de/anleitungen.md">Anleitungen</a> ·
   <a href="docs/de/konfiguration.md">Konfiguration</a> ·
@@ -132,6 +133,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
 | 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
+| 🔁 [Master & Backup](docs/de/master-backup.md) | Zweiter FRN-Server mit derselben Konfiguration: Abgleich jede volle Stunde und auf Knopfdruck, **verschlüsselt mit dem Sync-Schlüssel**, Wartungs-Übergabe von Hand, FRN-Passwort für beide Server |
 | ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Baum-Menü, Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, Portal-Token, System, Theme, Updates, Links, Import, Logs |
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |

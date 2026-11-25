@@ -2,6 +2,38 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.17.0 – 2026-11-25
+
+### 🔁 Neu: Master & Backup – zweiter FRN-Server mit derselben Konfiguration
+- **Einstellungen → 🔁 Master & Backup**: Rolle *Einzelserver / Master / Backup*, *Dashboard des Partners*, *Sync-Schlüssel*,
+  *Jede volle Stunde abgleichen*. Darüber ein Statuskasten: Partner erreichbar (Name, Rolle, Version, Stationen), letzter
+  Abgleich mit Ergebnis, nächster Abgleich, wann das Backup zuletzt abgeholt hat, wohin die Clients ausweichen.
+- **Abgleich**: Das Backup holt zu **jeder vollen Stunde** die Konfiguration des Masters, der Unterschied ist also höchstens eine
+  Stunde. **🔄 Jetzt abgleichen** auf beiden Servern (auf dem Master bittet es das Backup). Übernommen werden Räume
+  (mit fester `netNN`), Zugangs-, Admin-, Stumm- und Sperrlisten samt ACL-Dateien des Java-Servers, FRN-Konten und die
+  gemeinsamen Einstellungen. Jeder Server behält Adresse, Port, Ausweichserver, **sein FRN-Konto beim SystemManager**,
+  HTTPS, Benutzer, Statistik und Darstellung. Geschrieben wird nur bei Unterschieden; Anmeldezeiten zählen nicht.
+- **Java-Server nur neu starten, wenn nötig**: nur wenn sich Räume, Listen oder Konten geändert haben **und keine Station
+  verbunden ist**; sonst Hinweis „Jetzt neu starten“. Kommen vom Master keine Räume, übernimmt das Backup nichts. Alte
+  ACL-Dateien landen in `acl/backups/*.sync.bak`.
+- **Ausfall erledigt FRN selbst**: Mit gesetzter Rolle ist `backup_server_addr` automatisch der Partner (wenn unter
+  *FRN-Server → Ausweichserver* nichts steht). Die Clients wechseln also von selbst.
+- **🛠️ Wartung von Hand** (auf dem Master): **An das Backup übergeben** gleicht ab, prüft, dass der FRN-Server auf dem Backup
+  läuft, und stoppt erst dann den eigenen FRN-Server (Keep-Alive hält still). Die Stationen wechseln zum Backup. **Vom
+  Backup zurückholen** startet den Master und lässt danach das Backup seinen FRN-Server neu starten, sodass die Stationen
+  zurückkommen. Jeder Schritt wird angezeigt.
+- **🔐 Ende-zu-Ende verschlüsselt mit dem Sync-Schlüssel**, zusätzlich zu HTTPS: Jede Anfrage und Antwort ist
+  verschlüsselt und signiert (scrypt + SHAKE-256 + HMAC-SHA-256, dieselben Bausteine wie `*.frnbak`). Der Schlüssel wird nie
+  übertragen. Anfragen gelten nur für ihre Adresse, höchstens 5 Minuten und nur einmal (kein Wiedereinspielen), und
+  Antworten müssen zur Anfrage gehören. Falsche Versuche werden gebremst. **🎲 Neuer Schlüssel** erzeugt einen (32 Byte).
+- **📧 FRN-Passwort Master / Backup**: zwei Knöpfe, die das Formular „FRN-Passwort anfordern“ für den jeweiligen Server
+  vorausfüllen (Name + „Master“/„Backup“). Jeder Server braucht sein eigenes FRN-Konto.
+- Neue Adressen: `POST /api/cluster/{hello,export,pull,handback}` (nur verschlüsselt, zwischen den Servern),
+  `GET /api/admin/cluster`, `POST /api/admin/cluster/{sync,key,maintenance}`. Protokoll-Einträge `cluster_sync`,
+  `cluster_maintenance`, `cluster_key`, `cluster_handback`.
+- Doku [docs/de/master-backup.md](docs/de/master-backup.md) mit Einrichtung, Wartung und Fehlersuche; Tests
+  `tests/test_cluster.py` (Abgleich, Schutz, Verschlüsselung, Wiedereinspielen, Endpunkte).
+
 ## 2.16.0 – 2026-11-25
 
 ### 🌐 Neue Rubrik „Netz, Ports & Domains“ – wie in N8 Crosslink

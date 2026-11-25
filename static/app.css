@@ -486,3 +486,11 @@ header { padding:7px 12px; gap:9px; }
 .cl-txt { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
 .cl-txt small { color: var(--text-dim); font-size: 11.5px; }
 .cl-item label.btn { cursor: pointer; }
+
+/* 🔁 Master & Backup */
+.cl-box { margin: 4px 0 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); font-size: 13px; }
+.cl-grid { display: grid; grid-template-columns: max-content 1fr; gap: 5px 14px; align-items: baseline; }
+.cl-grid > span { color: var(--dim, #9aa4b8); }
+.cl-ok { color: #4ade80; } .cl-bad { color: #f87171; } .cl-warn { color: #fbbf24; }
+.cl-box .actions { margin-top: 10px; gap: 8px; flex-wrap: wrap; align-items: center; }
+.cl-steps > div { padding: 4px 0; }

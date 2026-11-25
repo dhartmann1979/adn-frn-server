@@ -110,6 +110,14 @@ def prop_value(v: Any) -> str:
     return "\\" + s if s.startswith(" ") else s
 
 
+def _peer_host(url) -> str:
+    from urllib.parse import urlparse
+    try:
+        return urlparse(str(url or "")).hostname or ""
+    except ValueError:
+        return ""
+
+
 def build_properties(s: Dict[str, Any], rooms: List[Dict[str, Any]], home: Path) -> str:
     lines = ["# server.properties – written by frn_adn from its SQLite database.",
              "# Do not edit: change the settings in the admin portal; this file is overwritten.", ""]
@@ -133,6 +141,10 @@ def build_properties(s: Dict[str, Any], rooms: List[Dict[str, Any]], home: Path)
     if s["frn.backup_host"] and s["frn.backup_port"]:
         put("backup_server_addr", s["frn.backup_host"])
         put("backup_server_port", s["frn.backup_port"])
+    elif s.get("cluster.role") in ("master", "backup") and _peer_host(s.get("cluster.peer_url")):
+        # Master & Backup: the clients go to the partner if this server is gone (FRN does the failover itself)
+        put("backup_server_addr", _peer_host(s.get("cluster.peer_url")))
+        put("backup_server_port", s["frn.backup_port"] or s["frn.port"])
     put("xmlFilesDir", str(home / "acl"))
     put("client_sotimeout", s["frn.client_timeout"])
     put("client_txtimeout", s["frn.tx_timeout"])

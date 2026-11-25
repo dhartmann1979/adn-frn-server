@@ -276,9 +276,11 @@ function userMenu(ev) {
 
 // ---------------------------------------------------------------- modals
 // Request an FRN password from the SystemManager (like "Get Password" in the FRN client)
-async function openFrnPassword() {
-    let d = {}; try { d = await api('GET', '/api/admin/frn-password'); } catch (e) { toast(e.message, true); return; }
-    modal(`<h2>📧 Request FRN password</h2>
+async function openFrnPassword(which) {
+    let d = {}; try { d = await api('GET', '/api/admin/frn-password' + (which ? '?for=' + which : '')); } catch (e) { toast(e.message, true); return; }
+    S.frnPwFor = d;
+    modal(`<h2>📧 Request FRN password${which ? ` – ${which === 'backup' ? 'Backup' : 'Master'}` : ''}</h2>
+        ${which && !d.own ? '<div class="notice-box">This account is for the other server: enter e-mail and password there under SystemManager.</div>' : ''}
         <p class="dim" style="margin:0 0 4px">The SystemManager e-mails a password for a new FRN account.</p>
         <p class="dim" style="margin:0 0 4px">Afterwards enter e-mail and password above under SystemManager and save. For a second server use a different name (e.g. “Server Test”) – callsign and name together must be new.</p>
         <p class="dim mono" style="margin:0 0 10px;font-size:12px">${esc(d.host)}:10025</p>
@@ -297,7 +299,7 @@ async function openFrnPassword() {
 async function sendFrnPassword(f) {
     const b = f.querySelector('button.primary'); b.disabled = true; $('frnPwErr').textContent = '';
     try {
-        const r = await api('POST', '/api/admin/frn-password', Object.fromEntries(new FormData(f)));
+        const r = await api('POST', '/api/admin/frn-password', { ...Object.fromEntries(new FormData(f)), use_email: !S.frnPwFor || S.frnPwFor.own !== false });
         const ok = $('frnPwOk'); ok.style.display = ''; ok.textContent = (r.ok ? '✅ ' : '⚠️ ') + r.message;
         if (r.ok) toast('FRN password requested');
     } catch (e) { $('frnPwErr').textContent = e.message; } finally { b.disabled = false; }
@@ -862,7 +864,72 @@ async function loadSettings() {
         <div class="tiles">${S.admin.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
             ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div><div class="notice-box">📋 <span>Refused by the SystemManager? The reason is in the public FRN error log of freeradionetwork.de (Help → Error log).</span> <button type="button" class="btn small" style="margin-left:6px" onclick="showAdmin(\'logs\')">📋 FRN error log</button> <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">open ↗</a></div>' : ''}
-            ${sec.fields.map(fieldHtml).join('')}<div class="actions"><button class="btn primary">Save</button></div></form>`).join('')}</div>`;
+            ${sec.id === 'cluster' ? '<div id="clusterBox" class="cl-box"><span class="dim">…</span></div>' : ''}
+            ${sec.fields.map(fieldHtml).join('')}<div class="actions">${sec.id === 'cluster' ? '<button type="button" class="btn" onclick="clusterKey(this)">🎲 New key</button>' : ''}<button class="btn primary">Save</button></div></form>`).join('')}</div>`;
+    if (S.admin.sections.some(x => x.id === 'cluster')) loadCluster();
+}
+
+// 🔁 Master & Backup – status, sync, maintenance switch, FRN password for both servers (frnadn/cluster.py)
+async function loadCluster() {
+    const box = $('clusterBox'); if (!box) return;
+    let d; try { d = await api('GET', '/api/admin/cluster'); } catch (e) { box.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
+    const role = { off: 'Single server', master: 'Master', backup: 'Backup' }[d.role] || d.role;
+    const p = d.peer, last = d.last || {}, m = d.maintenance && d.maintenance.since;
+    const peer = !p ? (d.role === 'off' ? '' : '<span class="dim">Enter the partner and the sync key, then save.</span>')
+        : p.ok === false ? `<span class="cl-bad">✕ ${esc(p.error)}</span>`
+        : `<span class="cl-ok">✓ ${esc(p.title || '')}</span> <span class="dim">· <span>${esc(({ master: 'Master', backup: 'Backup' })[p.role] || p.role)}</span> · ${esc(p.version)} · <span>${p.frn && p.frn.running ? `FRN: ${p.frn.clients} stations` : 'FRN stopped'}</span></span>`;
+    const bits = !last.ok ? [] : [last.changed === false ? 'unchanged' : 'taken over',
+        ...(last.counts ? [`${last.counts.rooms} rooms`, `${last.counts.frn_accounts} accounts`, `${last.counts.frn_lists + last.counts.room_access} list entries`] : []),
+        ...(last.restart === 'done' ? ['FRN server restarted'] : last.restart && last.restart.startsWith('pending') ? ['restart pending – stations connected'] : [])];
+    const lastTxt = !last.time ? '<span class="dim">never</span>'
+        : last.ok ? `<span class="cl-ok">✓</span> ${fmtDate(last.time)} <span class="dim">${bits.map(b => `· <span>${esc(b)}</span>`).join(' ')}</span>`
+        : `<span class="cl-bad">✕ ${fmtDate(last.time)}</span> <span class="cl-bad">${esc(last.error || '')}</span>`;
+    const rows = d.role === 'off' ? '<div class="dim">Choose the role of this server below: the master gives its configuration, the backup takes it over every full hour. The failover itself is done by FRN: the clients go to the backup address when this server is gone.</div>' : `
+        <div class="cl-grid">
+            <span>Role</span><b><span>${esc(role)}</span>${m ? ' · <span class="cl-warn">🛠️ maintenance – stations are on the backup</span>' : ''}</b>
+            <span>Partner</span><div>${peer}</div>
+            <span>Last sync</span><div>${lastTxt}</div>
+            ${d.next ? `<span>Next sync</span><div>${fmtDate(d.next)}</div>` : ''}
+            ${d.role === 'master' && d.last_export && d.last_export.time ? `<span>Last fetch by the backup</span><div>${fmtDate(d.last_export.time)}</div>` : ''}
+            <span>Clients switch to</span><div class="mono">${esc(d.backup_addr || '–')}</div>
+            <span>Transfer</span><div>🔐 <span>encrypted with the sync key</span></div>
+        </div>
+        <div class="actions" style="justify-content:flex-start">
+            <button type="button" class="btn small primary" onclick="clusterSync(this)">🔄 Sync now</button>
+            ${d.role === 'master' ? (m ? '<button type="button" class="btn small" onclick="clusterMaint(false, this)">↩️ Take back from the backup</button>'
+                                       : '<button type="button" class="btn small" onclick="clusterMaint(true, this)">🛠️ Hand over to the backup</button>') : ''}
+        </div>`;
+    box.innerHTML = rows + `<div class="actions" style="justify-content:flex-start">
+        <span class="dim" style="font-size:12.5px">Every server needs its own FRN account:</span>
+        <button type="button" class="btn small" onclick="openFrnPassword('master')">📧 FRN password Master</button>
+        <button type="button" class="btn small" onclick="openFrnPassword('backup')">📧 FRN password Backup</button></div>`;
+}
+async function clusterSync(btn) {
+    btn.disabled = true; toast('Syncing …');
+    try { const r = await api('POST', '/api/admin/cluster/sync', {}); r.ok ? toast(r.changed === false ? 'Sync: unchanged' : 'Sync: configuration taken over') : toast(r.error || 'Sync failed', true); }
+    catch (e) { toast(e.message, true); }
+    btn.disabled = false; loadCluster();
+}
+async function clusterKey(btn) {
+    if (!await confirmBox({ title: 'Create a new sync key?', body: 'The key is saved here. Enter the same key on the other server – until then the sync does not work.' }, 'Create')) return;
+    try {
+        const r = await api('POST', '/api/admin/cluster/key', {});
+        modal(`<h2>🎲 New sync key</h2><p class="dim">Copy it and enter it on the other server under Master & Backup.</p>
+            <pre class="term" style="user-select:all;white-space:pre-wrap;word-break:break-all">${esc(r.key)}</pre>
+            <div class="actions"><button class="btn" onclick="navigator.clipboard && navigator.clipboard.writeText('${esc(r.key)}'); toast('Copied')">📋 Copy</button><button class="btn primary" onclick="closeModal(); showAdmin(S.admin.tab)">Done</button></div>`);
+    } catch (e) { toast(e.message, true); }
+}
+async function clusterMaint(on, btn) {
+    const t = on ? ['Hand over to the backup?', 'The configuration is synced to the backup first. Then the FRN server here stops – the stations switch to the backup by themselves (FRN backup address). The dashboard keeps running.', 'Hand over']
+                 : ['Take back from the backup?', 'The FRN server here starts again. Then the backup restarts its FRN server, so its stations come back here.', 'Take back'];
+    if (!await confirmBox({ title: t[0], body: t[1] }, t[2], on ? 'danger' : 'primary')) return;
+    btn.disabled = true; toast(on ? 'Handing over …' : 'Taking back …');
+    try {
+        const r = await api('POST', '/api/admin/cluster/maintenance', { on });
+        modal(`<h2>${on ? '🛠️ Handed over to the backup' : '↩️ Taken back'}</h2><div class="cl-steps">${r.steps.map(x => `<div>${x.ok ? '✅' : '⚠️'} <span>${esc(x.step)}</span> <span class="dim">${esc(x.detail || '')}</span></div>`).join('')}</div>
+            <div class="actions"><button class="btn primary" onclick="closeModal()">OK</button></div>`);
+    } catch (e) { toast(e.message, true); }
+    btn.disabled = false; loadCluster();
 }
 async function saveSettings(form) {
     try {

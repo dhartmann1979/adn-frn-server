@@ -37,6 +37,7 @@ from . import n8_security as _sec
 from .n8_admin import N8Admin, own_unit
 from . import backup as fbackup
 from . import sysman as fsysman
+from . import cluster
 from . import frn_errorlog
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
@@ -391,7 +392,7 @@ async def save_settings(request: Request):
     if keys:
         ctx.auth.audit("settings_changed", u["username"], ", ".join(k for k in keys), ip_of(request))
         ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
-        if any(k.startswith(("frn.", "sysman.")) for k in keys):
+        if any(k.startswith(("frn.", "sysman.", "cluster.")) for k in keys):
             config_changed(u, request, "settings " + ", ".join(keys))
         refresh_sockets()
         await push({"type": "info"})
@@ -404,9 +405,13 @@ async def save_settings(request: Request):
 async def frn_password_defaults(request: Request):
     need_admin(request)
     g = ctx.settings.get
+    which = request.query_params.get("for", "")        # Master & Backup: an own FRN account for each server
+    tag = {"master": " Master", "backup": " Backup"}.get(which, "")
+    title = (g("dashboard.title") or "FRN server")
     return {"host": g("sysman.host") or "sysman.freeradionetwork.de", "callsign": g("frn.owner_callsign") or "",
-            "name": g("frn.owner_name") or "", "email": g("sysman.email") or "", "band": "PC Only",
-            "description": (g("dashboard.title") or "FRN server")[:60], "country": "Germany", "city": ""}
+            "name": ((g("frn.owner_name") or "") + tag).strip(), "email": g("sysman.email") or "", "band": "PC Only",
+            "description": (title + (" – Backup" if which == "backup" else ""))[:60], "country": "Germany", "city": "",
+            "for": which, "own": which in ("", g("cluster.role"))}
 
 
 @app.post("/api/admin/frn-password")
@@ -422,6 +427,247 @@ async def frn_password_request(request: Request):
     if r["ok"] and b.get("use_email") and not ctx.settings.get("sysman.email"):
         ctx.settings.update({"sysman.email": r["email"]}, u["username"])
     return r
+
+
+# ---------------------------------------------------------------- Master & Backup (cluster.py)
+def _cluster_set(key: str, value: Dict[str, Any]) -> None:
+    ctx.db.kv_set(key, json.dumps(value, ensure_ascii=False))
+
+
+def _cluster_get(key: str) -> Dict[str, Any]:
+    try:
+        return json.loads(ctx.db.kv_get(key) or "{}")
+    except ValueError:
+        return {}
+
+
+_cluster_replay = cluster.Replay()
+
+
+async def _cluster_peer(request: Request, roles) -> Dict[str, Any]:
+    """Calls between the two servers: encrypted with the shared sync key (cluster.py), only in the right role."""
+    raw = await request.body()
+    if len(raw) > 1024 * 1024:
+        raise HTTPError(413, "too large")
+    try:
+        msg = cluster.open_request(raw, ctx.settings.get("cluster.key"), request.url.path, _cluster_replay)
+    except cluster.ClusterError as e:
+        await asyncio.sleep(1.0)                        # slows down guessing
+        raise HTTPError(403, str(e))
+    if ctx.settings.get("cluster.role") not in roles:
+        raise HTTPError(409, f"this server is {ctx.settings.get('cluster.role')}, not {'/'.join(roles)}")
+    return msg
+
+
+def _cluster_answer(msg: Dict[str, Any], data: Any) -> Response:
+    return Response(cluster.answer(msg, data, ctx.settings.get("cluster.key")), media_type=cluster.CTYPE)
+
+
+def _frn_running() -> bool:
+    st = ctx.server.state()
+    return st["running"] or (DEMO and st["service"] == "active")       # demo: no Java process listens
+
+
+def _frn_state() -> Dict[str, Any]:
+    st = ctx.server.state()
+    return {"running": _frn_running(), "clients": st["clients"], "address": ctx.settings.get("frn.address"),
+            "port": ctx.settings.get("frn.port")}
+
+
+@app.post("/api/cluster/hello")
+async def cluster_hello(request: Request):
+    msg = await _cluster_peer(request, ("master", "backup"))
+    return _cluster_answer(msg, {"ok": True, "role": ctx.settings.get("cluster.role"), "version": __version__,
+            "title": ctx.settings.get("dashboard.title"), "frn": _frn_state(), "time": time.time(),
+            "maintenance": bool(_cluster_get("cluster.maintenance")), "last": _cluster_get("cluster.last")})
+
+
+@app.post("/api/cluster/export")
+async def cluster_export(request: Request):
+    msg = await _cluster_peer(request, ("master",))
+    errors = ctx.acls.sync_from_files()                 # moderators may have changed lists in the FRN client
+    data = cluster.export(ctx.db, ctx.settings, FRN_HOME / "acl", ctx.settings.get("dashboard.title"), ctx.store)
+    _cluster_set("cluster.last_export", {"time": time.time(), "ip": ip_of(request), "hash": data["hash"][:12]})
+    if errors:
+        data["warnings"] = errors
+    return await asyncio.to_thread(_cluster_answer, msg, data)
+
+
+@app.post("/api/cluster/pull")
+async def cluster_pull_remote(request: Request):
+    msg = await _cluster_peer(request, ("backup",))
+    return _cluster_answer(msg, await cluster_pull("master"))
+
+
+@app.post("/api/cluster/handback")
+async def cluster_handback(request: Request):
+    """End of the maintenance on the master: restart the own FRN server – the stations go back to the master
+    (it is their backup address here)."""
+    msg = await _cluster_peer(request, ("backup",))
+    st = ctx.server.state()
+    if not _frn_running():
+        return _cluster_answer(msg, {"ok": True, "restarted": False, "clients": 0})
+    ctx.n8._hold("frn-server.service", "restart")
+    r = await ctx.java.control("restart")
+    ctx.restart_needed = False
+    ctx.auth.audit("cluster_handback", "master", f"{st['clients']} stations sent back", ip_of(request))
+    return _cluster_answer(msg, {"ok": r["rc"] == 0, "restarted": True, "clients": st["clients"]})
+
+
+async def cluster_pull(who: str) -> Dict[str, Any]:
+    """Backup: fetch and take over the master's configuration. Restarts the FRN server only if it changed and no
+    station is connected – otherwise the restart banner says it is pending."""
+    s = ctx.settings.all()
+    t0 = time.time()
+    res: Dict[str, Any] = {"time": t0, "by": who, "ok": False}
+    try:
+        data = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/export", s["cluster.key"], "GET", None, 60)
+        r = await asyncio.to_thread(cluster.apply, ctx.db, ctx.settings, ctx.store, FRN_HOME / "acl", data, "sync:master")
+        res.update(ok=True, changed=r["changed"], counts=r["counts"], skipped=r["skipped"], master=data.get("version"),
+                   hash=str(data.get("hash", ""))[:12], warnings=data.get("warnings") or [])
+        restart = "none"
+        if r["changed"]:
+            ctx.store.invalidate()
+            ctx.server.reload_rooms()
+            ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
+            props = ctx.java.write_config()
+            if props or r["frn_changed"]:
+                st = {**ctx.server.state(), "running": _frn_running()}
+                if st["running"] and st["clients"] == 0:
+                    ctx.n8._hold("frn-server.service", "restart")
+                    await ctx.java.control("restart")
+                    ctx.restart_needed, restart = False, "done"
+                elif st["running"]:
+                    ctx.restart_needed, restart = True, f"pending ({st['clients']} stations connected)"
+                else:
+                    restart = "not running"
+            refresh_sockets()
+            await push({"type": "info"})
+            await push({"type": "rooms"})
+        res["restart"] = restart
+        ctx.auth.audit("cluster_sync", who, ("changed" if r["changed"] else "unchanged") + f" · {r['counts']} · restart {restart}", "")
+    except cluster.ClusterError as e:
+        res["error"] = str(e)
+    except Exception as e:  # noqa: BLE001 – a broken sync must never stop the dashboard
+        log.exception("cluster sync")
+        res["error"] = f"Sync failed: {e}"
+    res["seconds"] = round(time.time() - t0, 1)
+    _cluster_set("cluster.last", res)
+    if not res["ok"]:
+        log.warning("Master & Backup: %s", res.get("error"))
+    return res
+
+
+async def cluster_hourly() -> None:
+    """Backup: fetch the configuration at every full hour (a few seconds after it)."""
+    while True:
+        await asyncio.sleep(max(5.0, cluster.next_full_hour() - time.time() + 7))
+        s = ctx.settings.all()
+        if s["cluster.role"] == "backup" and s["cluster.hourly"] and s["cluster.peer_url"] and s["cluster.key"]:
+            await cluster_pull("hourly")
+
+
+@app.get("/api/admin/cluster")
+async def cluster_status(request: Request):
+    need_admin(request)
+    s = ctx.settings.all()
+    out: Dict[str, Any] = {"role": s["cluster.role"], "peer_url": s["cluster.peer_url"], "key_set": bool(s["cluster.key"]),
+                           "hourly": s["cluster.hourly"], "last": _cluster_get("cluster.last"),
+                           "last_export": _cluster_get("cluster.last_export"), "maintenance": _cluster_get("cluster.maintenance"),
+                           "next": cluster.next_full_hour() if s["cluster.role"] == "backup" and s["cluster.hourly"] else None,
+                           "frn": _frn_state(), "backup_addr": s["frn.backup_host"] or cluster.peer_host(s["cluster.peer_url"]),
+                           "peer": None}
+    if s["cluster.role"] != "off" and s["cluster.peer_url"] and s["cluster.key"]:
+        try:
+            out["peer"] = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/hello", s["cluster.key"], "GET", None, 8)
+        except cluster.ClusterError as e:
+            out["peer"] = {"ok": False, "error": str(e)}
+    return out
+
+
+@app.post("/api/admin/cluster/sync")
+async def cluster_sync_now(request: Request):
+    u = need_admin(request)
+    s = ctx.settings.all()
+    if s["cluster.role"] == "backup":
+        return await cluster_pull(u["username"])
+    if s["cluster.role"] == "master":         # the backup fetches – the master only asks it to
+        try:
+            r = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/pull", s["cluster.key"], "POST", {}, 90)
+        except cluster.ClusterError as e:
+            r = {"ok": False, "error": str(e), "time": time.time()}
+        r["via"] = "backup"
+        _cluster_set("cluster.last", r)
+        ctx.auth.audit("cluster_sync", u["username"], "asked the backup: " + ("ok" if r.get("ok") else r.get("error", "")), ip_of(request))
+        return r
+    raise HTTPError(400, "Set the role (Master or Backup) first.")
+
+
+@app.post("/api/admin/cluster/key")
+async def cluster_new_key(request: Request):
+    u = need_admin(request)
+    key = cluster.new_key()
+    ctx.settings.update({"cluster.key": key}, u["username"])
+    ctx.auth.audit("cluster_key", u["username"], "new sync key", ip_of(request))
+    return {"key": key}
+
+
+@app.post("/api/admin/cluster/maintenance")
+async def cluster_maintenance(request: Request):
+    """Master: hand over to the backup for maintenance (sync, then stop the own FRN server – the clients move to their
+    backup address by themselves) and take back afterwards (start, then the backup sends its stations back)."""
+    u = need_admin(request)
+    b = await body(request)
+    s = ctx.settings.all()
+    if s["cluster.role"] != "master":
+        raise HTTPError(400, "Only the master hands over to the backup.")
+    steps: List[Dict[str, Any]] = []
+    call = lambda path, timeout=30: asyncio.to_thread(cluster.call, s["cluster.peer_url"], path, s["cluster.key"],  # noqa: E731
+                                                      "POST", {}, timeout)
+    if b.get("on"):
+        try:
+            r = await call("/api/cluster/pull", 90)
+            steps.append({"step": "Configuration synced to the backup", "ok": bool(r.get("ok")), "detail": r.get("error", "")})
+            _cluster_set("cluster.last", {**r, "via": "backup"})
+            if not r.get("ok"):
+                raise HTTPError(409, f"Sync failed – nothing switched: {r.get('error', '')}")
+            hello = await call("/api/cluster/hello", 10)
+        except cluster.ClusterError as e:
+            raise HTTPError(409, f"Backup not reachable – nothing switched: {e}")
+        if not (hello.get("frn") or {}).get("running") and not b.get("force"):
+            raise HTTPError(409, "The FRN server on the backup is not running – nothing switched.")
+        steps.append({"step": "FRN server on the backup is running", "ok": True, "detail": ""})
+        clients = ctx.server.state()["clients"]
+        ctx.n8._hold("frn-server.service", "stop")      # Keep-Alive: stays stopped
+        r = await ctx.java.control("stop")
+        if r["rc"] != 0:
+            raise HTTPError(500, f"Stopping the FRN server failed: {r['out'].strip()[:200]}")
+        steps.append({"step": "FRN server here stopped – the stations switch to the backup", "ok": True, "detail": f"{clients} stations"})
+        _cluster_set("cluster.maintenance", {"since": time.time(), "by": u["username"]})
+        ctx.auth.audit("cluster_maintenance", u["username"], "handed over to the backup", ip_of(request))
+    else:
+        ctx.n8._hold("frn-server.service", "start")
+        r = await ctx.java.control("start")
+        if r["rc"] != 0:
+            raise HTTPError(500, f"Starting the FRN server failed: {r['out'].strip()[:200]}")
+        for _ in range(30):
+            await asyncio.sleep(1)
+            await ctx.server.poll_service()
+            if _frn_running():
+                break
+        ok = _frn_running()
+        steps.append({"step": "FRN server here started", "ok": ok, "detail": "" if ok else "not running after 30 s"})
+        ctx.db.x("DELETE FROM kv WHERE key='cluster.maintenance'")
+        if ok and b.get("handback", True):
+            try:
+                h = await call("/api/cluster/handback", 60)
+                steps.append({"step": "Backup sends its stations back", "ok": bool(h.get("ok")),
+                              "detail": f"{h.get('clients', 0)} stations" if h.get("restarted") else "no FRN server running there"})
+            except cluster.ClusterError as e:
+                steps.append({"step": "Backup sends its stations back", "ok": False, "detail": str(e)})
+        ctx.auth.audit("cluster_maintenance", u["username"], "taken back from the backup", ip_of(request))
+    await ctx.server.poll_service()
+    return {"ok": all(x["ok"] for x in steps), "steps": steps, "maintenance": bool(b.get("on"))}
 
 
 @app.post("/api/admin/server/{action}")
@@ -1643,6 +1889,7 @@ async def _startup() -> None:
     ctx.tasks.append(asyncio.ensure_future(background()))
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
     ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
+    ctx.tasks.append(asyncio.ensure_future(cluster_hourly()))
 
 
 async def _shutdown() -> None:
