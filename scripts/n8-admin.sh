@@ -189,6 +189,7 @@ check_perms() {
     if [[ -f "/etc/systemd/system/$u" ]]; then
       ck_mode systemd "/etc/systemd/system/$u" root:root 644 "$u"
       x=$(unit_val "$u" User); [[ -z "$x" || "$x" == root ]] && [[ " ${N8_ROOT_UNITS:-} " != *" $u "* ]] && ck warn systemd "$u läuft als root"
+    elif systemctl cat "$u" >/dev/null 2>&1; then ck ok systemd "$u (aus einem Systempaket)"
     else ck warn systemd "$u ist nicht installiert"; fi
   done
   if [[ -f "/etc/systemd/system/$UPD_PATH" && -f "/etc/systemd/system/$UPD_SVC" ]]; then
