@@ -693,6 +693,7 @@
     //   opts.fields = ['display_name', 'dmr_id', 'callsign']                  zusätzliche Felder je Benutzer
     //   opts.api = { list, create, update, remove, sessions, revoke, audit }    eigene Adressen (sonst /api/admin/users, /sessions, /audit)
     //   opts.locked(u, me) → Text | ''    warum ein Benutzer hier nicht änderbar ist; opts.avatar(u) → HTML; opts.note → Hinweis unter der Tabelle
+    //   opts.columns = [{ label, html(u) }]   zusätzliche Spalten · opts.actions(u) → [{ label, run(u) }] zusätzliche Knöpfe · opts.minPw (8)
     const FIELD = { display_name: ['Anzeigename', 'text'], dmr_id: ['DMR-ID', 'numeric'], callsign: ['Rufzeichen', 'text'] };
     const ago = ts => ts ? fmtShort(ts) : '–';
     function fmtShort(ts) { return new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }); }
@@ -729,6 +730,7 @@
             const canAssign = r => r.assign === 'all' || (r.assign === 'superadmin' && me.role === 'superadmin') || (r.assign === 'admin' && ['admin', 'superadmin'].includes(me.role));
             const opts = sel => roles.filter(r => canAssign(r) || r.id === sel).map(r => `<option value="${esc(r.id)}" ${r.id === sel ? 'selected' : ''} ${canAssign(r) ? '' : 'disabled'}>${esc(t(r.label))}</option>`).join('');
             const locked = u => o.locked ? o.locked(u, me) : (u.role === 'superadmin' && me.role !== 'superadmin' ? t('nur Superadmin') : '');
+            const cols = o.columns || [], minPw = o.minPw || 8;
             const load = async () => {
                 let users; try { users = await A.list(); } catch (e) { paint(card('👥 Benutzer', msg(e))); return; }
                 const inp = (f, u) => `<input name="${f}" placeholder="${esc(t(FIELD[f][0]))}" ${FIELD[f][1] === 'numeric' ? 'inputmode="numeric"' : ''} value="${esc(u ? (u[f] ?? '') : '')}">`;
@@ -738,9 +740,10 @@
                             <span><b>${esc(u.username)}</b>${u.display_name ? `<br><small>${esc(u.display_name)}</small>` : ''}</span></span></td>
                         <td>${role(u.role)}${u.disabled ? ` <span class="n8-role n8-role-off">${esc(t('gesperrt'))}</span>` : ''}</td>
                         ${fields.filter(f => f !== 'display_name').map(f => `<td>${esc(u[f] || '–')}</td>`).join('')}
+                        ${cols.map(c => `<td>${c.html(u)}</td>`).join('')}
                         <td>${esc(ago(u.last_login))}</td>
-                        <td class="n8-act">${lk ? `<small class="n8-dim">${esc(lk)}</small>` : `<button type="button" class="n8-btn sm" data-edit="${i}">${esc(t('Bearbeiten'))}</button>`}</td></tr>
-                        ${lk ? '' : `<tr class="n8-edit" data-row="${i}" hidden><td colspan="${4 + fields.filter(f => f !== 'display_name').length}"><form class="n8-iform" data-i="${i}">
+                        <td class="n8-act">${(o.actions ? o.actions(u) : []).map((a, k) => `<button type="button" class="n8-btn sm" data-x="${i}:${k}">${esc(t(a.label))}</button>`).join('')}${lk ? `<small class="n8-dim">${esc(lk)}</small>` : `<button type="button" class="n8-btn sm" data-edit="${i}">${esc(t('Bearbeiten'))}</button>`}</td></tr>
+                        ${lk ? '' : `<tr class="n8-edit" data-row="${i}" hidden><td colspan="${4 + cols.length + fields.filter(f => f !== 'display_name').length}"><form class="n8-iform" data-i="${i}">
                             ${fields.map(f => inp(f, u)).join('')}
                             <input name="password" type="password" placeholder="${esc(t('Neues Passwort (optional)'))}" autocomplete="new-password">
                             <select name="role">${opts(u.role)}</select>
@@ -748,15 +751,15 @@
                             <button class="n8-btn primary sm" type="submit">${esc(t('Speichern'))}</button>
                             <button class="n8-btn sm danger" type="button" data-del="${i}">${esc(t('Löschen'))}</button></form></td></tr>`}`;
                 }).join('');
-                const first = roles.filter(canAssign).slice(-1)[0];
+                const first = roles.find(r => r.id === o.defaultRole) || roles.filter(canAssign).slice(-1)[0];
                 paint(card('👥 Benutzer', `<p class="n8-help">${esc(t(o.intro || 'Wer sich anmelden darf. Admins sehen IP-Adressen und Ports und ändern Einstellungen; Benutzer sehen nur das Dashboard.'))}</p>
                     <form class="n8-iform create">
                         <input name="username" placeholder="${esc(t('Benutzername'))}" required autocomplete="off">
                         ${fields.map(f => inp(f)).join('')}
-                        <input name="password" type="password" placeholder="${esc(t('Passwort (min. 8)'))}" minlength="8" required autocomplete="new-password">
+                        <input name="password" type="password" placeholder="${esc(t('Passwort (min. {n})').replace('{n}', minPw))}" minlength="${minPw}" required autocomplete="new-password">
                         <select name="role">${opts(first ? first.id : '')}</select>
                         <button class="n8-btn primary sm" type="submit">＋ ${esc(t('Benutzer anlegen'))}</button></form>
-                    <table class="n8-tbl"><thead><tr><th>${esc(t('Benutzer'))}</th><th>${esc(t('Rolle'))}</th>${fields.filter(f => f !== 'display_name').map(f => `<th>${esc(t(FIELD[f][0]))}</th>`).join('')}<th>${esc(t('Letzte Anmeldung'))}</th><th></th></tr></thead>
+                    <table class="n8-tbl"><thead><tr><th>${esc(t('Benutzer'))}</th><th>${esc(t('Rolle'))}</th>${fields.filter(f => f !== 'display_name').map(f => `<th>${esc(t(FIELD[f][0]))}</th>`).join('')}${cols.map(c => `<th>${esc(t(c.label))}</th>`).join('')}<th>${esc(t('Letzte Anmeldung'))}</th><th></th></tr></thead>
                     <tbody>${rows}</tbody></table>${o.note ? `<p class="n8-help">${esc(t(o.note))}</p>` : ''}`));
                 const fd = f => { const d = {}; for (const x of f.elements) if (x.name) d[x.name] = x.type === 'checkbox' ? x.checked : x.value.trim(); if ('dmr_id' in d) d.dmr_id = d.dmr_id ? Number(d.dmr_id) : null; return d; };
                 el.querySelector('form.create').onsubmit = async e => {
@@ -764,6 +767,7 @@
                     try { await A.create(d); toast(t('Benutzer angelegt') + ': ' + d.username); load(); } catch (x) { toast(x.message, true); }
                 };
                 el.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { const r = el.querySelector(`tr[data-row="${b.dataset.edit}"]`); r.hidden = !r.hidden; });
+                el.querySelectorAll('[data-x]').forEach(b => b.onclick = () => { const [i, k] = b.dataset.x.split(':').map(Number); o.actions(users[i])[k].run(users[i], load); });
                 el.querySelectorAll('form[data-i]').forEach(f => f.onsubmit = async e => {
                     e.preventDefault(); const d = fd(f); if (!d.password) delete d.password;
                     try { await A.update(users[f.dataset.i], d); toast(t('Gespeichert')); load(); } catch (x) { toast(x.message, true); }
@@ -821,9 +825,10 @@
                 paint(`${card('🔌 Ports', `<p class="n8-help">${esc(t(d.intro || 'Alle Ports an einer Stelle. Eingehend: in Firewall und Router freigeben, wenn das von außen erreichbar sein soll. Ausgehend: die Gegenstelle muss erreichbar sein.'))}</p>
                     ${d.note ? `<div class="n8-help">♻️ ${esc(t(d.note))}</div>` : ''}`)}
                     <div class="n8-net-grid" style="margin-top:16px">${(d.groups || []).map(g => card(g.title, `${g.help ? `<p class="n8-help">${esc(t(g.help))}</p>` : ''}<table class="n8-tbl"><tbody>${g.rows.map(row).join('')}</tbody></table>`)).join('')}</div>
-                    <div class="n8-actions"><button type="button" class="n8-btn primary" data-a="save">💾 ${esc(t('Ports speichern'))}</button>${d.restart ? `<button type="button" class="n8-btn" data-a="restart">♻️ ${esc(t(d.restart.button || 'Dienst neu starten'))}</button>` : ''}</div>
+                    <div class="n8-actions">${(d.groups || []).some(g => g.rows.some(r => !r.readonly)) ? `<button type="button" class="n8-btn primary" data-a="save">💾 ${esc(t('Ports speichern'))}</button>` : ''}${d.restart ? `<button type="button" class="n8-btn" data-a="restart">♻️ ${esc(t(d.restart.button || 'Dienst neu starten'))}</button>` : ''}</div>
                     <pre class="n8-log n8-net-out" hidden></pre>`);
-                el.querySelector('[data-a=save]').onclick = async e => {
+                const sb = el.querySelector('[data-a=save]');
+                if (sb) sb.onclick = async e => {
                     const values = {};
                     el.querySelectorAll('.n8-in[data-k]').forEach(i => { values[i.dataset.k] = i.dataset.kind === 'port' ? Number(i.value) : i.value.trim(); });
                     e.target.disabled = true;
@@ -940,7 +945,7 @@
             // 1.4.0: Benutzer & Zugang, Netz, Ports & Domains
             '🌐 Netz, Ports & Domains': '🌐 Network, ports & domains', '👥 Benutzer': '👥 Users', '🔑 Sitzungen': '🔑 Sessions', '📜 Protokoll': '📜 Log',
             'Benutzer': 'User', 'Rolle': 'Role', 'Letzte Anmeldung': 'Last login', 'Bearbeiten': 'Edit', 'gesperrt': 'disabled', 'Anzeigename': 'Display name',
-            'Rufzeichen': 'Callsign', 'Benutzername': 'Username', 'Passwort (min. 8)': 'Password (min. 8)', 'Neues Passwort (optional)': 'New password (optional)',
+            'Rufzeichen': 'Callsign', 'Benutzername': 'Username', 'Passwort (min. {n})': 'Password (min. {n})', 'Neues Passwort (optional)': 'New password (optional)',
             'Benutzer anlegen': 'Add user', 'Löschen': 'Delete', 'Wirklich löschen?': 'Really delete?', 'Benutzer angelegt': 'User created', 'Benutzer gelöscht': 'User deleted',
             'nur Superadmin': 'superadmin only', 'Superadmin': 'Superadmin', 'Admin': 'Admin', 'Betrachter': 'Viewer', 'Autor': 'Author', 'Redakteur': 'Editor',
             'Wer sich anmelden darf. Admins sehen IP-Adressen und Ports und ändern Einstellungen; Benutzer sehen nur das Dashboard.': 'Who may log in. Admins see IP addresses and ports and change settings; users only see the dashboard.',
