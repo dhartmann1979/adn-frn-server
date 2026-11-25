@@ -2,6 +2,21 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.19.0 – 2026-11-25
+
+### 🔒 Schutz: Master und Backup nie wieder mit demselben FRN-Konto
+- **Anlass:** frn und frn-backup liefen mit demselben FRN-Konto. Der SystemManager lässt ein Konto nur auf einem Server online –
+  sie warfen sich gegenseitig raus, zuletzt waren **beide** abgewiesen („wrong FRN password“) und ihre FRN-Server beendeten sich
+  dauernd.
+- **Kennung bei jeder Verbindung:** Abgleich, Statusabruf, Übergabe und Antworten tragen die Kennung des FRN-Kontos (Hash der
+  E-Mail, Ende-zu-Ende verschlüsselt). Beide Server merken sich die des Partners.
+- **Das Backup sperrt sich selbst:** Bei gleichem Konto stoppt es seinen FRN-Server und hält ihn gesperrt – Keep-Alive, „▶ Start“,
+  Neustart nach einem Abgleich, „Vom Backup zurückholen“ und der Start beim Hochfahren lassen ihn aus. Der Master bleibt online.
+- **Speichern wird verweigert:** Die E-Mail des Partners lässt sich unter *SystemManager* nicht eintragen (auf Master und Backup).
+- **Freigabe von selbst**, sobald das Backup ein eigenes Konto hat – dann startet sein FRN-Server wieder.
+- Anzeige im Kasten *Master & Backup* (⛔ gleiches Konto, 🔒 gestoppt und gesperrt seit …), Protokoll-Einträge `cluster_guard`.
+- Doku docs/de/master-backup.md („Schutz: nie zwei Server mit demselben FRN-Konto“); Tests für Sperre, Ablehnung und Freigabe.
+
 ## 2.18.2 – 2026-11-25
 
 ### ⛔ Warnung: Master und Backup mit demselben FRN-Konto

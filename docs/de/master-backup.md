@@ -30,6 +30,25 @@ Partner die Anfrage ab.
 
 <p align="center"><img src="../images/admin-cluster-backup.png" alt="Master & Backup auf dem Backup" width="90%"></p>
 
+## 🔒 Schutz: nie zwei Server mit demselben FRN-Konto
+
+Der SystemManager lässt ein FRN-Konto nur auf **einem** Server online. Melden sich Master und Backup mit derselben E-Mail an,
+werfen sie sich gegenseitig raus („wrong FRN password“ / „wrong credentials“), und am Ende sind oft **beide** offline. Deshalb:
+
+- **Jede Verbindung zwischen den beiden** (Abgleich, Statusabruf, Übergabe) trägt die Kennung des FRN-Kontos mit (nur ein Hash der
+  E-Mail, verschlüsselt). Beide Server merken sich die Kennung des Partners.
+- **Das Backup sperrt sich selbst:** Hat es dasselbe Konto wie der Master, **stoppt es seinen FRN-Server und hält ihn gesperrt**.
+  Der Keep-Alive startet ihn nicht, „▶ Start“ wird abgelehnt, nach einem Abgleich oder Neustart bleibt er aus, und beim Hochfahren
+  wird er gleich wieder gestoppt. Der Master bleibt immer online.
+- **Speichern wird verweigert:** Wer auf einem der beiden unter *SystemManager* die E-Mail des anderen einträgt, bekommt
+  „Dieses FRN-Konto verwendet schon der Master/das Backup“.
+- **Freigabe von selbst:** Sobald auf dem Backup ein **eigenes** FRN-Konto gespeichert ist, wird die Sperre aufgehoben und sein
+  FRN-Server startet.
+- Im Kasten *Master & Backup* steht dann rot „⛔ Master und Backup verwenden dasselbe FRN-Konto“ und auf dem Backup
+  „🔒 FRN-Server hier gestoppt und gesperrt“. Jede Sperre und Freigabe steht im Protokoll (`cluster_guard`).
+
+Stand-alone-Server (ohne SystemManager) sind ausgenommen – dort gibt es kein Konto beim SystemManager.
+
 ## 🔗 Partner im Link-Menü
 
 Master und Backup stehen sich **über Kreuz automatisch als erster Eintrag** im Link-Menü der Kopfzeile: auf dem Master

@@ -253,6 +253,10 @@ N8Kit.i18n.add({
         'Your own links in the header: website, chat group, wiki, donation page … Everyone sees them, also without login.': 'Eigene Links in der Kopfzeile: Webseite, Chatgruppe, Wiki, Spendenseite … Jeder sieht sie, auch ohne Login.',
         'Website': 'Webseite', 'E-mail': 'E-Mail', 'Address': 'Adresse', 'Copy settings from': 'Einstellungen übernehmen von', 'Do not record': 'Nicht aufzeichnen', '(switches to that tab) and': '(wechselt in diesen Tab) und',
         // 2.17.0: Master & Backup
+        "FRN server here stopped and locked": "FRN-Server hier gestoppt und gesperrt",
+        "it starts by itself as soon as an own FRN account is saved under SystemManager": "er startet von selbst, sobald unter SystemManager ein eigenes FRN-Konto gespeichert ist.",
+        "The backup stops and locks its FRN server by itself (at the next sync or status check) – the master stays online": "Das Backup stoppt und sperrt seinen FRN-Server von selbst (beim nächsten Abgleich oder Statusabruf) – der Master bleibt online.",
+        "Locked: this backup uses the same FRN account as the master. Enter an own FRN account under SystemManager first (📧 FRN password Backup)": "Gesperrt: Dieses Backup verwendet dasselbe FRN-Konto wie der Master. Erst unter SystemManager ein eigenes FRN-Konto eintragen (📧 FRN-Passwort Backup).",
         "Master and backup use the same FRN account": "Master und Backup verwenden dasselbe FRN-Konto.",
         "The SystemManager lets only one of them online – the other one gets “wrong credentials” and its FRN server stops. Request an own FRN password for the backup and enter it there under SystemManager": "Der SystemManager lässt nur einen von beiden online – der andere bekommt „wrong credentials“ und sein FRN-Server stoppt. Für das Backup ein eigenes FRN-Passwort anfordern und dort unter SystemManager eintragen.",
         "Master & Backup": "Master & Backup",
@@ -334,6 +338,7 @@ N8Kit.i18n.add({
         "Use https:// for the partner – the sync carries the FRN accounts (http only inside the LAN)": "Für den Partner https:// verwenden – der Abgleich überträgt die FRN-Konten (http nur im Heimnetz)",
     },
     rules: [
+        [/^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$/, (m, w) => `Dieses FRN-Konto verwendet schon der ${w === 'master' ? 'Master' : 'Backup'} – jeder Server braucht sein eigenes FRN-Konto (📧 FRN-Passwort ${w === 'master' ? 'Master' : 'Backup'}).`],
         [/^(\d+) rooms$/, '$1 Räume'], [/^(\d+) accounts$/, '$1 Konten'], [/^(\d+) list entries$/, '$1 Listeneinträge'],
         [/^FRN: (\d+) stations$/, 'FRN: $1 Stationen'], [/^(\d+) stations$/, '$1 Stationen'],
         [/^Partner (\S+) not reachable \((.*)\)\.?$/, 'Partner $1 nicht erreichbar ($2).'],

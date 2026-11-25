@@ -387,6 +387,14 @@ async def save_settings(request: Request):
     if "frn.default_room" in changes and changes["frn.default_room"] and \
             changes["frn.default_room"] not in [r["name"] for r in ctx.store.rooms()]:
         raise HTTPError(400, "Default room: this room does not exist.")
+    if "sysman.email" in changes and ctx.settings.get("cluster.role") in ("master", "backup"):
+        new = str(changes.get("sysman.email") or "").strip().lower()
+        tag = hashlib.sha256(new.encode()).hexdigest()[:16] if new else ""
+        sa = changes.get("frn.standalone", ctx.settings.get("frn.standalone"))
+        if account_conflict(tag, bool(sa) if not isinstance(sa, str) else sa.lower() in ("1", "true", "on", "yes")):
+            other = "backup" if ctx.settings.get("cluster.role") == "master" else "master"
+            raise HTTPError(400, f"This FRN account is already used by the {other} – every server needs its own FRN account "
+                                 f"(📧 FRN password {other.capitalize()} / Backup).")
     changed = ctx.settings.update(changes, u["username"])
     keys = [f.key for f in changed]
     if any(k.startswith("https.") for k in keys):
@@ -396,6 +404,8 @@ async def save_settings(request: Request):
         ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
         if any(k.startswith(("frn.", "sysman.", "cluster.")) for k in keys):
             config_changed(u, request, "settings " + ", ".join(keys))
+        if any(k in keys for k in ("sysman.email", "frn.standalone", "cluster.role")):
+            await account_guard("settings")
         if "cluster.peer_url" in keys or "cluster.role" in keys:
             p = partner_link()
             if p:
@@ -463,6 +473,7 @@ async def _cluster_peer(request: Request, roles) -> Dict[str, Any]:
         raise HTTPError(403, str(e))
     if ctx.settings.get("cluster.role") not in roles:
         raise HTTPError(409, f"this server is {ctx.settings.get('cluster.role')}, not {'/'.join(roles)}")
+    _remember_peer(msg.get("data") or {})
     return msg
 
 
@@ -474,6 +485,51 @@ def _account_tag() -> str:
     """Kennung des FRN-Kontos beim SystemManager (Hash der E-Mail) – zum Vergleich mit dem Partner, ohne die Adresse zu zeigen."""
     e = (ctx.settings.get("sysman.email") or "").strip().lower()
     return hashlib.sha256(e.encode()).hexdigest()[:16] if e else ""
+
+
+def _me() -> Dict[str, Any]:
+    """Was jeder Server bei jeder Anfrage/Antwort über sich mitschickt: Kennung seines FRN-Kontos."""
+    return {"account": _account_tag(), "standalone": bool(ctx.settings.get("frn.standalone")), "role": ctx.settings.get("cluster.role")}
+
+
+def _remember_peer(d: Dict[str, Any]) -> None:
+    if isinstance(d, dict) and "account" in d:
+        _cluster_set("cluster.peer_account", {"tag": str(d.get("account") or ""), "standalone": bool(d.get("standalone")),
+                                              "time": time.time()})
+
+
+def account_conflict(tag: Optional[str] = None, standalone: Optional[bool] = None) -> bool:
+    """Master und Backup mit demselben FRN-Konto beim SystemManager? (Dann darf nur der Master sein FRN-Server laufen.)"""
+    s = ctx.settings.all()
+    if s["cluster.role"] not in ("master", "backup"):
+        return False
+    tag = _account_tag() if tag is None else tag
+    standalone = s["frn.standalone"] if standalone is None else standalone
+    p = _cluster_get("cluster.peer_account")
+    return bool(tag) and not standalone and bool(p.get("tag")) and not p.get("standalone") and p["tag"] == tag
+
+
+async def account_guard(where: str) -> None:
+    """Backup: hat es dasselbe FRN-Konto wie der Master, wird sein FRN-Server gestoppt und bleibt gesperrt (auch für den
+    Keep-Alive), bis ein eigenes Konto eingetragen ist – sonst nimmt er dem Master die Anmeldung beim SystemManager weg.
+    Ist das Konto wieder verschieden, gibt die Sperre den FRN-Server frei und startet ihn."""
+    guard = _cluster_get("cluster.guard")
+    if ctx.settings.get("cluster.role") == "backup" and account_conflict():
+        if not guard:
+            _cluster_set("cluster.guard", {"since": time.time(), "where": where})
+            ctx.auth.audit("cluster_guard", where, "same FRN account as the master – FRN server stopped and locked", "")
+            log.warning("Master & Backup: dasselbe FRN-Konto wie der Master – FRN-Server gestoppt und gesperrt (%s)", where)
+        st = await ctx.java.status()
+        if st.get("active") in ("active", "activating", "reloading"):
+            ctx.n8._hold("frn-server.service", "stop")
+            await ctx.java.control("stop")
+            await ctx.server.poll_service()
+    elif guard:
+        ctx.db.x("DELETE FROM kv WHERE key='cluster.guard'")
+        ctx.auth.audit("cluster_guard", where, "own FRN account – lock released, FRN server started", "")
+        if ctx.settings.get("cluster.role") == "backup" or not account_conflict():
+            ctx.n8._hold("frn-server.service", "start")
+            await ctx.java.control("start")
 
 
 def _frn_running() -> bool:
@@ -502,6 +558,7 @@ async def cluster_export(request: Request):
     errors = ctx.acls.sync_from_files()                 # moderators may have changed lists in the FRN client
     data = cluster.export(ctx.db, ctx.settings, FRN_HOME / "acl", ctx.settings.get("dashboard.title"), ctx.store)
     _cluster_set("cluster.last_export", {"time": time.time(), "ip": ip_of(request), "hash": data["hash"][:12]})
+    data.update(_me())
     if errors:
         data["warnings"] = errors
     return await asyncio.to_thread(_cluster_answer, msg, data)
@@ -519,7 +576,7 @@ async def cluster_handback(request: Request):
     (it is their backup address here)."""
     msg = await _cluster_peer(request, ("backup",))
     st = ctx.server.state()
-    if not _frn_running():
+    if not _frn_running() or _cluster_get("cluster.guard"):
         return _cluster_answer(msg, {"ok": True, "restarted": False, "clients": 0})
     ctx.n8._hold("frn-server.service", "restart")
     r = await ctx.java.control("restart")
@@ -535,7 +592,9 @@ async def cluster_pull(who: str) -> Dict[str, Any]:
     t0 = time.time()
     res: Dict[str, Any] = {"time": t0, "by": who, "ok": False}
     try:
-        data = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/export", s["cluster.key"], "GET", None, 60)
+        data = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/export", s["cluster.key"], "POST", _me(), 60)
+        _remember_peer(data)
+        await account_guard("sync")
         r = await asyncio.to_thread(cluster.apply, ctx.db, ctx.settings, ctx.store, FRN_HOME / "acl", data, "sync:master")
         res.update(ok=True, changed=r["changed"], counts=r["counts"], skipped=r["skipped"], master=data.get("version"),
                    hash=str(data.get("hash", ""))[:12], warnings=data.get("warnings") or [])
@@ -545,7 +604,9 @@ async def cluster_pull(who: str) -> Dict[str, Any]:
             ctx.server.reload_rooms()
             ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
             props = ctx.java.write_config()
-            if props or r["frn_changed"]:
+            if (props or r["frn_changed"]) and _cluster_get("cluster.guard"):
+                restart = "locked (same FRN account as the master)"
+            elif props or r["frn_changed"]:
                 st = {**ctx.server.state(), "running": _frn_running()}
                 if st["running"] and st["clients"] == 0:
                     ctx.n8._hold("frn-server.service", "restart")
@@ -593,13 +654,15 @@ async def cluster_status(request: Request):
                            "peer": None}
     if s["cluster.role"] != "off" and s["cluster.peer_url"] and s["cluster.key"]:
         try:
-            out["peer"] = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/hello", s["cluster.key"], "GET", None, 8)
+            out["peer"] = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/hello", s["cluster.key"], "POST", _me(), 8)
         except cluster.ClusterError as e:
             out["peer"] = {"ok": False, "error": str(e)}
         p = out["peer"] or {}
+        _remember_peer(p)
+        await account_guard("status")
+        out["guard"] = _cluster_get("cluster.guard")
         # beide Server mit demselben FRN-Konto: der SystemManager lässt nur einen online (der andere: „wrong credentials“)
-        out["same_account"] = bool(p.get("account")) and p.get("account") == _account_tag() \
-            and not s["frn.standalone"] and not p.get("standalone")
+        out["same_account"] = account_conflict()
     return out
 
 
@@ -611,7 +674,7 @@ async def cluster_sync_now(request: Request):
         return await cluster_pull(u["username"])
     if s["cluster.role"] == "master":         # the backup fetches – the master only asks it to
         try:
-            r = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/pull", s["cluster.key"], "POST", {}, 90)
+            r = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/pull", s["cluster.key"], "POST", _me(), 90)
         except cluster.ClusterError as e:
             r = {"ok": False, "error": str(e), "time": time.time()}
         r["via"] = "backup"
@@ -641,7 +704,7 @@ async def cluster_maintenance(request: Request):
         raise HTTPError(400, "Only the master hands over to the backup.")
     steps: List[Dict[str, Any]] = []
     call = lambda path, timeout=30: asyncio.to_thread(cluster.call, s["cluster.peer_url"], path, s["cluster.key"],  # noqa: E731
-                                                      "POST", {}, timeout)
+                                                      "POST", _me(), timeout)
     if b.get("on"):
         try:
             r = await call("/api/cluster/pull", 90)
@@ -693,6 +756,9 @@ async def server_control(action: str, request: Request):
     u = need_admin(request)
     if action not in ("start", "stop", "restart"):
         raise HTTPError(404, "Unknown action.")
+    if action != "stop" and _cluster_get("cluster.guard"):
+        raise HTTPError(409, "Locked: this backup uses the same FRN account as the master. Enter an own FRN account under "
+                             "SystemManager first (📧 FRN password Backup).")
     ctx.n8._hold("frn-server.service", action)        # Keep-Alive: von Hand gestoppt bleibt gestoppt
     r = await ctx.java.control(action)
     if r["rc"] != 0:
@@ -1922,7 +1988,9 @@ async def _startup() -> None:
         ctx.java.write_config()
     except OSError as e:
         log.error("cannot write the FRN server configuration: %s", e)
-    if ctx.java.direct:
+    if _cluster_get("cluster.guard") or account_conflict():
+        await account_guard("startup")                 # Backup mit dem Konto des Masters: FRN-Server bleibt aus
+    elif ctx.java.direct:
         await ctx.java.control("start")
     elif _RESTORED.get("ok"):
         await ctx.java.control("restart")             # the FRN server reads the restored configuration

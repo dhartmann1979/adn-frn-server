@@ -169,3 +169,40 @@ def test_same_fRN_account_warning(client, monkeypatch):
     assert client.get("/api/admin/cluster").json()["same_account"] is True
     monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "account": "other", "standalone": False})
     assert client.get("/api/admin/cluster").json()["same_account"] is False
+
+
+def test_backup_locked_with_masters_fRN_account(client, tmp_path, monkeypatch):
+    """Nie wieder beide mit demselben FRN-Konto: das Backup stoppt und sperrt seinen FRN-Server."""
+    A = client.A
+    mdb, ms, mst, macl = server(tmp_path, "m")
+    data = cluster.export(mdb, ms, macl, "M", mst)
+    A.ctx.settings.update({"cluster.role": "backup", "cluster.key": KEY, "cluster.peer_url": "https://frn.example.org",
+                           "sysman.email": "server@example.org", "frn.standalone": False}, "t")
+    data.update({"account": A._account_tag(), "standalone": False, "role": "master"})      # master: same account
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: data)
+    assert client.post("/api/admin/server/start", json={}, headers=H).status_code == 200
+    r = client.post("/api/admin/cluster/sync", json={}, headers=H).json()
+    assert r["ok"]
+    st = client.get("/api/admin/cluster").json()
+    assert st["guard"]["since"] and st["same_account"]
+    assert A.ctx.java._demo_state if hasattr(A.ctx.java, "_demo_state") else True
+    r = client.post("/api/admin/server/start", json={}, headers=H)
+    assert r.status_code == 409 and "Locked" in r.json()["error"]
+    # the master's account cannot be entered again …
+    assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "SERVER@example.org"}}, headers=H).status_code == 400
+    # … an own account releases the lock
+    assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "backup@example.org"}}, headers=H).status_code == 200
+    assert not client.get("/api/admin/cluster").json().get("guard")
+    assert client.post("/api/admin/server/start", json={}, headers=H).status_code == 200
+
+
+def test_master_refuses_backups_account(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org",
+                           "sysman.email": "master@example.org", "frn.standalone": False}, "t")
+    import hashlib
+    tag = hashlib.sha256(b"backup@example.org").hexdigest()[:16]
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "account": tag, "standalone": False})
+    client.get("/api/admin/cluster")
+    assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "backup@example.org"}}, headers=H).status_code == 400
+    assert client.post("/api/admin/settings", json={"changes": {"sysman.email": "neu@example.org"}}, headers=H).status_code == 200

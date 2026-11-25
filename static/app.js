@@ -887,7 +887,9 @@ async function loadCluster() {
     const lastTxt = !last.time ? '<span class="dim">never</span>'
         : last.ok ? `<span class="cl-ok">✓</span> ${fmtDate(last.time)} <span class="dim">${bits.map(b => `· <span>${esc(b)}</span>`).join(' ')}</span>`
         : `<span class="cl-bad">✕ ${fmtDate(last.time)}</span> <span class="cl-bad">${esc(last.error || '')}</span>`;
-    const same = d.same_account ? `<div class="notice-box cl-alarm">⛔ <b>Master and backup use the same FRN account.</b> <span>The SystemManager lets only one of them online – the other one gets “wrong credentials” and its FRN server stops. Request an own FRN password for the backup and enter it there under SystemManager.</span></div>` : '';
+    const same = d.same_account || (d.guard && d.guard.since) ? `<div class="notice-box cl-alarm">⛔ <b>Master and backup use the same FRN account.</b> <span>The SystemManager lets only one of them online – the other one gets “wrong credentials” and its FRN server stops. Request an own FRN password for the backup and enter it there under SystemManager.</span>
+        ${d.guard && d.guard.since ? `<div style="margin-top:6px">🔒 <b>FRN server here stopped and locked</b> <span class="dim">· ${fmtDate(d.guard.since)}</span> – <span>it starts by itself as soon as an own FRN account is saved under SystemManager.</span></div>`
+          : d.role === 'master' ? '<div style="margin-top:6px">🔒 <span>The backup stops and locks its FRN server by itself (at the next sync or status check) – the master stays online.</span></div>' : ''}</div>` : '';
     const rows = d.role === 'off' ? '<div class="dim">Choose the role of this server below: the master gives its configuration, the backup takes it over every full hour. The failover itself is done by FRN: the clients go to the backup address when this server is gone.</div>' : `
         <div class="cl-grid">
             <span>Role</span><b><span>${esc(role)}</span>${m ? ' · <span class="cl-warn">🛠️ maintenance – stations are on the backup</span>' : ''}</b>
