@@ -22,7 +22,8 @@ Konfiguration des Masters **zu jeder vollen Stunde** und auf Knopfdruck. Die bei
    **🎲 Neuer Schlüssel** → Schlüssel kopieren → **Speichern**.
 2. **Auf dem Backup:** Rolle **Backup**, *Dashboard des Partners* = `https://frn.auf-der-nachtschicht.de`, denselben
    **Sync-Schlüssel** einfügen, *Jede volle Stunde abgleichen* an → **Speichern** → **🔄 Jetzt abgleichen**.
-3. In beiden Kästen steht jetzt beim *Partner* ein grüner Haken mit Name, Rolle, Version und Stationen.
+3. In beiden Kästen steht jetzt beim *Partner* ein grüner Haken mit Name, Rolle, Version und Stationen. Im Kopfbereich steht
+   hinter dem Titel **[Master]** bzw. **[Backup]** (ohne Rolle: **[Standalone]**).
 
 Beide Server müssen dieselbe Version haben (mindestens 2.17.0). Die Uhren müssen stimmen (± 5 Minuten), sonst lehnt der
 Partner die Anfrage ab.

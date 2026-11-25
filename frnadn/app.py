@@ -235,7 +235,8 @@ def info_for(u) -> Dict[str, Any]:
         addr = f"{addr}:{s['frn.port']}"
     return {"title": s["dashboard.title"], "subtitle": s["dashboard.subtitle"], "address": addr, "public": s["dashboard.public"],
             "version": __version__, "demo": DEMO, "chat": ctx.chat_allowed(u), "owner": s["frn.owner_callsign"],
-            "website": s["frn.website"], "setup_needed": not ctx.auth.has_superadmin()}
+            "website": s["frn.website"], "setup_needed": not ctx.auth.has_superadmin(),
+            "role": s["cluster.role"]}          # Master & Backup: im Kopfbereich als [Master] / [Backup] / [Standalone]
 
 
 def refresh_sockets() -> None:
@@ -1672,6 +1673,14 @@ async def crashes_ack(request: Request):
     b = b if isinstance(b, dict) else {}
     ids = b.get("ids") if isinstance(b.get("ids"), list) else []
     return await asyncio.to_thread(ctx.n8.crash_ack, [str(i) for i in ids][:500], bool(b.get("all")))
+
+@app.post("/api/admin/crashes/delete")
+async def crashes_delete(request: Request):
+    need_admin(request)
+    b = await body(request)
+    b = b if isinstance(b, dict) else {}
+    ids = b.get("ids") if isinstance(b.get("ids"), list) else []
+    return await asyncio.to_thread(ctx.n8.crash_delete, [str(i) for i in ids][:500], bool(b.get("all")))
 
 
 @app.get("/api/admin/keepalive")

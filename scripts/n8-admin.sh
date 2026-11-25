@@ -13,6 +13,7 @@
 #    n8-admin.sh setup-crashwatch       Absturz-Wächter: systemd-Drop-in (ExecStopPost) für jeden Dienst des Projekts
 #    n8-admin.sh crash-hook UNIT        läuft nach JEDEM Ende eines Dienstes (vom Drop-in, als root) und hält Abstürze fest
 #    n8-admin.sh crashes                die letzten Befunde auf der Konsole anzeigen
+#    n8-admin.sh crashes-clear          alle Befunde samt Protokollen löschen (bereinigen)
 #
 #  Projektdaten stehen in n8-admin.conf neben diesem Skript (Name, Dienste, Datenordner, Hooks: n8_layout, n8_version,
 #  n8_post_update, n8_sudo_extra, n8_restart, n8_check_extra, n8_fix_extra).
@@ -433,6 +434,13 @@ for n in os.listdir(cd) if os.path.isdir(cd) else []:
         os.remove(os.path.join(cd, n))
 PY
   crash_own
+}
+crash_clear() {   # alle Befunde und ihre Protokolle löschen (wie „🗑 Alle löschen“ im Webinterface)
+  local n=0
+  [[ -s "$STATE_DIR/crashes.jsonl" ]] && n=$(grep -c . "$STATE_DIR/crashes.jsonl" || true)
+  : > "$STATE_DIR/crashes.jsonl" 2>/dev/null || true
+  find "$STATE_DIR/crash" -maxdepth 1 -type f \( -name '*.log' -o -name 'ack.json' \) ! -name 'fault-*' -delete 2>/dev/null || true
+  ok "$n Befund(e) gelöscht"
 }
 crash_show() {
   local f="$STATE_DIR/crashes.jsonl"
@@ -913,6 +921,7 @@ case "${1:-}" in
   setup-crashwatch) setup_crashwatch ;;
   crash-hook) crash_hook "${2:-}" ;;
   crashes) crash_show ;;
+  crashes-clear) crash_clear ;;
   update) do_update "${2:-}" ;;
   *) echo "Aufruf: $SELF check-perms [--json] | fix-perms | sudo-setup | setup-units | setup-keepalive | keepalive | setup-crashwatch | crash-hook UNIT | crashes | update [--auto]"; exit 2 ;;
 esac

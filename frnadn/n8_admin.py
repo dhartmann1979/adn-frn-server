@@ -271,7 +271,7 @@ class N8Admin:
                 continue
             if isinstance(e, dict) and isinstance(e.get("id"), str) and _CRASH_ID.fullmatch(e["id"]):
                 out.append(e)
-        if self.demo and not out:
+        if self.demo and not out and not getattr(self, "_demo_deleted", False):
             now = time.time()
             unit = next((u["unit"] for u in self.config().get("units", []) if u["unit"].endswith(".service")), "demo.service")
             out = [{"id": "20261125-031240-d001", "time": now - 26 * 3600, "unit": unit, "service": "Datenbank ← Live-Daten", "kind": "watchdog",
@@ -337,6 +337,45 @@ class N8Admin:
         os.replace(tmp, d / "ack.json")
         return self.crashes()
 
+    def crash_delete(self, ids: Optional[List[str]] = None, all_: bool = False) -> Dict[str, Any]:
+        """Befunde löschen (bereinigen): alle oder einzelne – Eintrag in crashes.jsonl und das Protokoll crash/<id>.log."""
+        d = self.state_dir / "crash"
+        if self.demo:
+            self._demo_deleted = True if all_ else getattr(self, "_demo_deleted", False)
+            return self.crashes()
+        keep_ids = None if all_ else {i for i in (ids or []) if _CRASH_ID.fullmatch(str(i))}
+        f = self.state_dir / "crashes.jsonl"
+        try:
+            lines = f.read_text("utf-8", "replace").splitlines()
+        except OSError:
+            lines = []
+        kept, gone = [], []
+        for line in lines:
+            try:
+                cid = json.loads(line).get("id")
+            except (ValueError, AttributeError):
+                cid = None
+            if keep_ids is None or (cid in keep_ids):
+                if cid:
+                    gone.append(cid)
+                continue
+            kept.append(line)
+        if lines:
+            tmp = f.with_name("crashes.jsonl.tmp")
+            tmp.write_text("".join(x + "\n" for x in kept), "utf-8")
+            os.chmod(tmp, 0o640)
+            os.replace(tmp, f)
+        for cid in gone:
+            if _CRASH_ID.fullmatch(cid):
+                (d / f"{cid}.log").unlink(missing_ok=True)
+        if all_:                                  # alles weg: auch Reste von Protokollen ohne Eintrag
+            for p_ in d.glob("*.log"):
+                if _CRASH_ID.fullmatch(p_.stem):
+                    p_.unlink(missing_ok=True)
+            (d / "ack.json").unlink(missing_ok=True)
+        r = self.crashes()
+        r["deleted"] = len(gone)
+        return r
 
 def own_unit() -> str:
     """systemd-Dienst, in dem dieser Prozess läuft (aus /proc/self/cgroup), sonst ''."""

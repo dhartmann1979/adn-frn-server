@@ -233,8 +233,10 @@ async function boot() {
 }
 function renderHeader() {
     const i = S.info || {};
-    $('title').textContent = i.title || 'Auf der NachtSchicht';
-    document.title = i.title || 'Auf der NachtSchicht';
+    // Rolle des Servers als Suffix: Auf der NachtSchicht [Master] / [Backup] / [Standalone]
+    const role = { master: 'Master', backup: 'Backup', off: 'Standalone' }[i.role] || '';
+    $('title').innerHTML = esc(i.title || 'Auf der NachtSchicht') + (role ? ` <span class="title-role role-${esc(i.role)} notranslate" translate="no">[${role}]</span>` : '');
+    document.title = (i.title || 'Auf der NachtSchicht') + (role ? ` [${role}]` : '');
     const parts = [i.subtitle, i.address ? `<span class="addr">${esc(i.address)}</span>` : '', i.demo ? 'Demo' : ''].filter(Boolean);
     $('subtitle').innerHTML = parts.map(p => p.startsWith('<') ? p : esc(p)).join(' · ');
     $('tabAdminBtn').classList.toggle('hidden', !isAdmin());

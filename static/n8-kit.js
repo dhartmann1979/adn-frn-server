@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.4.1 – shared by the N8schicht web interfaces
+ * N8 Kit 1.4.2 – shared by the N8schicht web interfaces
  * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -627,7 +627,8 @@
             <span class="n8-badge ${k[2]}">${esc(t(k[1]))}</span><b class="n8-crash-s">${esc(e.service || e.unit || '?')}</b>
             <span class="n8-crash-r">${esc(e.reason || '')}</span>
             <span class="n8-crash-m">${e.restarted ? `<span class="n8-badge ok">↻ ${esc(t('neu gestartet'))}</span>` : ''}${e.new ? `<span class="n8-badge bad">${esc(t('neu'))}</span>` : ''}<code>${esc(e.unit || '')}</code></span>
-            </summary><pre class="n8-log">…</pre></details>`;
+            </summary><pre class="n8-log">…</pre>
+            <div class="n8-actions"><button type="button" class="n8-btn" data-del="${esc(e.id)}">🗑 ${esc(t('Diesen Befund löschen'))}</button></div></details>`;
     }
     function bindRows(el, req) {
         el.querySelectorAll('details.n8-crash').forEach(d => d.addEventListener('toggle', async () => {
@@ -650,7 +651,7 @@
             paint(`<div class="n8-crash-sys">${card('💥 Abstürze', `<p class="n8-help">${esc(t('Jeder Absturz, Hänger und Notfall-Neustart aller Dienste wird hier festgehalten – mit dem Teil der Anwendung, in dem er passiert ist, und dem vollständigen Protokoll (Journal, Python-Stack). Der Dienst wird dabei automatisch neu gestartet. Neue Befunde erscheinen nach der Anmeldung als Hinweis, bis sie als gelesen markiert sind.'))}</p>
                 ${week.length ? `<div class="n8-crash-week"><span class="n8-dim">${esc(t('Letzte 7 Tage'))}:</span> ${week.map(([s, n]) => `<button type="button" class="n8-chip ${filter === s ? 'on' : ''}" data-f="${esc(s)}">${esc(s)} <b>${n}</b></button>`).join('')}${filter ? `<button type="button" class="n8-chip" data-f="">✕ ${esc(t('alle'))}</button>` : ''}</div>` : ''}
                 <div class="n8-crash-list">${items.length ? items.map(crashRow).join('') : `<div class="n8-help">✅ ${esc(t('Keine Abstürze festgehalten.'))}</div>`}</div>
-                <div class="n8-actions">${d.unacked ? `<button type="button" class="n8-btn primary" data-a="ack">✔ ${esc(t('Alle als gelesen markieren'))}</button>` : ''}<button type="button" class="n8-btn" data-a="reload">↻ ${esc(t('Neu laden'))}</button></div>`, badge)}
+                <div class="n8-actions">${d.unacked ? `<button type="button" class="n8-btn primary" data-a="ack">✔ ${esc(t('Alle als gelesen markieren'))}</button>` : ''}${items.length ? `<button type="button" class="n8-btn danger" data-a="del">🗑 ${esc(filter ? t('Angezeigte löschen') + ` (${items.length})` : t('Alle löschen'))}</button>` : ''}<button type="button" class="n8-btn" data-a="reload">↻ ${esc(t('Neu laden'))}</button></div>`, badge)}
                 ${card('🛡️ Absturz-Wächter', units.length ? `<p class="n8-help">${esc(t('Diese Dienste werden überwacht. Nach jedem unerwarteten Ende hält systemd den Befund fest und startet den Dienst neu; bleibt er ausgefallen, startet ihn der Keep-Alive neu.'))}</p>
                     <div class="n8-perm">${units.map(u => `<div class="n8-perm-r">✅<b>${esc(u.label || u.unit)}</b><span><code>${esc(u.unit)}</code> · ${esc(t('Neustart'))}: ${esc(u.restart || '–')}</span></div>`).join('')}</div>`
                     : `<p class="n8-help">⚠️ ${esc(t('Der Absturz-Wächter ist noch nicht eingerichtet. Er wird beim nächsten Update eingerichtet – oder einmal auf der Konsole:'))}</p><pre class="n8-log">${esc(cons)} setup-crashwatch</pre>`)}</div>`);
@@ -659,6 +660,16 @@
             const ack = el.querySelector('[data-a=ack]');
             if (ack) ack.onclick = async () => { try { await req('POST', '/api/admin/crashes/ack', { all: true }); load(); if (o.onAck) o.onAck(); } catch (x) { alert(x.message); } };
             el.querySelector('[data-a=reload]').onclick = load;
+            // bereinigen: alle (oder die gefilterten) Befunde samt Protokoll löschen
+            const del = async (body, question) => {
+                if (!confirm(question)) return;
+                try { await req('POST', '/api/admin/crashes/delete', body); if (o.onAck) o.onAck(); load(); } catch (x) { alert(x.message); }
+            };
+            const delAll = el.querySelector('[data-a=del]');
+            if (delAll) delAll.onclick = () => filter
+                ? del({ ids: items.map(e => e.id) }, t('Die angezeigten Befunde samt Protokoll löschen?') + ` (${items.length})`)
+                : del({ all: true }, t('Alle Befunde samt Protokoll löschen? Das lässt sich nicht rückgängig machen.'));
+            el.querySelectorAll('[data-del]').forEach(b => b.onclick = ev => { ev.preventDefault(); del({ ids: [b.dataset.del] }, t('Diesen Befund samt Protokoll löschen?')); });
         };
         return load();
     }
@@ -931,6 +942,10 @@
             'Update installiert.': 'Update installed.',
             'Das Update wurde zurückgenommen – es läuft wieder die vorherige Version.': 'The update was rolled back – the previous version is running again.',
             'Nicht aktualisiert – es läuft unverändert die bisherige Version.': 'Not updated – the previous version keeps running unchanged.',
+            'Diesen Befund löschen': 'Delete this record', 'Angezeigte löschen': 'Delete shown', 'Alle löschen': 'Delete all',
+            'Die angezeigten Befunde samt Protokoll löschen?': 'Delete the shown records with their logs?',
+            'Alle Befunde samt Protokoll löschen? Das lässt sich nicht rückgängig machen.': 'Delete all records with their logs? This cannot be undone.',
+            'Diesen Befund samt Protokoll löschen?': 'Delete this record with its log?',
             'Einzelheiten im Update-Protokoll (System → Update).': 'Details in the update log (System → Update).',
             'von Hand geänderte Dateien – Update abgebrochen': 'files changed by hand – update stopped',
             'Der Dienst antwortet noch nicht. Bitte in ein paar Minuten neu laden oder das Update-Protokoll ansehen.': 'The service does not answer yet. Reload in a few minutes or look at the update log.',

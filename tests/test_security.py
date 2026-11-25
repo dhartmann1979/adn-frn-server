@@ -78,6 +78,7 @@ def test_services_and_perms_api(app_mod, tmp_path):
         assert c.get("/api/admin/crashes/" + d["items"][0]["id"]).json()["log"]
         assert c.get("/api/admin/crashes/..%2Fx").status_code == 404
         assert c.post("/api/admin/crashes/ack", json={"all": True}, headers={"X-N8": "1"}).json()["unacked"] == 0
+        assert c.post("/api/admin/crashes/delete", json={"all": True}, headers={"X-N8": "1"}).json()["total"] == 0
     conf = (ROOT / "scripts" / "n8-admin.conf").read_text()
     assert "N8_KA_CHECKS=" in conf and "frn-server.service|tcp|" in conf
 

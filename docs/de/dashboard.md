@@ -45,6 +45,11 @@ Zustand der Dienste zeigt. Beides bleibt beim Scrollen oben stehen.
 
 <p align="center"><img src="../images/header-desktop.png" alt="Kopfzeile mit Menü und Statusleiste" width="95%"></p>
 
+**Rolle hinter dem Titel:** `[Master]` (grün), `[Backup]` (gelb) oder `[Standalone]` (grau, Einzelserver) – je nach
+*Einstellungen → 🔁 Master & Backup*, auch im Browser-Tab. So ist sofort klar, auf welchem Server man gerade ist.
+
+<p align="center"><img src="../images/kopf-rolle.png" alt="Kopfzeile des Backups mit [Backup]" width="95%"></p>
+
 **Menü**
 
 | Eintrag | Bedeutung |
