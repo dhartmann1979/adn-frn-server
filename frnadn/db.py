@@ -46,16 +46,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     ip         TEXT NOT NULL DEFAULT '',
     user_agent TEXT NOT NULL DEFAULT ''
 );
-CREATE TABLE IF NOT EXISTS api_tokens (       -- HobbyRadioPortal and other services (only the SHA-256 is stored)
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    name       TEXT NOT NULL,
-    token_hash TEXT NOT NULL UNIQUE,
-    hint       TEXT NOT NULL DEFAULT '',
-    created_at REAL NOT NULL,
-    created_by TEXT NOT NULL DEFAULT '',
-    last_used  REAL,
-    last_ip    TEXT NOT NULL DEFAULT ''
-);
+DROP TABLE IF EXISTS api_tokens;               -- until 2.10: tokens for the HobbyRadioPortal (now: same server, no token)
 CREATE TABLE IF NOT EXISTS audit (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     ts       REAL NOT NULL,

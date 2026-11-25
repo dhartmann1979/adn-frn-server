@@ -2,6 +2,36 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.11.0 – 2026-11-25
+
+**🔌 HobbyRadioPortal ohne Token.** Läuft das Portal auf demselben Rechner, verwaltet es diesen Server direkt – kein Token anlegen,
+kopieren und eintragen mehr. Ausführlich: [docs/de/adminbereich.md](docs/de/adminbereich.md#-hobbyradioportal-auf-diesem-server).
+
+### Was sich ändert
+- **API-Tokens sind weg:** Kachel *Portal-Zugang (API-Token)* unter Users, die Adressen `/api/admin/api-tokens` und
+  `python -m frnadn api-token` gibt es nicht mehr; die Tabelle `api_tokens` wird beim Start gelöscht. Unter Users steht stattdessen ein
+  kurzer Hinweis, was das Portal darf.
+- **Als Portal gilt nur ein direkter Aufruf auf diesem Rechner:** Absender und `Host` Loopback (`127.0.0.1`, `::1`, `localhost`),
+  Kopfzeile `X-HobbyRadioPortal: 1` und **keine** Proxy-Kopfzeile (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `X-Forwarded-Host/-Proto`,
+  `Via`, `CF-Connecting-IP`, `True-Client-IP`, `X-Client-IP`). Anfragen über nginx/Caddy – die auch von 127.0.0.1 kommen – und von anderen
+  Rechnern sind damit nie „das Portal“. nginx des Portals setzt `X-Forwarded-For`, uvicorn meldet dann sogar die echte Adresse.
+- **Was das Portal darf, bleibt gleich:** Einstellungen (ohne `https.*`), Räume, Zugriffslisten, Start/Stopp/Neustart des Java-Servers,
+  FRN-Passwort anfordern, Protokoll – nie Benutzer, Sitzungen, FRN-Konten, Updates, System, Theme, Links, Import, Logs oder HTTPS. Der
+  CSRF-Kopf `X-N8` bleibt Pflicht.
+- Im Protokoll steht das Portal als `portal (<Portal-Benutzer>)` (vorher `api:<Token-Name> (…)`).
+- **Abschalten:** `FRNADN_PORTAL_LOCAL=0` in der Umgebung des Dienstes (dann zeigt das Portal nur Live-Daten).
+
+### ⚠️ Eigener Reverse-Proxy
+- Steht vor dem Dashboard ein eigener Proxy, muss er `X-Forwarded-For` setzen (`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`) –
+  die Vorlagen der N8schicht-Projekte und des Portals tun das. Jedes Programm auf diesem Rechner könnte sich als Portal ausgeben; wer
+  das nicht will, schaltet es ab (siehe oben).
+
+### Doku und Tests
+- [Admin-Portal](docs/de/adminbereich.md), [Betrieb](docs/de/betrieb.md), [Sicherheit](docs/de/sicherheit.md) umgestellt; Screenshot
+  *Users* neu, *admin-api-tokens.png* entfernt.
+- `tests/test_portal_local.py`: erlaubte und gesperrte Adressen, Proxy-Kopfzeilen und öffentlicher Host werden abgelehnt, ohne Kennung oder
+  von einem anderen Rechner kein Zugriff, CSRF bleibt, Abschalten.
+
 ## 2.10.0 – 2026-11-25
 
 **📧 FRN-Passwort anfordern – direkt beim Server.** Wie *„Get Password“* im FRN-Client, nur im Dashboard: Ein neues FRN-Konto für

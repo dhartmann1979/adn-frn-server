@@ -72,7 +72,7 @@ Danach E-Mail und Passwort oben eintragen, speichern, FRN-Server neu starten.
 | ⚠️ *Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen* | Rufzeichen + Name sind schon registriert. Für einen zweiten Server einen anderen Namen wählen, z. B. `DO1ABC, Server Test`, und eine andere E-Mail |
 
 Höchstens eine Anfrage pro Minute; jede steht im Protokoll (*FRN-Passwort angefordert*). Auch das **HobbyRadioPortal** kann den Knopf nutzen
-(per API-Token, *Admin → FRN-Server → Server*).
+(vom HobbyRadioPortal auf demselben Rechner, *Admin → Dienste → FRN → FRN-Server*).
 
 ## 🏠 Rooms
 
@@ -108,20 +108,19 @@ Der Java-Server braucht die Passwörter im Klartext in seiner Datei; frn_adn leg
 
 Benutzer des Dashboards (nicht zu verwechseln mit FRN-Konten). Den Superadmin kann hier niemand ändern oder löschen; Admins bearbeitet nur der Superadmin.
 
-## 🔌 Portal-Zugang (API-Token)
+## 🔌 HobbyRadioPortal auf diesem Server
 
-<p align="center"><img src="../images/admin-api-tokens.png" alt="Portal-Zugang (API-Token)" width="90%"></p>
+Ab 2.11.0 gibt es **keine API-Tokens** mehr. Läuft das [HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) auf
+**demselben Rechner**, verwaltet es diesen Server direkt aus seinem Admin-Panel (*Dienste → FRN*): **Einstellungen, Räume,
+Zugriffslisten und Start/Stopp** des Java-Servers. Nichts eintragen, nichts kopieren. Unter **Users** steht dazu ein kurzer Hinweis.
 
-Unter **Users** liegt die Kachel *Portal-Zugang (API-Token)*. Mit einem Token verwaltet das
-[HobbyRadioPortal](https://github.com/dhartmann1979/HobbyRadioPortal) (Plugin *FRN*) diesen Server aus seinem eigenen Admin-Bereich:
-**Einstellungen, Räume, Zugriffslisten und Start/Stopp** des Java-Servers.
+Als Portal gilt nur ein **direkter Aufruf auf diesem Rechner**: Absender `127.0.0.1`/`::1`, Adresse `http://127.0.0.1:…`, die
+Kennung `X-HobbyRadioPortal: 1` – und **keine** Proxy-Kopfzeile (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `Via` …). Anfragen über
+nginx/Caddy (die auch von 127.0.0.1 kommen) oder von anderen Rechnern sind damit nie „das Portal“. Abschalten: `FRNADN_PORTAL_LOCAL=0`
+in der Umgebung des Dienstes.
 
-1. Als Admin anmelden → **Users** → *Portal-Zugang* → Name eingeben (z. B. `HobbyRadioPortal`) → **➕ Token anlegen**.
-2. Den angezeigten Token (`frn_…`) **sofort kopieren** – er erscheint nur einmal.
-3. Im Portal: **Admin → Dienste & Plugins → FRN** → Adresse dieses Dashboards und **API-Token** eintragen → Speichern.
-
-Ein Token darf **nie** Benutzer, Sitzungen, Tokens, FRN-Konten, Updates, System, Theme, Links, Import, Logs oder HTTPS ändern – das bleibt
-hier im Dashboard. **Widerrufen** sperrt ihn sofort. Im Protokoll stehen Änderungen aus dem Portal als `api:<Token-Name> (<Portal-Benutzer>)`.
+Das Portal darf **nie** Benutzer, Sitzungen, FRN-Konten, Updates, System, Theme, Links, Import, Logs oder HTTPS ändern – das bleibt hier
+im Dashboard. Im Protokoll stehen Änderungen aus dem Portal als `portal (<Portal-Benutzer>)`.
 
 ## 🖥️ System
 
@@ -141,7 +140,7 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 
 <p align="center"><img src="../images/admin-backup.png" alt="Backup und Wiederherstellen" width="90%"></p>
 
-Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten. API-Tokens (Portal-Zugang)
+Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten. Das HobbyRadioPortal
 haben hier keinen Zugriff.
 
 **💾 Backup** – Passwort zweimal eingeben (mindestens 10 Zeichen), **Backup erstellen**. Der Browser lädt die Datei
@@ -150,7 +149,7 @@ haben hier keinen Zugriff.
 
 | im Backup | nicht im Backup |
 |---|---|
-| Datenbank (Einstellungen, Benutzer, Räume, FRN-Konten, Stationen, Statistik, Chat, Protokoll, Client-Logos, API-Tokens) | Sitzungen (alle melden sich neu an) |
+| Datenbank (Einstellungen, Benutzer, Räume, FRN-Konten, Stationen, Statistik, Chat, Protokoll, Client-Logos) | Sitzungen (alle melden sich neu an) |
 | `branding/` (Logo, Site-Icons, Links) | Zertifikate `letsencrypt/` – werden neu geholt |
 | `frn/` des FRN-Servers: `server.properties`, `log4j.xml`, Zugriffslisten `acl/` | Logdateien `frn/logs/`, alte Backups |
 

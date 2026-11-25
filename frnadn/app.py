@@ -143,16 +143,36 @@ def ip_of(conn) -> str:
     return conn.client.host if conn.client else ""
 
 
-# What an API token (HobbyRadioPortal) may reach besides the public data: settings, rooms, the lists (ACL),
-# starting/stopping the FRN server and the change log. Never users, sessions, tokens, accounts, updates, system or HTTPS.
-API_TOKEN_EXACT = {"/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
+# HobbyRadioPortal on the same server (no token, since 2.11.0): what it may reach besides the public data – settings, rooms,
+# the lists (ACL), starting/stopping the FRN server and the change log. Never users, sessions, accounts, updates, system or HTTPS.
+PORTAL_PATHS = {"/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
                    "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart", "/api/admin/frn-password"}
-API_TOKEN_LOCKED = ("https.",)
+PORTAL_LOCKED = ("https.",)
+# Only a *direct* call from this machine counts: loopback peer, Host is loopback, the portal's marker header and **no** proxy
+# header. Requests through nginx/Caddy also arrive from 127.0.0.1, but every proxy of the N8schicht projects adds
+# X-Forwarded-For – and uvicorn (proxy_headers) then even reports the real client address. Switch off: FRNADN_PORTAL_LOCAL=0.
+PORTAL_LOCAL = os.environ.get("FRNADN_PORTAL_LOCAL", "1") != "0"
+_LOOPBACK = {"127.0.0.1", "::1", "localhost"}
+_PROXY_HEADERS = ("x-forwarded-for", "x-real-ip", "forwarded", "x-forwarded-host", "x-forwarded-proto", "via",
+                  "cf-connecting-ip", "true-client-ip", "x-client-ip")
 
 
-def _token_path_ok(path: str) -> bool:
+def portal_local(conn) -> bool:
+    """Is this the HobbyRadioPortal calling directly on this server?"""
+    if not PORTAL_LOCAL or conn.headers.get("x-hobbyradioportal") != "1":
+        return False
+    if (conn.client.host if conn.client else "") not in _LOOPBACK:
+        return False
+    if any(h in conn.headers for h in _PROXY_HEADERS):
+        return False
+    host = conn.headers.get("host", "")
+    host = host[1:host.find("]")] if host.startswith("[") else host.rsplit(":", 1)[0]
+    return host in _LOOPBACK
+
+
+def _token_path_ok(path: str) -> bool:   # paths the HobbyRadioPortal may use
     if path.startswith("/api/admin/"):
-        return path in API_TOKEN_EXACT or bool(re.fullmatch(r"/api/admin/rooms/\d+", path))
+        return path in PORTAL_PATHS or bool(re.fullmatch(r"/api/admin/rooms/\d+", path))
     return path.startswith("/api/") and not path.startswith("/api/auth/")
 
 
@@ -160,16 +180,15 @@ def user_of(conn) -> Optional[Dict[str, Any]]:
     u = ctx.auth.session_user(conn.cookies.get(COOKIE))
     if u:
         return u
-    auth = conn.headers.get("authorization") or ""
-    if auth[:7].lower() == "bearer " and _token_path_ok(conn.url.path):
-        return ctx.auth.token_user(auth[7:].strip(), ip_of(conn), conn.headers.get("x-portal-user", ""))
+    if _token_path_ok(conn.url.path) and portal_local(conn):
+        return ctx.auth.portal_user(conn.headers.get("x-portal-user", ""))
     return None
 
 
 def need_human_admin(request: Request) -> Dict[str, Any]:
     u = need_admin(request)
     if u.get("api"):
-        raise HTTPError(403, "Not with an API token.")
+        raise HTTPError(403, "Not for the HobbyRadioPortal – log in to the dashboard.")
     return u
 
 
@@ -392,7 +411,7 @@ async def save_settings(request: Request):
     changes = b.get("changes") or {}
     if not isinstance(changes, dict):
         raise HTTPError(400, "Invalid request.")
-    if u.get("api") and any(str(k).startswith(API_TOKEN_LOCKED) for k in changes):
+    if u.get("api") and any(str(k).startswith(PORTAL_LOCKED) for k in changes):
         raise HTTPError(403, "HTTPS settings cannot be changed with an API token.")
     if "frn.default_room" in changes and changes["frn.default_room"] and \
             changes["frn.default_room"] not in [r["name"] for r in ctx.store.rooms()]:
@@ -1035,33 +1054,6 @@ async def accounts_delete(email: str, request: Request):
 
 
 # ---------------------------------------------------------------- admin: users & sessions
-# ---------------------------------------------------------------- admin: API tokens (HobbyRadioPortal)
-@app.get("/api/admin/api-tokens")
-async def api_tokens_get(request: Request):
-    need_human_admin(request)
-    return {"tokens": ctx.auth.api_tokens(), "paths": sorted(API_TOKEN_EXACT) + ["/api/admin/rooms/{id}"]}
-
-
-@app.post("/api/admin/api-tokens")
-async def api_tokens_create(request: Request):
-    u = need_human_admin(request)
-    b = await body(request)
-    try:
-        return {"token": ctx.auth.create_api_token(str(b.get("name") or ""), u["username"], ip_of(request))}
-    except AuthError as e:
-        raise HTTPError(400, str(e))
-
-
-@app.delete("/api/admin/api-tokens/{tid}")
-async def api_tokens_delete(tid: int, request: Request):
-    u = need_human_admin(request)
-    try:
-        ctx.auth.revoke_api_token(tid, u["username"], ip_of(request))
-    except AuthError as e:
-        raise HTTPError(404, str(e))
-    return {"ok": True}
-
-
 @app.get("/api/admin/users")
 async def users(request: Request):
     need_admin(request)

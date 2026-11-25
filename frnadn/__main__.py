@@ -6,7 +6,6 @@ Current values:     python -m frnadn show-settings                  (JSON, used 
 Apply setup:        python -m frnadn apply-setup FILE.json          (JSON from install.sh)
 Write config:       python -m frnadn write-config                   (server.properties etc. from SQLite)
 FRN account:        python -m frnadn add-account EMAIL CALLSIGN     (stand-alone password list; asks for the password)
-Portal token:       python -m frnadn api-token NAME                 (API token for the HobbyRadioPortal, printed once)
 Behind the portal:  python -m frnadn behind-proxy                   (own HTTPS off; prints domain/e-mail as JSON)
 Backup:             python -m frnadn backup [DIR]                   (encrypted .frnbak; asks for a password, min. 10)
 Restore:            python -m frnadn restore FILE.frnbak            (stop frnadn first; asks for the backup password)
@@ -134,14 +133,6 @@ def main() -> int:
         except bk.BackupError as e:
             print(f"{R}✗{N} {e}", file=sys.stderr)
             return 2
-    if cmd == "api-token" and len(args) > 1:
-        c = _ctx()
-        try:
-            print(c.auth.create_api_token(" ".join(args[1:]), "installer", "")["token"])
-        except Exception as e:   # AuthError / ValueError: name or limit
-            print(e, file=sys.stderr)
-            return 2
-        return 0
     if cmd == "behind-proxy":
         # Used by the HobbyRadioPortal installer: nginx of the portal takes ports 80/443 and the domain, the dashboard
         # then listens on 127.0.0.1 (FRNADN_BIND/FRNADN_PORT in a systemd drop-in written by the portal).

@@ -51,7 +51,7 @@ N8Kit.i18n.add({
         "The backup password needs at least 10 characters": "Das Backup-Passwort braucht mindestens 10 Zeichen",
         "Backups contain all access data – superadmin only": "Backups enthalten alle Zugangsdaten – nur für den Superadmin",
         // header, strip, live
-        'Portal access (API tokens)': 'Portal-Zugang (API-Token)', 'Token name': 'Name des Tokens', 'Create token': 'Token anlegen', 'No token yet': 'Noch kein Token',
+         'No token needed: an HobbyRadioPortal on this server manages settings, rooms, the access lists and start/stop of the FRN server directly – never users, sessions, FRN accounts, updates, system or HTTPS. Requests through a proxy or from other machines never count as the portal. Switch off: FRNADN_PORTAL_LOCAL=0 in the service.': 'Kein Token nötig: ein HobbyRadioPortal auf diesem Server verwaltet Einstellungen, Räume, Zugriffslisten und Start/Stopp des FRN-Servers direkt – nie Benutzer, Sitzungen, FRN-Konten, Updates, System oder HTTPS. Anfragen über einen Proxy oder von anderen Rechnern gelten nie als Portal. Abschalten: FRNADN_PORTAL_LOCAL=0 im Dienst.',
         'Revoke': 'Widerrufen', 'Revoke this token?': 'Token widerrufen?', 'The service loses access at once': 'Der Dienst verliert sofort den Zugang',
         'Token revoked': 'Token widerrufen', 'Last used': 'Zuletzt benutzt', 'Copy': 'Kopieren', 'Copied': 'Kopiert', 'Token': 'Token',
         'Copy the token now – it is shown only once:': 'Token jetzt kopieren – er wird nur einmal angezeigt:', 'API token': 'API-Token', 'API token revoked': 'API-Token widerrufen', 'Lists': 'Listen',

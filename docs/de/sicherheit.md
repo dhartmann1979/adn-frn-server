@@ -40,22 +40,26 @@ Rufzeichen, Namen, Orte, Band und Beschreibung schicken die FRN-Clients selbst; 
 
 Sitzungs-Cookie `HttpOnly`, `SameSite`, über HTTPS `Secure`; jede schreibende Anfrage braucht den Header `X-N8` (CSRF-Schutz); Fehlversuche werden gebremst. IP-Adressen sehen nur Admins.
 
-### Portal-Zugang (API-Token)
+### HobbyRadioPortal auf diesem Server (ohne Token)
 
-Für das HobbyRadioPortal gibt es eigene **API-Tokens** (Admin → Users). Gespeichert wird nur der SHA-256-Hash; der Token selbst erscheint
-beim Anlegen einmal. Er gilt nur als `Authorization: Bearer`-Header und nur für eine feste Liste von Adressen:
+Seit 2.11.0 gibt es keine API-Tokens mehr (die Tabelle wird beim Start gelöscht). Das HobbyRadioPortal auf **demselben Rechner** gilt als
+Admin – aber nur bei einem **direkten** Aufruf: Absender und `Host` sind Loopback (`127.0.0.1`, `::1`, `localhost`), Kopfzeile
+`X-HobbyRadioPortal: 1`, **keine** Proxy-Kopfzeile (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `X-Forwarded-Host/-Proto`, `Via`,
+`CF-Connecting-IP`, `True-Client-IP`, `X-Client-IP`). nginx des Portals und eigene Reverse-Proxys setzen `X-Forwarded-For` – über sie
+kommt niemand an die Verwaltung. **Eigener Reverse-Proxy vor dem Dashboard:** `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
+gehört dazu (Vorlagen der N8schicht-Projekte haben es). Jedes Programm auf diesem Rechner könnte sich als Portal ausgeben – wer das nicht
+will: `FRNADN_PORTAL_LOCAL=0`. Erlaubt sind nur feste Adressen:
 
 | erlaubt | gesperrt |
 |---|---|
-| `/api/admin/settings` (ohne `https.*`), `/api/admin/rooms…`, `/api/admin/acl`, `/api/admin/audit`, `/api/admin/server/start\|stop\|restart`, öffentliche Lese-APIs | Benutzer, Sitzungen, Tokens, FRN-Konten, Updates, System, Theme, Links, Import, Logs, `/api/auth/*` |
+| `/api/admin/settings` (ohne `https.*`), `/api/admin/rooms…`, `/api/admin/acl`, `/api/admin/audit`, `/api/admin/server/start\|stop\|restart`, öffentliche Lese-APIs | Benutzer, Sitzungen, FRN-Konten, Updates, System, Theme, Links, Import, Logs, `/api/auth/*` |
 
-Tokens verwalten nur angemeldete Menschen (Admin/Superadmin) – ein Token kann keine weiteren Tokens anlegen. Jede Änderung steht im
-Protokoll mit dem Token-Namen und dem Portal-Benutzer, der sie ausgelöst hat. Ein verlorener Token: **Widerrufen**, neuen anlegen.
+Jede Änderung steht im Protokoll als `portal (<Portal-Benutzer>)`. Schreibende Aufrufe brauchen weiter den CSRF-Kopf `X-N8`.
 
 ### Backups
 
 Backups (*Admin → System → 💾 Backup*, `frnadn backup`) enthalten alle Zugangsdaten und sind deshalb **nur für den Superadmin** – kein
-Admin und kein API-Token kommt an Anlegen, Herunterladen, Löschen oder Wiederherstellen. Die Datei ist mit einem eigenen Passwort
+Admin und auch das HobbyRadioPortal kommt nicht an Anlegen, Herunterladen, Löschen oder Wiederherstellen. Die Datei ist mit einem eigenen Passwort
 verschlüsselt (scrypt n=2¹⁴, SHAKE-256-Schlüsselstrom, HMAC-SHA256 über alles – encrypt-then-MAC); eine veränderte oder falsch entschlüsselte
 Datei wird abgewiesen, bevor etwas entpackt wird. Beim Einspielen werden nur Einträge unter `data/` und `frn/` angenommen – keine absoluten
 Pfade, kein `..`, keine Links –, höchstens 20 000 Dateien und 4 GiB. Auf dem Server liegen Backups mit Rechten 600 in einem 700-Ordner.
