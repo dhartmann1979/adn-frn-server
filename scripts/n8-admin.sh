@@ -9,7 +9,8 @@
 #                                       Prüfung der Weboberfläche – sonst zurück auf den alten Stand
 #    n8-admin.sh setup-units            Update-Auslöser <id>-update.path/.service einrichten
 #
-#  Projektdaten stehen in n8-admin.conf neben diesem Skript (Name, Dienste, Datenordner, Hooks).
+#  Projektdaten stehen in n8-admin.conf neben diesem Skript (Name, Dienste, Datenordner, Hooks: n8_layout, n8_version,
+#  n8_post_update, n8_sudo_extra, n8_restart, n8_check_extra, n8_fix_extra).
 #  Aus dem Webinterface kommt der Aufruf per sudo aus der Sandbox des Dienstes (ProtectSystem: /etc schreibgeschützt);
 #  dann startet sich das Skript als kurzlebiger systemd-Dienst außerhalb der Sandbox neu.
 # =============================================================================
@@ -32,8 +33,9 @@ fail() { echo "  ${E}✖ $*${R0}" >&2; exit 1; }
 N8_ID=""; N8_NAME=""; N8_MAIN_UNIT=""; N8_UNITS=(); N8_DATA_DIRS=(); N8_SECRETS=(); N8_GROUPS=(); N8_HEALTH_URL=""
 N8_WRITABLE_IN_APP=(); N8_EXTRA_OWNED=(); N8_DATA_MODE=750; N8_RESTART_UNITS=()
 N8_WEB_UNIT=""      # Dienst des Webinterfaces – muss sudo dürfen (NoNewPrivileges=no); leer = N8_MAIN_UNIT
+N8_APP_GROUP=root   # Gruppe des Programmverzeichnisses (z. B. die des Dienstes, wenn „andere“ gar nichts lesen sollen)
 APP=""; SVC_USER=""; STATE_DIR=""
-n8_layout() { :; }; n8_post_update() { :; }; n8_sudo_extra() { :; }; n8_restart() { local u; for u in "${N8_RESTART_UNITS[@]}"; do systemctl restart "$u" || true; done; }
+n8_layout() { :; }; n8_post_update() { :; }; n8_sudo_extra() { :; }; n8_check_extra() { :; }; n8_fix_extra() { :; }; n8_restart() { local u; for u in "${N8_RESTART_UNITS[@]}"; do systemctl restart "$u" || true; done; }
 # shellcheck source=/dev/null
 . "$CONF"
 unit_val() { sed -n "s/^$2=//p" "/etc/systemd/system/$1" 2>/dev/null | head -1; }
@@ -162,10 +164,10 @@ check_perms() {
   else ck bad user "Dienstbenutzer $SVC_USER fehlt – bitte den Installer neu starten"; fi
   [[ -d "$APP" ]] || { ck bad prog "$APP fehlt"; return 0; }
   prune_args
-  n=$(find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group root -o -perm /022 \) -print 2>/dev/null | wc -l)
-  first=$(find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group root -o -perm /022 \) -print 2>/dev/null | head -1)
+  n=$(find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group "$N8_APP_GROUP" -o -perm /022 \) -print 2>/dev/null | wc -l)
+  first=$(find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group "$N8_APP_GROUP" -o -perm /022 \) -print 2>/dev/null | head -1)
   (( n == 0 )) && ck ok prog "Programm $APP gehört root und ist für den Dienst schreibgeschützt" \
-               || ck bad prog "$n Programmdateien gehören nicht root:root oder sind beschreibbar (z. B. ${first#$APP/})"
+               || ck bad prog "$n Programmdateien gehören nicht root:$N8_APP_GROUP oder sind beschreibbar (z. B. ${first#$APP/})"
   for f in "$SELF" "$APP"/scripts/*.sh "$APP"/*.sh; do [[ -f "$f" ]] && [[ "$(stat -c %a "$f")" != 755 ]] && ck bad prog "${f#$APP/} nicht 755"; done
   [[ "$(stat -c '%U %a' "$SELF")" == "root 755" ]] && ck ok prog "n8-admin.sh gehört root (755)" || ck bad prog "n8-admin.sh: $(stat -c '%U %a' "$SELF") statt root 755"
   if [[ -d "$APP/venv" ]]; then [[ -x "$APP/venv/bin/python" ]] && ck ok prog "Python-Umgebung (venv) ausführbar" || ck bad prog "venv/bin/python fehlt"; fi
@@ -204,6 +206,7 @@ check_perms() {
     if [[ -n "$x" && "$x" != "~" && "${x,,}" != *cap_setuid* ]]; then ck bad systemd "$N8_WEB_UNIT: CapabilityBoundingSet=$x – sudo kann so nicht arbeiten (NoNewPrivileges=yes)"; fi
   fi
   check_sudo
+  n8_check_extra     # projekteigene Prüfungen (z. B. Modem-Schnittstelle), melden mit: ck ok|warn|bad Bereich Text
   return 0
 }
 web_unit_dropin() {   # NoNewPrivileges für das Webinterface aus – sudo erlaubt dann genau die Freigaben, sonst nichts
@@ -242,7 +245,7 @@ perm_bad() { local l n=0; for l in "${CK[@]}"; do [[ "$l" == bad\|* ]] && n=$((n
 perm_bad_in() { local l; for l in "${CK[@]}"; do [[ "$l" == "bad|$1|"* ]] && return 0; done; return 1; }
 perm_report() {
   local l st ar tx last="" icon
-  declare -A NAME=([user]="Dienstbenutzer" [prog]="Programm $APP" [data]="Daten" [systemd]="systemd" [sudo]="sudo")
+  declare -A NAME=([user]="Dienstbenutzer" [prog]="Programm $APP" [data]="Daten" [systemd]="systemd" [sudo]="sudo" [hw]="Hardware")
   for l in "${CK[@]}"; do
     IFS='|' read -r st ar tx <<<"$l"
     [[ "${1:-alle}" == fehler && "$st" == ok ]] && continue
@@ -262,9 +265,9 @@ print(json.dumps({"ok": not any(r["status"] == "bad" for r in rows), "bad": sum(
 fix_perms() {
   local d g x f
   prune_args
-  find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group root \) -exec chown -h root:root {} + 2>/dev/null || true
+  find "$APP" "${PRUNE[@]}" ! -type l \( ! -user root -o ! -group "$N8_APP_GROUP" \) -exec chown -h "root:$N8_APP_GROUP" {} + 2>/dev/null || true
   find "$APP" "${PRUNE[@]}" ! -type l -perm /022 -exec chmod go-w {} + 2>/dev/null || true
-  chown root:root "$SELF"; chmod 755 "$SELF"
+  chown "root:$N8_APP_GROUP" "$SELF"; chmod 755 "$SELF"
   for f in "$APP"/scripts/*.sh "$APP"/*.sh; do [[ -f "$f" ]] && chmod 755 "$f"; done
   if id "$SVC_USER" &>/dev/null; then
     for g in "${N8_GROUPS[@]}"; do getent group "$g" >/dev/null && ! id -nG "$SVC_USER" | grep -qw "$g" && usermod -aG "$g" "$SVC_USER"; done
@@ -277,6 +280,7 @@ fix_perms() {
   local ent u
   for ent in "${N8_UNITS[@]}"; do IFS='|' read -r u _ <<<"$ent"; [[ -f "/etc/systemd/system/$u" ]] && chown root:root "/etc/systemd/system/$u" && chmod 644 "/etc/systemd/system/$u"; done
   [[ -n "$(git -C "$APP" rev-parse --git-dir 2>/dev/null)" ]] && git config --global --add safe.directory "$APP" 2>/dev/null || true
+  n8_fix_extra || true   # projekteigene Korrekturen
   return 0
 }
 repair() {
