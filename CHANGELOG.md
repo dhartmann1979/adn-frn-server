@@ -2,6 +2,17 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.14.4 – 2026-11-25
+
+### 🖥️ Ganze Browser-Breite und dieselbe Menüleiste in allen N8-Systemen
+- **Volle Breite:** Seiten, Fußzeile nutzen jetzt die **ganze Breite des Browserfensters** (vorher höchstens 1400–1600 Pixel);
+  der Rand passt sich der Fensterbreite an (10–24 Pixel).
+- **Einheitliche Menüleiste nach dem Vorbild des ADN-FRN-Servers:** gleiche Höhe (64 px), gleiche Glas-Kachel, Logo 46 px, Titel 19 px mit
+  Farbverlauf, Untertitel 12 px, das Hauptmenü als Pille in der Mitte (gleiche Knöpfe, gleiche Hervorhebung der aktiven Seite), rechts Links,
+  DE | EN und Anmelden/Benutzer in gleicher Größe, darunter die schmale Statusleiste. Das gilt in HobbyRadioPortal, ADN-FRN-Server,
+  HBlink4-FreeRadioID, N8 Hotspot und N8 Crosslink gleich (N8 Kit 1.2 „N8 Frame“, gemeinsam in `n8-kit.css`). Auf dem Handy bleibt die
+  jeweilige kompakte Kopfzeile.
+
 ## 2.14.3 – 2026-11-25
 
 ### 🧭 Baum-Menü: anfangs zugeklappt, überall gleich

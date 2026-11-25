@@ -167,3 +167,34 @@ html[data-theme-mode=light] .n8-log { background: rgba(0, 0, 0, .05); }
 .n8-admin-main [hidden], .hb-admin [hidden] { display: none !important; }
 .n8-admin-main .tiles.one, .n8-admin-main .grid.one { grid-template-columns: 1fr !important; }
 .n8-tree-i .n8-badge.dot { background: none; padding: 0 2px; font-size: 10px; margin-left: auto; }
+
+/* ---------- 1.2: N8 Frame – the whole browser width and the same menu bar in every N8 system (model: ADN FRN Server) ---------- */
+body > :is(.container, .wrap) { max-width: none !important; padding-left: clamp(10px, 1.3vw, 24px) !important; padding-right: clamp(10px, 1.3vw, 24px) !important; box-sizing: border-box; }
+body .site-footer { max-width: none !important; }
+.modal-content.admin { width: calc(100vw - 32px) !important; max-width: none !important; }
+@media (min-width: 901px) {
+    :is(.n8-topbar, .topbar) > header { display: flex !important; align-items: center !important; gap: 14px !important; padding: 8px 14px !important;
+        height: 64px !important; min-height: 64px !important; box-sizing: border-box; border-radius: 20px !important;
+        background: var(--glass-bg, rgba(20, 26, 45, .55)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, .12)) !important;
+        box-shadow: inset 0 1px 0 var(--glass-highlight, rgba(255, 255, 255, .18)), 0 10px 40px rgba(0, 0, 0, .35) !important; }
+    :is(.n8-topbar, .topbar) > header > :first-child { display: flex !important; align-items: center !important; gap: 10px !important; min-width: 0; flex: 0 1 auto !important; text-decoration: none; color: inherit; }
+    :is(.n8-topbar, .topbar) > header > :first-child img { width: 46px !important; height: 46px !important; border-radius: 12px !important; object-fit: contain; flex: none; }
+    :is(.n8-topbar, .topbar) > header h1 { margin: 0 !important; font-size: 19px !important; font-weight: 700 !important; letter-spacing: -.02em !important; line-height: 1.2 !important; white-space: nowrap; }
+    :is(.n8-topbar, .topbar) > header > :first-child h1 + * { margin: 1px 0 0 !important; font-size: 12px !important; font-weight: 400 !important; line-height: 1.25 !important;
+        color: var(--text-dim, rgba(245, 247, 251, .62)) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 36vw; }
+    :is(.n8-topbar, .topbar) > header > nav { margin: 0 auto !important; display: flex !important; gap: 3px !important; padding: 3px !important; border-radius: 999px !important;
+        background: rgba(255, 255, 255, .04) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, .12)) !important; flex: 0 1 auto !important; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(button, a) { display: flex; align-items: center !important; gap: 6px !important; padding: 6px 12px !important; margin: 0 !important;
+        font-size: 12.5px !important; font-weight: 650 !important; line-height: 1.2 !important; border-radius: 999px !important; border: 0 !important; white-space: nowrap;
+        background: transparent !important; box-shadow: none !important; color: var(--text-dim, rgba(245, 247, 251, .7)) !important; text-decoration: none !important; min-height: 0 !important; height: auto !important; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(.hidden, [hidden]) { display: none !important; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(button, a):hover { color: var(--text, #f5f7fb) !important; background: rgba(255, 255, 255, .06) !important; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(.active, .on, [aria-current=page], [aria-selected=true]) { color: var(--text, #f5f7fb) !important;
+        background: rgba(var(--accent-rgb, 90, 200, 250), .18) !important; box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb, 90, 200, 250), .38) !important; }
+    :is(.n8-topbar, .topbar) > header > :last-child { display: flex !important; align-items: center !important; gap: 6px !important; flex: none !important; margin-left: 0 !important; }
+    :is(.n8-topbar, .topbar) > header > :last-child :is(.links-trigger, .links-btn, .hbtn, .hdr-btn, .btn, #userArea button, #userDd > button):not(:is(.links-pop, .dd-menu, .listen-pop, .links-pop *, .dd-menu *, .listen-pop *)) {
+        height: 31px !important; min-height: 31px !important; padding: 5px 11px !important; font-size: 12px !important; font-weight: 650 !important; line-height: 1 !important;
+        border-radius: 999px !important; box-sizing: border-box; display: inline-flex; align-items: center !important; gap: 6px; white-space: nowrap; }
+    :is(.n8-topbar, .topbar) > :is(.n8-strip, .status-strip, .strip) { height: 22px !important; line-height: 22px !important; font-size: 11.5px !important; margin: -1px 24px 0 !important; padding: 0 14px !important; border-radius: 0 0 14px 14px !important; }
+}
+html[data-theme-mode=light] :is(.n8-topbar, .topbar) > header > nav { background: rgba(0, 0, 0, .04) !important; }
