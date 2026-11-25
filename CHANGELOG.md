@@ -2,6 +2,15 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.14.2 – 2026-11-25
+
+### 🧭 Frühere Unter-Menüs im Baum-Menü
+- **⚙️ Einstellungen** hat jetzt Zweige im Baum: FRN-Server · SystemManager · Operator · Dashboard · Daten · HTTPS & Web.
+  Ein Klick auf einen Zweig zeigt nur diesen Abschnitt in voller Breite, „Einstellungen“ selbst zeigt wie bisher alle (mit der Java-Kachel oben).
+- **💾 Backup** hat wie in den anderen N8-Systemen einen eigenen Eintrag unter **System** (nur für den Superadmin); „Server & Daten“ zeigt
+  nur noch FRN-Server, Rechner und Datenbank.
+- N8 Kit: Einträge im Baum können Zweige haben (`children`); sie klappen mit ihrem Eintrag auf und zu.
+
 ## 2.14.1 – 2026-11-25
 
 ### 🐛 Fix: Keep-Alive startete einen gesunden Dienst neu („Antwort ist kein JSON“)

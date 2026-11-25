@@ -13,12 +13,12 @@ mit denselben Gruppen in derselben Reihenfolge:
 
 | Gruppe | Einträge |
 |---|---|
-| 📡 **Betrieb** | ⚙️ Einstellungen · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
+| 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten, HTTPS & Web) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
 | 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔐 Sitzungen & Protokoll |
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
-| 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive |
+| 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💾 Backup (nur Superadmin) |
 
-Gruppen klappen per Klick auf und zu; auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
+Gruppen klappen per Klick auf und zu; seit 2.14.2 hängen die Abschnitte der Einstellungen als Zweige darunter (ein Zweig zeigt nur diesen Abschnitt). Auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
 
 ## Rollen
 
@@ -129,7 +129,7 @@ Benutzer des Dashboards (nicht zu verwechseln mit FRN-Konten). Den Superadmin ka
 
 <p align="center"><img src="../images/admin-system.png" alt="Server & Daten" width="90%"></p>
 
-FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), Maschine (Last, Speicher, Platte) und Backup. Update, Dienste, Berechtigungen und Keep-Alive haben seit 2.14.0 eigene Einträge unter **System**.
+FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache) und Maschine (Last, Speicher, Platte). Das Backup hat seit 2.14.2 einen eigenen Eintrag **System → 💾 Backup**. Update, Dienste, Berechtigungen und Keep-Alive haben seit 2.14.0 eigene Einträge unter **System**.
 
 | Knopf | Wirkung |
 |---|---|
@@ -141,7 +141,7 @@ FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), M
 
 <p align="center"><img src="../images/admin-backup.png" alt="Backup und Wiederherstellen" width="90%"></p>
 
-Unter *Server & Daten* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten.
+Unter **System → 💾 Backup** stehen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten.
 
 **💾 Backup** – Passwort zweimal eingeben (mindestens 10 Zeichen), **Backup erstellen**. Der Browser lädt die Datei
 `frn-backup-<host>-<datum>.frnbak` sofort herunter; die letzten **5** Backups bleiben zusätzlich in `/var/lib/frnadn/backups/`

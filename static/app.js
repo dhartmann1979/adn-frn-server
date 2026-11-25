@@ -751,22 +751,38 @@ const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system'
 function adminGroups() {
     const G = N8Kit.nav.GROUPS;
     return [
-        { id: 'betrieb', label: G.betrieb, items: [{ id: 'settings', label: '⚙️ Settings' }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
+        { id: 'betrieb', label: G.betrieb, items: [{ id: 'settings', label: '⚙️ Settings',
+            children: (S.admin.sections || []).map(sec => ({ id: 'settings:' + sec.id, label: sec.title })) }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
             { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
         { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Users' }, { id: 'audit', label: '🔐 Sessions & log' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
-        { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label }))] },
+        { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label })),
+            { id: 'backup', label: '💾 Backup', hidden: !(S.me && S.me.role === 'superadmin') }] },
     ];
 }
 function showAdmin(a) {
-    if (!adminGroups().some(g => g.items.some(i => i.id === a))) a = 'settings';
+    const [base, sub] = String(a || '').split(':');
+    if (!adminGroups().some(g => g.items.some(i => i.id === base))) a = 'settings';
     S.admin.tab = a;
-    N8Kit.nav.tree($('adminNav'), adminGroups(), { active: a, key: 'frnadn-admin', onSelect: showAdmin });
-    const pane = a.startsWith('sys-') ? 'sys' : a;
+    const nav = () => N8Kit.nav.tree($('adminNav'), adminGroups(), { active: a, key: 'frnadn-admin', onSelect: showAdmin });
+    nav();
+    const pane = base.startsWith('sys-') ? 'sys' : base === 'backup' ? 'system' : (ADMIN_PANES.includes(base) ? base : 'settings');
     ADMIN_PANES.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== pane));
-    if (pane === 'sys') loadSysView(a.slice(4));
+    if (pane === 'sys') loadSysView(base.slice(4));
     else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
-       system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[a]().catch(e => $('admin-' + a).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
+       system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[pane]()
+       .then(() => {
+           if (pane === 'system') {             // 💾 Backup has its own entry like in the other N8 systems
+               [...$('admin-system').children].forEach(c => { c.hidden = base === 'backup' ? c.id !== 'backupTiles' : c.id === 'backupTiles'; });
+               return;
+           }
+           if (pane !== 'settings') return;
+           nav();                                // the sections of the settings are the children in the menu
+           document.querySelectorAll('#admin-settings form[data-sec]').forEach(f => { f.hidden = !!sub && f.dataset.sec !== sub; });
+           const top = $('setServerTile'); if (top) top.hidden = !!sub;
+           const box = document.querySelector('#admin-settings .tiles'); if (box) box.classList.toggle('one', !!sub);
+       })
+       .catch(e => $('admin-' + pane).innerHTML = `<div class="tile"><div class="notice-box">⚠️ ${esc(e.message)}</div></div>`);
     if (S.tab === 'admin') history.replaceState(null, '', '#admin/' + a);
 }
 // Admin → System: update, services, permissions & sudo, keep-alive – the N8 Kit views, identical in every N8 system
@@ -818,8 +834,9 @@ function formValues(form) { const v = {}; form.querySelectorAll('[name]').forEac
 // settings: everything of server.properties plus the dashboard
 async function loadSettings() {
     const d = await api('GET', '/api/admin/settings');
+    S.admin.sections = d.sections;
     setRestart(d.restart_needed);
-    $('admin-settings').innerHTML = `<div class="tile" style="margin-bottom:14px">${serverBox(d.server, d.jar)}
+    $('admin-settings').innerHTML = `<div class="tile" id="setServerTile" style="margin-bottom:14px">${serverBox(d.server, d.jar)}
         <div class="actions" style="justify-content:flex-start;margin-top:10px"><button class="btn small" onclick="checkUpdate(this)">⬆️ Check for update</button>
             <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
         <div class="tiles">${d.sections.map(sec => `

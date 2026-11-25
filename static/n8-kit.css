@@ -158,3 +158,11 @@ html[data-theme-mode=light] .n8-log { background: rgba(0, 0, 0, .05); }
 .n8-admin-main .grid > .tile > .actions:last-child, .hb-admin .station-grid > .tile > .set-actions:last-child { margin-top: auto; padding-top: 12px; }
 .n8-sys-extra > .grid { grid-template-columns: 1fr !important; }
 .n8-card > p.n8-help { margin: 0 0 10px; }
+/* 1.1: children of a menu item (the former in-page menus) */
+.n8-tree-i.has-kids::after { content: "▸"; font-size: 10px; color: var(--text-dim, #aab); transition: transform .15s; }
+.n8-tree-i.has-kids.kids-open::after { transform: rotate(90deg); }
+.n8-tree-kids { display: flex; flex-direction: column; gap: 1px; margin: 1px 0 4px 12px; padding-left: 8px; border-left: 1px solid var(--glass-border, rgba(255, 255, 255, .12)); }
+.n8-tree-i.kid { padding: 5px 9px; font-size: 12.5px; font-weight: 600; color: var(--text-dim, rgba(235, 240, 250, .7)); }
+.n8-tree-i.kid:hover, .n8-tree-i.kid.on { color: var(--text, #f5f7fb); }
+.n8-admin-main [hidden], .hb-admin [hidden] { display: none !important; }
+.n8-admin-main .tiles.one, .n8-admin-main .grid.one { grid-template-columns: 1fr !important; }
