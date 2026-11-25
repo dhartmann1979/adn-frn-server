@@ -722,6 +722,8 @@ async def updates_upgrade(request: Request):
             raise HTTPError(500, f"Java-Update fehlgeschlagen: {e}")
     elif target == "github":
         # als root über scripts/n8-admin.sh update --auto: vorspulen, Pakete, Rechte, Neustart, Prüfung, sonst Rückfall
+        if not (_update_state.get("github") or {}).get("update"):
+            raise HTTPError(400, "Bitte zuerst nach Updates suchen.")
         ok, msg = ctx.n8.request_update()
         if not ok:
             raise HTTPError(400, msg)
