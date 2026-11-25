@@ -5,10 +5,13 @@
 ## Dienste
 
 **Admin → System → 🧩 Dienste** zeigt `frnadn`, `frn-server` und den Update-Auslöser schlank mit Status, **Autostart**-Schalter
-und **▶ Starten / 🔄 Neu starten / ⏹ Stoppen**. Daneben **🔐 Berechtigungen & sudo**: alle Prüfungen von `scripts/n8-admin.sh`, mit
+und **▶ Starten / ↻ Neu starten / ■ Stoppen**. Der eigene Eintrag **🔐 Berechtigungen & sudo** zeigt alle Prüfungen von `scripts/n8-admin.sh`, mit
 **🛠️ Korrigieren** (prüfen → korrigieren → erneut prüfen). Konsole: `sudo /opt/adn-frn-server/scripts/n8-admin.sh check-perms` bzw. `fix-perms`.
 
-<p align="center"><img src="../images/admin-services.png" alt="Dienste und Berechtigungen" width="90%"></p>
+<p align="center">
+  <img src="../images/admin-services.png" alt="Dienste" width="48%">
+  <img src="../images/admin-perms.png" alt="Berechtigungen & sudo" width="48%">
+</p>
 
 ```bash
 systemctl status frn-server frnadn     # laufen sie?
@@ -20,6 +23,32 @@ tail -f /var/lib/frnadn/frn/logs/server.log
 Beide Dienste laufen als Benutzer `frnadn` ohne Root-Rechte. frn_adn darf per sudoers-Regel (`/etc/sudoers.d/frnadn`) genau `frn-server` starten, stoppen, neu starten sowie *Reboot* und *Shut down* auslösen – sonst nichts.
 
 `frn-server` startet nach einem Absturz nach **60 Sekunden** neu. Der Java-Server beendet sich bei schweren SystemManager-Fehlern selbst; die Wartezeit verhindert, dass er den SystemManager mit Anmeldeversuchen überflutet.
+
+
+## 💓 Keep-Alive
+
+<p align="center"><img src="../images/admin-keepalive.png" alt="System → Keep-Alive" width="95%"></p>
+
+Seit **2.14.0** wacht ein Keep-Alive über das Dashboard und den Java-FRN-Server. `frnadn-keepalive.timer` startet **jede Minute
+als root** `scripts/n8-admin.sh keepalive`:
+
+| Was | Wie |
+|---|---|
+| **Dashboard** | antwortet es auf `/api/info`? |
+| **Java-FRN-Server** | läuft er (`/api/n8/health`, nur lokal erreichbar) **und** nimmt er Verbindungen auf seinem FRN-Port an? |
+| **Neustart** | nach **3 Minuten** krank (sofort bei `failed`), **höchstens 4× je Stunde** – danach „aufgegeben“ im Protokoll |
+| **Internet-Ausfall** | 1.1.1.1, 9.9.9.9 und github.com (Port 443) nicht erreichbar → keine sinnlosen Neustarts; ist das Netz nach mindestens 60 s wieder da, wird der FRN-Server einmal neu gestartet, damit er sich sofort wieder am SystemManager meldet |
+| **Heartbeat** | optional jede Minute ein Ping an Uptime Kuma („Push“) oder Healthchecks.io, bei Fehlern an die Fehler-Adresse |
+| **Wartung** | **⏸ 1 h pausieren**; ein unter *Dienste* gestoppter Dienst bleibt gestoppt, bis du ihn dort startest |
+
+Dateien im Datenordner (`/var/lib/frnadn`): `keepalive.conf`, `keepalive.json`, `keepalive.log` (höchstens 400 Zeilen).
+Eingerichtet wird der Timer von Installer, Update und `fix-perms`; `check-perms` prüft ihn mit.
+
+```bash
+systemctl status frnadn-keepalive.timer
+sudo /opt/adn-frn-server/scripts/n8-admin.sh keepalive    # eine Runde von Hand
+tail -f /var/lib/frnadn/keepalive.log
+```
 
 ## 📋 Bei Problemen immer zuerst: das öffentliche FRN-Fehlerprotokoll
 

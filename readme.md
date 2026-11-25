@@ -93,8 +93,8 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 <td width="50%"><img src="docs/images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icons"><br><b>Link-Editor</b> mit Site-Icon-Vorschau, Fallback-Emoji, Sortierung und SQLite-Cache.</td>
 </tr>
 <tr>
-<td><img src="docs/images/admin-updates.png" alt="Software-Updates"><br><b>⬆️ Software updates</b>: installierte und neue Version, neue Commits, getrennte Upgrade-Knöpfe.</td>
-<td><img src="docs/images/admin-system.png" alt="System"><br><b>🖥️ System</b>: FRN-Server, Datenbank, Maschine und Updates.</td>
+<td><img src="docs/images/admin-updates.png" alt="Update"><br><b>⬆️ Update</b>: Baum-Menü wie in allen N8-Systemen, Dashboard und Java-FRN-Server, Update-Protokoll.</td>
+<td><img src="docs/images/admin-keepalive.png" alt="Keep-Alive"><br><b>💓 Keep-Alive</b>: prüft jede Minute Dashboard und FRN-Server, startet neu, Internet-Ausfall, Heartbeat.</td>
 </tr>
 <tr>
 <td><img src="docs/images/rooms-avatars.png" alt="Räume mit Client-Avataren"><br><b>📡 Räume</b>: Avatar = Client-Software, 👑/🛡️ vor dem Rufzeichen.</td>
@@ -128,16 +128,16 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
 | 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
-| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, Portal-Token, System, Theme, Updates, Links, Import, Logs |
+| ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Baum-Menü, Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, Portal-Token, System, Theme, Updates, Links, Import, Logs |
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |
-| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
+| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, Keep-Alive, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
 | 🏷️ [Änderungen](CHANGELOG.md) | Was sich in welcher Version geändert hat |
 
 ## Aktualisieren
 
-Am einfachsten im Admin-Portal: der Hinweis **Update verfügbar → Jetzt aktualisieren** unter der Statusleiste, oder **⚙️ Admin → 🖥️ System → ⬆️ Updates → ⬆️ Update jetzt installieren**. Antwortet das Dashboard danach nicht, wird automatisch auf den alten Stand zurückgesetzt. Oder auf der Konsole:
+Am einfachsten im Admin-Portal: der Hinweis **Update verfügbar → Jetzt aktualisieren** unter der Statusleiste, oder **⚙️ Admin → 🖥️ System → ⬆️ Update → ⬆️ Update jetzt installieren** (ohne Passwort). Antwortet das Dashboard danach nicht, wird automatisch auf den alten Stand zurückgesetzt. Oder auf der Konsole:
 
 ```bash
 cd /opt/adn-frn-server

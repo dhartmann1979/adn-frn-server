@@ -4,6 +4,22 @@
 
 Oben rechts **🔐 Login**, danach erscheint im Menü der Punkt **⚙️ Admin**. Das Admin-Portal ersetzt das Bearbeiten von `server.properties`: alles wird in SQLite gespeichert, frn_adn schreibt die Datei daraus neu. Der Java-FRN-Server liest sie beim Start – nach einer Änderung erscheint oben **Restart now**.
 
+## Das Menü
+
+<p align="center"><img src="../images/admin-keepalive.png" alt="Admin-Portal mit Baum-Menü" width="95%"></p>
+
+Seit **2.14.0** steht links ein **Baum-Menü** – dasselbe wie im HobbyRadioPortal, HBlink4-FreeRadioID, N8 Hotspot und N8 Crosslink,
+mit denselben Gruppen in derselben Reihenfolge:
+
+| Gruppe | Einträge |
+|---|---|
+| 📡 **Betrieb** | ⚙️ Einstellungen · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
+| 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔐 Sitzungen & Protokoll |
+| 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
+| 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive |
+
+Gruppen klappen per Klick auf und zu; auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
+
 ## Rollen
 
 | Rolle | Darf |
@@ -109,25 +125,23 @@ Der Java-Server braucht die Passwörter im Klartext in seiner Datei; frn_adn leg
 
 Benutzer des Dashboards (nicht zu verwechseln mit FRN-Konten). Den Superadmin kann hier niemand ändern oder löschen; Admins bearbeitet nur der Superadmin.
 
-## 🖥️ System
+## 🖥️ Server & Daten
 
-<p align="center"><img src="../images/admin-system.png" alt="System" width="90%"></p>
+<p align="center"><img src="../images/admin-system.png" alt="Server & Daten" width="90%"></p>
 
-FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), Maschine (Last, Speicher, Platte) und Updates.
+FRN-Server (Dienst, Port, Version, Pfade), Datenbank (Zeilen, Größe, Cache), Maschine (Last, Speicher, Platte) und Backup. Update, Dienste, Berechtigungen und Keep-Alive haben seit 2.14.0 eigene Einträge unter **System**.
 
 | Knopf | Wirkung |
 |---|---|
 | 🔄 Restart FRN server | `systemctl restart frn-server` mit neu geschriebener `server.properties` – alle Stationen verbinden sich neu |
 | ♻️ Restart dashboard | nur frn_adn startet neu, der FRN-Server läuft weiter |
 | 🔄 Reboot / ⏻ Shut down | nur Superadmin |
-| ↻ Jetzt prüfen | prüft Dashboard (GitHub) und Java-FRN-Server auf neue Versionen |
-| ⬆️ Update jetzt installieren / Upgrade Java now | installiert das jeweilige Update – Einzelheiten: [Updates](updates.md) |
 
 ### 💾 Backup & Wiederherstellen (nur Superadmin)
 
 <p align="center"><img src="../images/admin-backup.png" alt="Backup und Wiederherstellen" width="90%"></p>
 
-Unter *System* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten.
+Unter *Server & Daten* sitzen zwei Kacheln, die nur der **Superadmin** sieht – ein Backup enthält alle Zugangsdaten.
 
 **💾 Backup** – Passwort zweimal eingeben (mindestens 10 Zeichen), **Backup erstellen**. Der Browser lädt die Datei
 `frn-backup-<host>-<datum>.frnbak` sofort herunter; die letzten **5** Backups bleiben zusätzlich in `/var/lib/frnadn/backups/`
@@ -155,18 +169,26 @@ was drin ist (Host, Datum, Version, Räume, Benutzer, FRN-Konten, Stationen, Dur
 Das Protokoll vermerkt *💾 Backup created/downloaded/deleted*, *♻️ Restore started* und *♻️ Backup restored*.
 
 
-## 🔄 Updates, Links und Import
+## ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive
 
-<p align="center"><img src="../images/admin-updates.png" alt="Software-Updates" width="70%"></p>
+<p align="center"><img src="../images/admin-updates.png" alt="System → Update" width="95%"></p>
 
-### ⬆️ Updates (System)
+Diese vier Einträge unter **System** sind gemeinsame Ansichten des N8 Kit und sehen in allen N8-Systemen gleich aus.
 
-Das Dashboard prüft 30 Sekunden nach dem Start und danach zu **jeder vollen Stunde** auf neue Commits im GitHub-Repository und auf eine neue Version des Java-FRN-Servers. Nichts wird automatisch installiert. **↻ Jetzt prüfen** prüft sofort. Für jedes Programm zeigt die Karte die installierte und die neue Version; bei GitHub außerdem die neuen Commits und einen Vergleichslink.
+- **⬆️ Update**: installierte Version, Stand auf GitHub, **↻ Jetzt prüfen**, **⬆️ Update jetzt installieren** (ohne Passwort, mit
+  Fortschritt und automatischem Zurücksetzen) und rechts das **📜 Update-Protokoll**. Darunter der **☕ Java-FRN-Server** von
+  freeradionetwork.de mit **Java jetzt aktualisieren** (lädt `FRN_Server.zip`, ersetzt die JAR, startet den Java-Server neu).
+  Geprüft wird 30 Sekunden nach dem Start und zu jeder vollen Stunde; installiert wird nur auf Knopfdruck. Einzelheiten: [Updates](updates.md).
+- **🧩 Dienste**: Dashboard, Java-FRN-Server und Update-Auslöser mit Zustand, Autostart und Starten · Stoppen · Neu starten.
+- **🔐 Berechtigungen & sudo**: zeigt nur, was nicht stimmt; **🛠️ Korrigieren** repariert und prüft erneut.
+- **💓 Keep-Alive**: siehe [Betrieb & Fehlersuche → Keep-Alive](betrieb.md#-keep-alive).
 
-- **Upgrade Java now:** lädt `FRN_Server.zip` von freeradionetwork.de, ersetzt die JAR und startet den Java-Server neu.
-- **⬆️ Update jetzt installieren** (Dashboard, Kachel im N8-Kit-Stil wie in den anderen N8schicht-Projekten): holt genau den angezeigten Stand per Fast-Forward, installiert geänderte Python-Pakete und startet zuerst den FRN-Server für einen frischen Live-Site-Status und danach das Dashboard neu. Verbundene Stationen verbinden sich automatisch wieder; die Seite lädt sich selbst. Falls der FRN-Neustart fehlschlägt, zeigt das Dashboard eine Meldung mit dem manuellen Neustart-Hinweis. Antwortet die neue Version nicht, wird automatisch auf den alten Stand zurückgesetzt (siehe [Updates](updates.md#im-admin-portal)). Bei lokalen Änderungen im Programmverzeichnis oder fehlenden Schreibrechten ist der Knopf grau und die Karte nennt den Grund. Nach der Neuinstallation einmal `sudo ./scripts/update.sh` als root ausführen; das setzt die nötigen Schreibrechte. Für das öffentliche Standard-Repository ist kein GitHub-Token nötig: [Update-Funktion einrichten](updates.md#update-funktion-einmalig-freischalten).
+<p align="center">
+  <img src="../images/admin-services.png" alt="Dienste" width="48%">
+  <img src="../images/admin-perms.png" alt="Berechtigungen & sudo" width="48%">
+</p>
 
-Alle Meldungen und Lösungen: **[Updates](updates.md)**.
+## 🔗 Links und 📥 Import
 
 ### 🔗 Links
 

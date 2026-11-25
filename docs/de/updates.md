@@ -11,11 +11,11 @@ Zwei Programme werden aktualisiert, jedes mit eigenem Knopf. **Nichts wird autom
 
 <p align="center"><img src="../images/admin-updates.png" alt="Software-Updates im Admin-Portal" width="70%"></p>
 
-Zu finden unter **⚙️ Admin → 🖥️ System → ⬆️ Updates**. Hinweis, Kachel und Fortschritt kommen aus dem **N8 Kit** und sehen in adn-frn-server, HBlink4-FreeRadioID, N8-HotSpot und N8 Crosslink gleich aus.
+Zu finden unter **⚙️ Admin → 🖥️ System → ⬆️ Update** (seit 2.14.0 ein eigener Eintrag im Baum-Menü; „Update jetzt“ braucht kein Passwort). Hinweis, Kachel und Fortschritt kommen aus dem **N8 Kit** und sehen in adn-frn-server, HBlink4-FreeRadioID, N8-HotSpot und N8 Crosslink gleich aus.
 
 <p align="center"><img src="../images/update-banner.png" alt="Update-Hinweis unter der Statusleiste" width="90%"></p>
 
-Gibt es ein neues Dashboard, sehen **angemeldete Admins** direkt unter der Statusleiste den Hinweis *Update verfügbar: v2.6.0 · … → v2.7.0 · …* mit **Was ist neu?** (Commit-Liste), **Jetzt aktualisieren**, **Details** (öffnet Admin → System) und **Später** (blendet den Hinweis für diese Version einen Tag aus). Besucher ohne Anmeldung sehen ihn nie.
+Gibt es ein neues Dashboard, sehen **angemeldete Admins** direkt unter der Statusleiste den Hinweis *Update verfügbar: v2.6.0 · … → v2.7.0 · …* mit **Was ist neu?** (Commit-Liste), **Jetzt aktualisieren**, **Details** (öffnet Admin → System → Update) und **Später** (blendet den Hinweis für diese Version einen Tag aus). Besucher ohne Anmeldung sehen ihn nie.
 
 ## Wie das Update läuft (N8 Admin)
 
@@ -48,9 +48,9 @@ Das richtet Besitzer und Rechte, die sudo-Freigaben und den Update-Auslöser ein
 
 Die Abfrage an GitHub braucht keinen Zugang (zwei Anfragen pro Prüfung). Das Ergebnis zeigt je Programm: installierte Version, neue Version, bei GitHub zusätzlich die Zahl der neuen Commits samt Liste und einen Vergleichslink.
 
-<p align="center"><img src="../images/admin-updates.png" alt="Software updates unter Admin → System" width="70%"></p>
+<p align="center"><img src="../images/admin-updates.png" alt="System → Update" width="70%"></p>
 
-Beim Öffnen von **Admin → System** zeigt die Karte das letzte Ergebnis (höchstens 10 Minuten alt), damit GitHub nicht bei jedem
+Beim Öffnen von **Admin → System → Update** zeigt die Karte das letzte Ergebnis (höchstens 10 Minuten alt), damit GitHub nicht bei jedem
 Klick gefragt wird – ohne Anmeldung erlaubt GitHub 60 Abfragen pro Stunde. **↻ Jetzt prüfen** fragt immer sofort neu, nach einem Upgrade
 wird automatisch neu geprüft. Die Uhrzeit der letzten Prüfung steht unten in der Karte.
 
