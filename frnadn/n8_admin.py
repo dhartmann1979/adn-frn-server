@@ -9,6 +9,8 @@ was es darf, steht in <Datenordner>/n8-admin.json (schreibt n8-admin.sh sudo-set
     fix_perms()        prüfen, korrigieren, erneut prüfen (Ausgabe)    – sudo n8-admin.sh fix-perms
     request_update()   „Update jetzt“: legt update.request an, die Path-Unit startet n8-admin.sh update --auto als root
     update_state()     läuft gerade ein Update? Protokoll und Ergebnis des letzten
+    keepalive()        Keep-Alive: Zustand der Prüfungen, Internet, Heartbeat, Protokoll und Einstellungen
+    keepalive_set(d)   Einstellungen (an/aus, Neustart nach Internet-Ausfall, Heartbeat-Adressen, Pause) – n8-admin.sh liest sie nur
 
 Alles ist asynchron (asyncio) und hängt an keinem Web-Framework.
 """
@@ -83,6 +85,7 @@ class N8Admin:
     async def unit_action(self, unit: str, action: str) -> Tuple[bool, str]:
         if not self.allowed(unit, action):
             return False, "Aktion nicht freigegeben"
+        self._hold(unit, action)
         if self.demo:
             st = self._demo_units.setdefault(unit, ["active", "enabled"])
             st[0] = {"start": "active", "restart": "active", "stop": "inactive"}.get(action, st[0])
@@ -92,6 +95,18 @@ class N8Admin:
         args = [sc, action, unit] if action not in ("start", "restart") else [sc, "--no-block", action, unit]
         rc, out = await self._sudo(*args, timeout=60)
         return rc == 0, out.strip()[-400:] or ("ok" if rc == 0 else f"Fehler {rc}")
+
+    def _hold(self, unit: str, action: str) -> None:
+        """Von Hand gestoppt → Keep-Alive startet den Dienst nicht wieder, bis er hier gestartet wird."""
+        d = self.state_dir / "keepalive.hold"
+        try:
+            if action == "stop":
+                d.mkdir(exist_ok=True)
+                (d / unit).write_text(str(time.time()), "utf-8")
+            elif action in ("start", "restart"):
+                (d / unit).unlink(missing_ok=True)
+        except OSError:
+            pass
 
     # ------------------------------------------------------------ Berechtigungen
     async def check_perms(self) -> Dict[str, Any]:
@@ -154,6 +169,72 @@ class N8Admin:
             and "Update gestartet" in log.rsplit("\n=== ", 1)[-1]
         return {"ready": bool(c.get("request")), "pending": pending, "running": running and not pending,
                 "log": _plain(log), "result": result}
+
+
+    # ------------------------------------------------------------ Keep-Alive
+    KA_KEYS = ("enabled", "net_restart", "heartbeat_url", "heartbeat_fail_url", "paused_until")
+
+    def keepalive_conf(self) -> Dict[str, Any]:
+        out: Dict[str, Any] = {"enabled": True, "net_restart": True, "heartbeat_url": "", "heartbeat_fail_url": "", "paused_until": 0}
+        try:
+            for line in (self.state_dir / "keepalive.conf").read_text("utf-8").splitlines():
+                k, _, v = line.partition("=")
+                if k in ("enabled", "net_restart"):
+                    out[k] = v.strip() != "0"
+                elif k == "paused_until":
+                    out[k] = int(v) if v.strip().isdigit() else 0
+                elif k in self.KA_KEYS:
+                    out[k] = v.strip()
+        except OSError:
+            pass
+        return out
+
+    def keepalive_set(self, d: Dict[str, Any]) -> Dict[str, Any]:
+        import re
+        c = self.keepalive_conf()
+        for k in ("enabled", "net_restart"):
+            if k in d:
+                c[k] = bool(d[k])
+        for k in ("heartbeat_url", "heartbeat_fail_url"):
+            if k in d:
+                v = str(d[k] or "").strip()
+                if v and not re.fullmatch(r"https?://[A-Za-z0-9._~:/?#@!&+,;=%-]{3,400}", v):
+                    raise ValueError("Heartbeat-Adresse: nur http(s)://… ohne Leerzeichen und Sonderzeichen wie $ ` Anführungszeichen")
+                c[k] = v
+        if "pause_minutes" in d:
+            m = max(0, min(int(d["pause_minutes"] or 0), 24 * 60))
+            c["paused_until"] = int(time.time() + m * 60) if m else 0
+        lines = [f"{k}={int(c[k]) if isinstance(c[k], bool) else c[k]}" for k in self.KA_KEYS]
+        self.state_dir.mkdir(parents=True, exist_ok=True)
+        tmp = self.state_dir / "keepalive.conf.tmp"
+        tmp.write_text("\n".join(lines) + "\n", "utf-8")
+        os.replace(tmp, self.state_dir / "keepalive.conf")
+        return c
+
+    def keepalive(self) -> Dict[str, Any]:
+        def read(name: str, n: int = 30000) -> str:
+            try:
+                return (self.state_dir / name).read_text("utf-8", "replace")[-n:]
+            except OSError:
+                return ""
+        try:
+            st = json.loads(read("keepalive.json") or "{}")
+        except ValueError:
+            st = {}
+        if self.demo and not st:
+            now = int(time.time())
+            st = {"time": now - 20, "mode": "an", "net": 1, "net_down_since": 0, "heartbeat": "ok", "restarted": 0, "fails_needed": 3, "max_hour": 4,
+                  "checks": [{"unit": u["unit"], "label": u.get("label", u["unit"]), "state": "ok", "active": "active", "why": "", "fails": 0,
+                              "restarts": 1 if i == 0 else 0, "last_restart": now - 5400 if i == 0 else 0}
+                             for i, u in enumerate(self.config().get("units", [])) if not u["unit"].endswith(".path")]}
+        log = _plain(read("keepalive.log", 12000))
+        if self.demo and not log:
+            log = ("2026-11-25 03:12:40 🌐 Internet weg (keine Antwort von 1.1.1.1:443 9.9.9.9:443 github.com:443)\n"
+                   "2026-11-25 03:16:41 🌐 Internet wieder da (nach 241 s Ausfall)\n"
+                   "2026-11-25 03:16:41 ↻ Dienst nach dem Internet-Ausfall neu gestartet (Demo)\n")
+        age = time.time() - float(st.get("time") or 0)
+        return {**st, "stale": bool(st) and age > 180, "age": int(age) if st else None, "conf": self.keepalive_conf(),
+                "log": "\n".join(log.splitlines()[-80:]), "ready": bool(st) or self.demo}
 
 
 def _plain(s: str) -> str:

@@ -1123,10 +1123,11 @@ async function loadSystem() {
             <div id="permList"><div class="dim">checking …</div></div>
             <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="loadPerms()">🔍 Check again</button><button class="btn primary" id="permFix" onclick="fixPerms(this)">🛠️ Fix</button></div>
             <pre class="term hidden" id="permOut" style="height:220px;margin-top:10px"></pre></div>
+        <div class="tile ka-tile" id="kaTile" style="grid-column:1/-1"><h3>💓 Keep-Alive</h3><div class="empty">…</div></div>
         </div>
         ${sa ? '<div class="grid g2" style="margin-top:14px" id="backupTiles"><div class="tile"><div class="empty">Loading …</div></div></div>' : ''}`;
     checkAllUpdates();
-    loadServices(); loadPerms();
+    loadServices(); loadPerms(); loadKeepalive();
     if (sa) loadBackups();
 }
 
@@ -1540,3 +1541,41 @@ boot();
     addEventListener('resize', fit);
     setTimeout(fit, 300);
 })();
+
+// ---------------------------------------------------------------- Keep-Alive (N8 Admin-Kit): Dienste-Wächter, Internet, Heartbeat
+async function loadKeepalive() {
+    const el = $('kaTile'); if (!el) return;
+    let d;
+    try { d = await api('GET', '/api/admin/keepalive'); } catch (e) { el.innerHTML = `<h3>💓 Keep-Alive</h3><div class="empty">${esc(e.message)}</div>`; return; }
+    const c = d.conf || {};
+    const paused = c.paused_until && c.paused_until * 1000 > Date.now();
+    const badge = !d.ready ? '<span class="pill warn">not set up</span>' : !c.enabled ? '<span class="pill">off</span>' : paused ? '<span class="pill warn">paused</span>'
+        : d.stale ? '<span class="pill bad">not running</span>' : '<span class="pill ok">active</span>';
+    const icon = st => ({ ok: '<span class="pill ok">✓</span>', hold: '<span class="pill">⏸</span>', restarted: '<span class="pill warn">↻</span>', giveup: '<span class="pill bad">✕</span>' }[st] || '<span class="pill warn">!</span>');
+    const rows = (d.checks || []).map(x => `<div class="perm-row">${icon(x.state)}<div><b>${esc(x.label)}</b> <span class="mono dim">${esc(x.unit)}</span>
+        <div class="dim"><span>${x.state === 'ok' ? 'healthy' : x.state === 'hold' ? 'stopped by hand – Keep-Alive waits' : esc(x.why || '')}</span>${x.fails ? ` · <span>${x.fails} min</span>` : ''}${x.restarts ? ` · <span>${x.restarts}× restarted</span>${x.last_restart ? ` · <span>${fmtDate(x.last_restart)}</span>` : ''}` : ''}</div></div></div>`).join('');
+    el.innerHTML = `<h3>💓 Keep-Alive ${badge}</h3>
+        <div class="subt">Every minute as root: checks each service for real (dashboard, Java FRN server running and accepting stations), restarts sick ones after 3 minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address.</div>
+        ${d.ready ? `<div class="kv"><div class="k">Internet</div><div class="v">${d.net ? '<span class="pill ok">reachable</span>' : `<span class="pill bad">down since ${fmtDate(d.net_down_since)}</span>`}</div>
+            <div class="k">Last check</div><div class="v">${d.age != null ? (d.age < 120 ? 'just now' : fmtDate(d.time)) : '–'}</div>
+            ${c.heartbeat_url ? `<div class="k">Heartbeat</div><div class="v">${esc(d.heartbeat || '–')}</div>` : ''}</div>
+            <div class="perm-list">${rows}</div>` : '<div class="help">Set up once on the console: <code>sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms</code></div>'}
+        <form class="ka-form" onsubmit="event.preventDefault(); saveKeepalive(this)">
+            <div class="row"><label for="kaOn">Keep-Alive on</label><label class="switch"><input type="checkbox" id="kaOn" name="enabled" ${c.enabled ? 'checked' : ''}><span></span></label></div>
+            <div class="row"><label for="kaNet">Restart network services after an internet outage</label><label class="switch"><input type="checkbox" id="kaNet" name="net_restart" ${c.net_restart ? 'checked' : ''}><span></span></label></div>
+            <div class="row"><label for="kaHb">Heartbeat address</label><input type="text" id="kaHb" name="heartbeat_url" value="${esc(c.heartbeat_url || '')}" placeholder="https://hc-ping.com/… or https://kuma…/api/push/…">
+                <div class="help">Called every minute while everything is fine (Uptime Kuma “Push”, Healthchecks.io …) – it alerts you when the calls stop.</div></div>
+            <div class="row"><label for="kaHbF">Heartbeat on errors (optional)</label><input type="text" id="kaHbF" name="heartbeat_fail_url" value="${esc(c.heartbeat_fail_url || '')}" placeholder="https://hc-ping.com/…/fail"></div>
+            <div class="actions"><button type="button" class="btn" onclick="pauseKeepalive(${paused ? 0 : 60})">${paused ? '▶ Resume' : '⏸ Pause 1 h (maintenance)'}</button><button class="btn primary">Save</button></div>
+        </form>
+        ${d.log ? `<details class="perm-ok"><summary>Keep-Alive log</summary><pre class="term" style="max-height:220px">${esc(d.log)}</pre></details>` : ''}`;
+}
+async function saveKeepalive(f) {
+    try { await api('POST', '/api/admin/keepalive', { enabled: f.enabled.checked, net_restart: f.net_restart.checked, heartbeat_url: f.heartbeat_url.value.trim(), heartbeat_fail_url: f.heartbeat_fail_url.value.trim() });
+          toast('Keep-Alive saved'); loadKeepalive(); }
+    catch (e) { toast(e.message, true); }
+}
+async function pauseKeepalive(min) {
+    try { await api('POST', '/api/admin/keepalive', { pause_minutes: min }); toast(min ? 'Keep-Alive paused for 1 hour' : 'Keep-Alive active again'); loadKeepalive(); }
+    catch (e) { toast(e.message, true); }
+}

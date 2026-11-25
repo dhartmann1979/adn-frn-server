@@ -66,6 +66,14 @@ def test_services_and_perms_api(app_mod, tmp_path):
         assert c.post("/api/admin/services/frnadn.service/mask", headers={"X-N8": "1"}).status_code == 400
         assert c.get("/api/admin/perms").json()["ok"]
         assert c.get("/api/admin/update-log").json()["ready"]
+        # Keep-Alive: von Hand gestoppt → Halt-Marke, Einstellungen, Health nur lokal
+        assert (data / "keepalive.hold" / "frnadn.service").exists()
+        k = c.post("/api/admin/keepalive", json={"heartbeat_url": "https://hc-ping.com/a-1"}, headers={"X-N8": "1"}).json()
+        assert k["conf"]["heartbeat_url"] == "https://hc-ping.com/a-1"
+        assert c.post("/api/admin/keepalive", json={"heartbeat_url": "https://x/`id`"}, headers={"X-N8": "1"}).status_code == 400
+        assert c.get("/api/n8/health").status_code == 403
+    conf = (ROOT / "scripts" / "n8-admin.conf").read_text()
+    assert "N8_KA_CHECKS=" in conf and "frn-server.service|tcp|" in conf
 
 
 def test_kit_files_loaded():

@@ -428,6 +428,7 @@ async def server_control(action: str, request: Request):
     u = need_admin(request)
     if action not in ("start", "stop", "restart"):
         raise HTTPError(404, "Unknown action.")
+    ctx.n8._hold("frn-server.service", action)        # Keep-Alive: von Hand gestoppt bleibt gestoppt
     r = await ctx.java.control(action)
     if r["rc"] != 0:
         raise HTTPError(500, f"systemctl {action} frn-server: {r['out'].strip()[:300] or 'failed'}")
@@ -1236,6 +1237,40 @@ async def perms_fix(request: Request):
     ok, out = await ctx.n8.fix_perms()
     ctx.auth.audit("perms_fix", u["username"], "ok" if ok else "errors remain", ip_of(request))
     return {"ok": ok, "message": out, "check": await ctx.n8.check_perms()}
+
+
+@app.get("/api/admin/keepalive")
+async def keepalive_get(request: Request):
+    need_admin(request)
+    return ctx.n8.keepalive()
+
+
+@app.post("/api/admin/keepalive")
+async def keepalive_set(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        c = ctx.n8.keepalive_set(b)
+    except (ValueError, TypeError) as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("keepalive", u["username"], ", ".join(f"{k}={'…' if 'url' in k and v else v}" for k, v in c.items()), ip_of(request))
+    return ctx.n8.keepalive()
+
+
+@app.get("/api/n8/health")
+async def n8_health(request: Request):
+    """Für den Keep-Alive (scripts/n8-admin.sh): Zustand der Teile – nur direkt von diesem Rechner, nie über einen Proxy."""
+    host = request.client.host if request.client else ""
+    if host not in ("127.0.0.1", "::1") or any(h in request.headers for h in ("x-forwarded-for", "x-real-ip", "forwarded", "via")):
+        raise HTTPError(403, "local only")
+    st = ctx.server.state()
+    ok = DEMO or bool(st.get("running"))
+    return {"ok": True, "items": {
+        "web": {"ok": True},
+        "frn": {"ok": ok, "why": "" if ok else ("FRN-Server " + (st.get("service") or "?") + (" – nimmt keine Verbindungen an" if st.get("service") == "active" else "")
+                                                 + (f" ({st['error']})" if st.get("error") else ""))},
+        "sysman": {"ok": True, "warning": st.get("error") or ""},
+    }}
 
 
 @app.get("/api/admin/update-log")

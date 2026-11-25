@@ -3,6 +3,16 @@
 N8Kit.i18n.add({
     base: 'en',
     de: {
+        // 2.14.0: Keep-Alive (N8 Admin-Kit)
+        'Every minute as root: checks each service for real (dashboard, Java FRN server running and accepting stations), restarts sick ones after 3 minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address.': 'Jede Minute als root: prüft jeden Dienst wirklich (Dashboard, Java-FRN-Server läuft und nimmt Stationen an), startet kranke Dienste nach 3 Minuten neu (höchstens 4× je Stunde), erkennt Internet-Ausfälle und startet danach die Netzdienste neu, und meldet sich bei einer Heartbeat-Adresse.',
+        'Keep-Alive': 'Keep-Alive', 'active': 'aktiv', 'off': 'aus', 'paused': 'pausiert', 'not running': 'läuft nicht', 'healthy': 'gesund',
+        'stopped by hand – Keep-Alive waits': 'von Hand gestoppt – Keep-Alive wartet', 'Internet': 'Internet', 'reachable': 'erreichbar', 'Last check': 'Letzte Prüfung',
+        'just now': 'gerade eben', 'Heartbeat': 'Heartbeat', 'Keep-Alive on': 'Keep-Alive an', 'Restart network services after an internet outage': 'Netzdienste nach einem Internet-Ausfall neu starten',
+        'Heartbeat address': 'Heartbeat-Adresse', 'Heartbeat on errors (optional)': 'Heartbeat bei Fehlern (optional)',
+        'Called every minute while everything is fine (Uptime Kuma “Push”, Healthchecks.io …) – it alerts you when the calls stop.': 'Wird jede Minute aufgerufen, solange alles in Ordnung ist (Uptime Kuma „Push“, Healthchecks.io …) – bleiben die Aufrufe aus, alarmiert es dich.',
+        'Resume': 'Fortsetzen', 'Pause 1 h (maintenance)': '1 h pausieren (Wartung)', 'Keep-Alive log': 'Keep-Alive-Protokoll', 'Keep-Alive saved': 'Keep-Alive gespeichert',
+        'Keep-Alive paused for 1 hour': 'Keep-Alive für 1 Stunde pausiert', 'Keep-Alive active again': 'Keep-Alive wieder aktiv', 'Set up once on the console:': 'Einmal auf der Konsole einrichten:',
+        'Set up once on the console:': 'Einmal auf der Konsole einrichten:', 'Resume': 'Fortsetzen',
         // public FRN error log (freeradionetwork.de)
         "Public FRN error log": "Öffentliches FRN-Fehlerprotokoll",
         "For problems always look here first: the FRN SystemManager of freeradionetwork.de writes every refused login of servers and clients there (wrong FRN password, multiple connection, port not reachable …) – the reason the FRN server itself does not tell. Shown are entries about this server address, the owner's callsign and stations refused here. New entries also appear in the events below": "Bei Problemen immer zuerst hier schauen: Der FRN-SystemManager von freeradionetwork.de schreibt jede abgelehnte Anmeldung von Servern und Clients dorthin (falsches FRN-Passwort, Mehrfachverbindung, Port nicht erreichbar …) – den Grund, den der FRN-Server selbst nicht nennt. Gezeigt werden Einträge zu dieser Server-Adresse, dem Rufzeichen des Betreibers und hier abgelehnten Stationen. Neue Einträge erscheinen auch unten in den Ereignissen.",
@@ -242,6 +252,7 @@ N8Kit.i18n.add({
         'Website': 'Webseite', 'E-mail': 'E-Mail', 'Address': 'Adresse', 'Copy settings from': 'Einstellungen übernehmen von', 'Do not record': 'Nicht aufzeichnen', '(switches to that tab) and': '(wechselt in diesen Tab) und',
     },
     rules: [
+        [/^down since (.+)$/, 'weg seit $1'], [/^(\d+)× restarted$/, '$1× neu gestartet'], [/^(\d+) min$/, '$1 Min.'],
         [/^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\S+)\. Also check the spam folder\.?$/, '$1Angefordert – der SystemManager schickt das Passwort an $2. Auch im Spam-Ordner nachsehen.'],
         [/^(⚠️ )?There is already an FRN account with this callsign and name\./, '$1Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen. Das Passwort kam damals per E-Mail – für einen zweiten Server einen anderen Namen nehmen (z. B. „DO1ABC, Server Test“).'],
         [/^(\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\/parrot room of the server$/, '$1 Stationen online · der FRN-Server übernimmt Änderungen nach einem Neustart · net00 ist immer der Test-/Papageienraum des Servers'],
