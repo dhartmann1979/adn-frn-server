@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.4.0 – shared by the N8schicht web interfaces
+ * N8 Kit 1.4.1 – shared by the N8schicht web interfaces
  * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -393,7 +393,18 @@
                 try { seen = await o.version(); } catch (e) { seen = null; }
                 if (seen == null) { step(2, 'bad'); finish(false, esc(t('Der Dienst antwortet noch nicht. Bitte in ein paar Minuten neu laden oder das Update-Protokoll ansehen.'))); return; }
                 if (o.to && String(seen).indexOf(o.to) < 0 && o.from && String(seen).indexOf(o.from) >= 0) {
-                    step(2, 'bad'); finish(false, esc(t('Das Update wurde zurückgenommen – es läuft wieder die vorherige Version.')) + ' <b>' + esc(seen) + '</b>'); return;
+                    // the version did not change: was it rolled back, or did the update not even start? (data/update.result)
+                    let r = null;
+                    try { const d = await (await fetch(o.resultUrl || '/api/admin/update-log', { credentials: 'same-origin', cache: 'no-store' })).json(); r = d && d.result; } catch (e) { r = null; }
+                    const fresh = r && !r.ok && r.time && r.time * 1000 >= t0 - 15000;
+                    if (fresh && !/zurück/i.test(r.message || '')) {          // stopped before anything was changed
+                        step(0, 'bad');
+                        finish(false, esc(t('Nicht aktualisiert – es läuft unverändert die bisherige Version.')) + ' <b>' + esc(seen) + '</b><br>' + esc(t(r.message || ''))
+                            + '<br><span class="n8-help">' + esc(t('Einzelheiten im Update-Protokoll (System → Update).')) + '</span>');
+                        return;
+                    }
+                    step(2, 'bad'); finish(false, esc(t('Das Update wurde zurückgenommen – es läuft wieder die vorherige Version.')) + ' <b>' + esc(seen) + '</b>'
+                        + (fresh && r.message ? '<br>' + esc(t(r.message)) : '')); return;
                 }
                 step(2, 'done');
                 finish(true, esc(t('Update installiert. Die Seite wird neu geladen …')));
@@ -919,6 +930,9 @@
             'Update installiert. Die Seite wird neu geladen …': 'Update installed. Reloading the page …',
             'Update installiert.': 'Update installed.',
             'Das Update wurde zurückgenommen – es läuft wieder die vorherige Version.': 'The update was rolled back – the previous version is running again.',
+            'Nicht aktualisiert – es läuft unverändert die bisherige Version.': 'Not updated – the previous version keeps running unchanged.',
+            'Einzelheiten im Update-Protokoll (System → Update).': 'Details in the update log (System → Update).',
+            'von Hand geänderte Dateien – Update abgebrochen': 'files changed by hand – update stopped',
             'Der Dienst antwortet noch nicht. Bitte in ein paar Minuten neu laden oder das Update-Protokoll ansehen.': 'The service does not answer yet. Reload in a few minutes or look at the update log.',
             'Sprache / Language': 'Language / Sprache',
             'immer': 'always', 'aus': 'off', 'nie': 'never',
