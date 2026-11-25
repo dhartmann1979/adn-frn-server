@@ -402,6 +402,7 @@ function onEvent(ev) {
         case 'chat': S.chat.entries.unshift(ev.entry); if (S.tab === 'chat') renderChat(); break;
         case 'server': if (S.live) { S.live.server = ev.server; renderChips(); } break;
         case 'info': api('GET', '/api/info').then(i => { S.info = { ...S.info, ...i }; renderHeader(); }); break;
+        case 'links': loadPublicLinks(); break;
         case 'client_logos': loadClientLogos().then(() => renderAllLive()); break;
         case 'log': S.admin.logs.push(ev.entry); if (S.admin.logs.length > 600) S.admin.logs.shift(); appendLog(ev.entry); break;
     }
@@ -937,7 +938,7 @@ async function saveSettings(form) {
     try {
         const r = await api('POST', '/api/admin/settings', { changes: formValues(form) });
         toast(r.dashboard_restart_needed ? 'HTTPS settings saved. Restart the dashboard service to apply them.' : (r.changed.length ? `Saved (${r.changed.length})` : 'No changes')); setRestart(r.restart_needed);
-        const i = await api('GET', '/api/info'); S.info = { ...S.info, ...i }; renderHeader();
+        const i = await api('GET', '/api/info'); S.info = { ...S.info, ...i }; renderHeader(); loadPublicLinks();
     } catch (e) { toast(e.message, true); }
 }
 async function checkUpdate(btn) {

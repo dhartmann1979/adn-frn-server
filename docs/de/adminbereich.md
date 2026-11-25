@@ -191,6 +191,8 @@ Diese vier Einträge unter **System** sind gemeinsame Ansichten des N8 Kit und s
 
 ### 🔗 Links
 
+Mit **🔁 Master & Backup** steht der Partner zusätzlich automatisch als erster Eintrag im Menü (Master → „FRN Backup“, Backup → „FRN Master“) – siehe [Master & Backup](master-backup.md#-partner-im-link-menü).
+
 <p align="center"><img src="../images/admin-links-siteicons.png" alt="Link-Editor mit Site-Icon-Vorschau und SQLite-Cache" width="90%"></p>
 
 Eigener Admin-Tab **🔗 Links** mit Schalter *Show links on the dashboard*, Menütext, Darstellung als Aufklapp-Menü oder Knopfreihe und einer sortierbaren Liste. Je Link legst du Name, Adresse, Fallback-Emoji, **Site icon** und **New tab** fest. Website-Icons werden über die üblichen Favicon-Pfade oder die `rel=icon`-Angabe der Zielseite gefunden und in SQLite gecacht. Der erste Bildaufruf füllt den Cache bei Bedarf direkt; **Save & refresh site icons** lädt sie sofort neu. Zusätzlich werden die Icons jede Nacht um Mitternacht aktualisiert. Wenn ein Ziel kein Icon anbietet, erscheint das Emoji. Bis zu 20 Links; erlaubt sind `https://`, `http://`, `mailto:`, `#stats` / `#stations` (Tab wechseln) und `/pfad`. Schritt für Schritt: [Anleitungen → Link-Menü](anleitungen.md#-link-menü-einrichten).

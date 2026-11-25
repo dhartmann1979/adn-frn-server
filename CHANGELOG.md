@@ -2,6 +2,16 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.18.1 – 2026-11-25
+
+### 🔗 Master & Backup über Kreuz im Link-Menü
+- Mit gesetzter Rolle steht der Partner automatisch als **erster Eintrag** im Link-Menü der Kopfzeile: auf dem Master
+  **🔁 FRN Backup**, auf dem Backup **🔁 FRN Master** – mit der *Dashboard-Adresse des Partners*, seinem Site-Icon und in neuem Tab.
+- Wird nicht in `links.json` gespeichert (taucht unter *Darstellung → 🔗 Links* nicht auf), folgt Rolle und Partner-Adresse sofort
+  (alle offenen Seiten laden das Menü neu), erscheint auch bei ausgeschaltetem Link-Menü, und eine gleiche Adresse in den eigenen
+  Links wird nicht doppelt gezeigt. Einzelserver: keine Änderung.
+- Test `test_partner_first_in_link_menu`; Doku *Master & Backup* und *Admin-Portal → Links* mit Screenshot.
+
 ## 2.18.0 – 2026-11-25
 
 ### 🏷️ Rolle im Kopfbereich: [Master] · [Backup] · [Standalone]

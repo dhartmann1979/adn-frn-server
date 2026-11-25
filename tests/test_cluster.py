@@ -146,3 +146,15 @@ def test_backup_sync_now(client, tmp_path, monkeypatch):
     assert client.post("/api/admin/cluster/sync", json={}, headers=H).json()["changed"] is False
     assert client.get("/api/admin/cluster").json()["last"]["ok"]
     assert client.post("/api/admin/cluster/maintenance", json={"on": True}, headers=H).status_code == 400   # only the master
+
+
+def test_partner_first_in_link_menu(client):
+    A = client.A
+    first = lambda: client.get("/api/links").json()["links"][0]  # noqa: E731
+    assert first()["label"] != "FRN Backup"                                          # single server: nothing added
+    A.ctx.settings.update({"cluster.role": "master", "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+    assert first()["label"] == "FRN Backup" and first()["url"] == "https://frn-backup.example.org/"
+    A.ctx.settings.update({"cluster.role": "backup", "cluster.peer_url": "https://frn.example.org"}, "t")
+    d = client.get("/api/links").json()
+    assert d["links"][0]["label"] == "FRN Master" and d["enabled"]
+    assert all(x["label"] != "FRN Master" for x in client.get("/api/admin/links").json()["items"])   # not stored in the menu

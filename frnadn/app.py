@@ -395,6 +395,11 @@ async def save_settings(request: Request):
         ctx.live.chat_mode = ctx.settings.get("dashboard.chat")
         if any(k.startswith(("frn.", "sysman.", "cluster.")) for k in keys):
             config_changed(u, request, "settings " + ", ".join(keys))
+        if "cluster.peer_url" in keys or "cluster.role" in keys:
+            p = partner_link()
+            if p:
+                ctx.tasks.append(asyncio.create_task(asyncio.to_thread(siteicons.refresh_many, ctx.db, [p["url"]])))
+            await push({"type": "links"})
         refresh_sockets()
         await push({"type": "info"})
         await push({"type": "rooms"})
@@ -762,9 +767,24 @@ def links_payload(cfg: Dict[str, Any]) -> Dict[str, Any]:
     return {**cfg, "links": links}
 
 
+def partner_link() -> Optional[Dict[str, Any]]:
+    """Master & Backup: der Partner steht über Kreuz automatisch als erster Eintrag im Link-Menü
+    (auf dem Master „FRN Backup“, auf dem Backup „FRN Master“)."""
+    s = ctx.settings.all()
+    url = (s["cluster.peer_url"] or "").rstrip("/")
+    if s["cluster.role"] not in ("master", "backup") or not url:
+        return None
+    label = "FRN Backup" if s["cluster.role"] == "master" else "FRN Master"
+    return {"icon": "🔁", "label": label, "url": url + "/", "new_tab": True, "site_icon": True, "auto": "cluster"}
+
+
 @app.get("/api/links")
 async def public_links():
-    return links_payload(linkstore.read(LINKS_FILE))
+    cfg = linkstore.read(LINKS_FILE)
+    p = partner_link()
+    if p:
+        cfg = {**cfg, "enabled": True, "items": [p] + [x for x in cfg["items"] if x.get("url", "").rstrip("/") != p["url"].rstrip("/")]}
+    return links_payload(cfg)
 
 
 @app.get("/api/admin/links")
@@ -1883,7 +1903,8 @@ async def _startup() -> None:
         log.warning("ACL import: %s", error)
     configured_links = linkstore.read(LINKS_FILE)
     ctx.tasks.append(asyncio.create_task(asyncio.to_thread(
-        siteicons.refresh_many, ctx.db, [x["url"] for x in configured_links["items"] if x.get("site_icon", True)])))
+        siteicons.refresh_many, ctx.db, [x["url"] for x in configured_links["items"] if x.get("site_icon", True)]
+        + ([partner_link()["url"]] if partner_link() else []))))
     ctx.server.reload_rooms()
     try:
         ctx.java.write_config()

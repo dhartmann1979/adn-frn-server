@@ -30,6 +30,15 @@ Partner die Anfrage ab.
 
 <p align="center"><img src="../images/admin-cluster-backup.png" alt="Master & Backup auf dem Backup" width="90%"></p>
 
+## 🔗 Partner im Link-Menü
+
+Master und Backup stehen sich **über Kreuz automatisch als erster Eintrag** im Link-Menü der Kopfzeile: auf dem Master
+**🔁 FRN Backup**, auf dem Backup **🔁 FRN Master** (Adresse = *Dashboard des Partners*, mit dessen Site-Icon, öffnet in einem
+neuen Tab). Der Eintrag wird nicht unter *Darstellung → 🔗 Links* gespeichert, ändert sich mit der Rolle von selbst und erscheint
+auch dann, wenn das Link-Menü sonst ausgeschaltet ist. Steht dieselbe Adresse schon in deinen Links, erscheint sie nur einmal.
+
+<p align="center"><img src="../images/links-partner.png" alt="FRN Backup als erster Eintrag im Link-Menü des Masters" width="55%"></p>
+
 ## 🔐 Verschlüsselte Übertragung
 
 Alles zwischen Master und Backup ist **mit dem Sync-Schlüssel verschlüsselt**, zusätzlich zu HTTPS. Der Schlüssel selbst
