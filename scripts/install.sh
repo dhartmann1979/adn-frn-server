@@ -151,8 +151,14 @@ step 4 "Dashboard frn_adn nach ${DIR}"
 mkdir -p "$DIR" "$DATA" "$FRN_HOME/acl" "$FRN_HOME/logs"
 if [ "$SRC_DIR" != "$DIR" ]; then
     rm -rf "$DIR/frnadn" "$DIR/static"
-    cp -a "$SRC_DIR/frnadn" "$SRC_DIR/static" "$SRC_DIR/scripts" "$SRC_DIR/systemd" "$SRC_DIR/requirements.txt" "$DIR/"
-    if [ -d "$SRC_DIR/.git" ]; then rm -rf "$DIR/.git"; cp -a "$SRC_DIR/.git" "$DIR/"; fi
+    if [ -d "$SRC_DIR/.git" ]; then
+        # das ganze Repository (Programm, Doku, LICENSE …) – sonst hält „Update jetzt“ die fehlenden Dateien für von Hand gelöscht
+        rm -rf "$DIR/.git"
+        tar -C "$SRC_DIR" --exclude=./venv --exclude=./data --exclude='__pycache__' -cf - . | tar -C "$DIR" -xf -
+        git -c "safe.directory=$DIR" -C "$DIR" checkout -q -- . 2>/dev/null || true
+    else
+        cp -a "$SRC_DIR/frnadn" "$SRC_DIR/static" "$SRC_DIR/scripts" "$SRC_DIR/systemd" "$SRC_DIR/requirements.txt" "$DIR/"
+    fi
 fi
 [ -x "$DIR/venv/bin/python" ] || python3 -m venv "$DIR/venv"
 "$DIR/venv/bin/pip" install -q --upgrade pip >/dev/null

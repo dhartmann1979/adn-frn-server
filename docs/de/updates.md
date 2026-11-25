@@ -92,6 +92,17 @@ sudo ./scripts/update.sh
 
 ## Wenn etwas nicht klappt
 
+**„Im Programmverzeichnis wurden Dateien von Hand geändert – nichts aktualisiert“** mit lauter `D …`-Zeilen (Doku, LICENSE,
+`.github`): Die Dateien **fehlen** nur (Installer bis 2.17.1 hat nicht alles kopiert). Ab 2.17.2 stellt das Update sie selbst wieder
+her. Einmalig, um von einer älteren Version aus zu aktualisieren:
+
+```bash
+cd /opt/adn-frn-server && sudo git ls-files -z --deleted | sudo xargs -0 -r git checkout --
+sudo ./scripts/n8-admin.sh update
+```
+
+Stehen dort `M …`-Zeilen, wurden Dateien wirklich geändert: mit `sudo git diff` ansehen, sichern, dann `sudo git checkout -- <datei>`.
+
 | Anzeige | Ursache | Lösung |
 |---|---|---|
 | **Update jetzt installieren** ist grau, Hinweis „Run once as root …“ | Update-Auslöser oder sudo noch nicht eingerichtet | `sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms` |

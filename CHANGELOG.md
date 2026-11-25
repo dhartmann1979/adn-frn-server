@@ -2,6 +2,23 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.17.2 – 2026-11-25
+
+### 🛠️ Update: fehlende Programmdateien werden wiederhergestellt statt das Update abzubrechen
+- „Update jetzt“ (`scripts/n8-admin.sh update`) brach ab mit „Im Programmverzeichnis wurden Dateien von Hand geändert – nichts
+  aktualisiert“, wenn im Programmordner nur Dateien **fehlten** (z. B. Doku, LICENSE, `.github` – etwa nach einer Installation, die
+  nicht alles kopiert hat). Jetzt stellt das Update **fehlende** Dateien aus git wieder her (`git checkout -- <Datei>`, im Protokoll:
+  „N fehlende Programmdatei(en) aus git wiederhergestellt“) und läuft weiter. Wirklich **geänderte** Dateien sind weiterhin ein
+  Grund zum Abbruch – nichts von Hand Geändertes geht verloren.
+- Gemeinsames N8 Admin-Kit (`scripts/n8-admin.sh`), gleich in allen N8-Systemen.
+
+### 📦 Installer kopiert jetzt das ganze Repository
+- **Ursache des Abbruchs:** `install.sh` kopierte nur `frnadn`, `static`, `scripts`, `systemd` und `requirements.txt` nach
+  `/opt/adn-frn-server`, aber das **komplette** `.git`. Für git fehlten damit Doku, LICENSE, `.github` usw. – „Update jetzt“ hielt das
+  für von Hand gelöschte Dateien und aktualisierte nichts (so auf frn-backup.auf-der-nachtschicht.de).
+- Jetzt kommt das ganze Repository (ohne `venv`, `data`, `__pycache__`) nach `/opt/adn-frn-server`, danach `git checkout -- .`.
+  Bestehende Installationen heilt das Update selbst (siehe oben); einmalig von Hand siehe docs/de/updates.md.
+
 ## 2.17.1 – 2026-11-25
 
 ### 🌐 Web-Port bei der Installation: HTTP 8080

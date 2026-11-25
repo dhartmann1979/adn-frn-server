@@ -682,6 +682,14 @@ do_update() {
   branch="$(git_ rev-parse --abbrev-ref HEAD)"; old="$(git_ rev-parse HEAD)"; old_ver="$(version_of)"
   info "Hole Updates ($branch) …"
   git_ fetch -q --no-tags origin "refs/heads/$branch" || { result false "$old_ver" "?" "git fetch fehlgeschlagen"; fail "git fetch fehlgeschlagen"; }
+  # Nur fehlende Dateien (z. B. Doku, LICENSE, .github – ältere Installer kopierten nicht alles, aber das ganze .git):
+  # aus dem aktuellen Stand wiederherstellen. Das verliert nichts; geänderte Dateien bleiben ein Grund zum Abbruch.
+  local -a gone=()
+  mapfile -d '' -t gone < <(git_ ls-files -z --deleted 2>/dev/null)
+  if (( ${#gone[@]} )); then
+    info "${#gone[@]} fehlende Programmdatei(en) aus git wiederhergestellt (z. B. ${gone[0]})"
+    git_ checkout -q -- "${gone[@]}" || warn "Wiederherstellen fehlgeschlagen"
+  fi
   dirty="$(git_ status --porcelain --untracked-files=no)"
   if [[ -n "$dirty" ]]; then
     result false "$old_ver" "?" "von Hand geänderte Dateien – Update abgebrochen"
