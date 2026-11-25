@@ -2,6 +2,23 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.9.0 – 2026-11-25
+
+**Installer: komplett ohne Fragen neu einrichten – mit `FRNADN_SETUP_FILE`.** Damit kann der Web-Installer des HobbyRadioPortals
+(ab 0.11.0, Schritt *FRN → ✨ FRN-Server neu installieren*) einen FRN-Server samt Superadmin, Räumen und SystemManager-Konto aufsetzen,
+ohne dass jemand in der Konsole antwortet. Ausführlich: [docs/de/installation.md](docs/de/installation.md#ohne-fragen).
+
+### ⌨️ `FRNADN_SETUP_FILE=/pfad/setup.json`
+- Ersetzt die Fragen in Schritt 5 (Superadmin) und 6 (FRN-Server). Inhalt ist genau das JSON, das sonst aus den Antworten entsteht und
+  `frnadn apply-setup` liest: `settings` (z. B. `frn.standalone`, `sysman.email`, `sysman.password`, `frn.address`, `frn.port`,
+  `frn.owner_callsign`, `dashboard.title`, `dashboard.public`), `test_room` (wird `net00`, Parrot), `rooms` und `superadmin`.
+- Die Datei wird mit Rechten 600 an den Dienstbenutzer übergeben und danach gelöscht; das Passwort landet nur als scrypt-Hash in SQLite.
+- Kombinierbar mit `FRNADN_YES=1`, `FRNADN_PORT=8090` und `FRNADN_BEHIND_PROXY=1` (hinter dem Portal).
+
+### 🧪 Tests
+- `tests/test_setup_file.py`: `apply-setup` aus einer Datei legt Räume (Test als net00), Einstellungen und den Superadmin an und schreibt
+  `server.properties`; `install.sh` kennt den neuen Zweig und ist syntaktisch in Ordnung.
+
 ## 2.8.1 – 2026-11-25
 
 **Installer: `FRNADN_BEHIND_PROXY=1`** – schaltet direkt nach dem Einspielen eines Backups (oder einer Einrichtung) das eigene HTTPS aus,

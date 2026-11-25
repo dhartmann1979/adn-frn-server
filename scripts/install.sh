@@ -26,6 +26,8 @@
 #    FRNADN_RESTORE=/pfad/x.frnbak          statt Einrichtung ein Backup einspielen (ohne Fragen)
 #    FRNADN_RESTORE_PASSWORD_FILE=/pfad     Passwort des Backups (erste Zeile) – z. B. für den HobbyRadioPortal-Installer
 #    FRNADN_BEHIND_PROXY=1                  eigenes HTTPS aus (das Portal/nginx übernimmt Port 80/443 und die Domain)
+#    FRNADN_SETUP_FILE=/pfad/setup.json     ohne Fragen neu einrichten – {"settings": {…}, "test_room": "Test", "rooms": […],
+#                                           "superadmin": {"username", "password"}} wie "frnadn apply-setup" (mit FRNADN_YES=1)
 # =============================================================================
 set -euo pipefail
 
@@ -206,6 +208,19 @@ fi
 if [ "$RESTORED" = 1 ]; then
 step 5 "Superadmin für das Admin-Portal"; ok "aus dem Backup übernommen – Anmeldung mit den Konten des alten Servers"
 step 6 "FRN-Server einrichten"; run_app write-config >/dev/null && ok "server.properties und Zugriffslisten aus dem Backup geschrieben"
+CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
+FPORT="$(cdef frn.port 10024)"
+elif [ -n "${FRNADN_SETUP_FILE:-}" ]; then
+# Ohne Fragen neu einrichten (z. B. Web-Installer des HobbyRadioPortals): dasselbe JSON, das sonst aus den Fragen entsteht
+[ -f "$FRNADN_SETUP_FILE" ] || fail "FRNADN_SETUP_FILE nicht gefunden: $FRNADN_SETUP_FILE"
+step 5 "Superadmin für das Admin-Portal"
+step 6 "FRN-Server einrichten"
+umask 077
+install -m 600 -o "$SVC_USER" -g "$SVC_USER" "$FRNADN_SETUP_FILE" /tmp/frnadn-setup.json
+umask 022
+run_app apply-setup /tmp/frnadn-setup.json || { rm -f /tmp/frnadn-setup.json; fail "Einrichtung fehlgeschlagen (FRNADN_SETUP_FILE)"; }
+rm -f /tmp/frnadn-setup.json
+ok "Einstellungen, Räume und Superadmin aus $(basename "$FRNADN_SETUP_FILE") übernommen"
 CUR="$(run_app show-settings 2>/dev/null || echo '{}')"
 FPORT="$(cdef frn.port 10024)"
 else
