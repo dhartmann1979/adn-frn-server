@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.1.0 – shared by the N8schicht web interfaces
+ * N8 Kit 1.3.0 – shared by the N8schicht web interfaces
  * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -12,7 +12,8 @@
  *   N8Kit.update.panel(el, state, handlers)    Admin → Updates
  *   N8Kit.update.run(opts)                     install with progress, health check and reload
  *   N8Kit.nav.tree(el, groups, opts)           admin menu as a tree on the left (same structure in every N8 system)
- *   N8Kit.sys.view(el, name, opts)             the same System views everywhere: update, services, perms, keepalive
+ *   N8Kit.sys.view(el, name, opts)             the same System views everywhere: update, services, perms, keepalive, crashes
+ *   N8Kit.sys.crashPopup(opts)                 after the admin login: window with new crashes/hangs (until marked as read)
  *
  * Translation works on the finished page: text nodes and the attributes title, placeholder, aria-label
  * and alt are looked up in the dictionary of the page language (exact text, then without leading
@@ -583,11 +584,96 @@
             };
             return load();
         }
+        if (name === 'crashes') return crashView(el, o, paint, msg);
+    }
+
+    // ============================================================ crashes (1.3.0) – identical in every N8 system
+    // /api/admin/crashes → { items: [{id, time, unit, service, kind, reason, restarted, new}], unacked, week: {service: n}, watch: {units} }
+    // /api/admin/crashes/<id> → { log }   ·   POST /api/admin/crashes/ack { all: true } | { ids: [...] }
+    const KIND = { crash: ['💥', 'Absturz', 'bad'], watchdog: ['⏱️', 'Watchdog', 'bad'], oom: ['🧠', 'Speicher voll', 'bad'], exit: ['⏹️', 'Beendet', 'warn'],
+                   timeout: ['⌛', 'Zeitüberschreitung', 'bad'], stall: ['⏳', 'Hänger', 'warn'], task: ['🧩', 'Teil abgestürzt', 'warn'],
+                   thread: ['🧵', 'Thread abgestürzt', 'warn'], helper: ['⚙️', 'Hilfsprozess abgestürzt', 'warn'], keepalive: ['💓', 'Keep-Alive-Neustart', 'warn'],
+                   restart: ['↻', 'Neustart', 'warn'], intern: ['⚠️', 'Fehler', 'warn'] };
+    const kindOf = k => KIND[k] || ['⚠️', k || '?', 'warn'];
+    const fmtFull = ts => ts ? new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '–';
+    function crashRow(e) {
+        const k = kindOf(e.kind);
+        return `<details class="n8-crash ${e.new ? 'new' : ''}" data-id="${esc(e.id)}"><summary>
+            <span class="n8-crash-ic">${k[0]}</span><span class="n8-crash-t">${esc(fmtFull(e.time))}</span>
+            <span class="n8-badge ${k[2]}">${esc(t(k[1]))}</span><b class="n8-crash-s">${esc(e.service || e.unit || '?')}</b>
+            <span class="n8-crash-r">${esc(e.reason || '')}</span>
+            <span class="n8-crash-m">${e.restarted ? `<span class="n8-badge ok">↻ ${esc(t('neu gestartet'))}</span>` : ''}${e.new ? `<span class="n8-badge bad">${esc(t('neu'))}</span>` : ''}<code>${esc(e.unit || '')}</code></span>
+            </summary><pre class="n8-log">…</pre></details>`;
+    }
+    function bindRows(el, req) {
+        el.querySelectorAll('details.n8-crash').forEach(d => d.addEventListener('toggle', async () => {
+            if (!d.open || d.dataset.loaded) return;
+            d.dataset.loaded = '1';
+            const pre = d.querySelector('pre');
+            try { const r = await req('GET', '/api/admin/crashes/' + encodeURIComponent(d.dataset.id)); pre.textContent = r.log || t('Kein Protokoll vorhanden.'); }
+            catch (x) { pre.textContent = x.message; }
+        }));
+    }
+    async function crashView(el, o, paint, msg) {
+        const req = o.req, cons = o.console || 'sudo scripts/n8-admin.sh';
+        let filter = '';
+        const load = async () => {
+            let d; try { d = await req('GET', '/api/admin/crashes'); } catch (e) { paint(card('💥 Abstürze', msg(e))); return; }
+            const items = (d.items || []).filter(e => !filter || (e.service || e.unit) === filter);
+            const week = Object.entries(d.week || {}).sort((a, b) => b[1] - a[1]);
+            const units = (d.watch && d.watch.units) || [];
+            const badge = d.unacked ? `<span class="n8-badge bad">${d.unacked} ${esc(t('neu'))}</span>` : `<span class="n8-badge ok">${esc(t('alles gelesen'))}</span>`;
+            paint(`<div class="n8-crash-sys">${card('💥 Abstürze', `<p class="n8-help">${esc(t('Jeder Absturz, Hänger und Notfall-Neustart aller Dienste wird hier festgehalten – mit dem Teil der Anwendung, in dem er passiert ist, und dem vollständigen Protokoll (Journal, Python-Stack). Der Dienst wird dabei automatisch neu gestartet. Neue Befunde erscheinen nach der Anmeldung als Hinweis, bis sie als gelesen markiert sind.'))}</p>
+                ${week.length ? `<div class="n8-crash-week"><span class="n8-dim">${esc(t('Letzte 7 Tage'))}:</span> ${week.map(([s, n]) => `<button type="button" class="n8-chip ${filter === s ? 'on' : ''}" data-f="${esc(s)}">${esc(s)} <b>${n}</b></button>`).join('')}${filter ? `<button type="button" class="n8-chip" data-f="">✕ ${esc(t('alle'))}</button>` : ''}</div>` : ''}
+                <div class="n8-crash-list">${items.length ? items.map(crashRow).join('') : `<div class="n8-help">✅ ${esc(t('Keine Abstürze festgehalten.'))}</div>`}</div>
+                <div class="n8-actions">${d.unacked ? `<button type="button" class="n8-btn primary" data-a="ack">✔ ${esc(t('Alle als gelesen markieren'))}</button>` : ''}<button type="button" class="n8-btn" data-a="reload">↻ ${esc(t('Neu laden'))}</button></div>`, badge)}
+                ${card('🛡️ Absturz-Wächter', units.length ? `<p class="n8-help">${esc(t('Diese Dienste werden überwacht. Nach jedem unerwarteten Ende hält systemd den Befund fest und startet den Dienst neu; bleibt er ausgefallen, startet ihn der Keep-Alive neu.'))}</p>
+                    <div class="n8-perm">${units.map(u => `<div class="n8-perm-r">✅<b>${esc(u.label || u.unit)}</b><span><code>${esc(u.unit)}</code> · ${esc(t('Neustart'))}: ${esc(u.restart || '–')}</span></div>`).join('')}</div>`
+                    : `<p class="n8-help">⚠️ ${esc(t('Der Absturz-Wächter ist noch nicht eingerichtet. Er wird beim nächsten Update eingerichtet – oder einmal auf der Konsole:'))}</p><pre class="n8-log">${esc(cons)} setup-crashwatch</pre>`)}</div>`);
+            bindRows(el, req);
+            el.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; load(); });
+            const ack = el.querySelector('[data-a=ack]');
+            if (ack) ack.onclick = async () => { try { await req('POST', '/api/admin/crashes/ack', { all: true }); load(); if (o.onAck) o.onAck(); } catch (x) { alert(x.message); } };
+            el.querySelector('[data-a=reload]').onclick = load;
+        };
+        return load();
+    }
+    // after the admin login (and on every admin page load): show new crashes once per browser tab until they are marked as read
+    // opts = { req, open: () => go to System → Abstürze, force }
+    async function crashPopup(o) {
+        o = o || {};
+        let d; try { d = await o.req('GET', '/api/admin/crashes'); } catch (e) { return null; }
+        if (!d || !d.unacked) return d;
+        const fresh = (d.items || []).filter(e => e.new);
+        const key = 'n8_crash_seen';
+        let seen = ''; try { seen = sessionStorage.getItem(key) || ''; } catch (e) { }
+        if (!o.force && seen === fresh[0].id) return d;
+        try { sessionStorage.setItem(key, fresh[0].id); } catch (e) { }
+        if (document.querySelector('.n8-crash-ov')) return d;
+        const ov = document.createElement('div');
+        ov.className = 'n8-upd-ov n8-crash-ov';
+        ov.innerHTML = `<div class="n8-upd-box n8-crash-box" role="dialog" aria-modal="true">
+            <h3>💥 ${esc(fresh.length === 1 ? t('1 neuer Absturz') : t('{n} neue Abstürze').replace('{n}', fresh.length))}</h3>
+            <p class="n8-help">${esc(t('Seit dem letzten Lesen ist ein Dienst abgestürzt oder hing. Er wurde automatisch neu gestartet. Der Befund nennt den Teil der Anwendung und enthält das vollständige Protokoll.'))}</p>
+            <div class="n8-crash-list">${fresh.slice(0, 6).map(crashRow).join('')}</div>
+            ${fresh.length > 6 ? `<div class="n8-help">+ ${fresh.length - 6} ${esc(t('weitere'))}</div>` : ''}
+            <div class="n8-actions">${o.open ? `<button type="button" class="n8-btn" data-a="open">🔎 ${esc(t('Alle Abstürze ansehen'))}</button>` : ''}
+              <button type="button" class="n8-btn" data-a="later">${esc(t('Später'))}</button>
+              <button type="button" class="n8-btn primary" data-a="ack">✔ ${esc(t('Gelesen'))}</button></div></div>`;
+        document.body.appendChild(ov);
+        retranslateEl(ov);
+        bindRows(ov, o.req);
+        const close = () => ov.remove();
+        ov.addEventListener('click', e => { if (e.target === ov) close(); });
+        ov.querySelector('[data-a=later]').onclick = close;
+        const op = ov.querySelector('[data-a=open]'); if (op) op.onclick = () => { close(); o.open(); };
+        ov.querySelector('[data-a=ack]').onclick = async () => { try { await o.req('POST', '/api/admin/crashes/ack', { ids: fresh.map(e => e.id) }); } catch (x) { } close(); if (o.onAck) o.onAck(); };
+        return d;
     }
 
     // the menu structure every N8 system uses (projects fill in their items)
     const GROUPS = { betrieb: '📡 Betrieb', zugang: '👥 Benutzer & Zugang', darstellung: '🎨 Darstellung', netz: '🌐 Netz & Domains', system: '🖥️ System' };
-    const SYS_ITEMS = [['sys-update', '⬆️ Update'], ['sys-services', '🧩 Dienste'], ['sys-perms', '🔐 Berechtigungen & sudo'], ['sys-keepalive', '💓 Keep-Alive']];
+    const SYS_ITEMS = [['sys-update', '⬆️ Update'], ['sys-services', '🧩 Dienste'], ['sys-perms', '🔐 Berechtigungen & sudo'], ['sys-keepalive', '💓 Keep-Alive'], ['sys-crashes', '💥 Abstürze']];
 
     // ------------------------------------------------------------ the kit's own words
     add({
@@ -631,6 +717,21 @@
             'nicht eingerichtet': 'not set up', 'pausiert': 'paused', 'läuft nicht': 'not running', 'aktiv': 'active', 'Internet': 'Internet', 'erreichbar': 'reachable',
             'weg seit': 'down since', 'Letzte Prüfung': 'Last check', 'gerade eben': 'just now', 'Heartbeat': 'Heartbeat', 'gesund': 'healthy', 'kein Neustart': 'no restart',
             'von Hand gestoppt – Keep-Alive wartet': 'stopped by hand – keep-alive waits', 'neu gestartet': 'restarted', 'Einmal auf der Konsole einrichten:': 'Set up once on the console:',
+            // 1.3.0: crashes
+            '💥 Abstürze': '💥 Crashes', 'Absturz': 'Crash', 'Watchdog': 'Watchdog', 'Speicher voll': 'Out of memory', 'Beendet': 'Exited',
+            'Zeitüberschreitung': 'Timeout', 'Hänger': 'Hang', 'Teil abgestürzt': 'Part crashed', 'Thread abgestürzt': 'Thread crashed',
+            'Hilfsprozess abgestürzt': 'Helper process crashed', 'Keep-Alive-Neustart': 'Keep-alive restart', 'Neustart': 'Restart', 'Fehler': 'Error',
+            'neu': 'new', 'alles gelesen': 'all read', 'alle': 'all', 'Letzte 7 Tage': 'Last 7 days', 'Keine Abstürze festgehalten.': 'No crashes recorded.',
+            'Alle als gelesen markieren': 'Mark all as read', 'Kein Protokoll vorhanden.': 'No log available.', '🛡️ Absturz-Wächter': '🛡️ Crash watch',
+            'Jeder Absturz, Hänger und Notfall-Neustart aller Dienste wird hier festgehalten – mit dem Teil der Anwendung, in dem er passiert ist, und dem vollständigen Protokoll (Journal, Python-Stack). Der Dienst wird dabei automatisch neu gestartet. Neue Befunde erscheinen nach der Anmeldung als Hinweis, bis sie als gelesen markiert sind.':
+                'Every crash, hang and emergency restart of every service is recorded here – with the part of the application where it happened and the full log (journal, Python stack). The service is restarted automatically. New findings show up as a notice after login until they are marked as read.',
+            'Diese Dienste werden überwacht. Nach jedem unerwarteten Ende hält systemd den Befund fest und startet den Dienst neu; bleibt er ausgefallen, startet ihn der Keep-Alive neu.':
+                'These services are watched. After every unexpected end systemd records the finding and restarts the service; if it stays down, the keep-alive restarts it.',
+            'Der Absturz-Wächter ist noch nicht eingerichtet. Er wird beim nächsten Update eingerichtet – oder einmal auf der Konsole:':
+                'The crash watch is not set up yet. The next update sets it up – or once on the console:',
+            '1 neuer Absturz': '1 new crash', '{n} neue Abstürze': '{n} new crashes', 'weitere': 'more', 'Alle Abstürze ansehen': 'View all crashes', 'Gelesen': 'Mark as read',
+            'Seit dem letzten Lesen ist ein Dienst abgestürzt oder hing. Er wurde automatisch neu gestartet. Der Befund nennt den Teil der Anwendung und enthält das vollständige Protokoll.':
+                'Since you last looked, a service crashed or hung. It was restarted automatically. The finding names the part of the application and contains the full log.',
             'Keep-Alive an': 'Keep-alive on', 'Netzdienste nach einem Internet-Ausfall neu starten': 'Restart network services after an internet outage',
             'Heartbeat-Adresse': 'Heartbeat address', 'Heartbeat bei Fehlern (optional)': 'Heartbeat on errors (optional)', '▶ Fortsetzen': '▶ Resume',
             '⏸ 1 h pausieren (Wartung)': '⏸ Pause 1 h (maintenance)', 'Speichern': 'Save', 'Keep-Alive-Protokoll': 'Keep-alive log',
@@ -673,12 +774,12 @@
     });
 
     window.N8Kit = {
-        version: '1.1.0',
+        version: '1.3.0',
         lang: () => lang, setLang, t, langSwitch, esc, fmtTime,
         i18n: { add, retranslate: () => { cache.clear(); retranslate(); }, t },
         update: { banner, panel, run },
         nav: { tree, GROUPS, SYS_ITEMS },
-        sys: { view },
+        sys: { view, crashPopup },
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();

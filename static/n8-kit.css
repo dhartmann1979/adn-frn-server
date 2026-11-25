@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.1 – shared by the N8schicht web interfaces (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
+ * N8 Kit 1.3 – shared by the N8schicht web interfaces (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * Same file in every repository. Uses the N8 Theme 2 variables (--accent, --accent-rgb, --glass-*, --text, --text-dim).
  */
 
@@ -198,3 +198,32 @@ body .site-footer { max-width: none !important; }
     :is(.n8-topbar, .topbar) > :is(.n8-strip, .status-strip, .strip) { height: 22px !important; line-height: 22px !important; font-size: 11.5px !important; margin: -1px 24px 0 !important; padding: 0 14px !important; border-radius: 0 0 14px 14px !important; }
 }
 html[data-theme-mode=light] :is(.n8-topbar, .topbar) > header > nav { background: rgba(0, 0, 0, .04) !important; }
+
+/* ---- 1.3: Abstürze (System → 💥 Abstürze, Hinweisfenster nach der Anmeldung) ---- */
+.n8-crash-list { display: grid; gap: 6px; margin: 8px 0; }
+.n8-crash { border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .06); }
+html[data-theme-mode=light] .n8-crash { background: rgba(0, 0, 0, .03); border-color: rgba(0, 0, 0, .06); }
+.n8-crash.new { border-color: rgba(255, 69, 58, .45); box-shadow: inset 3px 0 0 #ff453a; }
+.n8-crash > summary { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr) auto; gap: 3px 10px; align-items: center; padding: 8px 12px; cursor: pointer; list-style: none; }
+.n8-crash > summary::-webkit-details-marker { display: none; }
+.n8-crash-ic { font-size: 16px; }
+.n8-crash-t { font-variant-numeric: tabular-nums; color: var(--text-dim, #aab); font-size: 12.5px; white-space: nowrap; }
+.n8-crash-s { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.n8-crash .n8-badge { white-space: nowrap; }
+.n8-crash-r { grid-column: 2 / -1; grid-row: 2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--text-dim, #c5cad6); }
+.n8-crash[open] .n8-crash-r { white-space: normal; }
+.n8-crash-m { grid-column: 5; grid-row: 1; display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+.n8-crash-sys { display: grid; gap: 16px; }
+.n8-crash-m code { font-size: 11px; color: var(--text-dim, #aab); }
+.n8-crash > .n8-log { margin: 0 10px 10px; max-height: 420px; white-space: pre-wrap; word-break: break-word; }
+.n8-crash-week { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 4px; }
+.n8-chip { border: 1px solid rgba(var(--accent-rgb, 10, 132, 255), .35); background: rgba(var(--accent-rgb, 10, 132, 255), .10); color: inherit;
+  border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.n8-chip.on { background: rgba(var(--accent-rgb, 10, 132, 255), .35); }
+.n8-crash-box { width: min(860px, 100%) !important; max-height: calc(100vh - 40px); overflow: auto; }
+@media (max-width: 720px) {
+  .n8-crash > summary { grid-template-columns: auto auto minmax(0, 1fr); }
+  .n8-crash-t, .n8-crash-m code { display: none; }
+  .n8-crash-m { grid-column: 1 / -1; grid-row: 3; justify-content: flex-start; }
+  .n8-crash-r { grid-column: 1 / -1; }
+}

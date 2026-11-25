@@ -241,8 +241,18 @@ function renderHeader() {
     $('tabChatBtn').classList.toggle('hidden', !i.chat);
     $('setupBanner').classList.toggle('hidden', !i.setup_needed);
 }
+// Abstürze (N8 Kit): Hinweisfenster nach der Anmeldung (und beim Laden als Admin), bis die Befunde als gelesen markiert sind
+async function checkCrashes(force) {
+    if (!isAdmin()) return;
+    const d = await N8Kit.sys.crashPopup({ req: api, force, open: () => showTab('admin', 'sys-crashes'),
+        onAck: () => { S.crashNew = 0; if (S.tab === 'admin') showAdmin(S.admin.tab); } });
+    const n = d ? d.unacked || 0 : 0;
+    if (n !== (S.crashNew || 0)) { S.crashNew = n; if (S.tab === 'admin') showAdmin(S.admin.tab); }
+}
 function renderUser() {
     const el = $('userArea');
+    if (isAdmin() && !S.crashChecked) { S.crashChecked = true; setTimeout(() => checkCrashes(), 900); }
+    if (!S.me) S.crashChecked = false;
     if (!S.me) { el.innerHTML = '<button class="btn primary" onclick="openLogin()" title="Login">🔐<span class="u-name">&nbsp;Login</span></button>'; return; }
     // logged in: name (click = my account) and log out – no drop-down; ⚙️ Admin is a menu item
     const name = esc(S.me.display_name || S.me.username);
@@ -756,7 +766,7 @@ function adminGroups() {
             { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
         { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Users' }, { id: 'audit', label: '🔐 Sessions & log' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
-        { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label })),
+        { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label, ...(id === 'sys-crashes' && S.crashNew ? { badge: String(S.crashNew), badgeClass: 'bad' } : {}) })),
             { id: 'backup', label: '💾 Backup', hidden: !(S.me && S.me.role === 'superadmin') }] },
     ];
 }
@@ -788,7 +798,7 @@ function showAdmin(a) {
 // Admin → System: update, services, permissions & sudo, keep-alive – the N8 Kit views, identical in every N8 system
 function loadSysView(name) {
     N8Kit.sys.view($('admin-sys'), name, {
-        req: api, console: 'sudo /opt/adn-frn-server/scripts/n8-admin.sh',
+        req: api, console: 'sudo /opt/adn-frn-server/scripts/n8-admin.sh', onAck: () => { S.crashNew = 0; if (S.tab === 'admin') showAdmin(S.admin.tab); },
         update: window.adnUpdate ? { load: window.adnUpdate.load, onInstall: () => window.upgradeNow('github') } : undefined,
         extra: box => { if (window.adnUpdate) window.adnUpdate.java(box); },
     });

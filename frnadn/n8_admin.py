@@ -11,6 +11,9 @@ was es darf, steht in <Datenordner>/n8-admin.json (schreibt n8-admin.sh sudo-set
     update_state()     läuft gerade ein Update? Protokoll und Ergebnis des letzten
     keepalive()        Keep-Alive: Zustand der Prüfungen, Internet, Heartbeat, Protokoll und Einstellungen
     keepalive_set(d)   Einstellungen (an/aus, Neustart nach Internet-Ausfall, Heartbeat-Adressen, Pause) – n8-admin.sh liest sie nur
+    crashes()          Abstürze, Hänger und Neustarts aller Dienste (n8-admin.sh crash-hook, Keep-Alive, n8_crash.CrashWatch)
+    crash_log(id)      vollständiges Protokoll eines Befunds (Journal, Python-Stack, Ursache)
+    crash_ack(ids|all) als gelesen markieren – danach erscheint das Hinweisfenster nach der Anmeldung nicht mehr
 
 Alles ist asynchron (asyncio) und hängt an keinem Web-Framework.
 """
@@ -235,6 +238,92 @@ class N8Admin:
         age = time.time() - float(st.get("time") or 0)
         return {**st, "stale": bool(st) and age > 180, "age": int(age) if st else None, "conf": self.keepalive_conf(),
                 "log": "\n".join(log.splitlines()[-80:]), "ready": bool(st) or self.demo}
+
+    # ------------------------------------------------------------ Abstürze (2.0)
+    # <Datenordner>/crashes.jsonl schreiben: n8-admin.sh crash-hook (systemd ExecStopPost, als root), der Keep-Alive und die
+    # Anwendung selbst (n8_crash.CrashWatch). Einzelheiten: crash/<id>.log. Gelesen-Markierung: crash/ack.json (nur hier).
+    def _crash_entries(self) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        try:
+            raw = (self.state_dir / "crashes.jsonl").read_text("utf-8", "replace").splitlines()[-1000:]
+        except OSError:
+            raw = []
+        for line in raw:
+            try:
+                e = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(e, dict) and isinstance(e.get("id"), str) and _CRASH_ID.fullmatch(e["id"]):
+                out.append(e)
+        if self.demo and not out:
+            now = time.time()
+            unit = next((u["unit"] for u in self.config().get("units", []) if u["unit"].endswith(".service")), "demo.service")
+            out = [{"id": "20261125-031240-d001", "time": now - 26 * 3600, "unit": unit, "service": "Datenbank ← Live-Daten", "kind": "watchdog",
+                    "reason": "systemd-Watchdog: keine Rückmeldung mehr – der Prozess hing und wurde beendet (SIGABRT) – Event-Loop stand 61 s",
+                    "source": "systemd", "restarted": True},
+                   {"id": "20261125-093012-d002", "time": now - 5 * 3600, "unit": unit, "service": unit.split(".")[0], "kind": "keepalive",
+                    "reason": "Keep-Alive: Weboberfläche – keine Antwort (seit 3 min) – neu gestartet", "source": "keepalive", "restarted": True},
+                   {"id": "20261125-151512-d003", "time": now - 600, "unit": unit, "service": "Live-Daten", "kind": "task",
+                    "reason": "ConnectionResetError: [Errno 104] Connection reset by peer (Task live)", "source": "app", "restarted": True}]
+        return out
+
+    def _crash_ack(self) -> Dict[str, Any]:
+        try:
+            a = json.loads((self.state_dir / "crash" / "ack.json").read_text("utf-8"))
+            return {"until": float(a.get("until") or 0), "ids": [str(i) for i in a.get("ids", [])][-500:]}
+        except (OSError, ValueError, AttributeError, TypeError):
+            return {"until": 0.0, "ids": []}
+
+    def crashes(self, limit: int = 200) -> Dict[str, Any]:
+        """Befunde (neueste zuerst), Zahl der ungelesenen und welche Dienste der Absturz-Wächter überwacht."""
+        ack = self._crash_ack()
+        items = []
+        for e in reversed(self._crash_entries()):
+            e["new"] = float(e.get("time") or 0) > ack["until"] and e["id"] not in ack["ids"]
+            items.append(e)
+        try:
+            watch = json.loads((self.state_dir / "crashwatch.json").read_text("utf-8"))
+        except (OSError, ValueError):
+            watch = {}
+        if self.demo and not watch:
+            watch = {"units": [{"unit": u["unit"], "label": u.get("label", u["unit"]), "restart": "always"}
+                               for u in self.config().get("units", []) if u["unit"].endswith(".service")]}
+        week = time.time() - 7 * 86400
+        by_svc: Dict[str, int] = {}
+        for e in items:
+            if float(e.get("time") or 0) >= week:
+                by_svc[e.get("service") or e.get("unit") or "?"] = by_svc.get(e.get("service") or e.get("unit") or "?", 0) + 1
+        return {"items": items[:limit], "total": len(items), "unacked": sum(1 for e in items if e["new"]),
+                "week": by_svc, "watch": watch, "ready": bool(watch) or self.demo}
+
+    def crash_log(self, cid: str) -> Optional[str]:
+        if not _CRASH_ID.fullmatch(cid or ""):
+            return None
+        if self.demo:
+            return "Demo – hier steht das vollständige Protokoll des Befunds (Journal, Python-Stack, Ursache)."
+        try:
+            return _plain((self.state_dir / "crash" / f"{cid}.log").read_text("utf-8", "replace")[-200000:])
+        except OSError:
+            return None
+
+    def crash_ack(self, ids: Optional[List[str]] = None, all_: bool = False) -> Dict[str, Any]:
+        """Als gelesen markieren: alle (bis jetzt) oder einzelne Befunde."""
+        a = self._crash_ack()
+        if all_:
+            newest = max((float(e.get("time") or 0) for e in self._crash_entries()), default=0.0)
+            a = {"until": max(time.time(), newest), "ids": []}
+        else:
+            a["ids"] = (a["ids"] + [i for i in (ids or []) if _CRASH_ID.fullmatch(str(i))])[-500:]
+        d = self.state_dir / "crash"
+        d.mkdir(parents=True, exist_ok=True)
+        tmp = d / "ack.json.tmp"
+        tmp.write_text(json.dumps(a), "utf-8")
+        os.replace(tmp, d / "ack.json")
+        return self.crashes()
+
+
+import re as _re  # noqa: E402
+_CRASH_ID = _re.compile(r"[0-9]{8}-[0-9]{6}-[0-9a-z]{2,12}")
 
 
 def _plain(s: str) -> str:

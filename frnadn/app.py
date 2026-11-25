@@ -1239,6 +1239,32 @@ async def perms_fix(request: Request):
     return {"ok": ok, "message": out, "check": await ctx.n8.check_perms()}
 
 
+# Abstürze (N8 Kit 1.3): crash-hook von scripts/n8-admin.sh (auch für den Java-FRN-Server), Keep-Alive und n8_crash.CrashWatch
+# schreiben <Datenordner>/crashes.jsonl – gleiche Adressen in allen N8-Systemen
+@app.get("/api/admin/crashes")
+async def crashes_get(request: Request):
+    need_admin(request)
+    return await asyncio.to_thread(ctx.n8.crashes)
+
+
+@app.get("/api/admin/crashes/{cid}")
+async def crash_get(cid: str, request: Request):
+    need_admin(request)
+    txt = await asyncio.to_thread(ctx.n8.crash_log, cid)
+    if txt is None:
+        raise HTTPError(404, "Befund nicht gefunden")
+    return {"id": cid, "log": txt}
+
+
+@app.post("/api/admin/crashes/ack")
+async def crashes_ack(request: Request):
+    need_admin(request)
+    b = await body(request)
+    b = b if isinstance(b, dict) else {}
+    ids = b.get("ids") if isinstance(b.get("ids"), list) else []
+    return await asyncio.to_thread(ctx.n8.crash_ack, [str(i) for i in ids][:500], bool(b.get("all")))
+
+
 @app.get("/api/admin/keepalive")
 async def keepalive_get(request: Request):
     need_admin(request)
@@ -1464,8 +1490,23 @@ async def _shutdown() -> None:
             t.cancel()
 
 
+CRASH_SERVICES = [   # welcher Teil des Dashboards steckt in einem Stack (Absturz-Befunde, auch für den crash-hook)
+    (r"/frnadn/frn/", "FRN-Protokoll"), (r"/frnadn/live\.py$", "Live-Daten"), (r"/frnadn/(sysman|clientsw)\.py$", "System Manager"),
+    (r"/frnadn/frn_errorlog\.py$", "FRN-Fehlerprotokoll"), (r"/frnadn/stats\.py$", "Statistik"), (r"/frnadn/db\.py$", "Datenbank"),
+    (r"/frnadn/(backup|n8mig)\.py$", "Backup"), (r"/frnadn/updater\.py$", "Update-Prüfung"), (r"/frnadn/tls\.py$", "HTTPS"),
+    (r"/frnadn/auth\.py$", "Anmeldung"), (r"/frnadn/(settings|system)\.py$", "Einstellungen & System"), (r"/frnadn/siteicons\.py$", "Site-Icons"),
+    (r"/frnadn/app\.py$", "Dashboard"), (r"/(uvicorn|starlette|fastapi|websockets)/", "Webinterface"),
+]
+
+
 @contextlib.asynccontextmanager
 async def lifespan(_app):
+    if not DEMO:       # Absturz-Melder (N8 Kit): Hänger der Event-Loop, abgestürzte Tasks, harter Absturz → Admin → System → 💥 Abstürze
+        try:
+            from .n8_crash import CrashWatch
+            CrashWatch(str(DATA), app="ADN-FRN-Server", unit="frnadn.service", services=CRASH_SERVICES).install()
+        except Exception as e:  # noqa: BLE001
+            log.warning("Absturz-Melder nicht aktiv: %s", e)
     await _startup()
     yield
     await _shutdown()

@@ -50,6 +50,24 @@ sudo /opt/adn-frn-server/scripts/n8-admin.sh keepalive    # eine Runde von Hand
 tail -f /var/lib/frnadn/keepalive.log
 ```
 
+
+## 💥 Abstürze erkennen und aufklären
+
+<img src="../images/admin-abstuerze.png" alt="System → Abstürze" width="49%"> <img src="../images/absturz-hinweis.png" alt="Hinweis nach der Anmeldung" width="49%">
+
+Seit **ADN-FRN-Server 2.15.0** wird jedes unerwartete Ende festgehalten – in allen N8-Systemen gleich (N8 Kit 1.3). Überwacht werden
+Dashboard (`frnadn.service`) und der Java-FRN-Server (`frn-server.service`).
+
+| Ebene | Was festgehalten wird |
+|---|---|
+| **Absturz-Wächter** (systemd, als root) | Drop-in `/etc/systemd/system/<dienst>.d/n8-crashwatch-<id>.conf` mit `ExecStopPost=+… crash-hook`. Nach jedem nicht geplanten Ende: Art (Signal, Fehlercode, Watchdog, OOM, Zeitüberschreitung), letzte 200 Journal-Zeilen, Coredump-Kurzinfo, Python-Stack. systemd startet den Dienst sofort neu |
+| **Python-Dienste** | faulthandler (`crash/fault-<dienst>.log`), Hänger-Wächter der Event-Loop (> 8 s, mit Stack und Teil), abgestürzte Tasks und Threads. Teile: FRN-Protokoll · Live-Daten · System Manager · FRN-Fehlerprotokoll · Statistik · Datenbank · Backup · Update-Prüfung · HTTPS · Anmeldung · Einstellungen & System · Webinterface. Zwei Teile bedeuten „wartet auf“, z. B. *Datenbank ← Live-Daten* |
+| **Keep-Alive** | jeder Neustart durch den Keep-Alive (mit Grund); Dienste im Zustand `failed` werden mit `reset-failed` neu gestartet; Neustarts durch systemd ohne Absturz-Wächter werden erkannt; fehlt der Wächter, richtet der Keep-Alive ihn ein |
+
+**Anzeigen:** ⚙️ Admin → 🖥️ System → **💥 Abstürze** (Liste mit Art, Teil, Ursache, vollständigem Protokoll, Zähler je Teil). Neue Befunde
+erscheinen **nach der Anmeldung als Hinweisfenster** und als roter Zähler im Menü, bis sie als gelesen markiert sind.
+Konsole: `sudo /opt/adn-frn-server/scripts/n8-admin.sh crashes`. Dateien: `crashes.jsonl` (letzte 300), `crash/<id>.log`, `crash/ack.json`, `crashwatch.json`.
+
 ## 📋 Bei Problemen immer zuerst: das öffentliche FRN-Fehlerprotokoll
 
 Der FRN-SystemManager von freeradionetwork.de schreibt **jede abgelehnte Anmeldung** von Servern und Clients in ein öffentliches

@@ -16,7 +16,7 @@ mit denselben Gruppen in derselben Reihenfolge:
 | 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten, HTTPS & Web) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
 | 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔐 Sitzungen & Protokoll |
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
-| 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💾 Backup (nur Superadmin) |
+| 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💥 Abstürze · 💾 Backup (nur Superadmin) |
 
 Alle Gruppen sind **anfangs zugeklappt** – offen ist nur die Gruppe der gerade gewählten Seite; seit 2.14.2 hängen die Abschnitte der Einstellungen als Zweige darunter (ein Zweig zeigt nur diesen Abschnitt). Auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
 
@@ -169,7 +169,10 @@ was drin ist (Host, Datum, Version, Räume, Benutzer, FRN-Konten, Stationen, Dur
 Das Protokoll vermerkt *💾 Backup created/downloaded/deleted*, *♻️ Restore started* und *♻️ Backup restored*.
 
 
-## ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive
+## ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💥 Abstürze
+
+**💥 Abstürze** (seit 2.15.0): jeder Absturz, Hänger und Notfall-Neustart von Dashboard und Java-FRN-Server mit Teil, Ursache und Protokoll; neue Befunde erscheinen nach der Anmeldung als Hinweisfenster – siehe [Betrieb → Abstürze](betrieb.md#-abstürze-erkennen-und-aufklären).
+
 
 <p align="center"><img src="../images/admin-updates.png" alt="System → Update" width="95%"></p>
 

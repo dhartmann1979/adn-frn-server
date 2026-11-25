@@ -2,6 +2,28 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.15.0 – 2026-11-25
+
+### 💥 Neu: Absturz-Erkennung – jeder Absturz wird mit Ursache und Protokoll festgehalten, gemeldet und der Dienst neu gestartet
+Gleiche Grundlage in allen N8-Systemen (N8 Kit 1.3, `scripts/n8-admin.sh`, `n8_crash.py`) – ausgelöst durch häufige Abstürze von N8 Crosslink,
+bei denen nicht erkennbar war, welcher Teil schuld ist. Überwacht werden hier: Dashboard (`frnadn.service`) und der Java-FRN-Server (`frn-server.service`).
+- **Absturz-Wächter (systemd, als root):** jeder Dienst bekommt ein Drop-in `n8-crashwatch-<id>.conf` mit `ExecStopPost=+… crash-hook`.
+  Nach **jedem** Ende prüft er, ob es geplant war (Stoppen/Neustart von Hand, Update, Keep-Alive, Herunterfahren); alles andere wird
+  festgehalten – **Absturz durch ein Signal**, **Fehlercode**, **systemd-Watchdog**, **Speicher voll (OOM)**, **Zeitüberschreitung**,
+  **unerwartetes Ende** – mit den letzten 200 Journal-Zeilen, Coredump-Kurzinfo und Python-Stack. systemd startet den Dienst sofort neu
+  (Dienste ohne `Restart=` bekommen `Restart=on-failure`); bleibt er ausgefallen (`failed`), startet ihn der Keep-Alive neu (`reset-failed`,
+  höchstens 4× je Stunde). Neustarts durch den Keep-Alive werden mit Grund festgehalten.
+- **Welcher Teil war es?** Die Python-Dienste melden selbst: **faulthandler** (Stack aller Threads beim harten Ende, auch beim Watchdog),
+  **Hänger-Wächter** (Event-Loop steht > 8 s → Stack und Teil, z. B. „Datenbank ← Live-Daten“), abgestürzte Tasks und Threads.
+  Teile: FRN-Protokoll · Live-Daten · System Manager · FRN-Fehlerprotokoll · Statistik · Datenbank · Backup · Update-Prüfung · HTTPS · Anmeldung · Einstellungen & System · Webinterface.
+- **⚙️ Admin → 🖥️ System → 💥 Abstürze:** alle Befunde mit Zeit, Art, Teil, Ursache und vollständigem Protokoll zum Aufklappen, Zähler je Teil
+  (7 Tage, als Filter) und die überwachten Dienste.
+- **Hinweisfenster nach der Anmeldung:** neue Befunde erscheinen direkt nach dem Admin-Login als Fenster („Gelesen“, „Später“, „Alle Abstürze
+  ansehen“) und als roter Zähler im Admin-Menü, bis sie als gelesen markiert sind.
+- Konsole: `sudo /opt/adn-frn-server/scripts/n8-admin.sh crashes`; einrichten von Hand: `sudo /opt/adn-frn-server/scripts/n8-admin.sh setup-crashwatch` (macht sonst „Update jetzt“, die
+  Berechtigungsprüfung oder spätestens der Keep-Alive). Dateien im Datenordner: `crashes.jsonl`, `crash/<id>.log`.
+- Neue Adressen (gleich in allen N8-Systemen): `GET /api/admin/crashes`, `GET /api/admin/crashes/<id>`, `POST /api/admin/crashes/ack`.
+
 ## 2.14.4 – 2026-11-25
 
 ### 🖥️ Ganze Browser-Breite und dieselbe Menüleiste in allen N8-Systemen

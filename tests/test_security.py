@@ -72,6 +72,12 @@ def test_services_and_perms_api(app_mod, tmp_path):
         assert k["conf"]["heartbeat_url"] == "https://hc-ping.com/a-1"
         assert c.post("/api/admin/keepalive", json={"heartbeat_url": "https://x/`id`"}, headers={"X-N8": "1"}).status_code == 400
         assert c.get("/api/n8/health").status_code == 403
+        # Abstürze (N8 Kit 1.3): Liste, Protokoll, gelesen
+        d = c.get("/api/admin/crashes").json()
+        assert d["items"] and d["unacked"] == len(d["items"])
+        assert c.get("/api/admin/crashes/" + d["items"][0]["id"]).json()["log"]
+        assert c.get("/api/admin/crashes/..%2Fx").status_code == 404
+        assert c.post("/api/admin/crashes/ack", json={"all": True}, headers={"X-N8": "1"}).json()["unacked"] == 0
     conf = (ROOT / "scripts" / "n8-admin.conf").read_text()
     assert "N8_KA_CHECKS=" in conf and "frn-server.service|tcp|" in conf
 

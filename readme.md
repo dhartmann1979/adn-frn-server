@@ -97,6 +97,10 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 <td><img src="docs/images/admin-keepalive.png" alt="Keep-Alive"><br><b>💓 Keep-Alive</b>: prüft jede Minute Dashboard und FRN-Server, startet neu, Internet-Ausfall, Heartbeat.</td>
 </tr>
 <tr>
+<td><img src="docs/images/admin-abstuerze.png" alt="Abstürze"><br><b>💥 Abstürze</b>: jeder Absturz mit Teil, Ursache und Protokoll, automatischer Neustart, Zähler je Teil.</td>
+<td><img src="docs/images/absturz-hinweis.png" alt="Hinweis nach der Anmeldung"><br><b>Hinweis nach der Anmeldung</b>: neue Abstürze erscheinen sofort, bis sie als gelesen markiert sind.</td>
+</tr>
+<tr>
 <td><img src="docs/images/rooms-avatars.png" alt="Räume mit Client-Avataren"><br><b>📡 Räume</b>: Avatar = Client-Software, 👑/🛡️ vor dem Rufzeichen.</td>
 <td><img src="docs/images/admin-client-logos.png" alt="Client-Logos"><br><b>Client logos</b>: eingebaute Abzeichen, je Art durch ein eigenes Bild ersetzbar.</td>
 </tr>
@@ -132,7 +136,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |
-| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, Keep-Alive, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
+| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **💥 Abstürze** mit Teil, Ursache und Protokoll (Hinweis nach der Anmeldung). **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, Keep-Alive, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
 | 🏷️ [Änderungen](CHANGELOG.md) | Was sich in welcher Version geändert hat |
 
 ## Aktualisieren
