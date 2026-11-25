@@ -30,7 +30,7 @@ KNOWN_ENABLED = {"enabled", "disabled", "static", "masked", "not-found", "indire
 class N8Admin:
     def __init__(self, state_dir: str | os.PathLike, demo: bool = False):
         self.state_dir = Path(state_dir)
-        self.demo = demo
+        self.demo = demo or os.environ.get("N8_ADMIN_DEMO") == "1"     # Vorführung/Screenshots: Zustände nur im Speicher
         self._demo_units: Dict[str, List[str]] = {}
 
     # ------------------------------------------------------------ Konfiguration

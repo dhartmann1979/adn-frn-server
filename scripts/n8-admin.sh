@@ -198,6 +198,10 @@ check_perms() {
     [[ -z "$x" ]] && x=$(cat "/etc/systemd/system/$N8_WEB_UNIT" "/etc/systemd/system/$N8_WEB_UNIT.d/"*.conf 2>/dev/null | sed -n 's/^NoNewPrivileges=//p' | tail -1)
     [[ "$x" == yes || "$x" == true ]] && ck bad systemd "$N8_WEB_UNIT hat NoNewPrivileges=yes – das Webinterface kann sudo nicht nutzen" \
                                     || ck ok systemd "$N8_WEB_UNIT darf sudo nutzen (nur die Freigaben)"
+    # eine enge CapabilityBoundingSet (z. B. nur CAP_NET_BIND_SERVICE) nimmt auch sudo die Rechte, die Nutzer-ID zu wechseln
+    x=$(systemctl show -p CapabilityBoundingSet --value "$N8_WEB_UNIT" 2>/dev/null)
+    [[ -z "$x" ]] && x=$(cat "/etc/systemd/system/$N8_WEB_UNIT" "/etc/systemd/system/$N8_WEB_UNIT.d/"*.conf 2>/dev/null | sed -n 's/^CapabilityBoundingSet=//p' | tail -1)
+    if [[ -n "$x" && "$x" != "~" && "${x,,}" != *cap_setuid* ]]; then ck bad systemd "$N8_WEB_UNIT: CapabilityBoundingSet=$x – sudo kann so nicht arbeiten (NoNewPrivileges=yes)"; fi
   fi
   check_sudo
   return 0
@@ -205,7 +209,7 @@ check_perms() {
 web_unit_dropin() {   # NoNewPrivileges für das Webinterface aus – sudo erlaubt dann genau die Freigaben, sonst nichts
   [[ -f "/etc/systemd/system/$N8_WEB_UNIT" ]] || return 0
   install -d -m 755 "/etc/systemd/system/$N8_WEB_UNIT.d"
-  printf '%s\n' "# $N8_NAME – von n8-admin.sh: das Webinterface nutzt sudo (nur die Befehle in $SUDOERS)" "[Service]" "NoNewPrivileges=no" \
+  printf '%s\n' "# $N8_NAME – von n8-admin.sh: das Webinterface nutzt sudo (nur die Befehle in $SUDOERS)" "[Service]" "NoNewPrivileges=no" "CapabilityBoundingSet=~" \
     > "/etc/systemd/system/$N8_WEB_UNIT.d/n8-admin.conf"
   chmod 644 "/etc/systemd/system/$N8_WEB_UNIT.d/n8-admin.conf"
   systemctl daemon-reload >/dev/null 2>&1 || true
@@ -291,9 +295,11 @@ repair() {
 
 # ---------------------------------------------------------------- Update
 git_() { git -c "safe.directory=$APP" -c core.hooksPath=/dev/null -c protocol.ext.allow=never -C "$APP" "$@"; }
-health() {   # Weboberfläche antwortet innerhalb von 90 s?
+health() {   # Weboberfläche antwortet innerhalb von 90 s? (N8_HEALTH_URL: eine oder mehrere Adressen, Leerzeichen getrennt)
   [[ -z "$N8_HEALTH_URL" ]] && return 0
-  local i; for i in $(seq 1 45); do curl -fsS -m 3 -o /dev/null "$N8_HEALTH_URL" 2>/dev/null && return 0; sleep 2; done; return 1
+  local i u; for i in $(seq 1 45); do
+    for u in $N8_HEALTH_URL; do curl -fsSk -m 3 -o /dev/null "$u" 2>/dev/null && return 0; done   # mehrere Adressen möglich (http/https)
+    sleep 2; done; return 1
 }
 result() {  # result ok from to message
   printf '{"ok": %s, "from": "%s", "to": "%s", "time": %s, "message": "%s"}\n' "$1" "$2" "$3" "$(date +%s)" "${4//\"/\'}" > "$STATE_DIR/update.result"
