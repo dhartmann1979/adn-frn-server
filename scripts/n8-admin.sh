@@ -472,7 +472,8 @@ ka_json() {   # ka_json DATEI SCHLÜSSEL [WERT] – kleiner Zustandsspeicher „
     [[ -f "$f" ]] && while IFS= read -r line; do [[ "${line%%=*}" == "$k" ]] || out+="$line"$'\n'; done < "$f"
     printf '%s%s=%s\n' "$out" "$k" "$3" > "$f.tmp" && mv -f "$f.tmp" "$f"
   else
-    [[ -f "$f" ]] && while IFS= read -r line; do [[ "${line%%=*}" == "$k" ]] && { echo "${line#*=}"; return 0; }; done < "$f"
+    # nur Zahlen zurückgeben: der Datenordner gehört dem Dienst – nichts davon darf in bash-Arithmetik etwas ausführen
+    [[ -f "$f" ]] && while IFS= read -r line; do [[ "${line%%=*}" == "$k" ]] && { line="${line#*=}"; [[ "$line" =~ ^[0-9]{1,12}$ ]] && echo "$line"; return 0; }; done < "$f"
     echo ""
   fi
 }
@@ -564,6 +565,7 @@ do_keepalive() {
     tail -400 "$STATE_DIR/keepalive.log" > "$STATE_DIR/keepalive.log.tmp" && mv -f "$STATE_DIR/keepalive.log.tmp" "$STATE_DIR/keepalive.log"
   fi
   chmod 644 "$STATE_DIR/keepalive.log" "$STATE_DIR/keepalive.json" 2>/dev/null; chmod 600 "$st" 2>/dev/null
+  id "$SVC_USER" &>/dev/null && chown "$SVC_USER:$SVC_USER" "$STATE_DIR/keepalive.log" "$STATE_DIR/keepalive.json" "$st" 2>/dev/null
   return 0
 }
 ka_write() {   # ka_write zeit modus zeilen [netz heartbeat neustarts]
