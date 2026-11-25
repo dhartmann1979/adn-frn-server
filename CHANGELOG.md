@@ -2,6 +2,19 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.13.2 – 2026-11-25
+
+### 🐛 Fix: „sudo verweigert“ und „Installiert vX · ?“ nach dem Umstellen auf das N8 Admin-Kit
+- **git `safe.directory`:** Seit der Programmordner root gehört, lehnte git ihn für den Dienst-Benutzer ab („dubious ownership“) –
+  das Webinterface sah keinen Commit (`?`) und bot kein „Update jetzt“ an. `fix-perms` trägt den Ordner jetzt systemweit ein
+  (`git config --system`), `check-perms` prüft es.
+- **Webinterface noch mit NoNewPrivileges gestartet:** Die Unit war korrigiert, der laufende Prozess aber noch alt – sudo wurde
+  abgelehnt. `check-perms` prüft jetzt den **laufenden** Prozess (`/proc/<pid>/status`), `fix-perms` startet das Webinterface dann
+  nach 5 Sekunden selbst neu (auch wenn „Korrigieren“ im Browser gedrückt wurde).
+- Die Meldung „sudo verweigert“ zeigt jetzt auch den Grund (letzte Zeile von sudo).
+
+> Einmal auf der Konsole: `sudo git -c safe.directory=/opt/adn-frn-server -C /opt/adn-frn-server pull --ff-only && sudo /opt/adn-frn-server/scripts/n8-admin.sh fix-perms`
+
 ## 2.13.1 – 2026-11-25
 
 ### 🐛 Fix: `n8-admin.sh fix-perms` brach nach „korrigiere …“ ohne Meldung ab

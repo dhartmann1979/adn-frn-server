@@ -108,7 +108,8 @@ class N8Admin:
                     return json.loads(line)
                 except ValueError:
                     break
-        return {"ok": False, "checks": [], "message": (f"sudo verweigert – auf der Konsole: sudo {c['self']} fix-perms"
+        last = (_plain(out).strip().splitlines() or [""])[-1][:200]
+        return {"ok": False, "checks": [], "message": (f"sudo verweigert ({last}) – auf der Konsole: sudo {c['self']} fix-perms"
                                                      if "password" in out or "sudo" in out else out[-300:] or f"Fehler {rc}")}
 
     async def fix_perms(self) -> Tuple[bool, str]:

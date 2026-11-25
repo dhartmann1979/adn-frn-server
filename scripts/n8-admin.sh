@@ -206,6 +206,18 @@ check_perms() {
     x=$(systemctl show -p CapabilityBoundingSet --value "$N8_WEB_UNIT" 2>/dev/null)
     [[ -z "$x" ]] && x=$(cat "/etc/systemd/system/$N8_WEB_UNIT" "/etc/systemd/system/$N8_WEB_UNIT.d/"*.conf 2>/dev/null | sed -n 's/^CapabilityBoundingSet=//p' | tail -1)
     if [[ -n "$x" && "$x" != "~" && "${x,,}" != *cap_setuid* ]]; then ck bad systemd "$N8_WEB_UNIT: CapabilityBoundingSet=$x – sudo kann so nicht arbeiten (NoNewPrivileges=yes)"; fi
+    # die Unit kann stimmen, der laufende Prozess aber noch mit den alten Einstellungen gestartet sein
+    x=$(systemctl show -p MainPID --value "$N8_WEB_UNIT" 2>/dev/null)
+    if [[ -n "$x" && "$x" != 0 && -r "/proc/$x/status" ]]; then
+      if grep -q '^NoNewPrivs:[[:space:]]*1' "/proc/$x/status"; then
+        [[ "${WEB_RESTART_PLANNED:-0}" == 1 ]] && ck warn systemd "$N8_WEB_UNIT läuft noch mit NoNewPrivileges – Neustart ist eingeplant (in 5 s)" \
+                                              || ck bad systemd "$N8_WEB_UNIT läuft noch mit NoNewPrivileges (vor der Korrektur gestartet) – sudo geht erst nach einem Neustart"
+      else ck ok systemd "$N8_WEB_UNIT läuft ohne NoNewPrivileges"; fi
+    fi
+  fi
+  if [[ -n "$(git -C "$APP" rev-parse --git-dir 2>/dev/null)" ]]; then   # git lehnt fremde Ordner ab („dubious ownership“) – der Dienst liest Version und Commit
+    git config --system --get-all safe.directory 2>/dev/null | grep -qxF "$APP" && ck ok prog "git darf den Programmordner für alle Benutzer lesen (safe.directory)" \
+      || ck bad prog "git: Programmordner nicht als sicher eingetragen – der Dienst sieht Commit und Updates nicht (safe.directory)"
   fi
   check_sudo
   n8_check_extra     # projekteigene Prüfungen (z. B. Modem-Schnittstelle), melden mit: ck ok|warn|bad Bereich Text
@@ -219,6 +231,16 @@ web_unit_dropin() {   # NoNewPrivileges für das Webinterface aus – sudo erlau
   chmod 644 "/etc/systemd/system/$N8_WEB_UNIT.d/n8-admin.conf"
   systemctl daemon-reload >/dev/null 2>&1 || true
   warn "$N8_WEB_UNIT: NoNewPrivileges aus (Drop-in n8-admin.conf) – wirkt nach dem nächsten Neustart des Dienstes"
+}
+web_restart_if_needed() {   # läuft das Webinterface noch mit NoNewPrivileges, in 5 s neu starten (auch wenn der Aufruf aus ihm selbst kommt)
+  local pid; pid=$(systemctl show -p MainPID --value "$N8_WEB_UNIT" 2>/dev/null || true)
+  [[ -n "$pid" && "$pid" != 0 && -r "/proc/$pid/status" ]] || return 0
+  grep -q '^NoNewPrivs:[[:space:]]*1' "/proc/$pid/status" || return 0
+  if systemd-run --quiet --on-active=5 --collect -p "Description=$N8_NAME – Webinterface ohne NoNewPrivileges neu starten" \
+       "$(type -P systemctl || echo /usr/bin/systemctl)" restart "$N8_WEB_UNIT" >/dev/null 2>&1; then
+    WEB_RESTART_PLANNED=1; info "$N8_WEB_UNIT startet in 5 s neu (danach darf es sudo nutzen)"
+  else systemctl --no-block restart "$N8_WEB_UNIT" || true; WEB_RESTART_PLANNED=1; fi
+  return 0
 }
 check_sudo() {
   local -; set +e +o pipefail
@@ -281,7 +303,10 @@ fix_perms() {
   for g in "${N8_SECRETS[@]}"; do IFS='|' read -r x f <<<"$g"; for d in $x; do [[ -f "$d" ]] && chmod "$f" "$d"; done; done
   local ent u
   for ent in "${N8_UNITS[@]}"; do IFS='|' read -r u _ <<<"$ent"; [[ -f "/etc/systemd/system/$u" ]] && chown root:root "/etc/systemd/system/$u" && chmod 644 "/etc/systemd/system/$u"; done
-  [[ -n "$(git -C "$APP" rev-parse --git-dir 2>/dev/null)" ]] && git config --global --add safe.directory "$APP" 2>/dev/null || true
+  if [[ -n "$(git -C "$APP" rev-parse --git-dir 2>/dev/null)" ]]; then
+    git config --system --get-all safe.directory 2>/dev/null | grep -qxF "$APP" || git config --system --add safe.directory "$APP" 2>/dev/null || true
+    git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$APP" || git config --global --add safe.directory "$APP" 2>/dev/null || true
+  fi
   n8_fix_extra || true   # projekteigene Korrekturen
   return 0
 }
@@ -294,6 +319,7 @@ repair() {
   fix_perms
   perm_bad_in systemd && { setup_units; grep -q "NoNewPrivileges=yes" <<<"${CK[*]}" && web_unit_dropin; }
   perm_bad_in sudo && sudo_setup
+  web_restart_if_needed
   check_perms; after=$(perm_bad)
   if (( after == 0 )); then ok "alle $before Fehler korrigiert – erneut geprüft, alles in Ordnung"; return 0; fi
   warn "$after Fehler ließen sich nicht automatisch korrigieren:"; perm_report fehler; return 1
