@@ -7,7 +7,7 @@
 .n8-lang { display: inline-flex; align-items: center; flex: none; height: 30px; padding: 2px; gap: 2px; border-radius: 999px;
            background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); }
 .n8-lang button { all: unset; cursor: pointer; padding: 0 9px; height: 24px; line-height: 24px; border-radius: 999px;
-                  font: 700 11.5px/24px inherit; letter-spacing: .04em; color: var(--text-dim, rgba(235, 240, 250, .62)); }
+                  font-family: inherit; font-weight: 700; font-size: 11.5px; line-height: 24px; letter-spacing: .04em; color: var(--text-dim, rgba(235, 240, 250, .62)); }
 .n8-lang button:hover { color: var(--text, #f5f7fb); }
 .n8-lang button.on { color: #fff; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff)));
                      box-shadow: 0 2px 8px rgba(var(--accent-rgb, 90, 200, 250), .35); }
@@ -16,7 +16,7 @@ html[data-theme-mode=light] .n8-lang { background: rgba(0, 0, 0, .05); }
 @media (max-width: 600px) { .n8-lang { height: 26px; } .n8-lang button { padding: 0 6px; height: 20px; line-height: 20px; font-size: 10.5px; } }
 
 /* ---------- buttons, badges, key/value list used by the kit ---------- */
-.n8-btn { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font: 650 13px/1.2 inherit;
+.n8-btn { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-family: inherit; font-weight: 650; font-size: 13px; line-height: 1.2;
           color: var(--text, #f5f7fb); background: rgba(255, 255, 255, .08); border: 1px solid var(--glass-border, rgba(255, 255, 255, .16)); }
 .n8-btn:hover:not(:disabled) { background: rgba(var(--accent-rgb, 90, 200, 250), .18); border-color: rgba(var(--accent-rgb, 90, 200, 250), .5); }
 .n8-btn.primary { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); }
@@ -63,8 +63,8 @@ html[data-theme-mode=light] .n8-upd-box { background: rgba(255, 255, 255, .97); 
 .n8-steps li.run { color: var(--text, #f5f7fb); }
 .n8-steps li.run::before { border-color: var(--accent, #5ac8fa); border-top-color: transparent; animation: n8-spin .9s linear infinite; }
 .n8-steps li.done { color: var(--text, #f5f7fb); }
-.n8-steps li.done::before { content: '✓'; border: 0; background: #30d158; color: #fff; font: 800 10px/16px inherit; text-align: center; }
-.n8-steps li.bad::before { content: '✕'; border: 0; background: #ff453a; color: #fff; font: 800 10px/16px inherit; text-align: center; }
+.n8-steps li.done::before { content: '✓'; border: 0; background: #30d158; color: #fff; font-family: inherit; font-weight: 800; font-size: 10px; line-height: 16px; text-align: center; }
+.n8-steps li.bad::before { content: '✕'; border: 0; background: #ff453a; color: #fff; font-family: inherit; font-weight: 800; font-size: 10px; line-height: 16px; text-align: center; }
 .n8-upd-msg { margin-top: 14px; font-size: 13.5px; }
 .n8-upd-msg.ok { color: #30d158; } .n8-upd-msg.bad { color: #ff6b61; }
 @keyframes n8-spin { to { transform: rotate(360deg); } }
@@ -83,14 +83,14 @@ html[data-theme-mode=light] .n8-pw { background: #fff; color: #111; }
 .n8-tree-toggle { display: none; }
 .n8-tree-g + .n8-tree-g { margin-top: 4px; }
 .n8-tree-gh { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 6px; width: 100%; padding: 7px 10px 5px;
-              font: 800 10.5px/1.2 inherit; letter-spacing: .08em; white-space: nowrap; text-transform: uppercase; color: var(--text-dim, rgba(235, 240, 250, .62)); }
+              font-family: inherit; font-weight: 800; font-size: 10.5px; line-height: 1.2; letter-spacing: .08em; white-space: nowrap; text-transform: uppercase; color: var(--text-dim, rgba(235, 240, 250, .62)); }
 .n8-tree-gh:hover { color: var(--text, #f5f7fb); }
 .n8-tree-car { display: inline-block; width: 10px; transition: transform .15s; font-size: 10px; }
 .n8-tree-g.open .n8-tree-car { transform: rotate(90deg); }
 .n8-tree-items { display: none; flex-direction: column; gap: 1px; padding: 2px 0 4px 8px; margin-left: 9px; border-left: 1px solid var(--glass-border, rgba(255, 255, 255, .12)); }
 .n8-tree-g.open .n8-tree-items { display: flex; }
 .n8-tree-i { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%;
-             padding: 7px 10px; border-radius: 10px; font: 600 13.5px/1.25 inherit; color: var(--text, #f5f7fb); }
+             padding: 7px 10px; border-radius: 10px; font-family: inherit; font-weight: 600; font-size: 13.5px; line-height: 1.25; color: var(--text, #f5f7fb); }
 .n8-tree-i:hover { background: rgba(255, 255, 255, .06); }
 .n8-tree-i.on { background: rgba(var(--accent-rgb, 90, 200, 250), .16); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb, 90, 200, 250), .45); }
 .n8-tree-i:focus-visible, .n8-tree-gh:focus-visible { outline: 2px solid var(--accent, #5ac8fa); outline-offset: -2px; }
@@ -98,7 +98,7 @@ html[data-theme-mode=light] .n8-tree-i:hover { background: rgba(0, 0, 0, .05); }
 @media (max-width: 860px) {
     .n8-admin { grid-template-columns: 1fr; }
     .n8-tree { position: relative; top: 0; max-height: none; padding: 6px; }
-    .n8-tree-toggle { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; font: 700 14px/1.2 inherit; color: var(--text, #f5f7fb); }
+    .n8-tree-toggle { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; font-family: inherit; font-weight: 700; font-size: 14px; line-height: 1.2; color: var(--text, #f5f7fb); }
     .n8-tree .n8-tree-body { display: none; padding-top: 4px; }
     .n8-tree.open .n8-tree-body { display: block; }
 }
