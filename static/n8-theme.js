@@ -1,11 +1,15 @@
 /*
- * N8 Theme 2 – shared colour engine of the N8schicht dashboards
+ * N8 Theme 2.1 – shared colour and font engine of the N8schicht dashboards
  * (HBlink4-FreeRadioID, ADN FRN Server, N8-HotSpot). The same file is in all three repositories;
  * change it in one, copy it to the others.
  *
  * A theme is a small object; every colour may be empty (= taken from the profile):
  *   { preset, accent, accent2, background, glow1, glow2, glow3, text, panel,
- *     glow (0–150 %), glass (0–100), blur (bool), radius (0–28 px) }
+ *     glow (0–150 %), glass (0–100), blur (bool), radius (0–28 px), font }
+ *
+ * Fonts (N8 Theme 2.1): technical, well readable, self-hosted next to this file in fonts/<dir>/ (SIL OFL 1.1) –
+ *   plex (IBM Plex Sans, default), inter, barlow, exo2, rajdhani, system. Numbers, LCD displays and code use
+ *   JetBrains Mono (CSS variable --n8-mono, also --mono). The font editor shows a preview of every font.
  *
  *   N8Theme.apply(theme)            sets the CSS variables and the page background
  *   N8Theme.resolve(theme)          the effective colours (profile + own colours)
@@ -34,7 +38,58 @@
         text: ['Text', 'Empty = suits the background automatically'],
         panel: ['Card tint', 'Colour mixed into the glass cards'],
     };
-    const DEFAULTS = { preset: 'n8', glow: 100, glass: 50, blur: true, radius: 22 };
+    const DEFAULTS = { preset: 'n8', glow: 100, glass: 50, blur: true, radius: 22, font: 'plex' };
+
+    // ------------------------------------------------------------------ fonts
+    const FONT_BASE = (() => {
+        try { const src = document.currentScript && document.currentScript.src; if (src) return src.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'fonts/'; } catch (e) { /* */ }
+        return '/static/fonts/';
+    })();
+    const FONTS = {
+        plex:     { name: 'IBM Plex Sans', dir: 'ibm-plex-sans', note: 'Technical and very readable – the default' },
+        inter:    { name: 'Inter', dir: 'inter', note: 'Neutral, very readable on screens' },
+        barlow:   { name: 'Barlow', dir: 'barlow', note: 'Like DIN road signs, compact' },
+        exo2:     { name: 'Exo 2', dir: 'exo-2', note: 'Technical with a futuristic touch' },
+        rajdhani: { name: 'Rajdhani', dir: 'rajdhani', note: 'Narrow, radio display look' },
+        system:   { name: 'System', dir: '', note: 'The font of the device (no download)' },
+    };
+    const MONO = { name: 'JetBrains Mono', dir: 'jetbrains-mono' };
+    const SYSTEM_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif';
+    const MONO_STACK = '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    const RANGES = {
+        latin: 'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
+        'latin-ext': 'U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF',
+    };
+    function faces(f, weights) {
+        if (!f || !f.dir) return '';
+        return (weights || [400, 600, 700]).map(w => Object.keys(RANGES).map(sub =>
+            `@font-face { font-family: "${f.name}"; font-style: normal; font-weight: ${w}; font-display: swap; ` +
+            `src: url("${FONT_BASE}${f.dir}/${sub}-${w}.woff2") format("woff2"); unicode-range: ${RANGES[sub]}; }`).join('\n')).join('\n');
+    }
+    function fontStack(key) {
+        const f = FONTS[key] || FONTS.plex;
+        return f.dir ? `"${f.name}", ${SYSTEM_STACK}` : SYSTEM_STACK;
+    }
+    function applyFont(key) {
+        const f = FONTS[key] || FONTS.plex;
+        let el = document.getElementById('n8FontStyle');
+        if (!el) { el = document.createElement('style'); el.id = 'n8FontStyle'; document.head.appendChild(el); }
+        const s = document.documentElement.style;
+        s.setProperty('--n8-font', fontStack(key));
+        s.setProperty('--n8-mono', MONO_STACK);
+        s.setProperty('--mono', MONO_STACK);
+        el.textContent = faces(MONO) + '\n' + faces(f) + (f.dir ? `
+            html body, html body button, html body input, html body select, html body textarea, html body .n8-btn { font-family: var(--n8-font); }
+            html body code, html body pre, html body kbd, html body .mono, html body .lcd { font-family: var(--n8-mono); }` : '');
+        document.documentElement.dataset.font = key in FONTS ? key : 'plex';
+    }
+    let previewLoaded = false;
+    function loadPreviewFonts() {
+        if (previewLoaded) return; previewLoaded = true;
+        const el = document.createElement('style'); el.id = 'n8FontPreview';
+        el.textContent = Object.values(FONTS).map(f => faces(f, [400, 700])).join('\n');
+        document.head.appendChild(el);
+    }
     const HEX = /^#[0-9a-f]{6}$/i;
 
     const rgb = h => { const n = parseInt(String(h || '#000000').slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
@@ -52,6 +107,7 @@
         out.glass = clamp(t.glass, 0, 100, DEFAULTS.glass);
         out.blur = t.blur !== false && t.blur !== 'false' && t.blur !== 0;
         out.radius = clamp(t.radius, 0, 28, DEFAULTS.radius);
+        out.font = FONTS[t.font] ? t.font : DEFAULTS.font;
         return out;
     }
 
@@ -94,6 +150,7 @@
         s.setProperty('--green', light ? '#15803d' : '#30d158');
         s.setProperty('--amber', light ? '#a16207' : '#ffd60a');
         s.setProperty('--red', light ? '#c0362c' : '#ff453a');
+        applyFont(r.font);
         doc.dataset.themeMode = light ? 'light' : 'dark';
         doc.style.colorScheme = light ? 'light' : 'dark';
         const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = c.background;
@@ -123,6 +180,16 @@
 
     function editorHtml(theme, id) {
         const t = normalize(theme), r = resolve(t);
+        loadPreviewFonts();
+        if (global.N8Kit && global.N8Kit.i18n && !editorHtml.de) {
+            editorHtml.de = true;
+            global.N8Kit.i18n.add({ base: 'en', de: {
+                'Font': 'Schrift', 'Technical, well readable fonts – numbers and displays always use JetBrains Mono': 'Technische, gut lesbare Schriften – Zahlen und Anzeigen immer in JetBrains Mono',
+                'Technical and very readable – the default': 'Technisch und sehr gut lesbar – Standard', 'Neutral, very readable on screens': 'Neutral, am Bildschirm sehr gut lesbar',
+                'Like DIN road signs, compact': 'Wie DIN-Beschilderung, kompakt', 'Technical with a futuristic touch': 'Technisch mit futuristischem Einschlag',
+                'Narrow, radio display look': 'Schmal, wie ein Funkgeräte-Display', 'The font of the device (no download)': 'Schrift des Geräts (kein Download)',
+            } });
+        }
         const presets = Object.keys(PRESETS).map(k => `
             <button type="button" class="n8t-preset ${k === t.preset ? 'active' : ''}" data-preset="${k}" style="background:${swatch(k)};color:${PRESETS[k].text}">
                 <i style="background:linear-gradient(135deg,${PRESETS[k].accent},${PRESETS[k].accent2})"></i><span>${esc(PRESETS[k].name)}</span></button>`).join('');
@@ -137,7 +204,7 @@
                 <input type="range" data-num="${k}" min="${min}" max="${max}" value="${t[k]}" data-unit="${unit}">
                 ${help ? `<small>${esc(help)}</small>` : ''}</label>`;
         return `
-        <div class="n8t-editor" id="${esc(id || 'n8tEditor')}" data-preset="${esc(t.preset)}">
+        <div class="n8t-editor" id="${esc(id || 'n8tEditor')}" data-preset="${esc(t.preset)}" data-font="${esc(t.font)}">
             <div class="n8t-sec"><div class="n8t-h">Colour profile</div><div class="n8t-presets">${presets}</div></div>
             <div class="n8t-sec"><div class="n8t-h">Own colours <small>Click a colour to change it; ↺ takes it from the profile again.</small></div>
                 <div class="n8t-colors">${colors}</div></div>
@@ -148,6 +215,13 @@
                 <label class="n8t-switch"><input type="checkbox" data-bool="blur" ${t.blur ? 'checked' : ''}><span></span>
                     <b>Glass blur</b><small>Off = faster on old phones</small></label>
             </div>
+            <div class="n8t-sec"><div class="n8t-h">Font <small>Technical, well readable fonts – numbers and displays always use JetBrains Mono.</small></div>
+                <div class="n8t-fonts">${Object.keys(FONTS).map(k => `
+                    <button type="button" class="n8t-font ${k === t.font ? 'active' : ''}" data-font="${k}" style="font-family:${esc(fontStack(k))}">
+                        <span class="n8t-fn">${esc(FONTS[k].name)}</span>
+                        <span class="n8t-fs">N8XLINK · TG 262 · 438.950 MHz</span>
+                        <span class="n8t-fs2">Ruhe auf allen Netzen – Äöü ß 0123456789</span>
+                        <small>${esc(FONTS[k].note)}</small></button>`).join('')}</div></div>
             <div class="n8t-preview"><div class="n8t-pv-head"><span class="n8t-pv-logo"></span><div><div class="n8t-pv-title">Title</div><div class="n8t-pv-sub">Subtitle</div></div>
                 <span class="n8t-pv-chip">✓ Live</span></div>
                 <div class="n8t-pv-row"><span class="n8t-pv-tab">🎙️ Live</span><span class="n8t-pv-num">1.287</span><span class="n8t-pv-btn">Save</span></div>
@@ -156,7 +230,7 @@
     }
 
     function readEditor(root) {
-        const t = { preset: root.dataset.preset || 'n8' };
+        const t = { preset: root.dataset.preset || 'n8', font: root.dataset.font || DEFAULTS.font };
         root.querySelectorAll('[data-color]').forEach(i => { t[i.dataset.color] = i.dataset.own === '1' ? i.value : ''; });
         root.querySelectorAll('[data-num]').forEach(i => { t[i.dataset.num] = Number(i.value); });
         root.querySelectorAll('[data-bool]').forEach(i => { t[i.dataset.bool] = i.checked; });
@@ -168,6 +242,7 @@
     function refresh(root) {
         const t = readEditor(root), r = resolve(t);
         root.querySelectorAll('.n8t-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === t.preset));
+        root.querySelectorAll('.n8t-font').forEach(b => b.classList.toggle('active', b.dataset.font === t.font));
         root.querySelectorAll('[data-color]').forEach(i => {
             const own = i.dataset.own === '1';
             if (!own) i.value = r.colors[i.dataset.color];
@@ -192,6 +267,8 @@
         root.addEventListener('click', e => {
             const p = e.target.closest('.n8t-preset');
             if (p) { root.dataset.preset = p.dataset.preset; changed(); return; }
+            const f = e.target.closest('.n8t-font');
+            if (f) { root.dataset.font = f.dataset.font; changed(); return; }
             const rs = e.target.closest('.n8t-reset');
             if (rs) { e.preventDefault(); root.querySelector(`[data-color="${rs.dataset.reset}"]`).dataset.own = '0'; changed(); }
         });
@@ -203,11 +280,14 @@
     function setEditor(root, theme) {
         const t = normalize(theme);
         root.dataset.preset = t.preset;
+        root.dataset.font = t.font;
         root.querySelectorAll('[data-color]').forEach(i => { i.dataset.own = t[i.dataset.color] ? '1' : '0'; if (t[i.dataset.color]) i.value = t[i.dataset.color]; });
         root.querySelectorAll('[data-num]').forEach(i => { i.value = t[i.dataset.num]; });
         root.querySelectorAll('[data-bool]').forEach(i => { i.checked = !!t[i.dataset.bool]; });
         refresh(root); apply(t);
     }
 
-    global.N8Theme = { PRESETS, COLOR_KEYS, DEFAULTS, normalize, resolve, apply, editorHtml, readEditor, bindEditor, setEditor, contrast };
+    global.N8Theme = { PRESETS, COLOR_KEYS, DEFAULTS, FONTS, normalize, resolve, apply, applyFont, editorHtml, readEditor, bindEditor, setEditor, contrast };
+    // until the saved theme arrives: the default font (no flash of a different font afterwards in most cases)
+    try { applyFont(DEFAULTS.font); } catch (e) { /* no document yet */ }
 })(window);

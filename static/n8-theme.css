@@ -44,3 +44,13 @@
 .n8t-pv-btn { margin-left: auto; padding: 5px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); }
 .n8t-pv-contrast { font-size: 11.5px; color: var(--text-dim); }
 .n8t-pv-contrast.bad { color: #ff9f0a; font-weight: 650; }
+
+/* N8 Theme 2.1 – font picker */
+.n8t-fonts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.n8t-font { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; cursor: pointer; padding: 10px 12px;
+            border-radius: var(--radius-sm, 12px); background: rgba(127, 127, 127, .08); border: 1px solid var(--glass-border); color: var(--text); }
+.n8t-font.active { box-shadow: 0 0 0 2px var(--accent), 0 6px 18px rgba(var(--accent-rgb), .3); }
+.n8t-fn { font-size: 15px; font-weight: 700; }
+.n8t-fs { font-size: 13.5px; font-weight: 600; color: var(--accent); }
+.n8t-fs2 { font-size: 12.5px; }
+.n8t-font small { font-size: 11px; color: var(--text-dim); font-family: inherit; }
