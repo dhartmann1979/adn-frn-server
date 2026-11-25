@@ -157,3 +157,4 @@ html[data-theme-mode=light] .n8-log { background: rgba(0, 0, 0, .05); }
 .n8-admin-main .grid > .tile, .n8-admin-main .tiles > .tile, .hb-admin .station-grid > .tile { display: flex; flex-direction: column; min-width: 0; }
 .n8-admin-main .grid > .tile > .actions:last-child, .hb-admin .station-grid > .tile > .set-actions:last-child { margin-top: auto; padding-top: 12px; }
 .n8-sys-extra > .grid { grid-template-columns: 1fr !important; }
+.n8-card > p.n8-help { margin: 0 0 10px; }
