@@ -96,8 +96,24 @@ class N8Admin:
             return True, "ok (Demo)"
         sc = self.config().get("systemctl") or "/usr/bin/systemctl"
         args = [sc, action, unit] if action not in ("start", "restart") else [sc, "--no-block", action, unit]
+        if action in ("restart", "stop") and unit == own_unit():
+            # Der eigene Dienst: systemd beendet beim Stoppen ALLE Prozesse des Dienstes – auch sudo/systemctl, die gerade laufen
+            # (bisher „Fehler -15“ = SIGTERM, obwohl der Neustart klappte). Darum erst antworten, dann kurz darauf auslösen.
+            self._later(self._sudo(*args, timeout=60))
+            return True, "wird gleich ausgeführt – die Weboberfläche ist dabei kurz nicht erreichbar"
         rc, out = await self._sudo(*args, timeout=60)
         return rc == 0, out.strip()[-400:] or ("ok" if rc == 0 else f"Fehler {rc}")
+
+    _bg: set = set()
+
+    @staticmethod
+    def _later(coro, delay: float = 1.0) -> None:
+        async def run() -> None:
+            await asyncio.sleep(delay)
+            await coro
+        t = asyncio.ensure_future(run())
+        N8Admin._bg.add(t)
+        t.add_done_callback(N8Admin._bg.discard)
 
     def _hold(self, unit: str, action: str) -> None:
         """Von Hand gestoppt → Keep-Alive startet den Dienst nicht wieder, bis er hier gestartet wird."""
@@ -320,6 +336,18 @@ class N8Admin:
         tmp.write_text(json.dumps(a), "utf-8")
         os.replace(tmp, d / "ack.json")
         return self.crashes()
+
+
+def own_unit() -> str:
+    """systemd-Dienst, in dem dieser Prozess läuft (aus /proc/self/cgroup), sonst ''."""
+    try:
+        for line in Path("/proc/self/cgroup").read_text().splitlines():
+            for part in line.rsplit(":", 1)[-1].split("/"):
+                if part.endswith(".service"):
+                    return part
+    except OSError:
+        pass
+    return ""
 
 
 import re as _re  # noqa: E402

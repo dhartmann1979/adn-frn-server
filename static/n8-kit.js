@@ -518,7 +518,18 @@
                     const u = b.dataset.u, a = b.dataset.a;
                     if (a === 'stop' && !confirm(t('Dienst stoppen?') + '\n' + u)) return;
                     b.disabled = true;
-                    try { await req('POST', `/api/admin/services/${encodeURIComponent(u)}/${a}`, {}); } catch (e) { alert(e.message); }
+                    let r = null;
+                    try { r = await req('POST', `/api/admin/services/${encodeURIComponent(u)}/${a}`, {}); } catch (e) { alert(e.message); }
+                    if (r && r.self) {          // der eigene Dienst startet neu: warten, bis die Weboberfläche wieder antwortet
+                        paint(card('🧩 Dienste', `<div class="n8-help">⏳ ${esc(t(a === 'stop' ? 'Die Weboberfläche wird gestoppt …' : 'Die Weboberfläche startet neu – einen Moment …'))}</div>`));
+                        if (a === 'stop') return;
+                        const t0 = Date.now();
+                        await new Promise(res => setTimeout(res, 3000));
+                        while (Date.now() - t0 < 120000) {
+                            try { await req('GET', '/api/admin/services'); break; } catch (e) { await new Promise(res => setTimeout(res, 2000)); }
+                        }
+                        return load();
+                    }
                     setTimeout(load, a === 'stop' ? 500 : 1500);
                 });
                 el.querySelectorAll('[data-auto]').forEach(c => c.onchange = async () => {
@@ -732,6 +743,7 @@
             '1 neuer Absturz': '1 new crash', '{n} neue Abstürze': '{n} new crashes', 'weitere': 'more', 'Alle Abstürze ansehen': 'View all crashes', 'Gelesen': 'Mark as read',
             'Seit dem letzten Lesen ist ein Dienst abgestürzt oder hing. Er wurde automatisch neu gestartet. Der Befund nennt den Teil der Anwendung und enthält das vollständige Protokoll.':
                 'Since you last looked, a service crashed or hung. It was restarted automatically. The finding names the part of the application and contains the full log.',
+            'Die Weboberfläche wird gestoppt …': 'The web interface is being stopped …', 'Die Weboberfläche startet neu – einen Moment …': 'The web interface is restarting – one moment …',
             'Keep-Alive an': 'Keep-alive on', 'Netzdienste nach einem Internet-Ausfall neu starten': 'Restart network services after an internet outage',
             'Heartbeat-Adresse': 'Heartbeat address', 'Heartbeat bei Fehlern (optional)': 'Heartbeat on errors (optional)', '▶ Fortsetzen': '▶ Resume',
             '⏸ 1 h pausieren (Wartung)': '⏸ Pause 1 h (maintenance)', 'Speichern': 'Save', 'Keep-Alive-Protokoll': 'Keep-alive log',

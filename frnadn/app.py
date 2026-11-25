@@ -33,7 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
 from . import n8_security as _sec
-from .n8_admin import N8Admin
+from .n8_admin import N8Admin, own_unit
 from . import backup as fbackup
 from . import sysman as fsysman
 from . import frn_errorlog
@@ -1222,7 +1222,7 @@ async def services_action(unit: str, action: str, request: Request):
     if unit == "frn-server.service":
         await asyncio.sleep(1.5)
         await ctx.server.poll_service()
-    return {"ok": ok, "message": out, "units": await ctx.n8.units()}
+    return {"ok": ok, "message": out, "units": await ctx.n8.units(), "self": action in ("restart", "stop") and unit == own_unit()}
 
 
 @app.get("/api/admin/perms")
