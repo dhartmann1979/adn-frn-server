@@ -779,7 +779,7 @@ function serverBox(st, jar) {
         <span style="flex:1"></span>
         ${svc === 'active' ? `<button class="btn small" onclick="serverCtl('stop', this)">⏹ Stop</button>` : `<button class="btn small" onclick="serverCtl('start', this)">▶ Start</button>`}
         <button class="btn small primary" onclick="serverCtl('restart', this)">🔄 Restart</button></div>
-        ${st.error ? `<div class="notice-box" style="margin-top:10px">⚠️ ${esc(st.error)}</div>` : ''}`;
+        ${st.error ? `<div class="notice-box" style="margin-top:10px">⚠️ ${esc(st.error)}<div style="margin-top:6px">📋 <span>The reason is in the public FRN error log:</span> <a href="#" onclick="event.preventDefault(); showAdmin('logs')">Logs → FRN error log</a> · <a href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">open the complete log ↗</a></div></div>` : ''}`;
 }
 function fieldHtml(f) {
     const lbl = `<label for="f_${f.key}">${esc(f.label)}</label>`;
@@ -804,7 +804,7 @@ async function loadSettings() {
             <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
         <div class="tiles">${d.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
-            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div>' : ''}
+            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div><div class="notice-box">📋 <span>Refused by the SystemManager? The reason is in the public FRN error log of freeradionetwork.de (Help → Error log).</span> <button type="button" class="btn small" style="margin-left:6px" onclick="showAdmin(\'logs\')">📋 FRN error log</button> <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">open ↗</a></div>' : ''}
             ${sec.fields.map(fieldHtml).join('')}<div class="actions"><button class="btn primary">Save</button></div></form>`).join('')}</div>`;
 }
 async function saveSettings(form) {
@@ -1381,11 +1381,32 @@ async function power(a) {
     try { await api('POST', '/api/admin/power', { action: a }); toast(a === 'reboot' ? 'Rebooting …' : 'Shutting down …'); } catch (e) { toast(e.message, true); }
 }
 
+// public FRN error log of freeradionetwork.de
+async function loadFrnErrorlog(force) {
+    const box = $('frnElList'); if (!box) return;
+    let d; try { d = await api('GET', '/api/admin/frn-errorlog' + (force ? '?force=1' : '')); } catch (e) { box.innerHTML = `<div class="notice-box">⚠️ ${esc(e.message)}</div>`; return; }
+    const n = d.mine.reduce((a, g) => a + g.count, 0);
+    $('frnElBadge').innerHTML = d.error ? '<span class="badge warn">not reachable</span>' : n ? `<span class="badge err">${n} ${N8Kit.i18n.t('entries about this server')}</span>` : '<span class="badge ok">nothing about this server</span>';
+    const when = (ts) => ts.slice(8, 10) + '.' + ts.slice(5, 7) + '. ' + ts.slice(11, 16);
+    const row = (g) => `<tr><td style="white-space:nowrap">${esc(when(g.ts))}${g.count > 1 ? `<div class="dim" style="font-size:12px">${g.count}× ${N8Kit.i18n.t('since')} ${esc(g.first.slice(11, 16))}</div>` : ''}</td>
+        <td>${g.kind === 'Client' ? '👤 Client' : '🖥️ Server'}<div class="dim mono" style="font-size:12px">${esc(g.id)}${g.name ? ', ' + esc(g.name) : ''}</div></td>
+        <td style="white-space:normal;min-width:320px"><b>${esc(g.message)}</b>${g.hint ? `<div style="margin-top:3px">💡 ${esc(N8Kit.i18n.t(g.hint))}</div>` : g.hint_en ? `<div class="dim">${esc(g.hint_en)}</div>` : ''}</td></tr>`;
+    box.innerHTML = (d.error ? `<div class="notice-box">⚠️ ${esc(d.error)}</div>` : '')
+        + (d.mine.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Time</th><th>Who</th><th>Message</th></tr></thead><tbody>${d.mine.map(row).join('')}</tbody></table></div>`
+            : d.error ? '' : `<div class="dim">✅ ${N8Kit.i18n.t('No entries about this server in the last entries of the log')} (${d.total}${d.span ? ', ' + esc(d.span[0].slice(11, 16)) + '–' + esc(d.span[1].slice(11, 16)) : ''}).</div>`)
+        + `<div class="dim" style="font-size:12px;margin-top:8px">${N8Kit.i18n.t('Server')} ${esc(d.scope.servers.join(', ') || '–')} · ${N8Kit.i18n.t('Callsigns')} ${esc(d.scope.callsigns.join(', ') || '–')}${d.others && d.others.length ? ` · ${N8Kit.i18n.t('other stations in the log')}: ${d.others.slice(0, 6).map(g => esc(g.id)).join(', ')}` : ''}</div>`;
+}
+
 // logs
 async function loadLogs() {
     const [d, v] = await Promise.all([api('GET', '/api/admin/logs'), api('GET', '/api/admin/visits?limit=100')]);
     S.admin.logs = d.entries;
-    $('admin-logs').innerHTML = `<div class="tile"><h3>📜 Events (live)</h3><div class="term logview" id="logView"></div>
+    $('admin-logs').innerHTML = `<div class="tile" style="margin-bottom:14px"><h3>📋 Public FRN error log <span id="frnElBadge"></span></h3>
+        <div class="subt">For problems always look here first: the FRN SystemManager of freeradionetwork.de writes every refused login of servers and clients there (wrong FRN password, multiple connection, port not reachable …) – the reason the FRN server itself does not tell. Shown are entries about this server address, the owner's callsign and stations refused here. New entries also appear in the events below.</div>
+        <div id="frnElList"><div class="dim">loading …</div></div>
+        <div class="actions" style="justify-content:flex-start"><button class="btn small" onclick="loadFrnErrorlog(true)">🔄 Reload</button>
+            <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">📋 Open the complete error log ↗</a></div></div>
+        <div class="tile"><h3>📜 Events (live)</h3><div class="term logview" id="logView"></div>
         <div class="actions" style="justify-content:flex-start"><button class="btn" onclick="loadJournal('frnlog')">🛰️ server.log of the FRN server</button>
             <button class="btn" onclick="loadJournal('frn-server')">Journal frn-server</button><button class="btn" onclick="loadJournal('frnadn')">Journal frnadn</button></div>
         <pre class="term hidden" id="jView" style="height:360px"></pre></div>
@@ -1396,9 +1417,10 @@ async function loadLogs() {
             <td class="num">${x.logout_ts ? fmtDur(x.logout_ts - x.login_ts, true) : '<span class="pill ok">online</span>'}</td></tr>`).join('') || '<tr><td colspan="6" class="empty">No logins recorded yet.</td></tr>'}
         </tbody></table></div></div>`;
     renderLogs();
+    loadFrnErrorlog();
 }
 function logLine(e) {
-    const cls = { denied: 'e', login: 'g', logout: 't', config: 'w', error: 'e' }[e.kind] || '';
+    const cls = { denied: 'e', login: 'g', logout: 't', config: 'w', error: 'e', frnlog: 'w' }[e.kind] || '';
     return `<div class="${cls}"><span class="t">${fmtTime(e.ts)}</span> ${esc(e.text)}</div>`;
 }
 function renderLogs() { const v = $('logView'); if (!v) return; v.innerHTML = S.admin.logs.slice(-400).map(logLine).join('') || '<div class="t">No events yet.</div>'; v.scrollTop = v.scrollHeight; }

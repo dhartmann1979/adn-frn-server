@@ -125,6 +125,10 @@ class Live:
         self._event("denied", f"{info.get('callsign') or '?'} ({info.get('email')}) refused for {info.get('room') or '-'}: {reason} · {peer}",
                     info.get("room") or "")
 
+    def frn_errorlog(self, text: str) -> None:
+        """Reason from the public FRN error log of freeradionetwork.de (refused logins at the SystemManager)."""
+        self._event("frnlog", text)
+
     def config_changed(self, text: str) -> None:
         self._event("config", text)
 

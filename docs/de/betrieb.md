@@ -32,9 +32,36 @@ Web-Installer des Portals auf Wunsch auch HBlink4 und N8 Crosslink auf diesen Re
 Rückgängig: `sudo rm /etc/systemd/system/frnadn.service.d/hobbyradioportal.conf && sudo systemctl daemon-reload && sudo systemctl restart frnadn`,
 dann *Admin → Settings → HTTPS & web* wieder einschalten (und nginx des Portals vorher stoppen).
 
+## 📋 Bei Problemen immer zuerst: das öffentliche FRN-Fehlerprotokoll
+
+Der FRN-SystemManager von freeradionetwork.de schreibt **jede abgelehnte Anmeldung** von Servern und Clients in ein öffentliches
+Fehlerprotokoll – auf freeradionetwork.de im Seitenmenü unter *Hilfe → Fehlerprotokoll*, direkt: <http://log.freeradionetwork.de:60080/error_log.php>.
+Dort steht der Grund, den der Java-Server oft nur als Nummer oder gar nicht meldet, z. B. *wrong FRN password*, *multiple connections at the
+same time with the same connection data are not permitted* oder *not listening on specified port*.
+
+adn-frn-server nutzt es ab 2.12.0 selbst:
+
+* **Admin → 📜 Logs → 📋 Öffentliches FRN-Fehlerprotokoll:** Einträge zu **dieser Server-Adresse**, dem **Rufzeichen des Betreibers** und zu
+  **hier abgelehnten Stationen** (letzte Stunde) – gleiche Meldungen zusammengefasst („6× seit 09:58“), mit Erklärung und Abhilfe.
+  **🔄 Neu laden** und **📋 Komplettes Fehlerprotokoll öffnen**.
+* **Automatisch:** alle 10 Minuten, solange der SystemManager einen Fehler meldet alle 2 Minuten – neue Einträge erscheinen als Ereignis im Log
+  (`FRN error log: server frn.example.org:10024 – wrong FRN password …`), jede Meldung einmal. Nicht im eigenständigen Betrieb.
+* **Hinweise:** unter *Settings → SystemManager* und im Fehlerkasten des Java-Servers ein Link dorthin.
+
+<p align="center"><img src="../images/admin-frn-errorlog.png" alt="Öffentliches FRN-Fehlerprotokoll" width="90%"></p>
+
+| Meldung im Protokoll | Bedeutung / Lösung |
+|---|---|
+| `wrong FRN password` | Falsches FRN-Passwort – *📧 FRN-Passwort anfordern* und genau das zugeteilte Passwort mit derselben E-Mail eintragen |
+| `multiple connections at the same time with the same connection data are not permitted` | Mit denselben Zugangsdaten ist schon eine Verbindung aktiv – zweite Instanz (alter Server, Test- oder Backup-Server mit demselben Konto) beenden; jeder Server braucht ein eigenes Konto |
+| `not listening on specified port` | Der SystemManager erreicht `server_addr:Port` nicht – Portweiterleitung TCP, Firewall, Adresse |
+
+Das Protokoll enthält nur die letzten etwa 100 Fehler des ganzen FRN-Netzes. Ist es nicht erreichbar (ausgehend Port 60080 gesperrt), steht
+das in der Kachel.
+
 ## Fehlermeldungen des SystemManagers
 
-Sie stehen im Admin-Portal oben unter *Settings* und im Log:
+Sie stehen im Admin-Portal oben unter *Settings* und im Log – den ausführlichen Grund liefert das [FRN-Fehlerprotokoll](#-bei-problemen-immer-zuerst-das-öffentliche-frn-fehlerprotokoll):
 
 | Fehler | Bedeutung | Lösung |
 |---|---|---|

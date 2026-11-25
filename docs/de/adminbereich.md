@@ -58,6 +58,8 @@ Voraussetzung sind ein korrekt auf den Server zeigender öffentlicher DNS-Eintra
 
 <p align="center"><img src="../images/admin-sysman.png" alt="SystemManager mit Knopf FRN-Passwort anfordern" width="48%"> <img src="../images/admin-frn-password.png" alt="FRN-Passwort anfordern" width="48%"></p>
 
+Lehnt der SystemManager ab, steht der Grund im **öffentlichen FRN-Fehlerprotokoll** – Knopf *📋 FRN-Fehlerprotokoll* in derselben Kachel.
+
 Jeder FRN-Server braucht ein **eigenes FRN-Konto**. Laufen zwei Server (z. B. Live und Test) mit derselben E-Mail und demselben Passwort,
 lehnt der SystemManager den zweiten ab: *SystemManager: the same credentials are already online on another server* – der Server bleibt offline.
 
@@ -267,7 +269,9 @@ hoch (PNG, JPEG, WebP, GIF, ICO oder SVG ohne Skripte, max. 512 KB) – z. B. da
 
 <p align="center"><img src="../images/admin-logs.png" alt="Logs" width="90%"></p>
 
-Ereignisse live (Logins, Abweisungen, Moderation aus dem FRN-Client, Konfigurationsänderungen), auf Knopfdruck **server.log** des FRN-Servers und das Journal von `frn-server` und `frnadn`, darunter alle Logins mit E-Mail und IP-Adresse.
+Oben das **📋 öffentliche FRN-Fehlerprotokoll** von freeradionetwork.de mit allen Einträgen zu diesem Server – bei Problemen immer zuerst
+hier schauen (siehe [Betrieb](betrieb.md#-bei-problemen-immer-zuerst-das-öffentliche-frn-fehlerprotokoll)). Darunter Ereignisse live (Logins,
+Abweisungen, Moderation aus dem FRN-Client, Konfigurationsänderungen, neue Einträge aus dem FRN-Fehlerprotokoll), auf Knopfdruck **server.log** des FRN-Servers und das Journal von `frn-server` und `frnadn`, darunter alle Logins mit E-Mail und IP-Adresse.
 
 ## 🔐 Sessions & log
 

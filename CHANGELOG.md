@@ -2,6 +2,29 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.12.0 – 2026-11-25
+
+**📋 Öffentliches FRN-Fehlerprotokoll eingebaut.** Der FRN-SystemManager von freeradionetwork.de schreibt jede abgelehnte Anmeldung in ein
+öffentliches Fehlerprotokoll (<http://log.freeradionetwork.de:60080/error_log.php>, auf der Website unter *Hilfe → Fehlerprotokoll*). adn-frn-server nutzt es jetzt zur Fehlersuche.
+Ausführlich: [docs/de/betrieb.md](docs/de/betrieb.md#-bei-problemen-immer-zuerst-das-öffentliche-frn-fehlerprotokoll).
+
+### Neu
+- **Admin → 📜 Logs → 📋 Öffentliches FRN-Fehlerprotokoll:** Einträge zu dieser Server-Adresse (`frn.address`), dem Rufzeichen des Betreibers
+  und zu Stationen, die hier in der letzten Stunde abgewiesen wurden. Gleiche Meldungen zusammengefasst („6× seit 09:58“), mit Erklärung und
+  Abhilfe (Deutsch/Englisch), Abzeichen „nichts zu diesem Server“ / „7 Einträge zu diesem Server“ / „nicht erreichbar“, andere Stationen im
+  Protokoll als Hinweis. **🔄 Neu laden**, **📋 Komplettes Fehlerprotokoll öffnen**.
+- **Automatische Prüfung:** alle 10 Minuten, bei einem SystemManager-Fehler alle 2 Minuten; neue Einträge kommen als Ereignis `frnlog` ins
+  Live-Log (jede Meldung einmal). Nicht im eigenständigen Betrieb und nicht in der Demo.
+- **Hinweise mit Link** unter *Settings → SystemManager* und im Fehlerkasten des Java-Servers.
+- Bekannte Meldungen mit Abhilfe: *wrong FRN password*, *multiple connections at the same time with the same connection data …*,
+  *not listening on specified port*; weitere per Stichwort (gesperrt, unbekannt, Version, E-Mail); Unbekanntes mit dem englischen Hinweis
+  des SystemManagers.
+- API `GET /api/admin/frn-errorlog[?force=1]` – auch für das HobbyRadioPortal auf demselben Rechner. Modul `frnadn/frn_errorlog.py`
+  (JSON `?action=getLog`, 60 s Zwischenspeicher).
+- Demo: Beispielprotokoll ohne Internet. Tests: `tests/test_frn_errorlog.py`.
+- Doku: Betrieb (neuer Abschnitt „Bei Problemen immer zuerst …“ mit Tabelle), Adminbereich (Logs, SystemManager), README; Screenshots
+  `admin-frn-errorlog.png` und `admin-sysman.png` neu.
+
 ## 2.11.0 – 2026-11-25
 
 **🔌 HobbyRadioPortal ohne Token.** Läuft das Portal auf demselben Rechner, verwaltet es diesen Server direkt – kein Token anlegen,

@@ -25,7 +25,7 @@ import time
 import base64
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -36,6 +36,7 @@ from . import n8_security as _sec
 from . import n8_update_guard as _guard
 from . import backup as fbackup
 from . import sysman as fsysman
+from . import frn_errorlog
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
@@ -145,7 +146,7 @@ def ip_of(conn) -> str:
 
 # HobbyRadioPortal on the same server (no token, since 2.11.0): what it may reach besides the public data – settings, rooms,
 # the lists (ACL), starting/stopping the FRN server and the change log. Never users, sessions, accounts, updates, system or HTTPS.
-PORTAL_PATHS = {"/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
+PORTAL_PATHS = {"/api/admin/frn-errorlog", "/api/admin/settings", "/api/admin/rooms", "/api/admin/rooms/order", "/api/admin/acl", "/api/admin/audit",
                    "/api/admin/server/start", "/api/admin/server/stop", "/api/admin/server/restart", "/api/admin/frn-password"}
 PORTAL_LOCKED = ("https.",)
 # Only a *direct* call from this machine counts: loopback peer, Host is loopback, the portal's marker header and **no** proxy
@@ -1319,10 +1320,73 @@ async def midnight_site_icon_refresh() -> None:
         except Exception:
             log.exception("midnight site icon refresh")
 
+# ---------------------------------------------------------------- public FRN error log (freeradionetwork.de)
+_ERRLOG_SEEN: set = set()
+if DEMO:   # demo without internet: a typical log with entries about the demo server
+    def _demo_errorlog(timeout: float) -> str:
+        ago = lambda m: time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() - m * 60))  # noqa: E731
+        hint = " - Hint: Perform an FRN password request and use the assigned FRN password !"
+        lines = [f"{ago(50 - i * 5)} ERROR - Server [frn-demo.example.org:10024], DE, Request SC - wrong FRN password{hint}" for i in range(6)]
+        lines += [f"{ago(31)} ERROR - Server [frn-demo.example.org:10024], DE, Request SC - multiple connections at the same time "
+                  "with the same connection data are not permitted",
+                  f"{ago(9)} ERROR - Server [uhf3radionet.ddns.net:10024], GR, Request SC - not listening on specified port - Hint: "
+                  "Check the firewall settings and port forwarding settings, if applicable !",
+                  f"{ago(2)} ERROR - Client [DL9XYZ, Gateway], DE/DE, Request CC - wrong FRN password{hint}"]
+        return json.dumps({"log": "\n".join(lines)})
+    frn_errorlog._get = _demo_errorlog
+
+
+def errorlog_scope() -> Tuple[List[str], List[str]]:
+    """Callsigns and server addresses whose entries in the public FRN error log concern this server: the own server
+    address, the owner's callsign and stations refused on this server in the last hour."""
+    s = ctx.settings.all()
+    calls = [s.get("frn.owner_callsign") or ""]
+    now = time.time()
+    for e in list(ctx.live.events):
+        if e.get("kind") == "denied" and e.get("ts", 0) > now - 3600:
+            calls.append(str(e.get("text", "")).split(" ", 1)[0])
+    return [c for c in dict.fromkeys(calls) if c and c != "?"], [h for h in [s.get("frn.address") or ""] if h]
+
+
+async def errorlog_watch() -> None:
+    """Look into the public FRN error log and report new entries about this server as event (once per message)."""
+    entries, err = await frn_errorlog.fetch(force=True)
+    if err:
+        return
+    calls, hosts = errorlog_scope()
+    recent = [e for e in frn_errorlog.relevant(entries, calls, hosts) if e["time"] >= time.time() - 1800]
+    for g in frn_errorlog.summarize(recent)[:5]:
+        key = (g["kind"], g["id"], g["message"], g["first"])
+        if key in _ERRLOG_SEEN:
+            continue
+        _ERRLOG_SEEN.add(key)
+        who = f"client {g['id']}" + (f", {g['name']}" if g["name"] else "") if g["kind"] == "Client" else f"server {g['id']}"
+        ctx.live.frn_errorlog(f"FRN error log: {who} – {g['message']}" + (f" ({g['count']}× since {g['first'][11:16]})" if g["count"] > 1 else "")
+                              + (f" → {g['hint']}" if g["hint"] else ""))
+
+
+@app.get("/api/admin/frn-errorlog")
+async def frn_errorlog_get(request: Request, force: bool = False):
+    """Public FRN error log of freeradionetwork.de – entries about this server (address, owner, refused stations)."""
+    need_admin(request)
+    calls, hosts = errorlog_scope()
+    entries, err = await frn_errorlog.fetch(force=force)
+    mine = frn_errorlog.relevant(entries, calls, hosts)
+    seen = {(e["ts"], e["kind"], e["id"]) for e in mine}
+    return {"ok": not err, "error": err, "page": frn_errorlog.PAGE, "fetched": frn_errorlog._cache["t"], "total": len(entries),
+            "span": [entries[0]["ts"], entries[-1]["ts"]] if entries else None, "scope": {"callsigns": calls, "servers": hosts},
+            "mine": frn_errorlog.summarize(mine),
+            "others": frn_errorlog.summarize([e for e in entries if (e["ts"], e["kind"], e["id"]) not in seen])[:15]}
+
+
 async def background() -> None:
     n = 0
     while True:
         try:
+            # public FRN error log: every 2 minutes while the SystemManager reports a problem, otherwise every 10 minutes
+            if not DEMO and ctx.settings.get("frn.address") and not ctx.settings.get("frn.standalone") \
+                    and n % (24 if ctx.server.error else 120) == 7:
+                await errorlog_watch()
             if n % 12 == 0:
                 ctx.live.sample()
             if n % 720 == 5:
