@@ -447,21 +447,49 @@ ka_conf() {   # ka_conf schlüssel vorgabe – nur erlaubte Zeichen, keine Shell
   echo "${v:-$2}"
 }
 ka_tcp() { local h="${1%:*}" p="${1##*:}"; timeout 4 bash -c "exec 3<>/dev/tcp/$h/$p" 2>/dev/null; }
-ka_http() { local c; c=$(curl -sk -m 8 -o /dev/null -w '%{http_code}' "$1" 2>/dev/null || true); [[ "$c" =~ ^[1-4][0-9][0-9]$ ]]; }   # jede Antwort außer 5xx
+# ka_local URL – Weiterleitung (z. B. http → https, wenn die Anwendung HTTPS selbst macht) auf denselben Weg bei 127.0.0.1 umbiegen:
+# so wird immer die Anwendung auf diesem Rechner gefragt, nie die öffentliche Adresse (Hairpin-NAT, Zertifikat, „nur lokal“).
+ka_local() {
+  local r="$1" proto rest hp port path
+  proto="${r%%://*}"; rest="${r#*://}"; hp="${rest%%/*}"; path="/${rest#*/}"; [[ "$rest" == */* ]] || path="/"
+  if [[ "$hp" =~ :([0-9]+)$ ]]; then port="${BASH_REMATCH[1]}"; elif [[ "$proto" == https ]]; then port=443; else port=80; fi
+  [[ "$proto" == http || "$proto" == https ]] || return 1
+  echo "$proto://127.0.0.1:$port$path"
+}
+# ka_get URL – Antwort holen (folgt höchstens zwei Weiterleitungen, jeweils zurück auf 127.0.0.1); setzt KA_CODE und KA_BODY
+ka_get() {
+  local url="$1" i out code red
+  KA_CODE=000; KA_BODY=""
+  for i in 1 2 3; do
+    out="$(curl -sk -m 8 -w $'\n%{http_code} %{redirect_url}' "$url" 2>/dev/null || true)"
+    code="$(tail -1 <<<"$out")"; red="${code#* }"; code="${code%% *}"
+    KA_CODE="${code:-000}"; KA_BODY="$(sed '$d' <<<"$out")"
+    [[ "$KA_CODE" =~ ^30[1278]$ && -n "$red" && "$red" != "$code" ]] || return 0
+    url="$(ka_local "$red")" || return 0
+  done
+}
+ka_http() { ka_get "$1"; [[ "$KA_CODE" =~ ^[1-4][0-9][0-9]$ && ! "$KA_CODE" =~ ^30 ]]; }   # jede Antwort außer 5xx und außer einer Weiterleitung ins Leere
 declare -A KA_HEALTH=()
 ka_health() {   # ka_health URL#punkt – /api/n8/health der Anwendung (nur von 127.0.0.1): {"items": {"punkt": {"ok": true, "why": "…"}}}
+  # Rückgabe 0 = gesund, 1 = die Anwendung meldet den Punkt als gestört (→ Neustart), 2 = Zustand unbekannt (keine/fremde Antwort –
+  # kein Neustart des Dienstes; ob die Weboberfläche selbst lebt, prüft ihre eigene http-Prüfung)
   local url="${1%%#*}" item="${1#*#}" body
-  if [[ -z "${KA_HEALTH[$url]+x}" ]]; then KA_HEALTH[$url]="$(curl -fsSk -m 8 "$url" 2>/dev/null || echo '{"error": "keine Antwort"}')"; fi
+  if [[ -z "${KA_HEALTH[$url]+x}" ]]; then
+    ka_get "$url"
+    if [[ "$KA_CODE" == 200 ]]; then KA_HEALTH[$url]="$KA_BODY"; else KA_HEALTH[$url]="{\"error\": \"Zustand unbekannt – /api/n8/health antwortet mit HTTP $KA_CODE\"}"; fi
+  fi
   body="${KA_HEALTH[$url]}"
   python3 -c 'import json, sys
 try:
     d = json.loads(sys.argv[1])
 except Exception:
-    print("Antwort ist kein JSON"); sys.exit(1)
-if "items" not in d:
-    print(d.get("error") or "keine Antwort"); sys.exit(1)
+    print("Zustand unbekannt – /api/n8/health liefert kein JSON"); sys.exit(2)
+if not isinstance(d, dict) or "items" not in d:
+    print((d.get("error") if isinstance(d, dict) else "") or "Zustand unbekannt"); sys.exit(2)
 i = d["items"].get(sys.argv[2])
-if i is None or i.get("ok", True):
+if i is None:
+    print("Zustand unbekannt – " + sys.argv[2] + " fehlt in /api/n8/health"); sys.exit(2)
+if i.get("ok", True):
     sys.exit(0)
 print(i.get("why") or (sys.argv[2] + " nicht in Ordnung")); sys.exit(1)' "$body" "$item"
 }
@@ -518,14 +546,19 @@ do_keepalive() {
       case "$kind" in
         http) ka_http "$tgt" || { healthy=0; why="keine Antwort von $tgt"; } ;;
         tcp)  ka_tcp "$tgt" || { healthy=0; why="Port $tgt nimmt nichts an"; } ;;
-        health) why="$(ka_health "$tgt" 2>&1)" && why="" || healthy=0 ;;
+        health) why="$(ka_health "$tgt" 2>&1)"; case $? in 0) why="" ;; 2) healthy=3 ;; *) healthy=0 ;; esac ;;
         fn)   why="$("$tgt" 2>&1)"; [[ $? == 0 ]] && why="" || { healthy=0; why="$(tail -1 <<<"$why")"; why="${why:-Prüfung $tgt fehlgeschlagen}"; } ;;
       esac
       # eine Verbindung nach draußen kann ohne Internet nicht stehen – dann nicht neu starten, nur melden
       if (( ! healthy && ! net )) && [[ " ${N8_KA_NET_UNITS[*]} " == *" $u "* ]]; then why="$why (Internet weg – kein Neustart)"; healthy=2; fi
     fi
     fails=$(ka_json "$st" "fails:$ck"); fails=${fails:-0}
-    if (( healthy == 1 )); then
+    if (( healthy == 3 )); then   # Zustand unbekannt: melden, aber nie deswegen neu starten
+      [[ "$(ka_json "$st" "unknown:$ck")" == 1 ]] || { ka_log "? $u: ${why//\"/\'}"; ka_json "$st" "unknown:$ck" 1 >/dev/null; }
+      ka_json "$st" "fails:$ck" 0 >/dev/null
+      rows+="$sep{\"unit\": \"$u\", \"label\": \"${label:-$u}\", \"state\": \"unknown\", \"active\": \"$act\", \"why\": \"${why//\"/\'}\", \"fails\": 0}"
+    elif (( healthy == 1 )); then
+      ka_json "$st" "unknown:$ck" 0 >/dev/null
       (( fails > 0 )) && ka_log "✔ $u wieder gesund"
       ka_json "$st" "fails:$ck" 0 >/dev/null; fails=0
       rows+="$sep{\"unit\": \"$u\", \"label\": \"${label:-$u}\", \"state\": \"ok\", \"active\": \"$act\", \"why\": \"\", \"fails\": 0}"

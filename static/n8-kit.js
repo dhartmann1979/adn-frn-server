@@ -554,12 +554,12 @@
                 const c = d.conf || {}, paused = c.paused_until && c.paused_until * 1000 > Date.now();
                 const badge = !d.ready ? `<span class="n8-badge warn">${esc(t('nicht eingerichtet'))}</span>` : !c.enabled ? `<span class="n8-badge">${esc(t('aus'))}</span>`
                     : paused ? `<span class="n8-badge warn">${esc(t('pausiert'))}</span>` : d.stale ? `<span class="n8-badge bad">${esc(t('läuft nicht'))}</span>` : `<span class="n8-badge ok">${esc(t('aktiv'))}</span>`;
-                const ic = st => ({ ok: '✅', hold: '⏸️', restarted: '🔄', giveup: '❌' }[st] || '⚠️');
+                const ic = st => ({ ok: '✅', hold: '⏸️', restarted: '🔄', giveup: '❌', unknown: '❔' }[st] || '⚠️');
                 paint(card('💓 Keep-Alive', `<p class="n8-help">${esc(t('Jede Minute als root: prüft jeden Dienst wirklich (Weboberfläche und Verbindungen der Protokolle), startet kranke Dienste nach ein paar Minuten neu (höchstens 4× je Stunde), erkennt Internet-Ausfälle und startet danach die Netzdienste neu, und meldet sich bei einer Heartbeat-Adresse (Uptime Kuma „Push“, Healthchecks.io …). Ein von Hand gestoppter Dienst bleibt gestoppt.'))}</p>
                     ${d.ready ? `<div class="n8-kv"><span>🌐 ${esc(t('Internet'))}</span><span>${d.net ? `<span class="n8-badge ok">${esc(t('erreichbar'))}</span>` : `<span class="n8-badge bad">${esc(t('weg seit'))} ${fmt(d.net_down_since)}</span>`}</span>
                         <span>${esc(t('Letzte Prüfung'))}</span><span>${d.age != null && d.age < 120 ? esc(t('gerade eben')) : fmt(d.time)}</span>
                         ${c.heartbeat_url ? `<span>${esc(t('Heartbeat'))}</span><span>${esc(d.heartbeat || '–')}</span>` : ''}</div>
-                      <div class="n8-perm" style="margin-top:10px">${(d.checks || []).map(x => `<div class="n8-perm-r">${ic(x.state)}<b>${esc(x.label)}</b><span><span>${esc(t(x.state === 'ok' ? 'gesund' : x.state === 'hold' ? 'von Hand gestoppt – Keep-Alive wartet' : ''))}</span>${x.state !== 'ok' && x.state !== 'hold' ? esc(x.why || '') : ''}${x.restarts ? ` · <span>${x.restarts}× ${esc(t('neu gestartet'))}</span>, ${fmt(x.last_restart)}` : ''}</span></div>`).join('')}</div>`
+                      <div class="n8-perm" style="margin-top:10px">${(d.checks || []).map(x => `<div class="n8-perm-r">${ic(x.state)}<b>${esc(x.label)}</b><span><span>${esc(t(x.state === 'ok' ? 'gesund' : x.state === 'hold' ? 'von Hand gestoppt – Keep-Alive wartet' : x.state === 'unknown' ? 'kein Neustart' : ''))}${x.state === 'unknown' ? ' · ' : ''}</span>${x.state !== 'ok' && x.state !== 'hold' ? esc(x.why || '') : ''}${x.restarts ? ` · <span>${x.restarts}× ${esc(t('neu gestartet'))}</span>, ${fmt(x.last_restart)}` : ''}</span></div>`).join('')}</div>`
                       : `<div class="n8-help">${esc(t('Einmal auf der Konsole einrichten:'))} <code>${esc(cons)} fix-perms</code></div>`}
                     <form class="n8-form">
                       <label class="n8-sw"><input type="checkbox" name="enabled" ${c.enabled ? 'checked' : ''}><i></i> ${esc(t('Keep-Alive an'))}</label>
@@ -622,7 +622,7 @@
             '👤 Dienstbenutzer': '👤 Service user', '📦 Programm': '📦 Program', '💾 Daten': '💾 Data', '🔌 Hardware': '🔌 Hardware', '🧬 Quellordner': '🧬 Source folder',
             '🔌 USB-Vocoder': '🔌 USB vocoder', '🔒 Domains & HTTPS': '🔒 Domains & HTTPS',
             'nicht eingerichtet': 'not set up', 'pausiert': 'paused', 'läuft nicht': 'not running', 'aktiv': 'active', 'Internet': 'Internet', 'erreichbar': 'reachable',
-            'weg seit': 'down since', 'Letzte Prüfung': 'Last check', 'gerade eben': 'just now', 'Heartbeat': 'Heartbeat', 'gesund': 'healthy',
+            'weg seit': 'down since', 'Letzte Prüfung': 'Last check', 'gerade eben': 'just now', 'Heartbeat': 'Heartbeat', 'gesund': 'healthy', 'kein Neustart': 'no restart',
             'von Hand gestoppt – Keep-Alive wartet': 'stopped by hand – keep-alive waits', 'neu gestartet': 'restarted', 'Einmal auf der Konsole einrichten:': 'Set up once on the console:',
             'Keep-Alive an': 'Keep-alive on', 'Netzdienste nach einem Internet-Ausfall neu starten': 'Restart network services after an internet outage',
             'Heartbeat-Adresse': 'Heartbeat address', 'Heartbeat bei Fehlern (optional)': 'Heartbeat on errors (optional)', '▶ Fortsetzen': '▶ Resume',

@@ -2,6 +2,23 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.14.1 – 2026-11-25
+
+### 🐛 Fix: Keep-Alive startete einen gesunden Dienst neu („Antwort ist kein JSON“)
+- **Ursache:** Macht die Anwendung HTTPS selbst (Let's Encrypt im Dashboard), leitet Port 80 nur noch auf `https://<domain>/` weiter.
+  Der Keep-Alive fragte `http://127.0.0.1/api/n8/health`, bekam die Weiterleitung statt der Antwort, meldete „Antwort ist kein JSON“ –
+  und startete deswegen den Java-FRN-Server (alle Stationen flogen raus) alle paar Minuten neu (bis zur Grenze von 4× je Stunde). Die Prüfung der Weboberfläche hielt die
+  Weiterleitung dagegen fälschlich für „gesund“.
+- **Weiterleitungen werden jetzt verfolgt – aber immer zurück auf 127.0.0.1** (gleiches Schema, gleicher Port, gleicher Pfad). So wird
+  stets die Anwendung auf diesem Rechner gefragt, nie die öffentliche Adresse (kein Hairpin-NAT, kein Zertifikatsproblem, und
+  `/api/n8/health` bleibt „nur lokal“). Eine Weiterleitung ins Leere zählt nicht mehr als „Weboberfläche antwortet“.
+- **„Zustand unbekannt“ führt nie mehr zu einem Neustart.** Startet ein Dienst neu, dann nur, wenn die Anwendung ihn ausdrücklich als
+  gestört meldet (oder wenn er nicht läuft / sein Port nichts annimmt). Keine oder eine fremde Antwort von `/api/n8/health` wird mit
+  ❔ angezeigt und einmal ins Protokoll geschrieben – ob die Weboberfläche selbst lebt, prüft weiterhin ihre eigene Prüfung.
+- Gilt für alle fünf N8-Systeme (gemeinsames `scripts/n8-admin.sh`).
+
+> Auf bestehenden Servern genügt „Update jetzt“; danach den Keep-Alive unter *System → 💓 Keep-Alive* wieder fortsetzen, falls er pausiert ist.
+
 ## 2.14.0 – 2026-11-25
 
 ### 🧭 Neu: Admin-Menü als Baum – in allen fünf N8-Systemen gleich
