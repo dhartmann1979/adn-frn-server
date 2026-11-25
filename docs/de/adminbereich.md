@@ -13,8 +13,9 @@ mit denselben Gruppen in derselben Reihenfolge:
 
 | Gruppe | Einträge |
 |---|---|
-| 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten, HTTPS & Web) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
-| 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔐 Sitzungen & Protokoll |
+| 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
+| 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔑 Sitzungen · 📜 Protokoll |
+| 🌐 **Netz, Ports & Domains** | 🔌 Ports · 🔒 Domains & HTTPS |
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
 | 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💥 Abstürze · 💾 Backup (nur Superadmin) |
 
@@ -46,25 +47,19 @@ Darunter fünf Karten, jede mit eigenem *Save*:
 | 🖥️ Dashboard | Titel, Untertitel, öffentliche Ansicht, versteckte Räume, Chat, Login-Dauer | nur SQLite |
 | 🗄️ Data | Aufbewahrung von Durchgängen, Logins, Chat | nur SQLite |
 
-## 🔒 HTTPS & web – Let's Encrypt
+## 🌐 Netz, Ports & Domains
 
-<p align="center"><img src="../images/admin-https.png" alt="HTTPS-Einstellungen" width="45%"></p>
+Seit **2.16.0** steht alles zu Netz, HTTPS und Domains **nur noch hier** – wie in N8 Crosslink und allen N8-Systemen (vorher unter
+*Einstellungen → HTTPS & web*).
 
-Der Abschnitt **HTTPS & web** übernimmt das automatische Zertifikatsmanagement aus HBlink4-FreeRadioID:
+<p align="center"><img src="../images/admin-ports.png" alt="Ports" width="49%"> <img src="../images/admin-https.png" alt="Domains & HTTPS" width="49%"></p>
 
-- **Enable HTTPS with Let's Encrypt:** aktiviert den HTTPS-Listener und den HTTP-01-Challenge-Endpunkt.
-- **Public domain:** öffentlicher DNS-Name des Dashboards, ohne Schema oder Pfad.
-- **Certificate e-mail:** Kontaktadresse für Let's Encrypt.
-- **Use test certificates (staging):** Testumgebung zum Prüfen von DNS und Portfreigaben; Browser vertrauen diesen Zertifikaten nicht.
-- **HTTP challenge / redirect port:** normalerweise TCP 80.
-- **HTTPS port:** normalerweise TCP 443.
-
-Nach dem Speichern ist ein Neustart des Dashboard-Dienstes erforderlich:
-
-```bash
-sudo systemctl restart frnadn
-sudo journalctl -u frnadn -n 80 --no-pager
-```
+- **🔌 Ports:** Web-Port (steht im systemd-Dienst, `FRNADN_PORT`), HTTP-Port (Let's-Encrypt-Prüfung, normalerweise 80), HTTPS-Port (443),
+  FRN-Port der Clients (10024), Port des Ausweichservers und SystemManager – jeweils *eingehend/ausgehend* mit Protokoll.
+  **💾 Ports speichern**; was einen Neustart braucht, steht danach unten, **♻️ Dashboard neu starten** erledigt ihn.
+- **🔒 Domains & HTTPS:** Domain und E-Mail eintragen (optional Test-Zertifikat) → **Domain eintragen & Zertifikat holen**: HTTPS wird
+  eingeschaltet, das Dashboard startet neu und holt das Zertifikat. Danach Tabelle mit DNS-Auflösung, Zertifikat (gültig/Test/abgelaufen,
+  bis wann), **🔄 Erneuern**, **Entfernen** und Schalter *HTTPS mit Let's Encrypt*. Hinter dem HobbyRadioPortal HTTPS hier aus lassen.
 
 Der Listener auf HTTP beantwortet ACME-Challenges und leitet sonst mit HTTP 301 auf HTTPS um. Certbot läuft als Benutzer `frnadn`; seine Daten liegen im Datenverzeichnis unter `letsencrypt/`. Die Erneuerung wird alle zwölf Stunden geprüft. Ein erneuertes Zertifikat wird in den laufenden TLS-Kontext geladen, ohne den Dienst neu zu starten.
 
@@ -279,8 +274,10 @@ Oben das **📋 öffentliche FRN-Fehlerprotokoll** von freeradionetwork.de mit a
 hier schauen (siehe [Betrieb](betrieb.md#-bei-problemen-immer-zuerst-das-öffentliche-frn-fehlerprotokoll)). Darunter Ereignisse live (Logins,
 Abweisungen, Moderation aus dem FRN-Client, Konfigurationsänderungen, neue Einträge aus dem FRN-Fehlerprotokoll), auf Knopfdruck **server.log** des FRN-Servers und das Journal von `frn-server` und `frnadn`, darunter alle Logins mit E-Mail und IP-Adresse.
 
-## 🔐 Sessions & log
+## 🔑 Sitzungen · 📜 Protokoll
 
-<p align="center"><img src="../images/admin-audit.png" alt="Sessions" width="90%"></p>
+<p align="center"><img src="../images/admin-sessions.png" alt="Sitzungen" width="49%"> <img src="../images/admin-audit.png" alt="Protokoll" width="49%"></p>
 
-Angemeldete Sitzungen (beenden mit *End*) und das Protokoll aller Änderungen: wer hat wann was geändert, mit IP.
+Seit **2.16.0** wie in HBlink4-FreeRadioID (gemeinsame Ansicht aller N8-Systeme): **🔑 Sitzungen** mit Benutzer, Rolle, IP, Browser,
+zuletzt aktiv und Ablauf – **Abmelden** beendet eine Sitzung sofort. **📜 Protokoll**: Anmeldungen, Fehlversuche und jede Änderung im
+Adminbereich, mit Zeit, Person und IP.

@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.3.0 – shared by the N8schicht web interfaces
+ * N8 Kit 1.4.0 – shared by the N8schicht web interfaces
  * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -13,6 +13,8 @@
  *   N8Kit.update.run(opts)                     install with progress, health check and reload
  *   N8Kit.nav.tree(el, groups, opts)           admin menu as a tree on the left (same structure in every N8 system)
  *   N8Kit.sys.view(el, name, opts)             the same System views everywhere: update, services, perms, keepalive, crashes
+ *   N8Kit.access.view(el, name, opts)          Benutzer & Zugang: users, sessions, audit (look of HBlink4-FreeRadioID)
+ *   N8Kit.net.view(el, name, opts)             Netz, Ports & Domains: ports, domains (look of N8 Crosslink)
  *   N8Kit.sys.crashPopup(opts)                 after the admin login: window with new crashes/hangs (until marked as read)
  *
  * Translation works on the finished page: text nodes and the attributes title, placeholder, aria-label
@@ -682,8 +684,215 @@
         return d;
     }
 
+
+    // ============================================================ Benutzer & Zugang (1.4.0) – Vorbild HBlink4-FreeRadioID, gleich in allen N8-Systemen
+    // N8Kit.access.view(el, 'users' | 'sessions' | 'audit', opts)
+    //   opts.req(method, url, body)       die Anfrage-Funktion des Projekts
+    //   opts.me = { username, role }      wer angemeldet ist
+    //   opts.roles = [{ id, label, assign: 'all' | 'superadmin' | 'none' }]   wählbare Rollen (Reihenfolge = Anzeige)
+    //   opts.fields = ['display_name', 'dmr_id', 'callsign']                  zusätzliche Felder je Benutzer
+    //   opts.api = { list, create, update, remove, sessions, revoke, audit }    eigene Adressen (sonst /api/admin/users, /sessions, /audit)
+    //   opts.locked(u, me) → Text | ''    warum ein Benutzer hier nicht änderbar ist; opts.avatar(u) → HTML; opts.note → Hinweis unter der Tabelle
+    const FIELD = { display_name: ['Anzeigename', 'text'], dmr_id: ['DMR-ID', 'numeric'], callsign: ['Rufzeichen', 'text'] };
+    const ago = ts => ts ? fmtShort(ts) : '–';
+    function fmtShort(ts) { return new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+    function shortUA(ua) {
+        if (!ua) return '–';
+        const b = /Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+        const os = /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac OS/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '';
+        return `${b}${os ? ' · ' + os : ''}`;
+    }
+    function initials(u) {
+        const n = String(u.display_name || u.username || '?').trim();
+        return esc((n.match(/\b\w/g) || [n[0] || '?']).slice(0, 2).join('').toUpperCase());
+    }
+    async function accessView(el, name, o) {
+        const req = o.req, me = o.me || {};
+        const A = Object.assign({
+            list: async () => { const r = await req('GET', '/api/admin/users'); return r.users || r.items || []; },
+            create: d => req('POST', '/api/admin/users', d),
+            update: (u, d) => req('PATCH', '/api/admin/users/' + encodeURIComponent(u.id), d),
+            remove: u => req('DELETE', '/api/admin/users/' + encodeURIComponent(u.id)),
+            sessions: async () => { const r = await req('GET', '/api/admin/sessions'); return r.sessions || r.items || []; },
+            revoke: s => req('DELETE', '/api/admin/sessions/' + encodeURIComponent(s.id)),
+            audit: async () => { const r = await req('GET', '/api/admin/audit'); return r.audit || r.entries || r.items || []; },
+        }, o.api || {});
+        const roles = o.roles || [{ id: 'superadmin', label: 'Superadmin', assign: 'none' }, { id: 'admin', label: 'Admin', assign: 'superadmin' }, { id: 'user', label: 'Benutzer', assign: 'all' }];
+        const RL = Object.fromEntries(roles.map(r => [r.id, r.label]));
+        const fields = o.fields || ['display_name'];
+        const msg = e => `<div class="n8-help">⚠️ ${esc(e && e.message ? e.message : String(e))}</div>`;
+        const paint = html => { el.innerHTML = html; retranslateEl(el); };
+        const role = r => `<span class="n8-role n8-role-${esc(r)}">${esc(t(RL[r] || r))}</span>`;
+        const toast = (m, bad) => { if (o.toast) o.toast(m, bad); else if (bad) alert(m); };
+        el.classList.add('n8-access');
+        if (name === 'users') {
+            const canAssign = r => r.assign === 'all' || (r.assign === 'superadmin' && me.role === 'superadmin') || (r.assign === 'admin' && ['admin', 'superadmin'].includes(me.role));
+            const opts = sel => roles.filter(r => canAssign(r) || r.id === sel).map(r => `<option value="${esc(r.id)}" ${r.id === sel ? 'selected' : ''} ${canAssign(r) ? '' : 'disabled'}>${esc(t(r.label))}</option>`).join('');
+            const locked = u => o.locked ? o.locked(u, me) : (u.role === 'superadmin' && me.role !== 'superadmin' ? t('nur Superadmin') : '');
+            const load = async () => {
+                let users; try { users = await A.list(); } catch (e) { paint(card('👥 Benutzer', msg(e))); return; }
+                const inp = (f, u) => `<input name="${f}" placeholder="${esc(t(FIELD[f][0]))}" ${FIELD[f][1] === 'numeric' ? 'inputmode="numeric"' : ''} value="${esc(u ? (u[f] ?? '') : '')}">`;
+                const rows = users.map((u, i) => {
+                    const lk = locked(u);
+                    return `<tr class="${u.disabled ? 'off' : ''}"><td><span class="n8-user-c">${o.avatar ? o.avatar(u) : `<span class="n8-av">${initials(u)}</span>`}
+                            <span><b>${esc(u.username)}</b>${u.display_name ? `<br><small>${esc(u.display_name)}</small>` : ''}</span></span></td>
+                        <td>${role(u.role)}${u.disabled ? ` <span class="n8-role n8-role-off">${esc(t('gesperrt'))}</span>` : ''}</td>
+                        ${fields.filter(f => f !== 'display_name').map(f => `<td>${esc(u[f] || '–')}</td>`).join('')}
+                        <td>${esc(ago(u.last_login))}</td>
+                        <td class="n8-act">${lk ? `<small class="n8-dim">${esc(lk)}</small>` : `<button type="button" class="n8-btn sm" data-edit="${i}">${esc(t('Bearbeiten'))}</button>`}</td></tr>
+                        ${lk ? '' : `<tr class="n8-edit" data-row="${i}" hidden><td colspan="${4 + fields.filter(f => f !== 'display_name').length}"><form class="n8-iform" data-i="${i}">
+                            ${fields.map(f => inp(f, u)).join('')}
+                            <input name="password" type="password" placeholder="${esc(t('Neues Passwort (optional)'))}" autocomplete="new-password">
+                            <select name="role">${opts(u.role)}</select>
+                            <label class="n8-chk"><input type="checkbox" name="disabled" ${u.disabled ? 'checked' : ''}> ${esc(t('gesperrt'))}</label>
+                            <button class="n8-btn primary sm" type="submit">${esc(t('Speichern'))}</button>
+                            <button class="n8-btn sm danger" type="button" data-del="${i}">${esc(t('Löschen'))}</button></form></td></tr>`}`;
+                }).join('');
+                const first = roles.filter(canAssign).slice(-1)[0];
+                paint(card('👥 Benutzer', `<p class="n8-help">${esc(t(o.intro || 'Wer sich anmelden darf. Admins sehen IP-Adressen und Ports und ändern Einstellungen; Benutzer sehen nur das Dashboard.'))}</p>
+                    <form class="n8-iform create">
+                        <input name="username" placeholder="${esc(t('Benutzername'))}" required autocomplete="off">
+                        ${fields.map(f => inp(f)).join('')}
+                        <input name="password" type="password" placeholder="${esc(t('Passwort (min. 8)'))}" minlength="8" required autocomplete="new-password">
+                        <select name="role">${opts(first ? first.id : '')}</select>
+                        <button class="n8-btn primary sm" type="submit">＋ ${esc(t('Benutzer anlegen'))}</button></form>
+                    <table class="n8-tbl"><thead><tr><th>${esc(t('Benutzer'))}</th><th>${esc(t('Rolle'))}</th>${fields.filter(f => f !== 'display_name').map(f => `<th>${esc(t(FIELD[f][0]))}</th>`).join('')}<th>${esc(t('Letzte Anmeldung'))}</th><th></th></tr></thead>
+                    <tbody>${rows}</tbody></table>${o.note ? `<p class="n8-help">${esc(t(o.note))}</p>` : ''}`));
+                const fd = f => { const d = {}; for (const x of f.elements) if (x.name) d[x.name] = x.type === 'checkbox' ? x.checked : x.value.trim(); if ('dmr_id' in d) d.dmr_id = d.dmr_id ? Number(d.dmr_id) : null; return d; };
+                el.querySelector('form.create').onsubmit = async e => {
+                    e.preventDefault(); const d = fd(e.target);
+                    try { await A.create(d); toast(t('Benutzer angelegt') + ': ' + d.username); load(); } catch (x) { toast(x.message, true); }
+                };
+                el.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { const r = el.querySelector(`tr[data-row="${b.dataset.edit}"]`); r.hidden = !r.hidden; });
+                el.querySelectorAll('form[data-i]').forEach(f => f.onsubmit = async e => {
+                    e.preventDefault(); const d = fd(f); if (!d.password) delete d.password;
+                    try { await A.update(users[f.dataset.i], d); toast(t('Gespeichert')); load(); } catch (x) { toast(x.message, true); }
+                });
+                el.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+                    if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = t('Wirklich löschen?'); return; }
+                    try { await A.remove(users[b.dataset.del]); toast(t('Benutzer gelöscht')); load(); } catch (x) { toast(x.message, true); }
+                });
+            };
+            return load();
+        }
+        if (name === 'sessions') {
+            const load = async () => {
+                let list; try { list = await A.sessions(); } catch (e) { paint(card('🔑 Sitzungen', msg(e))); return; }
+                paint(card('🔑 Sitzungen', `<p class="n8-help">${esc(t('Alle aktuellen Anmeldungen. Mit „Abmelden“ ist das Gerät sofort abgemeldet.'))}</p>
+                    ${!list.length ? `<div class="n8-help">${esc(t('Keine aktiven Sitzungen.'))}</div>` : `<table class="n8-tbl"><thead><tr><th>${esc(t('Benutzer'))}</th><th>IP</th><th>Browser</th><th>${esc(t('Zuletzt aktiv'))}</th><th>${esc(t('Läuft ab'))}</th><th></th></tr></thead>
+                    <tbody>${list.map((x, i) => `<tr><td><b>${esc(x.username)}</b> ${x.role ? role(x.role) : ''}${x.current ? ` <span class="n8-badge ok">${esc(t('diese Sitzung'))}</span>` : ''}</td>
+                        <td><code>${esc(x.ip || '–')}</code></td><td>${esc(shortUA(x.user_agent))}</td><td>${esc(ago(x.last_seen || x.created_at))}</td><td>${esc(ago(x.expires_at))}</td>
+                        <td class="n8-act">${x.id ? `<button type="button" class="n8-btn sm danger" data-rev="${i}">${esc(t('Abmelden'))}</button>` : ''}</td></tr>`).join('')}</tbody></table>`}`));
+                el.querySelectorAll('[data-rev]').forEach(b => b.onclick = async () => {
+                    try { await A.revoke(list[b.dataset.rev]); toast(t('Sitzung beendet')); load(); } catch (x) { toast(x.message, true); }
+                });
+            };
+            return load();
+        }
+        if (name === 'audit') {
+            let list; try { list = await A.audit(); } catch (e) { paint(card('📜 Protokoll', msg(e))); return; }
+            paint(card('📜 Protokoll', `<p class="n8-help">${esc(t('Anmeldungen, Fehlversuche und jede Änderung im Adminbereich – mit Zeit, Person und IP-Adresse.'))}</p>
+                ${!list.length ? `<div class="n8-help">–</div>` : `<table class="n8-tbl"><thead><tr><th>${esc(t('Zeit'))}</th><th>${esc(t('Ereignis'))}</th><th>${esc(t('Benutzer'))}</th><th>${esc(t('Einzelheiten'))}</th><th>IP</th></tr></thead>
+                <tbody>${list.map(a => `<tr><td>${esc(ago(a.ts || a.time))}</td><td>${esc((o.actions || {})[a.action] || a.action || '')}</td><td>${esc(a.username || a.user || '')}</td><td>${esc(a.detail || '')}</td><td><code>${esc(a.ip || '')}</code></td></tr>`).join('')}</tbody></table>`}`));
+        }
+    }
+
+    // ============================================================ Netz, Ports & Domains (1.4.0) – Vorbild N8 Crosslink, gleich in allen N8-Systemen
+    // N8Kit.net.view(el, 'ports' | 'domains', { req, onRestart })
+    //   GET  /api/admin/ports   → { intro, note, restart: { text, button }, groups: [{ title, rows: [{ key, label, dir: 'in'|'out', proto, help, value,
+    //                               kind: 'port'|'text', min, readonly }] }] }
+    //   POST /api/admin/ports   { values: { key: value } } → { ok, message }
+    //   GET  /api/admin/domains → { intro, hint, ok, sites: [{ domain, https, cert: { days, issuer, expires, staging } | null, dns: [], info,
+    //                               renew, remove }], add: { allowed, email, staging, reason, button }, options: [{ key, label, value, help }], renew_auto }
+    //   POST /api/admin/domains { domain, email, staging } · POST /api/admin/domains/<d>/renew · DELETE /api/admin/domains/<d>
+    //   POST /api/admin/domains/options { key: value }
+    async function netView(el, name, o) {
+        const req = o.req;
+        const msg = e => `<div class="n8-help">⚠️ ${esc(e && e.message ? e.message : String(e))}</div>`;
+        const paint = html => { el.innerHTML = html; retranslateEl(el); };
+        const out = (r, ok) => { const p = el.querySelector('.n8-net-out'); if (p) p.textContent = (r && (r.message || '')) + (r && r.log ? '\n\n' + r.log : ''); if (o.toast && r) o.toast((r.ok === false ? '⚠️ ' : '✅ ') + (r.message || ''), r.ok === false); };
+        el.classList.add('n8-net');
+        if (name === 'ports') {
+            const load = async () => {
+                let d; try { d = await req('GET', '/api/admin/ports'); } catch (e) { paint(card('🔌 Ports', msg(e))); return; }
+                const row = r => `<tr><td><b>${esc(t(r.label))}</b>${r.help ? `<div class="n8-dim">${esc(t(r.help))}</div>` : ''}</td>
+                    <td class="n8-nowrap"><span class="n8-badge ${r.dir === 'in' ? 'warn' : ''}">${r.dir === 'in' ? '⬇ ' + esc(t('eingehend')) : '⬆ ' + esc(t('ausgehend'))}</span>${r.proto ? ` <span class="n8-badge">${esc(r.proto)}</span>` : ''}</td>
+                    <td class="n8-num">${r.readonly ? `<code>${esc(r.value ?? '–')}</code>` : `<input class="n8-in" data-k="${esc(r.key)}" data-kind="${r.kind || 'port'}" ${(r.kind || 'port') === 'port' ? `type="number" min="${r.min ?? 1}" max="65535"` : 'type="text"'} value="${esc(r.value ?? '')}">`}</td></tr>`;
+                paint(`${card('🔌 Ports', `<p class="n8-help">${esc(t(d.intro || 'Alle Ports an einer Stelle. Eingehend: in Firewall und Router freigeben, wenn das von außen erreichbar sein soll. Ausgehend: die Gegenstelle muss erreichbar sein.'))}</p>
+                    ${d.note ? `<div class="n8-help">♻️ ${esc(t(d.note))}</div>` : ''}`)}
+                    <div class="n8-net-grid" style="margin-top:16px">${(d.groups || []).map(g => card(g.title, `${g.help ? `<p class="n8-help">${esc(t(g.help))}</p>` : ''}<table class="n8-tbl"><tbody>${g.rows.map(row).join('')}</tbody></table>`)).join('')}</div>
+                    <div class="n8-actions"><button type="button" class="n8-btn primary" data-a="save">💾 ${esc(t('Ports speichern'))}</button>${d.restart ? `<button type="button" class="n8-btn" data-a="restart">♻️ ${esc(t(d.restart.button || 'Dienst neu starten'))}</button>` : ''}</div>
+                    <pre class="n8-log n8-net-out" hidden></pre>`);
+                el.querySelector('[data-a=save]').onclick = async e => {
+                    const values = {};
+                    el.querySelectorAll('.n8-in[data-k]').forEach(i => { values[i.dataset.k] = i.dataset.kind === 'port' ? Number(i.value) : i.value.trim(); });
+                    e.target.disabled = true;
+                    try { const r = await req('POST', '/api/admin/ports', { values }); await load(); out(r); const q = el.querySelector('.n8-net-out'); if (q) q.hidden = !r.message; }
+                    catch (x) { e.target.disabled = false; alert(x.message); }
+                };
+                const rb = el.querySelector('[data-a=restart]');
+                if (rb) rb.onclick = async () => { if (o.onRestart) o.onRestart(); else { try { await req('POST', d.restart.url || '/api/admin/ports/restart', {}); } catch (x) { } alert(t('Der Dienst startet neu – die Seite danach neu laden.')); } };
+            };
+            return load();
+        }
+        if (name === 'domains') {
+            const load = async () => {
+                let d; try { d = await req('GET', '/api/admin/domains'); } catch (e) { paint(card('🔒 Domains & HTTPS', msg(e))); return; }
+                const days = c => c && c.days != null ? (c.days < 0 ? t('abgelaufen') : t('noch {n} Tage').replace('{n}', c.days)) : '';
+                const certBadge = s => !s.cert ? `<span class="n8-badge warn">${esc(t('kein Zertifikat'))}</span>`
+                    : s.cert.staging ? `<span class="n8-badge warn">${esc(t('Test-Zertifikat'))}</span>`
+                    : s.cert.days != null && s.cert.days < 14 ? `<span class="n8-badge bad">${esc(days(s.cert))}</span>` : `<span class="n8-badge ok">${esc(t('gültig'))}${s.cert.days != null ? ' · ' + esc(days(s.cert)) : ''}</span>`;
+                const sites = d.sites || [];
+                const add = d.add || {};
+                const opts = d.options || [];
+                paint(`${card('🔒 Domains & HTTPS', `<p class="n8-help">${esc(t(d.intro || 'Eigene Domains mit kostenlosem Zertifikat von Let’s Encrypt.'))}</p>
+                    ${d.hint ? `<div class="n8-help">⚠️ ${esc(t(d.hint))}</div>` : ''}
+                    ${opts.length ? `<div class="n8-net-opts">${opts.map(x => `<label class="n8-sw"><input type="checkbox" data-opt="${esc(x.key)}" ${x.value ? 'checked' : ''}><i></i> ${esc(t(x.label))}</label>${x.help ? `<div class="n8-dim">${esc(t(x.help))}</div>` : ''}`).join('')}</div>` : ''}
+                    ${sites.length ? `<table class="n8-tbl"><thead><tr><th>${esc(t('Domain'))}</th><th>${esc(t('Zertifikat'))}</th><th></th></tr></thead><tbody>${sites.map((s, i) => `<tr>
+                        <td><b>${esc(s.domain)}</b>${s.label ? ` <span class="n8-badge">${esc(t(s.label))}</span>` : ''}<div class="n8-dim">${s.dns && s.dns.length ? 'DNS: ' + s.dns.map(esc).join(', ') : s.dns ? '⚠️ ' + esc(t('DNS: kein Eintrag gefunden')) : ''}${s.info ? (s.dns ? ' · ' : '') + esc(t(s.info)) : ''}</div></td>
+                        <td>${s.https ? '<span class="n8-badge ok">HTTPS</span>' : `<span class="n8-badge warn">${esc(t('nur HTTP'))}</span>`} ${certBadge(s)}${s.cert && (s.cert.issuer || s.cert.expires) ? `<div class="n8-dim">${esc(s.cert.issuer || '')}${s.cert.expires ? ' · ' + esc(t('bis')) + ' ' + esc(s.cert.expires) : ''}</div>` : ''}</td>
+                        <td class="n8-act"><a class="n8-btn sm" href="https://${esc(s.domain)}/" target="_blank" rel="noopener">↗</a>
+                          ${s.renew !== false ? `<button type="button" class="n8-btn sm" data-renew="${i}">${s.cert ? '🔄 ' + esc(t('Erneuern')) : '🔒 ' + esc(t('Zertifikat holen'))}</button>` : ''}
+                          ${s.remove !== false ? `<button type="button" class="n8-btn sm danger" data-rm="${i}">${esc(t('Entfernen'))}</button>` : ''}</td></tr>`).join('')}</tbody></table>`
+                    : `<div class="n8-help">${esc(t('Noch keine Domain.'))}</div>`}
+                    ${d.renew_auto != null ? `<div class="n8-help">${d.renew_auto ? '✅ ' + esc(t('Zertifikate werden automatisch erneuert.')) : '⚠️ ' + esc(t('Automatische Erneuerung ist nicht eingerichtet.'))}</div>` : ''}`)}
+                    ${add.allowed === false && !add.reason ? '' : card('➕ Domain hinzufügen', `${add.reason ? `<p class="n8-help">${esc(t(add.reason))}</p>` : ''}
+                    <div class="n8-net-form"><label>${esc(t('Domain'))}<input class="n8-in" type="text" data-f="domain" placeholder="${esc(add.placeholder || 'dienst.example.org')}" autocomplete="off" value="${esc(add.domain || '')}"></label>
+                    <label>${esc(t('E-Mail für Let’s Encrypt'))}<input class="n8-in" type="email" data-f="email" value="${esc(add.email || '')}" placeholder="sysop@example.org"></label>
+                    <label class="n8-sw"><input type="checkbox" data-f="staging" ${add.staging ? 'checked' : ''}><i></i> ${esc(t('Test-Zertifikat (Let’s-Encrypt-Staging)'))}</label></div>
+                    <div class="n8-actions"><button type="button" class="n8-btn primary" data-a="add" ${add.allowed === false ? 'disabled' : ''}>🔒 ${esc(t(add.button || 'Domain anlegen & Zertifikat holen'))}</button></div>`)}
+                    <pre class="n8-log n8-net-out" hidden></pre>`);
+                const outEl = () => el.querySelector('.n8-net-out');
+                const busy = (b, txt) => { b.disabled = true; b.textContent = txt; const p = outEl(); p.hidden = false; p.textContent = t('Läuft – das kann bis zu einer Minute dauern …'); };
+                const done = async r => { const keep = r; await load(); const p = outEl(); if (p) { p.hidden = false; p.textContent = (keep.message || '') + (keep.log ? '\n\n' + keep.log : ''); } if (o.toast) o.toast((keep.ok === false ? '⚠️ ' : '✅ ') + (keep.message || ''), keep.ok === false); };
+                const ab = el.querySelector('[data-a=add]');
+                if (ab) ab.onclick = async () => {
+                    const f = k => el.querySelector(`[data-f=${k}]`);
+                    const domain = f('domain').value.trim(), email = f('email').value.trim();
+                    if (!domain) { f('domain').focus(); return; }
+                    if (!email) { f('email').focus(); return; }
+                    busy(ab, '🔒 ' + t('Hole Zertifikat …'));
+                    try { await done(await req('POST', '/api/admin/domains', { domain, email, staging: f('staging').checked })); } catch (x) { await done({ ok: false, message: x.message }); }
+                };
+                el.querySelectorAll('[data-renew]').forEach(b => b.onclick = async () => {
+                    busy(b, '🔄 …'); const s = sites[b.dataset.renew];
+                    try { await done(await req('POST', `/api/admin/domains/${encodeURIComponent(s.domain)}/renew`, {})); } catch (x) { await done({ ok: false, message: x.message }); }
+                });
+                el.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => {
+                    const s = sites[b.dataset.rm];
+                    if (!confirm(t('{d} entfernen? Weiterleitung und Zertifikat werden gelöscht.').replace('{d}', s.domain))) return;
+                    try { await done(await req('DELETE', `/api/admin/domains/${encodeURIComponent(s.domain)}`)); } catch (x) { await done({ ok: false, message: x.message }); }
+                });
+                el.querySelectorAll('[data-opt]').forEach(c => c.onchange = async () => {
+                    try { await done(await req('POST', '/api/admin/domains/options', { [c.dataset.opt]: c.checked })); } catch (x) { c.checked = !c.checked; alert(x.message); }
+                });
+            };
+            return load();
+        }
+    }
+
     // the menu structure every N8 system uses (projects fill in their items)
-    const GROUPS = { betrieb: '📡 Betrieb', zugang: '👥 Benutzer & Zugang', darstellung: '🎨 Darstellung', netz: '🌐 Netz & Domains', system: '🖥️ System' };
+    const GROUPS = { betrieb: '📡 Betrieb', zugang: '👥 Benutzer & Zugang', darstellung: '🎨 Darstellung', netz: '🌐 Netz, Ports & Domains', system: '🖥️ System' };
     const SYS_ITEMS = [['sys-update', '⬆️ Update'], ['sys-services', '🧩 Dienste'], ['sys-perms', '🔐 Berechtigungen & sudo'], ['sys-keepalive', '💓 Keep-Alive'], ['sys-crashes', '💥 Abstürze']];
 
     // ------------------------------------------------------------ the kit's own words
@@ -728,6 +937,27 @@
             'nicht eingerichtet': 'not set up', 'pausiert': 'paused', 'läuft nicht': 'not running', 'aktiv': 'active', 'Internet': 'Internet', 'erreichbar': 'reachable',
             'weg seit': 'down since', 'Letzte Prüfung': 'Last check', 'gerade eben': 'just now', 'Heartbeat': 'Heartbeat', 'gesund': 'healthy', 'kein Neustart': 'no restart',
             'von Hand gestoppt – Keep-Alive wartet': 'stopped by hand – keep-alive waits', 'neu gestartet': 'restarted', 'Einmal auf der Konsole einrichten:': 'Set up once on the console:',
+            // 1.4.0: Benutzer & Zugang, Netz, Ports & Domains
+            '🌐 Netz, Ports & Domains': '🌐 Network, ports & domains', '👥 Benutzer': '👥 Users', '🔑 Sitzungen': '🔑 Sessions', '📜 Protokoll': '📜 Log',
+            'Benutzer': 'User', 'Rolle': 'Role', 'Letzte Anmeldung': 'Last login', 'Bearbeiten': 'Edit', 'gesperrt': 'disabled', 'Anzeigename': 'Display name',
+            'Rufzeichen': 'Callsign', 'Benutzername': 'Username', 'Passwort (min. 8)': 'Password (min. 8)', 'Neues Passwort (optional)': 'New password (optional)',
+            'Benutzer anlegen': 'Add user', 'Löschen': 'Delete', 'Wirklich löschen?': 'Really delete?', 'Benutzer angelegt': 'User created', 'Benutzer gelöscht': 'User deleted',
+            'nur Superadmin': 'superadmin only', 'Superadmin': 'Superadmin', 'Admin': 'Admin', 'Betrachter': 'Viewer', 'Autor': 'Author', 'Redakteur': 'Editor',
+            'Wer sich anmelden darf. Admins sehen IP-Adressen und Ports und ändern Einstellungen; Benutzer sehen nur das Dashboard.': 'Who may log in. Admins see IP addresses and ports and change settings; users only see the dashboard.',
+            'Alle aktuellen Anmeldungen. Mit „Abmelden“ ist das Gerät sofort abgemeldet.': 'All current logins. „Log out“ ends one at once.',
+            'Keine aktiven Sitzungen.': 'No active sessions.', 'Zuletzt aktiv': 'Last active', 'Läuft ab': 'Expires', 'Abmelden': 'Log out', 'Sitzung beendet': 'Session ended', 'diese Sitzung': 'this session',
+            'Anmeldungen, Fehlversuche und jede Änderung im Adminbereich – mit Zeit, Person und IP-Adresse.': 'Logins, failed attempts and every change in the admin area – with time, person and IP address.',
+            'Zeit': 'Time', 'Ereignis': 'Event', 'Einzelheiten': 'Details', '🔌 Ports': '🔌 Ports', 'eingehend': 'incoming', 'ausgehend': 'outgoing', 'Ports speichern': 'Save ports',
+            'Alle Ports an einer Stelle. Eingehend: in Firewall und Router freigeben, wenn das von außen erreichbar sein soll. Ausgehend: die Gegenstelle muss erreichbar sein.':
+                'All ports in one place. Incoming: open in firewall and router if it should be reachable from outside. Outgoing: the other side must be reachable.',
+            'Dienst neu starten': 'Restart service', 'Der Dienst startet neu – die Seite danach neu laden.': 'The service restarts – reload the page afterwards.',
+            '🔒 Domains & HTTPS': '🔒 Domains & HTTPS', 'Domain': 'Domain', 'Zertifikat': 'Certificate', 'kein Zertifikat': 'no certificate', 'Test-Zertifikat': 'test certificate',
+            'gültig': 'valid', 'abgelaufen': 'expired', 'nur HTTP': 'HTTP only', 'bis': 'until', 'Erneuern': 'Renew', 'Zertifikat holen': 'Get certificate', 'Entfernen': 'Remove',
+            'Noch keine Domain.': 'No domain yet.', 'DNS: kein Eintrag gefunden': 'DNS: no record found', '➕ Domain hinzufügen': '➕ Add domain', 'E-Mail für Let’s Encrypt': 'E-mail for Let’s Encrypt',
+            'Test-Zertifikat (Let’s-Encrypt-Staging)': 'Test certificate (Let’s Encrypt staging)', 'Domain anlegen & Zertifikat holen': 'Add domain & get certificate', 'Hole Zertifikat …': 'Getting certificate …',
+            'Läuft – das kann bis zu einer Minute dauern …': 'Running – this can take up to a minute …', 'Zertifikate werden automatisch erneuert.': 'Certificates are renewed automatically.',
+            'Automatische Erneuerung ist nicht eingerichtet.': 'Automatic renewal is not set up.', 'Eigene Domains mit kostenlosem Zertifikat von Let’s Encrypt.': 'Own domains with a free certificate from Let’s Encrypt.',
+            '{d} entfernen? Weiterleitung und Zertifikat werden gelöscht.': 'Remove {d}? Forwarding and certificate are deleted.',
             // 1.3.0: crashes
             '💥 Abstürze': '💥 Crashes', 'Absturz': 'Crash', 'Watchdog': 'Watchdog', 'Speicher voll': 'Out of memory', 'Beendet': 'Exited',
             'Zeitüberschreitung': 'Timeout', 'Hänger': 'Hang', 'Teil abgestürzt': 'Part crashed', 'Thread abgestürzt': 'Thread crashed',
@@ -780,18 +1010,20 @@
         },
         rules: [
             [/^(\d+) minutes? ago$/, 'vor $1 Min.'], [/^(\d+) seconds? ago$/, 'vor $1 s'], [/^(\d+) hours? ago$/, 'vor $1 Std.'], [/^(\d+) days? ago$/, 'vor $1 Tagen'],
-            [/^rolled back to (.+)$/, 'zurückgesetzt auf $1'], [/^rollback failed \(git reset\)$/, 'Zurücksetzen fehlgeschlagen (git reset)'],
+            [/^rolled back to (.+)$/, 'zurückgesetzt auf $1'], [/^noch (\d+) Tage$/, '$1 days left'], [/^rollback failed \(git reset\)$/, 'Zurücksetzen fehlgeschlagen (git reset)'],
             [/^(\d+) min ago$/, 'vor $1 Min.'], [/^(\d+) s ago$/, 'vor $1 s'], [/^(\d+) h ago$/, 'vor $1 Std.'], [/^(\d+) d ago$/, 'vor $1 T.'],
         ]
     });
 
     window.N8Kit = {
-        version: '1.3.0',
+        version: '1.4.0',
         lang: () => lang, setLang, t, langSwitch, esc, fmtTime,
         i18n: { add, retranslate: () => { cache.clear(); retranslate(); }, t },
         update: { banner, panel, run },
         nav: { tree, GROUPS, SYS_ITEMS },
         sys: { view, crashPopup },
+        access: { view: accessView },
+        net: { view: netView },
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();

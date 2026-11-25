@@ -350,6 +350,12 @@ crash_hook() {   # crash_hook UNIT – systemd ExecStopPost=+ (als root), nach J
   [[ "$u" =~ ^[A-Za-z0-9@._-]+\.service$ ]] || return 0
   # geplantes Ende: für den Dienst läuft ein Auftrag (stop/restart von Hand, Update, Keep-Alive, Herunterfahren)
   if systemctl list-jobs --no-legend 2>/dev/null | awk '{print $2}' | grep -qxF "$u"; then return 0; fi
+  # … oder die Anwendung hat sich absichtlich selbst beendet (Neustart-Knopf; n8_crash.mark_planned, Marke höchstens 3 min alt)
+  local pm="$STATE_DIR/crash/planned-$u" pt
+  if [[ -f "$pm" ]]; then
+    pt="$(head -c 12 "$pm" | tr -dc 0-9)"; rm -f "$pm"
+    [[ -n "$pt" ]] && (( $(date +%s) - pt < 180 )) && return 0
+  fi
   local sig="$st"; [[ "$code" == killed || "$code" == dumped ]] && sig="SIG${st#SIG}"
   case "$res" in
     success)

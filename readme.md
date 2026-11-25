@@ -39,7 +39,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 📈 **Statistik** | Sprechzeit und Durchgänge je Raum und Station, heute bis ein Jahr, Aktivität nach Wochentag und Uhrzeit, Spitzenwert der Stationen online. |
 | 📇 **Stationen** | Alle gehörten Stationen mit Suche, Avatar, Land und Ort; Detailansicht je Station. |
 | ⚙️ **Admin-Portal statt Config-Dateien** | Alle Einstellungen, Räume und FRN-Konten liegen in SQLite; frn_adn schreibt daraus `server.properties`. Server starten, stoppen und neu starten per Knopf. |
-| 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu Sitzungen und ein Protokoll aller Änderungen. |
+| 👥 **Benutzer & Rechte** | Superadmin, Admins und Benutzer. **E-Mail- und IP-Adressen der Stationen sehen nur Admins.** Dazu **🔑 Sitzungen** (abmelden) und ein **📜 Protokoll** aller Änderungen – gleiche Ansicht wie in HBlink4 und allen N8-Systemen. |
 | 🧩 **Dienste & Berechtigungen** | Dienste schlank aktivieren, deaktivieren, starten, stoppen, neu starten; Berechtigungsprüfer mit Korrektur und sudo-Einrichtung (`scripts/n8-admin.sh`) – wie in N8 Crosslink |
 | 🧭 **Ein Menü + Statusleiste** | Kopfzeile mit Logo, Reitern, Links und Login ganz rechts (ohne Aufklappmenü, **⚙️ Admin** nach dem Login als Menüpunkt); darunter eine schmale Statusleiste für Live-Daten, FRN-Server, Stationen online und On air |
 | 🔗 **Link-Menü** | Eigene Links (Webseite, Chat, Kontakt …) als Aufklapp-Menü oder Knopfreihe in der Kopfzeile, mit den **Favicons der verlinkten Seiten** (in SQLite zwischengespeichert), „neuer Tab“, Reihenfolge und Schnellstart-Knöpfen – wie bei HBlink4-FreeRadioID. |
@@ -47,7 +47,7 @@ ADN FRN Server ist eine **frische Oberfläche für den Java-FRN-Server** von fre
 | 🎨 **Eigenes Aussehen** | N8 Theme wie bei HBlink4-FreeRadioID und N8-Hotspot: 7 Profile inkl. hellem *Daylight*, jede Farbe frei wählbar, dazu Dashboard-Logo, Site-Icon und Client-Logos. |
 | 💾 **Backup & Wiederherstellen** | Alles in einer passwortverschlüsselten `.frnbak` – Datenbank, Branding, Konfiguration und Zugriffslisten des FRN-Servers. Einspielen per Knopf (mit Vorschau und automatischem Rückweg), per `frnadn restore` oder beim Installieren. Nur Superadmin. |
 | 📥 **Import** | Eine alte `server.properties` nach der Neuinstallation übernehmen; nichts anderes wird kopiert. |
-| 🔒 **HTTPS** | Let's-Encrypt-Zertifikat, automatisch geholt und erneuert. |
+| 🔒 **HTTPS & Ports** | Let's-Encrypt-Zertifikat, automatisch geholt und erneuert – alles unter **🌐 Netz, Ports & Domains** (Ports, Domains & HTTPS), wie in allen N8-Systemen. |
 | 🧭 **Geführte Installation** | `scripts/install.sh` fragt alles ab, richtet beide Dienste ein und prüft am Ende das Ergebnis. |
 
 <p align="center">

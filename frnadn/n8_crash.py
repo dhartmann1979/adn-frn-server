@@ -46,6 +46,18 @@ KINDS = {   # Art -> Bezeichnung (gleiche Liste im N8 Kit und in n8-admin.sh)
 }
 
 
+def mark_planned(data_dir: str, unit: str, reason: str = "") -> None:
+    """Die Anwendung beendet sich gleich ABSICHTLICH selbst (z. B. Neustart-Knopf, der den eigenen Prozess beendet, damit systemd
+    ihn neu startet). Der crash-hook von n8-admin.sh sieht dann kein Absturz, sondern einen geplanten Neustart (Marke gilt 3 Minuten)."""
+    try:
+        d = os.path.join(os.path.abspath(data_dir), "crash")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, f"planned-{unit or 'app'}"), "w", encoding="utf-8") as f:
+            f.write(f"{time.time():.0f} {reason}\n")
+    except OSError:
+        pass
+
+
 def new_id() -> str:
     return time.strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
 

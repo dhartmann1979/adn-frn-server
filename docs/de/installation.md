@@ -140,16 +140,11 @@ frn_adn enthält das automatische HTTPS-System aus **HBlink4-FreeRadioID**. Ein 
 
 **Einrichtung im Admin-Portal:**
 
-1. Anmelden und **Settings → HTTPS & web** öffnen.
-2. **Enable HTTPS with Let's Encrypt** einschalten.
-3. Domain (nur Hostname, ohne `https://`) und E-Mail-Adresse eintragen.
-4. Optional zunächst **Use test certificates (staging)** aktivieren, um die DNS-/Firewall-Konfiguration zu prüfen.
-5. Speichern und den Dashboard-Dienst neu starten:
-
-```bash
-sudo systemctl restart frnadn
-sudo journalctl -u frnadn -n 80 --no-pager
-```
+1. Anmelden und **⚙️ Admin → 🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS** öffnen.
+2. Domain (nur Hostname, ohne `https://`) und E-Mail-Adresse eintragen.
+3. Optional zunächst **Test-Zertifikat** einschalten, um DNS und Portfreigaben zu prüfen.
+4. **Domain eintragen & Zertifikat holen** – HTTPS wird eingeschaltet und das Dashboard startet von selbst neu. Ports unter **🔌 Ports**.
+   Bei Problemen: `sudo journalctl -u frnadn -n 80 --no-pager`
 
 <p align="center"><img src="../images/admin-https.png" alt="HTTPS-Einstellungen" width="45%"></p>
 
@@ -160,7 +155,7 @@ sudo journalctl -u frnadn -n 80 --no-pager
 - Alle 12 Stunden wird `certbot renew` ausgeführt. Bei erfolgreicher Erneuerung wird das Zertifikat direkt im laufenden TLS-Kontext neu geladen; ein Dienstneustart ist dafür nicht nötig.
 - Bei Problemen bleibt der HTTP-Fallback erreichbar. Details stehen in `journalctl -u frnadn`.
 
-**Deaktivieren:** HTTPS in **Settings → HTTPS & web** ausschalten, speichern und `sudo systemctl restart frnadn` ausführen. Das Zertifikatsverzeichnis wird dabei nicht automatisch gelöscht.
+**Deaktivieren:** unter **🔒 Domains & HTTPS** den Schalter *HTTPS mit Let's Encrypt* ausschalten (das Dashboard startet neu) oder die Domain entfernen. Das Zertifikatsverzeichnis wird dabei nicht automatisch gelöscht.
 
 ## Aktualisieren
 

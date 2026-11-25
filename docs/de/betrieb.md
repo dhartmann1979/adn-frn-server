@@ -151,7 +151,7 @@ rm /root/frn.pw
 ```
 
 Mit `FRNADN_BEHIND_PROXY=1` bleibt das eigene HTTPS dabei aus (für einen Reverse-Proxy wie nginx).
-Sonst danach HTTPS unter *Admin → Settings → HTTPS & web* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
+Sonst danach HTTPS unter *Admin → 🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS* neu einschalten (Zertifikate sind nicht im Backup) – oder das Ganze gleich
 
 ## Testen ohne Funk
 

@@ -2,6 +2,28 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.16.0 – 2026-11-25
+
+### 🌐 Neue Rubrik „Netz, Ports & Domains“ – wie in N8 Crosslink
+- HTTPS, Domain und Ports stehen jetzt **nur noch** unter **🌐 Netz, Ports & Domains** (gleich in allen N8-Systemen); der Abschnitt
+  *Einstellungen → HTTPS & web* ist weg.
+  - **🔌 Ports**: Web-Port (aus dem systemd-Dienst), HTTP- und HTTPS-Port, FRN-Port der Clients, Port des Ausweichservers, SystemManager –
+    mit *eingehend/ausgehend* und Protokoll, ein Knopf zum Speichern, Hinweis auf Neustarts, **♻️ Dashboard neu starten**.
+  - **🔒 Domains & HTTPS**: Domain + E-Mail eintragen → HTTPS an, Dashboard startet neu und holt das Zertifikat; Tabelle mit DNS,
+    Zertifikat (gültig/Test/abgelaufen, bis wann), **🔄 Erneuern**, **Entfernen**, Schalter *HTTPS mit Let's Encrypt*.
+- Neue Adressen (gleich in allen N8-Systemen): `GET/POST /api/admin/ports`, `GET/POST /api/admin/domains`,
+  `POST /api/admin/domains/<domain>/renew`, `DELETE /api/admin/domains/<domain>`, `POST /api/admin/domains/options`.
+- Eine leere Domain ist jetzt erlaubt (Domain entfernen).
+
+### 👥 Benutzer & Zugang wie in HBlink4-FreeRadioID
+- **👥 Benutzer**, **🔑 Sitzungen** und **📜 Protokoll** sind jetzt drei eigene Einträge mit der gemeinsamen Ansicht des N8 Kit 1.4
+  (Vorlage HBlink4): Benutzerzeile mit Kürzel, Rolle, letzter Anmeldung, „＋ Benutzer anlegen“ in einer Zeile, Bearbeiten mit
+  Anzeigename, Passwort, Rolle, gesperrt, Löschen; Sitzungen mit Rolle, IP, Browser, Ablauf und **Abmelden**.
+
+### 🛡️ Absturz-Wächter: Neustart-Knopf ist kein „Absturz“ mehr
+- „Dashboard neu starten“ beendet den Prozess absichtlich – der Absturz-Wächter wird jetzt vorher informiert und hält das nicht mehr
+  als Absturz fest (`n8_crash.mark_planned`, gleich in allen N8-Systemen).
+
 ## 2.15.1 – 2026-11-25
 
 ### 🐛 Behoben: „Fehler -15“ beim Neustart des eigenen Dienstes (Admin → System → Dienste)

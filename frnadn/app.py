@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import re
+import socket
 import shutil
 import time
 import base64
@@ -1187,8 +1188,170 @@ async def restart_app(request: Request):
     """Restart the whole program; systemd starts it again (Restart=always)."""
     u = need_admin(request)
     ctx.auth.audit("app_restart", u["username"], "", ip_of(request))
+    from .n8_crash import mark_planned
+    mark_planned(str(DATA), "frnadn.service", "Neustart aus dem Adminbereich")   # kein „Absturz“ im Absturz-Wächter
     asyncio.get_running_loop().call_later(0.5, os._exit, 3)
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- 🌐 Netz, Ports & Domains (N8 Kit 1.4, Vorbild N8 Crosslink)
+# HTTPS, Domain und die Web-Ports stehen NUR hier (nicht mehr unter Einstellungen).
+_PORT_GROUPS = [
+    ("🌐 Webinterface", "Dashboard und Live-Daten. HTTP- und HTTPS-Port gelten nur mit HTTPS (Let's Encrypt prüft immer auf Port 80).", [
+        ("web.port", "Web-Port", "in", "TCP", "steht im systemd-Dienst (FRNADN_PORT) – mit HTTPS ist das Dashboard unter dem HTTPS-Port erreichbar"),
+        ("https.http_port", "HTTP-Port", "in", "TCP", "Let's-Encrypt-Prüfung und Weiterleitung auf HTTPS"),
+        ("https.port", "HTTPS-Port", "in", "TCP", "https:// der Domain (Standard 443)")]),
+    ("📻 FRN-Server (Java)", "Hier verbinden sich die FRN-Clients; gilt nach einem Neustart des FRN-Servers.", [
+        ("frn.port", "FRN-Port", "in", "TCP", "server_port in server.properties (Standard 10024)"),
+        ("frn.backup_port", "Port des Ausweichservers", "out", "TCP", "wird den Clients mitgeteilt · 0 = keiner"),
+        ("sysman.port", "SystemManager", "out", "TCP", "Anmeldung des Servers beim SystemManager (Standard 10025)")]),
+]
+
+
+def _web_port() -> int:
+    return int(os.environ.get("FRNADN_PORT", "80") or 80)
+
+
+@app.get("/api/admin/ports")
+async def admin_ports(request: Request):
+    need_admin(request)
+    vals = ctx.settings.all()
+    groups = []
+    for title, help_, rows in _PORT_GROUPS:
+        out = []
+        for k, lab, d, pr, h in rows:
+            if k == "web.port":
+                out.append({"key": k, "label": lab, "dir": d, "proto": pr, "help": h, "value": _web_port(), "readonly": True})
+            elif k == "sysman.port":
+                out.append({"key": k, "label": lab, "dir": d, "proto": pr, "help": h, "value": 10025, "readonly": True})
+            elif k in vals:
+                out.append({"key": k, "label": lab, "dir": d, "proto": pr, "help": h, "value": vals[k], "min": 0 if k == "frn.backup_port" else 1})
+        groups.append({"title": title, "help": help_, "rows": out})
+    note = "Gespeichert, aber noch nicht aktiv – Dashboard bzw. FRN-Server neu starten." if (ctx.dashboard_restart_needed or ctx.restart_needed) else ""
+    return {"intro": "Alle Ports des ADN-FRN-Servers an einer Stelle. Eingehend: in Firewall und Router freigeben, wenn das von außen "
+                     "erreichbar sein soll. Ausgehend: die Gegenstelle muss erreichbar sein.",
+            "groups": groups, "note": note, "restart": {"button": "Dashboard neu starten", "url": "/api/admin/restart"}}
+
+
+async def _save(request: Request, changes: Dict[str, Any]) -> List[str]:
+    u = need_admin(request)
+    try:
+        changed = ctx.settings.update(changes, u["username"])
+    except Exception as e:  # SettingsError
+        raise HTTPError(400, str(e))
+    keys = [f.key for f in changed]
+    if any(k.startswith("https.") for k in keys):
+        ctx.dashboard_restart_needed = True
+    if keys:
+        ctx.auth.audit("settings_changed", u["username"], ", ".join(keys), ip_of(request))
+        if any(k.startswith(("frn.", "sysman.")) for k in keys):
+            config_changed(u, request, "settings " + ", ".join(keys))
+    return keys
+
+
+@app.post("/api/admin/ports")
+async def admin_ports_save(request: Request):
+    b = await body(request)
+    vals = b.get("values") or {}
+    allowed = {"https.http_port", "https.port", "frn.port", "frn.backup_port"}
+    cur = ctx.settings.all()
+    keys = await _save(request, {k: v for k, v in vals.items() if k in allowed and v != cur.get(k)})
+    msg = "Nichts geändert." if not keys else "Gespeichert: " + ", ".join(keys) + "." + \
+        (" Der FRN-Server braucht einen Neustart." if any(k.startswith("frn.") for k in keys) else "") + \
+        (" Das Dashboard braucht einen Neustart." if any(k.startswith("https.") for k in keys) else "")
+    return {"ok": True, "message": msg, "changed": keys}
+
+
+def _cert_info() -> Optional[Dict[str, Any]]:
+    if _tls_manager is None or not _tls_manager.have_cert():
+        return None
+    try:
+        import ssl as _ssl
+        from datetime import datetime as _dt
+        c = _ssl._ssl._test_decode_cert(str(_tls_manager.cert_file))
+        exp = _dt.strptime(c.get("notAfter", ""), "%b %d %H:%M:%S %Y %Z")
+        issuer = " ".join(v for part in c.get("issuer", ()) for k, v in part if k in ("organizationName", "commonName"))
+        return {"days": (exp - _dt.utcnow()).days, "expires": exp.strftime("%d.%m.%Y"), "issuer": issuer, "staging": "STAGING" in issuer.upper()}
+    except Exception:  # noqa: BLE001
+        return {"days": None, "expires": "", "issuer": "", "staging": False}
+
+
+def _dns(name: str) -> List[str]:
+    try:
+        return sorted({a[4][0] for a in socket.getaddrinfo(name, None)})
+    except OSError:
+        return []
+
+
+@app.get("/api/admin/domains")
+async def admin_domains(request: Request):
+    need_admin(request)
+    v = ctx.settings.all()
+    on, dom = bool(v.get("https.enabled")), str(v.get("https.domain") or "").strip().lower()
+    cert = _cert_info()
+    sites = [{"domain": dom, "label": "Dashboard", "https": on and cert is not None, "cert": cert if on else None,
+              "dns": await asyncio.to_thread(_dns, dom), "info": "" if on else "HTTPS ist aus"}] if dom else []
+    hint = "HTTPS ist an, aber es ist keine Domain eingetragen." if on and not dom else \
+        ("HTTPS ist eingeschaltet, läuft aber erst nach einem Neustart des Dashboards." if on and _tls_manager is None else "")
+    return {"intro": "Eigene Domain für das Dashboard mit kostenlosem Zertifikat von Let's Encrypt – das Dashboard macht HTTPS selbst "
+                     "(certbot, ohne nginx). Voraussetzung: die Domain zeigt per DNS auf diesen Server und der HTTP-Port (Let's Encrypt prüft "
+                     "immer auf 80) und der HTTPS-Port sind aus dem Internet erreichbar (siehe 🔌 Ports). Hinter dem HobbyRadioPortal macht "
+                     "das Portal HTTPS – dann hier aus lassen.",
+            "hint": hint, "sites": sites, "renew_auto": True if (on and _tls_manager is not None) else None,
+            "options": [{"key": "https.enabled", "label": "HTTPS mit Let's Encrypt", "value": on,
+                         "help": "Aus = nur http://IP:Web-Port. Ein- und Ausschalten startet das Dashboard neu."}],
+            "add": {"allowed": not dom, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "frn.example.org",
+                    "button": "Domain eintragen & Zertifikat holen",
+                    "reason": "" if not dom else "Das Dashboard hat eine Domain. Zum Wechseln die bisherige erst entfernen."}}
+
+
+def _restart_soon(why: str) -> None:
+    from .n8_crash import mark_planned
+    mark_planned(str(DATA), "frnadn.service", why)
+    asyncio.get_running_loop().call_later(1.0, os._exit, 3)
+
+
+@app.post("/api/admin/domains")
+async def admin_domains_add(request: Request):
+    b = await body(request)
+    dom = str(b.get("domain") or "").strip().lower().rstrip(".")
+    if not re.fullmatch(r"(?=.{4,253}$)([a-z0-9-]{1,63}\.)+[a-z]{2,63}", dom):
+        raise HTTPError(400, "Keine gültige Domain")
+    await _save(request, {"https.domain": dom, "https.email": str(b.get("email") or "").strip(), "https.staging": bool(b.get("staging")),
+                          "https.enabled": True})
+    _restart_soon("HTTPS/Domain geändert")
+    return {"ok": True, "message": f"{dom} eingetragen, HTTPS ist an. Das Dashboard startet neu und holt das Zertifikat – in einer Minute "
+                                   f"unter https://{dom}/ öffnen."}
+
+
+@app.post("/api/admin/domains/{domain}/renew")
+async def admin_domains_renew(domain: str, request: Request):
+    need_admin(request)
+    if _tls_manager is None:
+        raise HTTPError(400, "HTTPS läuft noch nicht – erst einschalten und das Dashboard neu starten.")
+    ok = await (_tls_manager.renew() if _tls_manager.have_cert() else _tls_manager.obtain())
+    have = _tls_manager.have_cert()
+    return {"ok": bool(ok) or have, "message": "Zertifikat geholt bzw. aktuell." if ok or have else
+            "certbot ist fehlgeschlagen – zeigt die Domain auf diesen Server und ist Port 80 von außen erreichbar? Einzelheiten im Log."}
+
+
+@app.delete("/api/admin/domains/{domain}")
+async def admin_domains_remove(domain: str, request: Request):
+    if domain.strip().lower() != str(ctx.settings.get("https.domain") or "").strip().lower():
+        raise HTTPError(404, "Diese Domain ist nicht eingetragen.")
+    await _save(request, {"https.domain": "", "https.enabled": False})
+    _restart_soon("HTTPS/Domain geändert")
+    return {"ok": True, "message": f"{domain} entfernt, HTTPS ist aus. Das Dashboard startet neu."}
+
+
+@app.post("/api/admin/domains/options")
+async def admin_domains_options(request: Request):
+    b = await body(request)
+    if "https.enabled" not in b:
+        raise HTTPError(400, "unbekannte Option")
+    await _save(request, {"https.enabled": bool(b["https.enabled"])})
+    _restart_soon("HTTPS ein/aus")
+    return {"ok": True, "message": "HTTPS " + ("eingeschaltet" if b["https.enabled"] else "ausgeschaltet") + " – das Dashboard startet neu."}
 
 
 @app.post("/api/admin/power")

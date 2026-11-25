@@ -764,8 +764,9 @@ function adminGroups() {
         { id: 'betrieb', label: G.betrieb, items: [{ id: 'settings', label: '⚙️ Settings',
             children: (S.admin.sections || []).map(sec => ({ id: 'settings:' + sec.id, label: sec.title })) }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
             { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
-        { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Users' }, { id: 'audit', label: '🔐 Sessions & log' }] },
+        { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Benutzer' }, { id: 'sessions', label: '🔑 Sitzungen' }, { id: 'audit', label: '📜 Protokoll' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
+        { id: 'netz', label: G.netz, items: [{ id: 'ports', label: '🔌 Ports' }, { id: 'domains', label: '🔒 Domains & HTTPS' }] },
         { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label, ...(id === 'sys-crashes' && S.crashNew ? { badge: String(S.crashNew), badgeClass: 'bad' } : {}) })),
             { id: 'backup', label: '💾 Backup', hidden: !(S.me && S.me.role === 'superadmin') }] },
     ];
@@ -776,9 +777,18 @@ function showAdmin(a) {
     S.admin.tab = a;
     const nav = () => N8Kit.nav.tree($('adminNav'), adminGroups(), { active: a, key: 'frnadn-admin', onSelect: showAdmin });
     nav();
-    const pane = base.startsWith('sys-') ? 'sys' : base === 'backup' ? 'system' : (ADMIN_PANES.includes(base) ? base : 'settings');
+    const KIT = { users: 'access', sessions: 'access', audit: 'access', ports: 'net', domains: 'net' };   // N8 Kit 1.4
+    const pane = base.startsWith('sys-') || KIT[base] ? 'sys' : base === 'backup' ? 'system' : (ADMIN_PANES.includes(base) ? base : 'settings');
     ADMIN_PANES.forEach(x => $('admin-' + x).classList.toggle('hidden', x !== pane));
-    if (pane === 'sys') loadSysView(base.slice(4));
+    if (KIT[base] === 'access') {          // 👥 Benutzer & Zugang – wie HBlink4-FreeRadioID, gleich in allen N8-Systemen
+        const el = $('admin-sys'); el.className = 'tab-pane-inner';
+        N8Kit.access.view(el, base, { req: api, me: S.me || {}, fields: ['display_name'], toast: (m, bad) => toast(m, bad),
+            roles: [{ id: 'superadmin', label: 'Superadmin', assign: 'none' }, { id: 'admin', label: 'Admin', assign: 'superadmin' }, { id: 'user', label: 'Benutzer', assign: 'all' }],
+            note: 'Admins verwalten Räume, Listen, Benutzer und Einstellungen. Der Superadmin wird bei der Installation angelegt (python -m frnadn set-superadmin).' });
+    } else if (KIT[base] === 'net') {      // 🌐 Netz, Ports & Domains – wie N8 Crosslink
+        const el = $('admin-sys'); el.className = 'tab-pane-inner';
+        N8Kit.net.view(el, base, { req: api, toast: (m, bad) => toast(m, bad) });
+    } else if (pane === 'sys') loadSysView(base.slice(4));
     else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
        system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[pane]()
        .then(() => {
@@ -844,12 +854,12 @@ function formValues(form) { const v = {}; form.querySelectorAll('[name]').forEac
 // settings: everything of server.properties plus the dashboard
 async function loadSettings() {
     const d = await api('GET', '/api/admin/settings');
-    S.admin.sections = d.sections;
+    S.admin.sections = d.sections.filter(x => x.id !== 'https');      // HTTPS steht nur unter 🌐 Netz, Ports & Domains
     setRestart(d.restart_needed);
     $('admin-settings').innerHTML = `<div class="tile" id="setServerTile" style="margin-bottom:14px">${serverBox(d.server, d.jar)}
         <div class="actions" style="justify-content:flex-start;margin-top:10px"><button class="btn small" onclick="checkUpdate(this)">⬆️ Check for update</button>
             <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
-        <div class="tiles">${d.sections.map(sec => `
+        <div class="tiles">${S.admin.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
             ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div><div class="notice-box">📋 <span>Refused by the SystemManager? The reason is in the public FRN error log of freeradionetwork.de (Help → Error log).</span> <button type="button" class="btn small" style="margin-left:6px" onclick="showAdmin(\'logs\')">📋 FRN error log</button> <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">open ↗</a></div>' : ''}
             ${sec.fields.map(fieldHtml).join('')}<div class="actions"><button class="btn primary">Save</button></div></form>`).join('')}</div>`;

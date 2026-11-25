@@ -133,10 +133,10 @@ class Auth:
             self.db.x("DELETE FROM sessions WHERE token_hash = ?", (_th(token),))
 
     def sessions(self) -> List[Dict[str, Any]]:
-        rows = self.db.q("SELECT s.*, u.username FROM sessions s JOIN users u ON u.id = s.user_id "
+        rows = self.db.q("SELECT s.*, u.username, u.role FROM sessions s JOIN users u ON u.id = s.user_id "
                          "WHERE s.expires_at > ? ORDER BY s.created_at DESC", (time.time(),))
         return [{"id": r["token_hash"][:12], "username": r["username"], "created_at": r["created_at"],
-                 "expires_at": r["expires_at"], "ip": r["ip"], "user_agent": r["user_agent"]} for r in rows]
+                 "expires_at": r["expires_at"], "ip": r["ip"], "user_agent": r["user_agent"], "role": r["role"]} for r in rows]
 
     def revoke(self, short_id: str) -> None:
         if not re.fullmatch(r"[0-9a-f]{12}", short_id or ""):

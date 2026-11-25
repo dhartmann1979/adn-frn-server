@@ -144,7 +144,7 @@ def validate(f: Field, raw: Any) -> Any:
             raise SettingsError(f"{f.label}: one line only.")
     if len(v) > 4000:
         raise SettingsError(f"{f.label}: too long.")
-    if f.pattern and not re.fullmatch(f.pattern, v):
+    if f.pattern and v and not re.fullmatch(f.pattern, v):   # leer = nicht gesetzt (z. B. Domain entfernt)
         raise SettingsError(f"{f.label}: '{v}' is not valid.")
     if f.key == "frn.owner_callsign":
         v = v.upper()

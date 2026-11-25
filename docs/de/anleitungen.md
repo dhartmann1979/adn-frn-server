@@ -50,7 +50,7 @@ Nach der frischen Installation: **⚙️ Admin → 📥 Import** und nur die alt
 
 ## 🔐 Weiteren Admin anlegen
 
-Nur der Superadmin: **⚙️ Admin → 👥 Users → neuer Benutzer**, Rolle *Admin*. Passwörter haben mindestens 10 Zeichen. Rollen im Überblick: [Admin-Portal → Rollen](adminbereich.md#rollen).
+Nur der Superadmin: **⚙️ Admin → 👥 Benutzer & Zugang → 👥 Benutzer → ＋ Benutzer anlegen**, Rolle *Admin*. Passwörter haben mindestens 10 Zeichen. Rollen im Überblick: [Admin-Portal → Rollen](adminbereich.md#rollen).
 
 ## 🧪 Ausprobieren ohne Funkbetrieb
 
