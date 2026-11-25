@@ -2,6 +2,14 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.21.0 – 2026-11-25
+
+### 🔁 Master & Backup für FRN-Clients erkennbar (z. B. N8 Crosslink)
+- Das öffentliche `/api/info` sagt jetzt unter `cluster`, welcher Server **Master** und welcher **Backup** ist (Host und FRN-Port,
+  dazu ob der Master gerade in Wartung ist) – dieselben Angaben, die jeder FRN-Client ohnehin als `backup_server_addr` bekommt.
+- Damit erkennt N8 Crosslink (ab 1.21.0) das Paar, behandelt den Master immer als Priorität 1 und kehrt nach einem Ausfall von
+  selbst vom Backup zum Master zurück, sobald dieser wieder sauber läuft. Test `test_public_cluster_info_for_frn_clients`.
+
 ## 2.20.0 – 2026-11-25
 
 ### 🔑 FRN-Konten von Master und Backup im Kasten Master & Backup

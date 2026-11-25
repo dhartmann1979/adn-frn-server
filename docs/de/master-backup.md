@@ -62,6 +62,13 @@ werfen sie sich gegenseitig raus („wrong FRN password“ / „wrong credential
 
 Stand-alone-Server (ohne SystemManager) sind ausgenommen – dort gibt es kein Konto beim SystemManager.
 
+## 🔁 FRN-Clients kehren zum Master zurück
+
+Das öffentliche `/api/info` nennt unter `cluster` Master und Backup (Host, FRN-Port, Wartung). **N8 Crosslink** (ab 1.21.0) liest
+das, behandelt den Master immer als Priorität 1 und wechselt nach einem Ausfall vom Backup **von selbst zurück**, sobald der Master
+wieder sauber läuft (3 Prüfungen im Minutentakt, zwischen zwei Durchgängen). Während einer Wartung bleibt er auf dem Backup.
+Normale FRN-Clients bleiben nach einem Ausfall auf dem Backup, bis das Backup sie mit **↩️ Vom Backup zurückholen** zurückschickt.
+
 ## 🔗 Partner im Link-Menü
 
 Master und Backup stehen sich **über Kreuz automatisch als erster Eintrag** im Link-Menü der Kopfzeile: auf dem Master

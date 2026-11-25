@@ -229,6 +229,18 @@ async def push(ev: Dict[str, Any]) -> None:
         ctx.sockets.pop(ws, None)
 
 
+def _cluster_public(s: Dict[str, Any]) -> Dict[str, Any]:
+    role = s["cluster.role"]
+    if role not in ("master", "backup"):
+        return {"role": "off"}
+    host = s["frn.backup_host"] or cluster.peer_host(s["cluster.peer_url"])
+    port = int(s["frn.backup_port"] or s["frn.port"])
+    me = {"host": s["frn.address"] or "", "port": int(s["frn.port"])}
+    peer = {"host": host, "port": port} if host else None
+    return {"role": role, "master": me if role == "master" else peer, "backup": me if role == "backup" else peer,
+            "maintenance": bool(_cluster_get("cluster.maintenance"))}
+
+
 def info_for(u) -> Dict[str, Any]:
     s = ctx.settings.all()
     addr = s["frn.address"]
@@ -237,7 +249,10 @@ def info_for(u) -> Dict[str, Any]:
     return {"title": s["dashboard.title"], "subtitle": s["dashboard.subtitle"], "address": addr, "public": s["dashboard.public"],
             "version": __version__, "demo": DEMO, "chat": ctx.chat_allowed(u), "owner": s["frn.owner_callsign"],
             "website": s["frn.website"], "setup_needed": not ctx.auth.has_superadmin(),
-            "role": s["cluster.role"]}          # Master & Backup: im Kopfbereich als [Master] / [Backup] / [Standalone]
+            "role": s["cluster.role"],          # Master & Backup: im Kopfbereich als [Master] / [Backup] / [Standalone]
+            # für FRN-Clients wie N8 Crosslink: wer ist Master, wer Backup (die Adresse geht ohnehin als backup_server_addr an
+            # jeden FRN-Client) – damit sie nach einem Ausfall von selbst zum Master zurückkehren
+            "cluster": _cluster_public(s)}
 
 
 def refresh_sockets() -> None:

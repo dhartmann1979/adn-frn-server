@@ -220,3 +220,13 @@ def test_accounts_of_both_shown(client, monkeypatch):
     # the sync never touches them
     from frnadn.cluster import shared_keys
     assert "sysman.email" not in shared_keys() and "sysman.password" not in shared_keys()
+
+
+def test_public_cluster_info_for_frn_clients(client):
+    A = client.A
+    assert client.get("/api/info").json()["cluster"] == {"role": "off"}
+    A.ctx.settings.update({"cluster.role": "backup", "cluster.peer_url": "https://frn.example.org", "frn.address": "frn-backup.example.org",
+                           "frn.port": 10024}, "t")
+    c = client.get("/api/info").json()["cluster"]
+    assert c["role"] == "backup" and c["master"] == {"host": "frn.example.org", "port": 10024}
+    assert c["backup"] == {"host": "frn-backup.example.org", "port": 10024}
