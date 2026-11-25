@@ -31,6 +31,7 @@ fail() { echo "  ${E}✖ $*${R0}" >&2; exit 1; }
 # Vorgaben – n8-admin.conf überschreibt sie und kann n8_layout / n8_post_update / n8_sudo_extra definieren
 N8_ID=""; N8_NAME=""; N8_MAIN_UNIT=""; N8_UNITS=(); N8_DATA_DIRS=(); N8_SECRETS=(); N8_GROUPS=(); N8_HEALTH_URL=""
 N8_WRITABLE_IN_APP=(); N8_EXTRA_OWNED=(); N8_DATA_MODE=750; N8_RESTART_UNITS=()
+N8_WEB_UNIT=""      # Dienst des Webinterfaces – muss sudo dürfen (NoNewPrivileges=no); leer = N8_MAIN_UNIT
 APP=""; SVC_USER=""; STATE_DIR=""
 n8_layout() { :; }; n8_post_update() { :; }; n8_sudo_extra() { :; }; n8_restart() { local u; for u in "${N8_RESTART_UNITS[@]}"; do systemctl restart "$u" || true; done; }
 # shellcheck source=/dev/null
@@ -39,6 +40,7 @@ unit_val() { sed -n "s/^$2=//p" "/etc/systemd/system/$1" 2>/dev/null | head -1; 
 [[ -n "$APP" ]] || APP="$(unit_val "$N8_MAIN_UNIT" WorkingDirectory)"; [[ -n "$APP" ]] || APP="$(dirname "$HERE")"
 [[ -n "$SVC_USER" ]] || SVC_USER="$(unit_val "$N8_MAIN_UNIT" User)"; [[ -n "$SVC_USER" ]] || SVC_USER="$N8_ID"
 n8_layout
+[[ -n "$N8_WEB_UNIT" ]] || N8_WEB_UNIT="$N8_MAIN_UNIT"
 [[ -n "$STATE_DIR" ]] || STATE_DIR="${N8_DATA_DIRS[0]:-$APP/data}"
 SUDOERS="/etc/sudoers.d/${N8_ID}-n8admin"
 ADMIN_JSON="$STATE_DIR/n8-admin.json"
@@ -191,8 +193,23 @@ check_perms() {
     systemctl is-enabled "$UPD_PATH" >/dev/null 2>&1 && ck ok systemd "„Update jetzt“ ($UPD_PATH) aktiv" || ck bad systemd "$UPD_PATH ist nicht aktiv – „Update jetzt“ im Webinterface geht nicht"
     grep -qF "ExecStart=$SELF update --auto" "/etc/systemd/system/$UPD_SVC" && ck ok systemd "$UPD_SVC ruft n8-admin.sh auf" || ck bad systemd "$UPD_SVC veraltet"
   else ck bad systemd "Update-Auslöser $UPD_PATH fehlt"; fi
+  if [[ -f "/etc/systemd/system/$N8_WEB_UNIT" ]]; then
+    x=$(systemctl show -p NoNewPrivileges --value "$N8_WEB_UNIT" 2>/dev/null)
+    [[ -z "$x" ]] && x=$(cat "/etc/systemd/system/$N8_WEB_UNIT" "/etc/systemd/system/$N8_WEB_UNIT.d/"*.conf 2>/dev/null | sed -n 's/^NoNewPrivileges=//p' | tail -1)
+    [[ "$x" == yes || "$x" == true ]] && ck bad systemd "$N8_WEB_UNIT hat NoNewPrivileges=yes – das Webinterface kann sudo nicht nutzen" \
+                                    || ck ok systemd "$N8_WEB_UNIT darf sudo nutzen (nur die Freigaben)"
+  fi
   check_sudo
   return 0
+}
+web_unit_dropin() {   # NoNewPrivileges für das Webinterface aus – sudo erlaubt dann genau die Freigaben, sonst nichts
+  [[ -f "/etc/systemd/system/$N8_WEB_UNIT" ]] || return 0
+  install -d -m 755 "/etc/systemd/system/$N8_WEB_UNIT.d"
+  printf '%s\n' "# $N8_NAME – von n8-admin.sh: das Webinterface nutzt sudo (nur die Befehle in $SUDOERS)" "[Service]" "NoNewPrivileges=no" \
+    > "/etc/systemd/system/$N8_WEB_UNIT.d/n8-admin.conf"
+  chmod 644 "/etc/systemd/system/$N8_WEB_UNIT.d/n8-admin.conf"
+  systemctl daemon-reload >/dev/null 2>&1 || true
+  warn "$N8_WEB_UNIT: NoNewPrivileges aus (Drop-in n8-admin.conf) – wirkt nach dem nächsten Neustart des Dienstes"
 }
 check_sudo() {
   local -; set +e +o pipefail
@@ -265,7 +282,7 @@ repair() {
   warn "$before Fehler gefunden:"; perm_report fehler
   info "korrigiere …"
   fix_perms
-  perm_bad_in systemd && setup_units
+  perm_bad_in systemd && { setup_units; grep -q "NoNewPrivileges=yes" <<<"${CK[*]}" && web_unit_dropin; }
   perm_bad_in sudo && sudo_setup
   check_perms; after=$(perm_bad)
   if (( after == 0 )); then ok "alle $before Fehler korrigiert – erneut geprüft, alles in Ordnung"; return 0; fi
@@ -306,6 +323,7 @@ do_update() {
   info "Version: $old_ver → $new_ver"
   n8_post_update "$old" "$new" || warn "Nacharbeiten mit Fehler"
   fix_perms; setup_units >/dev/null; sudo_setup >/dev/null
+  check_perms; grep -q "NoNewPrivileges=yes" <<<"${CK[*]}" && web_unit_dropin
   n8_restart
   if ! health; then
     if [[ "$old" != "$new" ]]; then
