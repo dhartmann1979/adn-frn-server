@@ -60,3 +60,32 @@ def test_watch_reports_once(client):
     assert len([e for e in A.ctx.live.events if e["kind"] == "frnlog"]) == 1
 
 
+
+
+def test_errorlog_checked_right_after_a_problem(app_mod, monkeypatch):
+    """Wie in N8 Crosslink: meldet der FRN-Server ein Problem, wird gleich im Fehlerprotokoll nachgesehen (höchstens 1×/min)."""
+    import asyncio
+    A = app_mod
+    calls = []
+
+    async def watch():
+        calls.append(1)
+
+    async def nosleep(_):
+        return None
+    monkeypatch.setattr(A, "errorlog_watch", watch)
+    monkeypatch.setattr(asyncio, "sleep", nosleep)
+    A._ERRLOG_STATE.update(sig=None, at=0.0)
+    st = {"error": "", "restarts": 0, "service": "active"}
+    monkeypatch.setattr(A.ctx.server, "state", lambda: dict(st))
+    asyncio.run(A.errorlog_on_problem())                     # first look: only remember
+    assert calls == []
+    st.update(error="SystemManager: wrong credentials")
+    asyncio.run(A.errorlog_on_problem())
+    assert calls == [1]
+    st.update(restarts=1)
+    asyncio.run(A.errorlog_on_problem())                     # within a minute: not again
+    assert calls == [1]
+    A.ctx.settings.update({"frn.address": "frn.example.org", "cluster.role": "master",
+                           "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+    assert A.errorlog_scope()[1] == ["frn.example.org", "frn-backup.example.org"]

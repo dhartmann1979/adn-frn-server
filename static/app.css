@@ -505,3 +505,6 @@ header { padding:7px 12px; gap:9px; }
 .cl-own-l { grid-column: 1 / -1; color: var(--dim, #9aa4b8); font-size: 12.5px; }
 .cl-own input { width: 100%; min-width: 0; }
 @media (max-width: 700px) { .cl-own { grid-template-columns: 1fr; } }
+.el-inline { margin: 6px 0 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+.el-inline h4 { margin: 0 0 4px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+.el-inline h4 .badge { text-transform: none; letter-spacing: 0; margin-left: 8px; font-weight: 600; }

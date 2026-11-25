@@ -866,10 +866,16 @@ async function loadSettings() {
             <button class="btn small" onclick="showProps()">🧾 Show server.properties</button><span class="dim" id="javaUpdInfo" style="font-size:12.5px"></span></div></div>
         <div class="tiles">${S.admin.sections.map(sec => `
         <form class="tile" data-sec="${sec.id}" onsubmit="event.preventDefault(); saveSettings(this)"><h3>${esc(sec.title)}</h3><div class="subt">${esc(sec.subtitle)}</div>
-            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div><div class="notice-box">📋 <span>Refused by the SystemManager? The reason is in the public FRN error log of freeradionetwork.de (Help → Error log).</span> <button type="button" class="btn small" style="margin-left:6px" onclick="showAdmin(\'logs\')">📋 FRN error log</button> <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">open ↗</a></div>' : ''}
+            ${sec.id === 'sysman' ? '<div class="notice-box">🌐 Registered at the SystemManager the server is listed in the FRN system and checks the logins there. The SystemManager tests that address and port are reachable from the internet – set up port forwarding first.</div><div class="notice-box">🔑 Every FRN server needs its own FRN account – the same e-mail and password on two servers are refused (“the same credentials are already online on another server”). <button type="button" class="btn small" style="margin-left:6px" onclick="openFrnPassword()">📧 Request FRN password</button></div>' : ''}
             ${sec.id === 'cluster' ? '<div id="clusterBox" class="cl-box"><span class="dim">…</span></div>' : ''}
+            ${sec.id === 'sysman' ? `<div class="el-inline"><h4>📋 Public FRN error log <span id="frnElBadge"></span></h4>
+                <div class="subt">The reason for refused logins (wrong FRN password, unknown owner, multiple connection …) – also checked in the background: right after a problem of the FRN server, then every 2 minutes, new reasons appear in the events.</div>
+                <div id="frnElList"><div class="dim">loading …</div></div>
+                <div class="actions" style="justify-content:flex-start"><button type="button" class="btn small" onclick="loadFrnErrorlog(true)">🔄 Reload</button>
+                <a class="btn small" href="http://log.freeradionetwork.de:60080/error_log.php" target="_blank" rel="noopener">📋 Open the complete error log ↗</a></div></div>` : ''}
             ${sec.fields.map(fieldHtml).join('')}<div class="actions">${sec.id === 'cluster' ? '<button type="button" class="btn" onclick="clusterKey(this)">🎲 New key</button>' : ''}<button class="btn primary">Save</button></div></form>`).join('')}</div>`;
     if (S.admin.sections.some(x => x.id === 'cluster')) loadCluster();
+    if ($('frnElList')) loadFrnErrorlog(false);
 }
 
 // 🔁 Master & Backup – status, sync, maintenance switch, FRN password for both servers (frnadn/cluster.py)

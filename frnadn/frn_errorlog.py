@@ -29,6 +29,8 @@ HINTS = [
     (r"not listening on specified port", "The SystemManager cannot reach the server on this address and port from the internet – check "
                                          "firewall and port forwarding (TCP) and the server address."),
     (r"blocked|banned|locked", "Access blocked – ask the operator of the FRN network."),
+    (r"unknown owner", "Unknown owner: the owner e-mail of the server (server_owner – Settings → Operator, empty = the FRN account) is "
+                       "not a known FRN account at the SystemManager – enter the e-mail of an existing FRN account."),
     (r"unknown|not registered|no account|not found", "Account unknown at the SystemManager – request a password or check the spelling of "
                                                      "e-mail, callsign and name."),
     (r"version", "Protocol version refused – update the FRN server/client."),

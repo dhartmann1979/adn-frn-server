@@ -1940,7 +1940,11 @@ def errorlog_scope() -> Tuple[List[str], List[str]]:
     for e in list(ctx.live.events):
         if e.get("kind") == "denied" and e.get("ts", 0) > now - 3600:
             calls.append(str(e.get("text", "")).split(" ", 1)[0])
-    return [c for c in dict.fromkeys(calls) if c and c != "?"], [h for h in [s.get("frn.address") or ""] if h]
+    # Master & Backup: auch der Partner (dieselben Räume, oft dieselben Probleme – z. B. dasselbe FRN-Konto)
+    hosts = [s.get("frn.address") or ""]
+    if s.get("cluster.role") in ("master", "backup"):
+        hosts.append(s.get("frn.backup_host") or cluster.peer_host(s.get("cluster.peer_url")))
+    return [c for c in dict.fromkeys(calls) if c and c != "?"], [h for h in dict.fromkeys(hosts) if h]
 
 
 async def errorlog_watch() -> None:
@@ -1974,14 +1978,35 @@ async def frn_errorlog_get(request: Request, force: bool = False):
             "others": frn_errorlog.summarize([e for e in entries if (e["ts"], e["kind"], e["id"]) not in seen])[:15]}
 
 
+_ERRLOG_STATE = {"sig": None, "at": 0.0}
+
+
+async def errorlog_on_problem() -> None:
+    """Wie in N8 Crosslink: sobald der FRN-Server ein Problem meldet (Ablehnung durch den SystemManager, Ende, Neustart),
+    nach ein paar Sekunden im öffentlichen Fehlerprotokoll nachsehen – dort steht der Grund, den der Server selbst nicht nennt.
+    Höchstens einmal pro Minute; der Grund landet im Ereignisprotokoll."""
+    st = ctx.server.state()
+    sig = (bool(st.get("error")), st.get("error") or "", st.get("restarts") or 0, st.get("service"))
+    prev, _ERRLOG_STATE["sig"] = _ERRLOG_STATE["sig"], sig
+    if prev is None or sig == prev:
+        return
+    problem = bool(st.get("error")) or (st.get("restarts") or 0) > (prev[2] or 0) or st.get("service") not in ("active",)
+    if problem and time.time() - _ERRLOG_STATE["at"] > 60:
+        _ERRLOG_STATE["at"] = time.time()
+        await asyncio.sleep(4)                       # der SystemManager schreibt den Eintrag kurz nach der Ablehnung
+        await errorlog_watch()
+
+
 async def background() -> None:
     n = 0
     while True:
         try:
-            # public FRN error log: every 2 minutes while the SystemManager reports a problem, otherwise every 10 minutes
-            if not DEMO and ctx.settings.get("frn.address") and not ctx.settings.get("frn.standalone") \
-                    and n % (24 if ctx.server.error else 120) == 7:
-                await errorlog_watch()
+            # public FRN error log: right after a problem of the FRN server, every 2 minutes while the SystemManager reports
+            # one, otherwise every 10 minutes – new reasons go to the events (like N8 Crosslink)
+            if not DEMO and ctx.settings.get("frn.address") and not ctx.settings.get("frn.standalone"):
+                await errorlog_on_problem()
+                if n % (24 if ctx.server.error else 120) == 7:
+                    await errorlog_watch()
             if n % 12 == 0:
                 ctx.live.sample()
             if n % 720 == 5:

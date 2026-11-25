@@ -84,9 +84,16 @@ adn-frn-server nutzt es ab 2.12.0 selbst:
 * **Admin → 📜 Logs → 📋 Öffentliches FRN-Fehlerprotokoll:** Einträge zu **dieser Server-Adresse**, dem **Rufzeichen des Betreibers** und zu
   **hier abgelehnten Stationen** (letzte Stunde) – gleiche Meldungen zusammengefasst („6× seit 09:58“), mit Erklärung und Abhilfe.
   **🔄 Neu laden** und **📋 Komplettes Fehlerprotokoll öffnen**.
-* **Automatisch:** alle 10 Minuten, solange der SystemManager einen Fehler meldet alle 2 Minuten – neue Einträge erscheinen als Ereignis im Log
-  (`FRN error log: server frn.example.org:10024 – wrong FRN password …`), jede Meldung einmal. Nicht im eigenständigen Betrieb.
-* **Hinweise:** unter *Settings → SystemManager* und im Fehlerkasten des Java-Servers ein Link dorthin.
+* **Im Hintergrund (wie in N8 Crosslink):** **sofort nach einem Problem** des FRN-Servers (Ablehnung durch den SystemManager, Ende,
+  Neustart – ein paar Sekunden später, höchstens einmal pro Minute), solange der SystemManager einen Fehler meldet alle 2 Minuten, sonst alle
+  10 Minuten. Neue Gründe erscheinen als Ereignis im Log (`FRN error log: server frn.example.org:10024 – wrong FRN password …`), jede
+  Meldung einmal. Nicht im eigenständigen Betrieb.
+* **Mit Master & Backup** gehört auch die Adresse des Partners dazu – Probleme des anderen Servers (z. B. dasselbe FRN-Konto) sieht man
+  auf beiden.
+* **Auch direkt unter *Einstellungen → 🌐 SystemManager*** steht das Fehlerprotokoll (wie auf der FRN-Seite von N8 Crosslink), dazu im
+  Fehlerkasten des Java-Servers ein Link dorthin.
+* **„unknown owner“** (Server): Die Besitzer-E-Mail (`server_owner`, *Einstellungen → Operator*, leer = das FRN-Konto) ist beim
+  SystemManager kein bekanntes FRN-Konto – die E-Mail eines bestehenden FRN-Kontos eintragen.
 
 <p align="center"><img src="../images/admin-frn-errorlog.png" alt="Öffentliches FRN-Fehlerprotokoll" width="90%"></p>
 

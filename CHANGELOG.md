@@ -2,6 +2,19 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.22.0 – 2026-11-25
+
+### 📋 FRN-Fehlerprotokoll im Hintergrund – wie in N8 Crosslink
+- **Sofort nach einem Problem:** Meldet der FRN-Server eine Ablehnung durch den SystemManager, beendet er sich oder startet er neu,
+  schaut das Dashboard ein paar Sekunden später ins öffentliche FRN-Fehlerprotokoll (höchstens einmal pro Minute) und schreibt den
+  Grund ins Ereignisprotokoll. Dazu wie bisher alle 2 Minuten bei einem Fehler, sonst alle 10 Minuten.
+- **Mit Master & Backup** wird auch die Adresse des Partners beobachtet – Probleme des anderen Servers (z. B. dasselbe FRN-Konto)
+  stehen auf beiden.
+- **Direkt unter *Einstellungen → 🌐 SystemManager*** steht jetzt das Fehlerprotokoll (Einträge zu diesem Server, Neu laden, komplett
+  öffnen) – wie auf der FRN-Seite von N8 Crosslink; der bisherige Hinweiskasten dort entfällt.
+- Neue Erklärung für **„unknown owner“** (Besitzer-E-Mail des Servers ist kein bekanntes FRN-Konto).
+- Behoben: lange deutsche Texte mit „… of …“ wurden von einer Übersetzungsregel verschluckt; Test `test_errorlog_checked_right_after_a_problem`.
+
 ## 2.21.0 – 2026-11-25
 
 ### 🔁 Master & Backup für FRN-Clients erkennbar (z. B. N8 Crosslink)
