@@ -412,15 +412,16 @@
 
 
     // ============================================================ admin menu as a tree (1.1.0)
-    // groups: [{ id, label, items: [{ id, label, hidden }] }] – labels with a leading emoji. opts: { active, onSelect(id), key }
+    // groups: [{ id, label, items: [{ id, label, hidden, badge, badgeClass, children }] }] – labels with a leading emoji. opts: { active, onSelect(id), key }
     // The same groups in every N8 system: Betrieb · Benutzer & Zugang · Darstellung · Netz & Domains · System.
     // items may have children: [{ id, label }] – shown indented under the item (the former in-page menus of a page).
     // onSelect gets the id of the item or of the child ('settings' or 'settings:dmr').
     function tree(el, groups, opts) {
         opts = opts || {};
-        const key = 'n8nav:' + (opts.key || location.pathname);
-        let closed = {};
-        try { closed = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { closed = {}; }
+        // groups start closed (the same in every N8 system); only the group of the open page and the groups you opened are open
+        const key = 'n8nav2:' + (opts.key || location.pathname);
+        let opened = {};
+        try { opened = JSON.parse(sessionStorage.getItem(key) || '{}'); } catch (e) { opened = {}; }
         const act = opts.active;
         const items = groups.map(g => ({ ...g, items: (g.items || []).filter(i => !i.hidden) })).filter(g => g.items.length);
         const all = items.flatMap(g => g.items.flatMap(i => [i, ...(i.children || [])]));
@@ -430,7 +431,7 @@
         el.classList.add('n8-tree');
         el.innerHTML = `<button type="button" class="n8-tree-toggle">☰ <span>${esc(cur ? cur.label : 'Menü')}</span></button>
             <div class="n8-tree-body">${items.map(g => {
-                const open = !closed[g.id] || g.items.some(inItem);
+                const open = !!opened[g.id] || g.items.some(inItem);
                 return `<div class="n8-tree-g ${open ? 'open' : ''}" data-g="${esc(g.id)}">
                     <button type="button" class="n8-tree-gh"><span class="n8-tree-car">▸</span>${esc(g.label)}</button>
                     <div class="n8-tree-items">${g.items.map(i => btn(i, (i.children || []).length ? 'has-kids' + (inItem(i) ? ' kids-open' : '') : '')
@@ -438,8 +439,8 @@
             }).join('')}</div>`;
         el.querySelector('.n8-tree-toggle').onclick = () => el.classList.toggle('open');
         el.querySelectorAll('.n8-tree-gh').forEach(b => b.onclick = () => {
-            const g = b.parentElement; g.classList.toggle('open'); closed[g.dataset.g] = !g.classList.contains('open');
-            try { localStorage.setItem(key, JSON.stringify(closed)); } catch (e) { /* private mode */ }
+            const g = b.parentElement; g.classList.toggle('open'); if (g.classList.contains('open')) opened[g.dataset.g] = 1; else delete opened[g.dataset.g];
+            try { sessionStorage.setItem(key, JSON.stringify(opened)); } catch (e) { /* private mode */ }
         });
         el.querySelectorAll('.n8-tree-i').forEach(b => b.onclick = () => {
             const id = b.dataset.i;

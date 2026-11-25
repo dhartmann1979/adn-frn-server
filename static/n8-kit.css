@@ -166,3 +166,4 @@ html[data-theme-mode=light] .n8-log { background: rgba(0, 0, 0, .05); }
 .n8-tree-i.kid:hover, .n8-tree-i.kid.on { color: var(--text, #f5f7fb); }
 .n8-admin-main [hidden], .hb-admin [hidden] { display: none !important; }
 .n8-admin-main .tiles.one, .n8-admin-main .grid.one { grid-template-columns: 1fr !important; }
+.n8-tree-i .n8-badge.dot { background: none; padding: 0 2px; font-size: 10px; margin-left: auto; }

@@ -18,7 +18,7 @@ mit denselben Gruppen in derselben Reihenfolge:
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
 | 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💾 Backup (nur Superadmin) |
 
-Gruppen klappen per Klick auf und zu; seit 2.14.2 hängen die Abschnitte der Einstellungen als Zweige darunter (ein Zweig zeigt nur diesen Abschnitt). Auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
+Alle Gruppen sind **anfangs zugeklappt** – offen ist nur die Gruppe der gerade gewählten Seite; seit 2.14.2 hängen die Abschnitte der Einstellungen als Zweige darunter (ein Zweig zeigt nur diesen Abschnitt). Auf dem Handy wird das Menü zu einer aufklappbaren Leiste. Kacheln einer Reihe sind gleich hoch.
 
 ## Rollen
 
