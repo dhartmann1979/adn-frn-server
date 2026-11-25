@@ -106,6 +106,7 @@ zweiten ab („falsches FRN-Passwort“ bzw. „bereits online“). Deshalb gibt
 
 | Meldung | Ursache und Lösung |
 |---|---|
+| **⛔ Master und Backup verwenden dasselbe FRN-Konto** (roter Kasten) / FRN-Server stoppt mit *SystemManager: wrong credentials* | Beide Server melden sich mit derselben E-Mail beim SystemManager an. Er lässt nur einen online: Wer zuerst kommt (z. B. das Backup, während der Master für ein Update neu startet), bleibt – der andere bekommt „wrong credentials“, sein FRN-Server beendet sich, und die Stationen landen auf dem anderen. Lösung: FRN-Server auf dem Backup stoppen (Master kommt wieder), mit **📧 FRN-Passwort Backup** ein eigenes Konto anfordern und auf dem Backup unter *SystemManager* eintragen. |
 | *Partner … nicht erreichbar* | Adresse falsch, Partner aus, Firewall. Die Adresse ist die des **Dashboards** (https://…), nicht der FRN-Port. |
 | *Der Partner hat abgelehnt: wrong sync key* | Der Schlüssel ist auf beiden Servern nicht gleich. Neu erzeugen und auf dem anderen Server eintragen. |
 | *request expired …* | Die Uhrzeit eines Servers geht falsch: `timedatectl` prüfen, NTP einschalten. |

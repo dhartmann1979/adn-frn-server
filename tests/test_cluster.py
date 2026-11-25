@@ -158,3 +158,14 @@ def test_partner_first_in_link_menu(client):
     d = client.get("/api/links").json()
     assert d["links"][0]["label"] == "FRN Master" and d["enabled"]
     assert all(x["label"] != "FRN Master" for x in client.get("/api/admin/links").json()["items"])   # not stored in the menu
+
+
+def test_same_fRN_account_warning(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org",
+                           "sysman.email": "Server@Example.org", "frn.standalone": False}, "t")
+    tag = A._account_tag()
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "account": tag, "standalone": False})
+    assert client.get("/api/admin/cluster").json()["same_account"] is True
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "account": "other", "standalone": False})
+    assert client.get("/api/admin/cluster").json()["same_account"] is False

@@ -253,6 +253,8 @@ N8Kit.i18n.add({
         'Your own links in the header: website, chat group, wiki, donation page … Everyone sees them, also without login.': 'Eigene Links in der Kopfzeile: Webseite, Chatgruppe, Wiki, Spendenseite … Jeder sieht sie, auch ohne Login.',
         'Website': 'Webseite', 'E-mail': 'E-Mail', 'Address': 'Adresse', 'Copy settings from': 'Einstellungen übernehmen von', 'Do not record': 'Nicht aufzeichnen', '(switches to that tab) and': '(wechselt in diesen Tab) und',
         // 2.17.0: Master & Backup
+        "Master and backup use the same FRN account": "Master und Backup verwenden dasselbe FRN-Konto.",
+        "The SystemManager lets only one of them online – the other one gets “wrong credentials” and its FRN server stops. Request an own FRN password for the backup and enter it there under SystemManager": "Der SystemManager lässt nur einen von beiden online – der andere bekommt „wrong credentials“ und sein FRN-Server stoppt. Für das Backup ein eigenes FRN-Passwort anfordern und dort unter SystemManager eintragen.",
         "Master & Backup": "Master & Backup",
         "Second FRN server with the same configuration – sync every full hour and by button": "Zweiter FRN-Server mit derselben Konfiguration – Abgleich jede volle Stunde und auf Knopfdruck",
         "Role of this server": "Rolle dieses Servers",

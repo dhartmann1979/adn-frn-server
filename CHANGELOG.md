@@ -2,6 +2,18 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.18.2 – 2026-11-25
+
+### ⛔ Warnung: Master und Backup mit demselben FRN-Konto
+- **Ursache eines Ausfalls auf frn.auf-der-nachtschicht.de:** Master und Backup meldeten sich mit **demselben FRN-Konto** beim
+  SystemManager an. Er lässt nur einen online. Als der Master für das Update neu startete, kam das Backup zuerst durch, der Master
+  bekam „SystemManager: wrong credentials“, sein Java-FRN-Server beendete sich immer wieder (Exit 0, Keep-Alive-Neustarts) – und die
+  Stationen landeten auf dem Backup.
+- Jetzt vergleicht *🔁 Master & Backup* das FRN-Konto beider Server (über die verschlüsselte Verbindung, nur als Hash der E-Mail)
+  und zeigt bei Gleichheit oben einen **roten Hinweis** mit der Lösung (eigenes Konto fürs Backup über **📧 FRN-Passwort Backup**).
+  Stand-alone-Server (ohne SystemManager) sind ausgenommen.
+- Fehlersuche in docs/de/master-backup.md ergänzt; Test `test_same_fRN_account_warning`.
+
 ## 2.18.1 – 2026-11-25
 
 ### 🔗 Master & Backup über Kreuz im Link-Menü

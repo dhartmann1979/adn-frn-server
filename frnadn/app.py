@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import hashlib
 import json
 import logging
 import os
@@ -469,6 +470,12 @@ def _cluster_answer(msg: Dict[str, Any], data: Any) -> Response:
     return Response(cluster.answer(msg, data, ctx.settings.get("cluster.key")), media_type=cluster.CTYPE)
 
 
+def _account_tag() -> str:
+    """Kennung des FRN-Kontos beim SystemManager (Hash der E-Mail) – zum Vergleich mit dem Partner, ohne die Adresse zu zeigen."""
+    e = (ctx.settings.get("sysman.email") or "").strip().lower()
+    return hashlib.sha256(e.encode()).hexdigest()[:16] if e else ""
+
+
 def _frn_running() -> bool:
     st = ctx.server.state()
     return st["running"] or (DEMO and st["service"] == "active")       # demo: no Java process listens
@@ -485,7 +492,8 @@ async def cluster_hello(request: Request):
     msg = await _cluster_peer(request, ("master", "backup"))
     return _cluster_answer(msg, {"ok": True, "role": ctx.settings.get("cluster.role"), "version": __version__,
             "title": ctx.settings.get("dashboard.title"), "frn": _frn_state(), "time": time.time(),
-            "maintenance": bool(_cluster_get("cluster.maintenance")), "last": _cluster_get("cluster.last")})
+            "maintenance": bool(_cluster_get("cluster.maintenance")), "last": _cluster_get("cluster.last"),
+            "account": _account_tag(), "standalone": ctx.settings.get("frn.standalone")})
 
 
 @app.post("/api/cluster/export")
@@ -588,6 +596,10 @@ async def cluster_status(request: Request):
             out["peer"] = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/hello", s["cluster.key"], "GET", None, 8)
         except cluster.ClusterError as e:
             out["peer"] = {"ok": False, "error": str(e)}
+        p = out["peer"] or {}
+        # beide Server mit demselben FRN-Konto: der SystemManager lässt nur einen online (der andere: „wrong credentials“)
+        out["same_account"] = bool(p.get("account")) and p.get("account") == _account_tag() \
+            and not s["frn.standalone"] and not p.get("standalone")
     return out
 
 

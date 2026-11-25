@@ -887,6 +887,7 @@ async function loadCluster() {
     const lastTxt = !last.time ? '<span class="dim">never</span>'
         : last.ok ? `<span class="cl-ok">✓</span> ${fmtDate(last.time)} <span class="dim">${bits.map(b => `· <span>${esc(b)}</span>`).join(' ')}</span>`
         : `<span class="cl-bad">✕ ${fmtDate(last.time)}</span> <span class="cl-bad">${esc(last.error || '')}</span>`;
+    const same = d.same_account ? `<div class="notice-box cl-alarm">⛔ <b>Master and backup use the same FRN account.</b> <span>The SystemManager lets only one of them online – the other one gets “wrong credentials” and its FRN server stops. Request an own FRN password for the backup and enter it there under SystemManager.</span></div>` : '';
     const rows = d.role === 'off' ? '<div class="dim">Choose the role of this server below: the master gives its configuration, the backup takes it over every full hour. The failover itself is done by FRN: the clients go to the backup address when this server is gone.</div>' : `
         <div class="cl-grid">
             <span>Role</span><b><span>${esc(role)}</span>${m ? ' · <span class="cl-warn">🛠️ maintenance – stations are on the backup</span>' : ''}</b>
@@ -902,7 +903,7 @@ async function loadCluster() {
             ${d.role === 'master' ? (m ? '<button type="button" class="btn small" onclick="clusterMaint(false, this)">↩️ Take back from the backup</button>'
                                        : '<button type="button" class="btn small" onclick="clusterMaint(true, this)">🛠️ Hand over to the backup</button>') : ''}
         </div>`;
-    box.innerHTML = rows + `<div class="actions" style="justify-content:flex-start">
+    box.innerHTML = same + rows + `<div class="actions" style="justify-content:flex-start">
         <span class="dim" style="font-size:12.5px">Every server needs its own FRN account:</span>
         <button type="button" class="btn small" onclick="openFrnPassword('master')">📧 FRN password Master</button>
         <button type="button" class="btn small" onclick="openFrnPassword('backup')">📧 FRN password Backup</button></div>`;
