@@ -60,7 +60,7 @@ wieder ergänzt. Jeder Schritt steht im 📜 Protokoll.
 | Upstream-Port / -Verschlüsselung | 587 / STARTTLS | oder 465 / TLS von Anfang an – **immer verschlüsselt**, Zertifikat des Upstreams wird geprüft (`secure`) |
 | Upstream-Benutzer / -Passwort | leer | Zugang beim Anbieter (SASL) |
 | SPF des Upstreams | leer | z. B. `include:_spf.provider.de` – kommt in die SPF-Vorlage |
-| Port 25: Verschlüsselung Pflicht | aus | an = andere Mailserver müssen STARTTLS nutzen (die wenigen ohne TLS werden abgelehnt) |
+| Port 25: Verschlüsselung Pflicht | aus | an = andere Mailserver müssen STARTTLS nutzen (die wenigen ohne TLS werden abgelehnt, auch Prüftools wie MXToolbox: „530 Must issue a STARTTLS command first“; RFC 3207 rät bei öffentlichen MX davon ab) |
 | Postfachgröße / größte Nachricht | 2048 MB / 25 MB | Quota je Postfach (Dovecot) und Größe je Mail (Postfix) |
 | Postmaster | leer | Benutzer, der postmaster@, abuse@, hostmaster@, dmarc@ und tls-reports@ jeder Domain bekommt – leer = Superadmin |
 | Spam-Wert → Spam-Ordner / ablehnen | 6 / 15 | Rspamd: ab 6 in „Spam“ (Sieve), ab 15 schon beim Empfang abgelehnt |
@@ -77,6 +77,13 @@ wieder ergänzt. Jeder Schritt steht im 📜 Protokoll.
 
 Weitere Schutzmaßnahmen: Anmeldung nur über TLS, Benutzer senden nur mit ihrer eigenen Adresse (oder ihren Aliasen; `reject_sender_login_mismatch`),
 kein offenes Relay, Systembenutzer (PAM) können sich an Dovecot nicht anmelden, Dovecot bekommt nur SHA512-CRYPT-Hashes.
+
+### Prüfen mit MXToolbox & Co.
+
+- **„Reverse DNS does not match SMTP Banner“:** der PTR der Server-IP zeigt noch auf den Namen des Hosters. Im Kundenmenü des Hosters
+  (Reverse-DNS / rDNS) auf `mail.<hauptdomain>` setzen. Das Dashboard zeigt den aktuellen Wert unter 📮 Mailserver.
+- **„530 Must issue a STARTTLS command first“:** *Port 25: Verschlüsselung Pflicht* ist an – Prüftools ohne STARTTLS werden abgewiesen.
+- Die Begrüßung lautet `220 mail.<domain> ESMTP` (ohne Software und Distribution).
 
 ## 📬 Postfächer
 

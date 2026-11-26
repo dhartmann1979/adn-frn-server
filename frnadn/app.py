@@ -561,6 +561,22 @@ async def mta_sts(request: Request):
     return Response(mailcfg.mta_sts_policy(s, dom), media_type="text/plain")
 
 
+_PTR_CACHE: Dict[str, Any] = {"t": 0.0, "v": []}
+
+
+def _ptr_check() -> List[Tuple[str, List[str]]]:
+    """Reverse DNS of the public addresses of this server (cached 10 minutes)."""
+    if time.time() - _PTR_CACHE["t"] > 600:
+        out = []
+        for ip in mailcfg._ips().get("v4", []):
+            try:
+                out.append((ip, mailcfg.dns_query(ip, "PTR")))
+            except Exception:  # noqa: BLE001
+                out.append((ip, []))
+        _PTR_CACHE.update(t=time.time(), v=out)
+    return _PTR_CACHE["v"]
+
+
 def _mail_view(s: Dict[str, Any]) -> Dict[str, Any]:
     st = mailcfg.read_state(DATA)
     mb = mailcfg.mailboxes(ctx.db, s)
@@ -580,6 +596,15 @@ def _mail_view(s: Dict[str, Any]) -> Dict[str, Any]:
             warn.append("Kein Upstream eingetragen – Mails gehen direkt ins Internet (ausgehend Port 25, viele Anbieter sperren ihn).")
         if mb["waiting"]:
             warn.append(f"{len(mb['waiting'])} Benutzer haben noch kein Mail-Passwort – es entsteht bei der nächsten Anmeldung im Dashboard.")
+        if mailcfg.domains(s):
+            for ip, ptr in _ptr_check():
+                want = mailcfg.host_of(mailcfg.domains(s)[0])
+                if want not in [p.rstrip(".") for p in ptr]:
+                    warn.append(f"Reverse-DNS (PTR) von {ip} ist {', '.join(p.rstrip('.') for p in ptr) or 'nicht gesetzt'} – beim Hoster auf "
+                                f"{want} ändern. Sonst meldet die Gegenstelle „Reverse DNS does not match SMTP Banner“ und Mails landen eher im Spam.")
+        if s.get("mail.inbound_tls"):
+            warn.append("Port 25 verlangt TLS: Server und Prüftools ohne STARTTLS werden mit „530 Must issue a STARTTLS command first“ "
+                        "abgewiesen (RFC 3207 rät bei öffentlichen MX davon ab) – für den Empfang meist besser aus.")
         if s.get("mail.bimi") and s.get("mail.dmarc_policy") == "none":
             warn.append("BIMI braucht DMARC „quarantine“ oder „reject“.")
     boxes = [{k: v for k, v in b.items() if k != "hash"} for b in mb["boxes"]]

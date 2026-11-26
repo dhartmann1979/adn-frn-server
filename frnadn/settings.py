@@ -140,7 +140,7 @@ FIELDS: List[Field] = [
     Field("mail.relay_spf", "mail", "SPF of the upstream", "text", "",
           "For the DNS template, e.g. include:_spf.provider.de – your provider names it", pattern=r"[A-Za-z0-9.:_/\- ]*"),
     Field("mail.inbound_tls", "mail", "Port 25: encryption required", "bool", False,
-          "On: other mail servers must use TLS (STARTTLS) to deliver – the few without TLS are refused. Mail programs always need TLS."),
+          "On: other mail servers must use TLS (STARTTLS) to deliver – the few without TLS are refused, test tools like MXToolbox too (530 Must issue a STARTTLS command first). RFC 3207 advises against it for a public MX. Mail programs always need TLS."),
     Field("mail.quota_mb", "mail", "Mailbox size (MB)", "int", 2048, "", min=50, max=1048576),
     Field("mail.max_size_mb", "mail", "Largest message (MB)", "int", 25, "", min=1, max=200),
     Field("mail.postmaster", "mail", "Postmaster", "text", "",

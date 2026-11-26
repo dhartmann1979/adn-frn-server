@@ -230,6 +230,7 @@ def postfix_main(sp: Dict[str, Any]) -> List[str]:
         "smtpd_tls_received_header=yes", "tls_preempt_cipherlist=yes",
         "smtpd_sasl_type=dovecot", "smtpd_sasl_path=private/auth", "smtpd_sasl_auth_enable=no",
         "smtpd_helo_required=yes", "disable_vrfy_command=yes", "strict_rfc821_envelopes=yes",
+        "smtpd_banner=$myhostname ESMTP",                 # no software/distribution in the greeting
         "smtpd_relay_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination",
         "smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination,reject_unlisted_recipient",
         f"smtpd_sender_login_maps=hash:{PF_MAPS}/senders",

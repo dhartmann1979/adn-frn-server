@@ -2,6 +2,16 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.27.1 – 2026-11-26
+
+### ✉️ Mailserver: Hinweise aus dem MXToolbox-Test
+- **Reverse-DNS (PTR) wird geprüft:** Zeigt der PTR der öffentlichen IPv4 nicht auf `mail.<hauptdomain>` (z. B. noch auf den Namen
+  des Hosters wie `vps….fastwebserver.de`), steht unter 📮 Mailserver ein Hinweis mit dem richtigen Wert – sonst meldet die Gegenstelle
+  „Reverse DNS does not match SMTP Banner“ und Mails landen eher im Spam. Den PTR setzt man im Kundenmenü des Hosters.
+- **SMTP-Begrüßung ohne Software und Distribution:** `220 mail.<domain> ESMTP` statt `… ESMTP Postfix (Debian)`.
+- **Port 25 mit TLS-Pflicht:** Hinweis, dass dann Absender und Prüftools ohne STARTTLS mit „530 Must issue a STARTTLS command first“
+  abgewiesen werden (RFC 3207 rät bei öffentlichen MX davon ab); Hilfetext entsprechend ergänzt.
+
 ## 2.27.0 – 2026-11-26
 
 ### ✉️ Mail-Domains und Zertifikate automatisch
