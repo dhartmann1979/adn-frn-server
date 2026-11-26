@@ -119,6 +119,10 @@ ctx: Optional[Ctx] = None
 _RESTORED: Dict[str, Any] = {}
 app = FastAPI(title="frn_adn", **{"docs_url": None, "redoc_url": None, "openapi_url": None, **_sec.FASTAPI_KWARGS})
 app.add_middleware(GZipMiddleware, minimum_size=800)
+# N8 Guard: request budget per IP (flooding), websocket limit, body size – the same in every N8 system
+from .n8_guard import Guard, LoginGuard  # noqa: E402
+app.add_middleware(Guard, api_per_min=1200, page_per_min=600, auth_per_min=30, max_body=64 * 1024 * 1024)
+LOGIN_GUARD = LoginGuard()
 
 
 class HTTPError(Exception):
@@ -797,6 +801,9 @@ async def mail_att(request: Request, folder: str, uid: int, part: int):
                     headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(name)}", "Cache-Control": "no-store"})
 
 
+_WEBMAIL_SENT: Dict[str, List[float]] = {}
+
+
 @app.post("/api/mail/send")
 async def mail_send(request: Request):
     u, addr = _need_mail(request)
@@ -805,6 +812,12 @@ async def mail_send(request: Request):
         msg, rcpts = fwebmail.compose(addr, u.get("display_name") or "", b)
     except (fwebmail.MailboxError, ValueError) as e:
         raise HTTPError(400, str(e))
+    # against spam from a taken-over account: at most 200 recipients per user and hour from the webmail
+    now = time.time()
+    sent = [t for t in _WEBMAIL_SENT.get(addr, []) if now - t < 3600]
+    if len(sent) + len(rcpts) > 200:
+        raise HTTPError(429, "Sending limit reached (200 recipients per hour) – please try again later.")
+    _WEBMAIL_SENT[addr] = sent + [now] * len(rcpts)
     try:
         await asyncio.to_thread(fwebmail.send, addr, msg, rcpts)
     except fwebmail.MailboxError as e:
@@ -1056,7 +1069,16 @@ async def ws_endpoint(ws: WebSocket):
 async def login(request: Request):
     b = await body(request)
     hours = 24 * 30 if b.get("remember") else float(ctx.settings.get("dashboard.session_hours"))
-    r = ctx.auth.login(str(b.get("username", "")), str(b.get("password", "")), ip_of(request), request.headers.get("user-agent", ""), hours)
+    ip, name = ip_of(request), str(b.get("username", ""))[:64]
+    if not LOGIN_GUARD.allowed(ip, name):              # also blocks guessing with changing user names from one IP
+        raise HTTPError(429, "Too many failed attempts. Please wait 15 minutes.")
+    try:
+        r = ctx.auth.login(name, str(b.get("password", "")), ip, request.headers.get("user-agent", ""), hours)
+    except AuthError:
+        LOGIN_GUARD.failed(ip, name)
+        await asyncio.sleep(0.4)
+        raise
+    LOGIN_GUARD.ok(ip, name)
     resp = JSONResponse({"user": r["user"]})
     resp.set_cookie(COOKIE, r["token"], max_age=r["max_age"] if b.get("remember") else None, httponly=True,
                     samesite="strict", secure=request.url.scheme == "https", path="/")

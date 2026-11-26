@@ -78,6 +78,17 @@ wieder ergänzt. Jeder Schritt steht im 📜 Protokoll.
 Weitere Schutzmaßnahmen: Anmeldung nur über TLS, Benutzer senden nur mit ihrer eigenen Adresse (oder ihren Aliasen; `reject_sender_login_mismatch`),
 kein offenes Relay, Systembenutzer (PAM) können sich an Dovecot nicht anmelden, Dovecot bekommt nur SHA512-CRYPT-Hashes.
 
+### Schutz vor Brute-Force und Spam
+
+- **fail2ban** wird mitinstalliert und überwacht Dovecot (IMAP/POP3-Anmeldung) und Postfix (SMTP-AUTH, Protokollfehler): 10 Fehlversuche
+  sperren die IP für 1 Stunde, Wiederholungstäter immer länger (`bantime.increment`). Jail-Datei: `/etc/fail2ban/jail.d/n8mail.local`.
+- **Dovecot** antwortet nach einem falschen Passwort erst nach 2 Sekunden (`auth_failure_delay`) – Passwort-Raten wird sehr langsam.
+- **Postfix** begrenzt je Client-IP gleichzeitige Verbindungen, Verbindungen und Nachrichten pro Minute sowie Anmeldeversuche
+  (`smtpd_client_*_limit`, Anvil); ein Mailserver aus dem Internet merkt davon im normalen Betrieb nichts.
+- Der Begrüßungstext lautet nur `<Hostname> ESMTP` – keine Programm- oder Versionsangabe.
+- **Webmail** sendet höchstens an **200 Empfänger pro Stunde und Benutzer**; darüber kommt eine Meldung. Ein übernommenes Konto kann so
+  keine Spam-Welle über den Relay schicken. Die Anmeldung am Webmail läuft über die Dashboard-Anmeldung und ihre Login-Sperre.
+
 ### Prüfen mit MXToolbox & Co.
 
 - **„Reverse DNS does not match SMTP Banner“:** der PTR der Server-IP zeigt noch auf den Namen des Hosters. Im Kundenmenü des Hosters

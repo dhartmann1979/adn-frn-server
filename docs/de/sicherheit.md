@@ -49,6 +49,28 @@ Datei wird abgewiesen, bevor etwas entpackt wird. Beim Einspielen werden nur Ein
 Pfade, kein `..`, keine Links –, höchstens 20 000 Dateien und 4 GiB. Auf dem Server liegen Backups mit Rechten 600 in einem 700-Ordner.
 Downloads kommen mit `Cache-Control: no-store`.
 
+
+
+### Schutz vor Flooding und Brute-Force (N8 Guard)
+
+Seit dem Sicherheits-Update im November 2026 läuft in allen N8-Systemen derselbe Wächter **N8 Guard** vor dem Dashboard:
+
+| Was | Grenze je IP-Adresse | Antwort bei Überschreitung |
+|---|---|---|
+| API-Aufrufe (`/api/…`) | 1200 pro Minute (kurze Spitzen erlaubt) | `429 Too Many Requests` mit `Retry-After` |
+| Seitenaufrufe | 600 pro Minute | `429` |
+| Anmelde-Versuche (POST an Login/Setup) | 30 pro Minute | `429` |
+| WebSocket-Verbindungen | 60 neue pro Minute, höchstens 24 gleichzeitig | Verbindung wird abgelehnt |
+| Größe einer Anfrage | 64 MB | `413 Payload Too Large` |
+
+Dazu kommt die **Login-Sperre**: 5 Fehlversuche für denselben Benutzernamen oder 10 Fehlversuche von derselben IP innerhalb von
+15 Minuten sperren für 15 Minuten (`429`, mit Hinweis in der Anmeldemaske). Eine erfolgreiche Anmeldung setzt den Zähler zurück.
+Die Sperre gilt auch für Anmeldungen, deren Benutzername gar nicht existiert – von außen ist nicht zu erkennen, ob es ihn gibt.
+
+Die IP-Adresse kommt immer aus der Verbindung selbst. Den Header `X-Forwarded-For` nimmt das Dashboard **nur vom eigenen Rechner**
+(`127.0.0.1`, also vom Reverse-Proxy) an – ein Angreifer kann sich damit keine neue Adresse ausdenken, um die Sperren zu umgehen.
+Statische Dateien (`/static/…`) und die Let's-Encrypt-Prüfung zählen nicht mit.
+
 ## Reverse-Proxy davor (empfohlen)
 
 Das Dashboard kann HTTPS mit Let's Encrypt selbst. Läuft auf dem Server ohnehin ein Webserver, ist ein **Reverse-Proxy** davor die sauberste Lösung: Zertifikate, Header und Protokolle an einer Stelle. Das Dashboard lauscht dann nur lokal (Admin → 🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS: HTTPS **aus**; in `frnadn.service` z. B. `Environment=FRNADN_PORT=8090`). Die Weiterleitungs-Header nimmt frn_adn von `127.0.0.1` an (`proxy_headers`).

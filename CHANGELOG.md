@@ -2,6 +2,28 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.29.0 – 2026-11-26
+
+### 🔐 Sicherheits-Update: Flooding, Brute-Force, Mail
+Prüfung aller N8-Portale auf Sicherheitslücken, Fehler, Flooding, Brute-Force und Hintertüren. Hintertüren wurden keine gefunden; Pfade beim
+Einspielen von Backups und Dateien, Ausgabe von Benutzerdaten (XSS) und die CSRF-Prüfung waren in Ordnung. Verbessert wurde:
+
+- **N8 Guard gegen Flooding** – neuer, in allen N8-Systemen gleicher Wächter vor dem Dashboard (`n8_guard.py`, Version 1.0.0):
+  Anfragen-Budget je IP-Adresse (API 1200/min, Seiten 600/min, Anmeldung 30/min, WebSocket 60 neue/min und höchstens 24 gleichzeitig),
+  darüber `429 Too Many Requests` mit `Retry-After`; zu große Anfragen werden mit `413` abgewiesen, bevor sie gelesen werden (Grenze 64 MB).
+  Statische Dateien und die Let's-Encrypt-Prüfung zählen nicht mit. Der Speicher für die Zähler ist begrenzt (höchstens 20 000 IPs),
+  damit ein Angriff mit vielen Adressen den Server nicht vollschreibt.
+- **Login-Sperre** über den N8 Guard: 5 Fehlversuche für denselben Benutzernamen oder 10 von derselben IP in 15 Minuten sperren
+  15 Minuten – auch für Benutzernamen, die es nicht gibt. Gilt für Dashboard und Webmail.
+- **Mailserver gegen Passwort-Raten:** fail2ban wird mitinstalliert (Jails für Dovecot, Postfix-SASL und Postfix; 10 Fehlversuche → 1 Stunde
+  Sperre, bei Wiederholung länger); Dovecot wartet nach falschem Passwort 2 Sekunden (`auth_failure_delay`, passend für Dovecot 2.3 und 2.4).
+- **Postfix-Grenzen je Client** (Anvil): Verbindungen, gleichzeitige Verbindungen, Nachrichten, Empfänger und Anmeldungen pro Minute,
+  Pause nach Fehlern, höchstens 100 Empfänger je Mail. Normaler Mailverkehr merkt davon nichts.
+- **Webmail-Sendegrenze:** höchstens 200 Empfänger pro Stunde und Benutzer – ein übernommenes Konto kann keine Spam-Welle über den
+  Upstream-Relay schicken.
+- Begrüßung des Mailservers nur noch `<Hostname> ESMTP` ohne Programmnamen (MXToolbox-Hinweis „Banner“).
+- Doku: [Sicherheit](docs/de/sicherheit.md) und [E-Mail](docs/de/email.md) um die neuen Schutzmaßnahmen ergänzt.
+
 ## 2.28.0 – 2026-11-26
 
 ### 🖼️ Themenbild für die News im Portal

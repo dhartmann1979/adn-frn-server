@@ -42,8 +42,9 @@ RSPAMD_LOCAL = Path("/etc/rspamd/local.d")
 DKIM_DIR = Path("/var/lib/rspamd/dkim")
 VMAIL_USER = "n8vmail"
 VMAIL_HOME = Path("/var/mail/n8mail")
-PACKAGES = ["postfix", "dovecot-imapd", "dovecot-lmtpd", "dovecot-sieve", "rspamd"]
-UNITS = ["postfix", "dovecot", "rspamd"]
+PACKAGES = ["postfix", "dovecot-imapd", "dovecot-lmtpd", "dovecot-sieve", "rspamd", "fail2ban"]
+UNITS = ["postfix", "dovecot", "rspamd", "fail2ban"]
+F2B_JAIL = Path("/etc/fail2ban/jail.d/n8mail.local")
 RSPAMD_FILES = ["dkim_signing.conf", "actions.conf", "greylist.conf", "milter_headers.conf"]
 MILTER = "inet:127.0.0.1:11332"
 
@@ -231,6 +232,10 @@ def postfix_main(sp: Dict[str, Any]) -> List[str]:
         "smtpd_sasl_type=dovecot", "smtpd_sasl_path=private/auth", "smtpd_sasl_auth_enable=no",
         "smtpd_helo_required=yes", "disable_vrfy_command=yes", "strict_rfc821_envelopes=yes",
         "smtpd_banner=$myhostname ESMTP",                 # no software/distribution in the greeting
+        # against flooding and password guessing (per client, anvil)
+        "smtpd_client_connection_rate_limit=60", "smtpd_client_connection_count_limit=20", "smtpd_client_message_rate_limit=120",
+        "smtpd_client_recipient_rate_limit=300", "smtpd_client_auth_rate_limit=20", "smtpd_error_sleep_time=5s",
+        "smtpd_soft_error_limit=5", "smtpd_hard_error_limit=12", "smtpd_recipient_limit=100", "anvil_rate_time_unit=60s",
         "smtpd_relay_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination",
         "smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination,reject_unlisted_recipient",
         f"smtpd_sender_login_maps=hash:{PF_MAPS}/senders",
@@ -322,6 +327,7 @@ ssl_server_key_file = {SSL}/privkey.pem
 ssl_min_protocol = TLSv1.2
 auth_allow_cleartext = no
 auth_mechanisms = plain login
+auth_failure_delay = 2s
 auth_username_format = %{{user | lower}}
 auth_default_domain = {main}
 auth_master_user_separator = *
@@ -392,6 +398,7 @@ ssl_min_protocol = TLSv1.2
 ssl_prefer_server_ciphers = yes
 disable_plaintext_auth = yes
 auth_mechanisms = plain login
+auth_failure_delay = 2 secs
 auth_username_format = %Lu
 auth_default_realm = {main}
 auth_master_user_separator = *
@@ -448,6 +455,31 @@ namespace inbox {{
 """
 
 
+def fail2ban_jail() -> str:
+    """fail2ban: block IPs that guess passwords at IMAP or SMTP (10 tries in 10 minutes → 1 hour, repeaters longer)."""
+    return """# N8 Mail – written by mailctl.py, do not edit
+[DEFAULT]
+backend = systemd
+bantime = 1h
+bantime.increment = true
+bantime.maxtime = 1w
+findtime = 10m
+maxretry = 10
+ignoreip = 127.0.0.1/8 ::1
+
+[dovecot]
+enabled = true
+
+[postfix-sasl]
+enabled = true
+mode = aggressive
+
+[postfix]
+enabled = true
+mode = aggressive
+"""
+
+
 def rspamd_files(sp: Dict[str, Any]) -> Dict[str, str]:
     h = "# N8 Mail – written by mailctl.py, do not edit\n"
     return {
@@ -489,7 +521,7 @@ def restore(d: Path) -> None:
         src = d / str(f).lstrip("/").replace("/", "__")
         if src.exists():
             shutil.copy2(src, f)
-        elif f.exists() and str(f).startswith((str(PF_MAPS), str(DOVE_CONF), str(RSPAMD_LOCAL), str(DOVE_USERS), str(DOVE_MASTER))):
+        elif f.exists() and str(f).startswith((str(PF_MAPS), str(DOVE_CONF), str(RSPAMD_LOCAL), str(DOVE_USERS), str(DOVE_MASTER), str(F2B_JAIL))):
             f.unlink()
 
 
@@ -603,6 +635,10 @@ def checks(ver: Tuple[int, int]) -> List[str]:
     rc, out = run(["doveconf", "-n"], check=False)
     if rc != 0:
         problems.append("doveconf: " + out.strip()[-1200:])
+    if which("fail2ban-client") and F2B_JAIL.exists():
+        rc, out = run(["fail2ban-client", "-t"], check=False)
+        if rc != 0:
+            problems.append("fail2ban: " + out.strip()[-800:])
     if which("rspamadm"):
         rc, out = run(["rspamadm", "configtest"], check=False)
         if rc != 0:
@@ -686,7 +722,7 @@ def apply(data: Path, certs_only: bool = False) -> Dict[str, Any]:
         notes = reload_units(start=False)
         return {"ok": not notes, "message": "Certificate taken over" + (": " + "; ".join(notes) if notes else ".")}
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    files = [PF / "main.cf", PF / "master.cf", DOVE_CONF, DOVE_USERS, DOVE_MASTER, DOVE / "conf.d" / "10-auth.conf", DOVE_SIEVE,
+    files = [PF / "main.cf", PF / "master.cf", DOVE_CONF, F2B_JAIL, DOVE_USERS, DOVE_MASTER, DOVE / "conf.d" / "10-auth.conf", DOVE_SIEVE,
              *[PF_MAPS / n for n in ("domains", "mailboxes", "aliases", "senders", "relay_passwd")],
              *[RSPAMD_LOCAL / n for n in RSPAMD_FILES]]
     first = not (BACKUPS / "original").exists()
@@ -720,6 +756,8 @@ def apply(data: Path, certs_only: bool = False) -> Dict[str, Any]:
         RSPAMD_LOCAL.mkdir(parents=True, exist_ok=True)
         for name, text in rspamd_files(sp).items():
             write(RSPAMD_LOCAL / name, text)
+        if which("fail2ban-client"):
+            write(F2B_JAIL, fail2ban_jail())
         problems = checks(ver)
         if problems:
             raise Fail("Check failed – old configuration restored:\n" + "\n".join(problems))
@@ -736,6 +774,8 @@ def apply(data: Path, certs_only: bool = False) -> Dict[str, Any]:
                         "notes": notes}
     save_state(data, st)
     msg = f"Mail server configured: {len(sp['domains'])} domain(s), {len(sp['mailboxes'])} mailbox(es), Dovecot {ver[0]}.{ver[1]}."
+    if not which("fail2ban-client"):
+        msg += " fail2ban is missing – „Install again / repair“ adds it (blocks password guessing at IMAP/SMTP)."
     if notes:
         msg += " Services: " + "; ".join(notes)
     return {"ok": not notes, "message": msg}
