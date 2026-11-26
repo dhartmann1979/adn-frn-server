@@ -241,6 +241,7 @@ function renderHeader() {
     $('subtitle').innerHTML = parts.map(p => p.startsWith('<') ? p : esc(p)).join(' · ');
     $('tabAdminBtn').classList.toggle('hidden', !isAdmin());
     $('tabChatBtn').classList.toggle('hidden', !i.chat);
+    if ($('tabNewsLink')) { $('tabNewsLink').classList.toggle('hidden', !i.portal); if (i.portal) $('tabNewsLink').href = i.portal.url; }
     $('setupBanner').classList.toggle('hidden', !i.setup_needed);
 }
 // Abstürze (N8 Kit): Hinweisfenster nach der Anmeldung (und beim Laden als Admin), bis die Befunde als gelesen markiert sind
@@ -762,13 +763,15 @@ $('chatFilter').addEventListener('click', e => { const b = e.target.closest('but
 
 // ---------------------------------------------------------------- admin
 // Admin menu: the same tree in every N8 system (N8 Kit) – Betrieb · Benutzer & Zugang · Darstellung · System
-const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys'];
+const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys', 'news', 'portalcfg'];
 function adminGroups() {
     const G = N8Kit.nav.GROUPS;
     return [
         { id: 'betrieb', label: G.betrieb, items: [{ id: 'settings', label: '⚙️ Settings',
             children: (S.admin.sections || []).map(sec => ({ id: 'settings:' + sec.id, label: sec.title })) }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
             { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
+        // 📰 Portal: news (only admins are authors) and the portal page with its own domain
+        { id: 'portal', label: '📰 Portal', items: [{ id: 'news', label: '📝 News' }, { id: 'portalcfg', label: '⚙️ Portal page' }] },
         { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Benutzer' }, { id: 'sessions', label: '🔑 Sitzungen' }, { id: 'audit', label: '📜 Protokoll' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
         { id: 'netz', label: G.netz, items: [{ id: 'ports', label: '🔌 Ports' }, { id: 'domains', label: '🔒 Domains & HTTPS' }] },
@@ -795,7 +798,8 @@ function showAdmin(a) {
         N8Kit.net.view(el, base, { req: api, toast: (m, bad) => toast(m, bad) });
     } else if (pane === 'sys') loadSysView(base.slice(4));
     else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
-       system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit })[pane]()
+       system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit,
+       news: loadNewsAdmin, portalcfg: loadPortalAdmin })[pane]()
        .then(() => {
            if (pane === 'system') {             // 💾 Backup has its own entry like in the other N8 systems
                [...$('admin-system').children].forEach(c => { c.hidden = base === 'backup' ? c.id !== 'backupTiles' : c.id === 'backupTiles'; });

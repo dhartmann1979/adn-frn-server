@@ -104,6 +104,19 @@ FIELDS: List[Field] = [
           "Encrypts every transfer between the two servers – the same on both (at least 24 characters); “🎲 New key” creates one"),
     Field("cluster.hourly", "cluster", "Sync every full hour", "bool", True,
           "The backup fetches the configuration of the master at every full hour – the difference is at most one hour"),
+    # Portal page (portal.py) – own menu group "📰 Portal" in the admin area, not under Settings
+    Field("portal.enabled", "portal", "Portal page on", "bool", True,
+          "Public page with the news of the operators at /portal (and on the portal domain)"),
+    Field("portal.title", "portal", "Title of the portal", "text", "", "Empty = the title of the dashboard"),
+    Field("portal.subtitle", "portal", "Subtitle", "text", "", "e.g. „News from the FRN server Auf der NachtSchicht“"),
+    Field("portal.intro", "portal", "Welcome text", "longtext", "",
+          "Shown above the news. Formatting like in the news: **bold**, *italic*, [link](https://…), lists with -"),
+    Field("portal.show_live", "portal", "Show rooms and stations online", "bool", True,
+          "Side box with the rooms, stations online and who is on air (only when the dashboard is public)"),
+    Field("portal.show_stats", "portal", "Show today's figures", "bool", True, "Talks, airtime and stations of today"),
+    Field("portal.per_page", "portal", "News per page", "int", 8, "", min=3, max=30),
+    Field("portal.domain", "portal", "Domain of the portal", "text", "",
+          "Set under 🌐 Network, ports & domains → 🔒 Domains & HTTPS", pattern=r"(?=.{4,253}$)([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,63}"),
     # HTTPS – applied by the dashboard process on its next restart
     Field("https.enabled", "https", "Enable HTTPS with Let's Encrypt", "bool", False,
           "Needs a public DNS name pointing to this server and inbound TCP ports 80 and 443. Save, then restart frnadn."),
@@ -207,6 +220,18 @@ class Settings:
                       "updated_by=excluded.updated_by", (f.key, json.dumps(clean[f.key]), now, who))
         self._cache = None
         return changed
+
+    def describe_section(self, sid: str) -> List[Dict[str, Any]]:
+        """Fields of one section that is not listed under Settings (e.g. the portal page)."""
+        values, meta = self.all(), self.meta()
+        out = []
+        for f in FIELDS:
+            if f.section != sid:
+                continue
+            ts, by = meta.get(f.key, (None, ""))
+            out.append({"key": f.key, "label": f.label, "kind": f.kind, "value": values[f.key], "help": f.help,
+                        "choices": [list(c) for c in f.choices], "min": f.min, "max": f.max, "updated_at": ts, "updated_by": by})
+        return out
 
     def describe(self) -> List[Dict[str, Any]]:
         values, meta = self.all(), self.meta()

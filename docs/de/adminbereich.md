@@ -14,6 +14,7 @@ mit denselben Gruppen in derselben Reihenfolge:
 | Gruppe | Einträge |
 |---|---|
 | 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
+| 📰 **Portal** (seit 2.24) | 📝 News · ⚙️ Portal-Seite – nur Admins sind Autoren, siehe [Portal-Seite](portal.md) |
 | 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔑 Sitzungen · 📜 Protokoll |
 | 🌐 **Netz, Ports & Domains** | 🔌 Ports · 🔒 Domains & HTTPS |
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
@@ -26,7 +27,7 @@ Alle Gruppen sind **anfangs zugeklappt** – offen ist nur die Gruppe der gerade
 | Rolle | Darf |
 |---|---|
 | **Superadmin** | alles; als einziger Admins anlegen, ändern und löschen und die Maschine neu starten/herunterfahren. Wird bei der Installation festgelegt (`sudo frnadn set-superadmin NAME`) |
-| **Admin** | FRN-Server steuern und aktualisieren, alle Einstellungen, Räume, FRN-Konten; Benutzer mit Rolle *User* verwalten |
+| **Admin** | FRN-Server steuern und aktualisieren, alle Einstellungen, Räume, FRN-Konten; Benutzer mit Rolle *User* verwalten; **News schreiben und veröffentlichen** (einzige Autoren der Portal-Seite) |
 | **User** | sieht das Dashboard auch, wenn es nicht öffentlich ist, dazu versteckte Räume; ändert nur sein eigenes Passwort |
 
 Passwörter: mindestens 10 Zeichen, gespeichert als scrypt-Hash. Nach 5 Fehlversuchen ist der Login für diesen Namen und diese IP 15 Minuten gesperrt. Unter **👤 → My account** ändert jeder seinen Benutzernamen und sein Passwort.
@@ -61,6 +62,8 @@ Seit **2.16.0** steht alles zu Netz, HTTPS und Domains **nur noch hier** – wie
 - **🔒 Domains & HTTPS:** Domain und E-Mail eintragen (optional Test-Zertifikat) → **Domain eintragen & Zertifikat holen**: HTTPS wird
   eingeschaltet, das Dashboard startet neu und holt das Zertifikat. Danach Tabelle mit DNS-Auflösung, Zertifikat (gültig/Test/abgelaufen,
   bis wann), **🔄 Erneuern**, **Entfernen** und Schalter *HTTPS mit Let's Encrypt*. Hinter dem HobbyRadioPortal HTTPS hier aus lassen.
+
+**📰 Portal-Domain (seit 2.24):** Hat das Dashboard seine Domain, kann eine zweite Domain für die [Portal-Seite](portal.md) folgen – sie kommt mit auf dasselbe Let's-Encrypt-Zertifikat und zeigt direkt die News.
 
 Der Listener auf HTTP beantwortet ACME-Challenges und leitet sonst mit HTTP 301 auf HTTPS um. Certbot läuft als Benutzer `frnadn`; seine Daten liegen im Datenverzeichnis unter `letsencrypt/`. Die Erneuerung wird alle zwölf Stunden geprüft. Ein erneuertes Zertifikat wird in den laufenden TLS-Kontext geladen, ohne den Dienst neu zu starten.
 

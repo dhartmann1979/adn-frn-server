@@ -8,6 +8,7 @@ One SQLite database (WAL mode) holds everything – the FRN server and the dashb
 * visits      – logins/logouts of stations (from the server log and the monitor)
 * samples     – number of stations per room, once a minute (for "online" charts)
 * chat        – text messages in the rooms
+* news        – news of the portal page (only admins write and publish)
 * talk_daily  – roll-up per day/room/station, kept up to date on every talk;
 * online_daily – highest number of stations online per day (for long ranges)
                 long ranges (90 days, 1 year) are read from here instead of
@@ -169,6 +170,23 @@ CREATE TABLE IF NOT EXISTS frn_accounts (
     created_at    REAL NOT NULL,
     last_login    REAL
 );
+CREATE TABLE IF NOT EXISTS news (               -- portal page: news written by admins (portal.py)
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    title        TEXT NOT NULL,
+    teaser       TEXT NOT NULL DEFAULT '',
+    body         TEXT NOT NULL DEFAULT '',
+    category     TEXT NOT NULL DEFAULT 'info',
+    icon         TEXT NOT NULL DEFAULT '',
+    author       TEXT NOT NULL DEFAULT '',
+    author_name  TEXT NOT NULL DEFAULT '',
+    published    INTEGER NOT NULL DEFAULT 0,
+    pinned       INTEGER NOT NULL DEFAULT 0,
+    created_at   REAL NOT NULL,
+    updated_at   REAL NOT NULL,
+    published_at REAL,
+    updated_by   TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS news_pub ON news(published, pinned, published_at);
 CREATE TABLE IF NOT EXISTS kv (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL

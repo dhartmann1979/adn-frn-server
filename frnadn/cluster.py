@@ -53,7 +53,8 @@ CTYPE = "application/x-n8-cluster"
 MAX_AGE = 300
 MIN_KEY = 24
 TABLES = ("rooms", "room_access", "frn_lists", "frn_accounts")          # parents first
-LOCAL_KEYS = {"frn.address", "frn.port", "frn.backup_host", "frn.backup_port", "sysman.email", "sysman.password"}
+LOCAL_KEYS = {"frn.address", "frn.port", "frn.backup_host", "frn.backup_port", "sysman.email", "sysman.password", "portal.domain"}
+OPTIONAL_TABLES = ("news",)       # since 2.24: portal news go to the backup too (an older partner simply has none)
 LOCAL_PREFIXES = ("https.", "cluster.")
 ACL_RE = re.compile(r"(AdminList|MuteList|BlockList|AccessList)\d{2}\.xml")
 KV_RE = re.compile(r"acl-file-meta:(AdminList|MuteList|BlockList|AccessList)\d{2}\.xml")
@@ -154,7 +155,7 @@ def _acl_files(acl_dir: Path) -> Dict[str, str]:
 def content(db, settings, acl_dir: Path) -> Dict[str, Any]:
     s = settings.all()
     kv = {r["key"]: r["value"] for r in db.q("SELECT key, value FROM kv WHERE key LIKE 'acl-file-meta:%'") if KV_RE.fullmatch(r["key"])}
-    return {"settings": {k: s[k] for k in shared_keys()}, "tables": {t: _rows(db, t) for t in TABLES},
+    return {"settings": {k: s[k] for k in shared_keys()}, "tables": {t: _rows(db, t) for t in TABLES + OPTIONAL_TABLES},
             "kv": kv, "acl_files": _acl_files(acl_dir)}
 
 
@@ -197,8 +198,8 @@ def apply(db, settings, store, acl_dir: Path, data: Dict[str, Any], who: str = "
     if digest(local) == digest(data):
         return {"changed": False, "frn_changed": False, "counts": counts, "skipped": []}
     # the Java server reads rooms, lists and accounts only at its start – does it need a restart?
-    frn_changed = digest({"tables": local["tables"], "acl_files": local["acl_files"]}) != \
-        digest({"tables": data.get("tables"), "acl_files": data.get("acl_files") or {}})
+    frn_changed = digest({"tables": {t: local["tables"][t] for t in TABLES}, "acl_files": local["acl_files"]}) != \
+        digest({"tables": {t: tables[t] for t in TABLES}, "acl_files": data.get("acl_files") or {}})
 
     # 1) settings – one by one, an unknown or invalid value of the other version is skipped, not fatal
     skipped = []
@@ -214,7 +215,9 @@ def apply(db, settings, store, acl_dir: Path, data: Dict[str, Any], who: str = "
     # 2) tables in one transaction (children are removed with the rooms – ON DELETE CASCADE)
     st: List[tuple] = [("DELETE FROM room_access", ()), ("DELETE FROM frn_lists", ()), ("DELETE FROM rooms", ()),
                        ("DELETE FROM frn_accounts", ())]
-    for t in TABLES:
+    opt = [t for t in OPTIONAL_TABLES if isinstance(tables.get(t), dict)]
+    st += [(f"DELETE FROM {t}", ()) for t in opt]
+    for t in TABLES + tuple(opt):
         mine = [r[1] for r in db.q(f"PRAGMA table_info({t})")]
         src = tables[t].get("columns") or []
         cols = [c for c in src if c in mine]

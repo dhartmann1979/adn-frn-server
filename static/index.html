@@ -30,6 +30,7 @@
             </div>
         </div>
         <nav class="tabs" id="mainTabs">
+            <a class="tab-link hidden" id="tabNewsLink" href="/portal">📰 News</a>
             <button data-tab="live" class="active">🎙️ Live</button>
             <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
             <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
@@ -163,6 +164,8 @@
         <div id="admin-logs" class="hidden"></div>
         <div id="admin-audit" class="hidden"></div>
         <div id="admin-sys" class="hidden"></div>
+        <div id="admin-news" class="hidden"></div>
+        <div id="admin-portalcfg" class="hidden"></div>
         </div></div>
     </section>
 
@@ -177,6 +180,8 @@
 <div id="modalRoot"></div>
 <script src="/static/app.js?v={{V}}"></script>
 <script src="/static/extras.js?v={{V}}"></script>
+<script src="/static/portal-md.js?v={{V}}"></script>
+<script src="/static/portal-admin.js?v={{V}}"></script>
 <script>
     // N8 Kit: DE | EN next to Links and the login (the same switch in all N8schicht pages)
     N8Kit.langSwitch(document.querySelector('header .chips'), { before: document.getElementById('userArea') });

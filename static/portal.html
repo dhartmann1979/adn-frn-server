@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1224">
+    <title>News – Auf der NachtSchicht</title>
+    <link rel="icon" href="/branding/site-icon?v={{V}}">
+    <link rel="apple-touch-icon" href="/branding/site-icon?v={{V}}">
+    <link rel="alternate" type="application/rss+xml" title="News" href="/portal/rss.xml">
+    <link rel="stylesheet" href="/static/app.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-theme.css?v={{V}}">
+    <script src="/static/n8-theme.js?v={{V}}"></script>
+    <link rel="stylesheet" href="/static/extras.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-light.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-header.css?v={{V}}">
+    <link rel="stylesheet" href="/static/n8-kit.css?v={{V}}">
+    <link rel="stylesheet" href="/static/portal.css?v={{V}}">
+    <script src="/static/n8-kit.js?v={{V}}"></script>
+    <script src="/static/i18n-app.js?v={{V}}"></script>
+    <script src="/static/portal-md.js?v={{V}}"></script>
+</head>
+<body class="portal-page">
+<div class="container">
+    <div class="n8-topbar">
+    <header>
+        <div class="brand">
+            <img src="/branding/logo?v={{V}}" alt="">
+            <div>
+                <h1 id="title" translate="no">Auf der NachtSchicht</h1>
+                <div class="sub" id="subtitle">&nbsp;</div>
+            </div>
+        </div>
+        <nav class="tabs" id="mainTabs">
+            <a class="tab-link active" href="/portal" id="tabNews">📰 News</a>
+            <a class="tab-link" href="/" id="tabLive">🎙️ Live</a>
+            <a class="tab-link" href="/" id="tabStats" data-hash="#stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></a>
+            <a class="tab-link hidden n8-menu-admin" href="/" id="tabAdmin" data-hash="#admin">⚙️ Admin</a>
+        </nav>
+        <div class="chips">
+            <div class="links-menu" id="linksMenu"><button class="btn links-trigger" type="button" aria-expanded="false"><span class="links-label">🔗 Links</span> <span aria-hidden="true">▾</span></button><div class="links-pop" id="linksPop" role="menu"><div class="links-loading">Loading links …</div></div></div><span id="userArea"></span>
+        </div>
+    </header>
+    <div class="n8-strip" id="statusStrip" role="status">
+        <span class="n8-ss" id="chipServer">FRN server</span>
+        <span class="n8-ss" id="chipOnline">Online</span>
+        <span class="n8-sp"></span>
+        <span class="n8-ss" id="chipAir">Quiet</span>
+    </div>
+    </div>
+
+    <main class="portal">
+        <section class="portal-hero card" id="hero">
+            <div class="ph-text">
+                <div class="ph-kicker" id="heroKicker">📰 News</div>
+                <h2 id="heroTitle" translate="no">&nbsp;</h2>
+                <div class="ph-intro md" id="heroIntro" translate="no"></div>
+            </div>
+            <div class="ph-facts" id="heroFacts"></div>
+        </section>
+
+        <div class="portal-grid">
+            <section class="portal-news">
+                <div class="pn-head">
+                    <h2 class="section-header">📰 <span id="newsHead">Latest news</span></h2>
+                    <div class="seg" id="catFilter"></div>
+                </div>
+                <div id="newsList"><div class="empty">Loading …</div></div>
+                <div class="pn-more"><button class="btn" id="moreBtn" hidden>Older news</button></div>
+            </section>
+            <aside class="portal-side">
+                <div class="card ps-box" id="todayBox" hidden>
+                    <h3>📊 Today</h3>
+                    <div class="ps-stats" id="todayStats"></div>
+                </div>
+                <div class="card ps-box" id="liveBox" hidden>
+                    <h3>🎙️ Rooms <span class="badge" id="liveOnline"></span></h3>
+                    <div id="liveRooms"></div>
+                    <a class="btn ps-cta" id="liveBtn" href="/">🎙️ Open the live dashboard</a>
+                </div>
+                <div class="card ps-box" id="connectBox">
+                    <h3>📻 Connect</h3>
+                    <div id="connectInfo"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <span>© <span id="footerYear"></span> Die N8schicht</span><span class="ft-sep">·</span>
+        <span id="ver">ADN FRN Server</span><span class="ft-sep">·</span>
+        <a href="/portal/rss.xml">RSS</a>
+    </footer>
+</div>
+<script src="/static/portal.js?v={{V}}"></script>
+<script>N8Kit.langSwitch(document.querySelector('header .chips'), { before: document.getElementById('userArea') });</script>
+</body>
+</html>

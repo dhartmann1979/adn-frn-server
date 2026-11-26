@@ -33,6 +33,9 @@ class CertManager:
         self.staging = bool(self.cfg.get("staging", False))
         self.https_port = int(self.cfg.get("port", 443))
         self.http_port = int(self.cfg.get("http_port", 80))
+        # further names on the same certificate (SAN), e.g. the domain of the portal page
+        self.extra = [d for d in (str(x or "").strip().lower() for x in (self.cfg.get("extra") or []))
+                      if d and d != self.domain and _DOMAIN_RE.fullmatch(d)]
         self.base = Path(data_dir) / "letsencrypt"
         self.webroot = self.base / "webroot"
         self.webroot.mkdir(parents=True, exist_ok=True)
@@ -56,9 +59,26 @@ class CertManager:
         except OSError:
             return 0.0
 
-    def https_url(self, path: str = "/") -> str:
+    def names(self) -> list[str]:
+        return [self.domain, *self.extra]
+
+    def _marker(self) -> Path:
+        return self.base / f"names-{self.domain}.txt"
+
+    def needs_expand(self) -> bool:
+        """The certificate exists but was issued for other names (a domain was added or removed)."""
+        if not self.letsencrypt or not self.have_cert():
+            return False
+        try:
+            have = self._marker().read_text(encoding="utf-8").split()
+        except OSError:
+            have = [self.domain]
+        return sorted(have) != sorted(self.names())
+
+    def https_url(self, path: str = "/", host: str = "") -> str:
         port = "" if self.https_port == 443 else f":{self.https_port}"
-        return f"https://{self.domain}{port}{path}"
+        h = (host or "").split(":")[0].strip().lower()
+        return f"https://{h if h in self.names() else self.domain}{port}{path}"
 
     def _certbot_base(self) -> list[str]:
         exe = shutil.which("certbot")
@@ -93,20 +113,26 @@ class CertManager:
             return False
         try:
             args = self._certbot_base() + ["certonly", "--webroot", "-w", str(self.webroot),
-                "-d", self.domain, "--cert-name", self.domain, "--agree-tos", "--keep-until-expiring"]
+                "--cert-name", self.domain, "--agree-tos", "--keep-until-expiring", "--expand"]
+            for d in self.names():
+                args += ["-d", d]
         except RuntimeError as exc:
             logger.error("%s", exc)
             return False
         args += ["--email", self.email] if self.email else ["--register-unsafely-without-email"]
         if self.staging:
             args.append("--staging")
-        logger.info("Let's Encrypt Zertifikat für %s wird angefordert …", self.domain)
+        logger.info("Let's Encrypt Zertifikat für %s wird angefordert …", ", ".join(self.names()))
         try:
             rc = await self._run(args)
         except (asyncio.TimeoutError, RuntimeError):
             return False
         if rc == 0 and self.have_cert():
             self._mtime = self._cert_mtime()
+            try:
+                self._marker().write_text(" ".join(self.names()), encoding="utf-8")
+            except OSError:
+                pass
             logger.info("Zertifikat für %s ist bereit", self.domain)
             return True
         logger.error("certbot fehlgeschlagen (Exit %s). DNS, Port 80 und Firewall prüfen.", rc)
@@ -141,7 +167,7 @@ def build_http_app(cm: CertManager, redirect: bool = True) -> Starlette:
         if not redirect:
             return PlainTextResponse("HTTPS only", status_code=404)
         query = f"?{request.url.query}" if request.url.query else ""
-        return RedirectResponse(cm.https_url(request.url.path + query), status_code=301)
+        return RedirectResponse(cm.https_url(request.url.path + query, request.headers.get("host", "")), status_code=301)
 
     return Starlette(routes=[
         Route("/.well-known/acme-challenge/{token}", challenge),

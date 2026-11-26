@@ -2,6 +2,37 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.24.0 – 2026-11-26
+
+### 📰 Neu: Portal-Seite mit News – nur Admins sind Autoren
+- **Öffentliche Portal-Seite** unter `/portal` im Design des Dashboards: gleiche Kopfzeile (Titel mit [Master]/[Backup]/[Standalone],
+  📰 News · 🎙️ Live · 📈 Statistik, Links-Menü, DE | EN, Anmelden) und Statuszeile, über die ganze Breite.
+  - Begrüßung mit Titel, Untertitel, Begrüßungstext und Kennzahlen (jetzt online, Durchgänge heute).
+  - **News als Karten:** angeheftete oben über die volle Breite, Kategorien ℹ️ Info · ⚠️ Wichtig · 🛠️ Technik · 📅 Termin · 📻 Netz & Räume
+    mit Filter, Datum, Autor, Symbol, Anreißer, „Ältere News“; Artikel-Seite `/news/<id>`.
+  - **Seitenkästen:** Zahlen von heute, Räume mit Stationen und wer gerade sendet (nur bei öffentlichem Dashboard, versteckte Räume nie),
+    *Verbinden* (FRN-Server, Betreiber, Webseite).
+  - **RSS-Feed** `/portal/rss.xml`; auf dem Handy einspaltig; lädt alle 30 s neu.
+- **Eigene Rubrik im Admin-Menü: 📰 Portal** mit **📝 News** und **⚙️ Portal-Seite**.
+  - **Nur Admins** (Admin, Superadmin) schreiben, bearbeiten, veröffentlichen, ziehen zurück und löschen – Benutzer und Besucher
+    lesen nur (Server prüft, 403). Jede Änderung im 📜 Protokoll.
+  - Editor mit **Live-Vorschau**, Symbol, Kategorie, Anreißer, 📌 Anheften, **Entwurf** oder **Veröffentlichen**.
+  - Kleines Markdown (fett, kursiv, Code, Links, Überschriften, Listen, Zitat, Trennlinie). Alles wird erst maskiert, dann formatiert:
+    kein HTML oder Skript eines Autors erreicht einen Besucher.
+  - Einstellungen: Portal an/aus, Titel, Untertitel, Begrüßungstext, Räume zeigen, Zahlen zeigen, News je Seite.
+- **Eigene Domain mit Let's-Encrypt-Zertifikat** – wie immer unter 🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS:
+  Hat das Dashboard seine Domain, folgt **Portal-Domain eintragen & Zertifikat holen**. Das Zertifikat wird um die Portal-Domain
+  **erweitert** (ein Zertifikat, beide Namen, certbot `--expand`) und im laufenden Betrieb neu geladen; die Portal-Domain zeigt direkt
+  die News, `/dashboard` darunter das Dashboard. Die HTTP→HTTPS-Weiterleitung behält die aufgerufene Domain.
+  Entfernen nimmt nur die Portal-Domain weg.
+- **📰 News** als Menüpunkt in der Kopfzeile des Dashboards, sobald die Portal-Seite an ist.
+- **Master & Backup:** News und Portal-Einstellungen gehen beim Abgleich mit zum Backup (ältere Partner ohne News stören nicht, der
+  FRN-Server startet dafür nicht neu); die Portal-Domain bleibt je Server eigen.
+- Neue Tabelle `news` (SQLite, auch im Backup), neue Einstellungen `portal.*`, deutsche Texte für alles Neue.
+- Tests `tests/test_portal.py`: nur Admins sind Autoren, Entwürfe unsichtbar, Anheften, RSS ohne HTML, Portal aus, Portal-Domain zeigt
+  das Portal, Zertifikat mit beiden Namen, Weiterleitung je Domain. Alle 91 Tests grün.
+- Doku: neue Seite [Portal-Seite](docs/de/portal.md), Admin-Portal und Übersicht ergänzt, neue Screenshots.
+
 ## 2.23.0 – 2026-11-25
 
 ### 🔤 Schriftauswahl mit Vorschau – in allen N8-Systemen (N8 Theme 2.1)

@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.gzip import GZipMiddleware
 
@@ -38,6 +38,7 @@ from . import n8_security as _sec
 from .n8_admin import N8Admin, own_unit
 from . import backup as fbackup
 from . import sysman as fsysman
+from . import portal as fportal
 from . import cluster
 from . import frn_errorlog
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
@@ -252,7 +253,10 @@ def info_for(u) -> Dict[str, Any]:
             "role": s["cluster.role"],          # Master & Backup: im Kopfbereich als [Master] / [Backup] / [Standalone]
             # für FRN-Clients wie N8 Crosslink: wer ist Master, wer Backup (die Adresse geht ohnehin als backup_server_addr an
             # jeden FRN-Client) – damit sie nach einem Ausfall von selbst zum Master zurückkehren
-            "cluster": _cluster_public(s)}
+            "cluster": _cluster_public(s),
+            # 📰 portal page (news) – the tab in the menu leads there
+            "portal": ({"url": (f"{'https' if s['https.enabled'] else 'http'}://{s['portal.domain']}/" if s["portal.domain"] else "/portal")}
+                       if s["portal.enabled"] else None)}
 
 
 def refresh_sockets() -> None:
@@ -262,10 +266,161 @@ def refresh_sockets() -> None:
 
 
 # ---------------------------------------------------------------- pages & public API
-@app.get("/")
-async def index():
-    html = (STATIC / "index.html").read_text(encoding="utf-8").replace("{{V}}", __version__)
+def _page(name: str) -> Response:
+    html = (STATIC / name).read_text(encoding="utf-8").replace("{{V}}", __version__)
     return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/")
+async def index(request: Request):
+    # the portal page's own domain shows the portal (📰 Portal → domain under Netz, Ports & Domains)
+    if ctx.settings.get("portal.enabled") and fportal.host_is_portal(request.headers.get("host", ""), ctx.settings.get("portal.domain")):
+        return _page("portal.html")
+    return _page("index.html")
+
+
+@app.get("/dashboard")
+async def dashboard_page():
+    return _page("index.html")
+
+
+@app.get("/portal")
+async def portal_page():
+    if not ctx.settings.get("portal.enabled"):
+        return RedirectResponse("/", status_code=302)
+    return _page("portal.html")
+
+
+@app.get("/news/{nid}")
+async def portal_news_page(nid: int):
+    if not ctx.settings.get("portal.enabled"):
+        return RedirectResponse("/", status_code=302)
+    return _page("portal.html")
+
+
+def _portal_info(request: Request) -> Dict[str, Any]:
+    s = ctx.settings.all()
+    u = user_of(request)
+    dash = f"https://{s['https.domain']}/" if s.get("https.domain") and s.get("https.enabled") else "/dashboard"
+    if not fportal.host_is_portal(request.headers.get("host", ""), s.get("portal.domain")):
+        dash = "/"
+    return {"title": s["portal.title"] or s["dashboard.title"], "subtitle": s["portal.subtitle"] or s["dashboard.subtitle"],
+            "intro": s["portal.intro"], "dashboard_url": dash, "address": f"{s['frn.address']}:{s['frn.port']}" if s["frn.address"] else "",
+            "website": s["frn.website"], "owner": s["frn.owner_callsign"], "role": s["cluster.role"], "version": __version__,
+            "categories": [{"id": c, "label": l} for c, l in fportal.CATEGORIES], "per_page": s["portal.per_page"],
+            "user": ({"username": u["username"], "admin": is_admin(u)} if u else None),
+            "show_live": bool(s["portal.show_live"]) and (bool(u) or bool(s["dashboard.public"])),
+            "show_stats": bool(s["portal.show_stats"]) and (bool(u) or bool(s["dashboard.public"]))}
+
+
+@app.get("/portal/rss.xml")
+async def portal_rss(request: Request):
+    """RSS 2.0 feed of the published news."""
+    if not ctx.settings.get("portal.enabled"):
+        raise HTTPError(404, "The portal page is switched off.")
+    from email.utils import formatdate
+    from xml.sax.saxutils import escape as xesc
+    info = _portal_info(request)
+    host = re.sub(r"[^A-Za-z0-9.\-:\[\]]", "", request.headers.get("host", "")) or "localhost"
+    base = f"{'https' if _sec.is_https(request) else 'http'}://{host}"
+    items = (await asyncio.to_thread(fportal.list_public, ctx.db, 0, 30))["news"]
+    body_xml = "".join(
+        f"<item><title>{xesc(n['title'])}</title><link>{base}/news/{n['id']}</link><guid isPermaLink=\"true\">{base}/news/{n['id']}</guid>"
+        f"<pubDate>{formatdate(n['published_at'] or 0, usegmt=True)}</pubDate><category>{xesc(n['category'])}</category>"
+        f"<description>{xesc(n['teaser'] or n['body'][:500])}</description></item>" for n in items)
+    xml = (f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{xesc(info["title"])}</title>'
+           f"<link>{base}/portal</link><description>{xesc(info['subtitle'] or 'News')}</description>{body_xml}</channel></rss>")
+    return Response(xml, media_type="application/rss+xml; charset=utf-8")
+
+
+@app.get("/api/portal")
+async def api_portal(request: Request, offset: int = 0, category: str = ""):
+    """Public: portal page – title, welcome text, published news and (if the dashboard is public) a live summary."""
+    if not ctx.settings.get("portal.enabled"):
+        raise HTTPError(404, "The portal page is switched off.")
+    info = _portal_info(request)
+    news = await asyncio.to_thread(fportal.list_public, ctx.db, offset, info["per_page"], category)
+    out: Dict[str, Any] = {**info, **news}
+    if info["show_live"]:
+        rooms = ctx.live.rooms(False, False)
+        out["live"] = {"online": sum(len([c for c in r["clients"] if not c.get("parrot")]) for r in rooms),
+                       "rooms": [{"name": r["name"], "parrot": r["parrot"], "stations": len([c for c in r["clients"] if not c.get("parrot")]),
+                                  "talking": ({"callsign": r["talking"].get("callsign"), "name": r["talking"].get("name")} if r["talking"] else None)}
+                                 for r in rooms],
+                       "running": bool((ctx.server.state() or {}).get("running"))}
+    if info["show_stats"]:
+        t = (await asyncio.to_thread(ctx.stats.summary, "today", ctx.live.hidden_rooms())).get("totals", {})
+        out["today"] = {k: t.get(k) for k in ("talks", "duration", "stations", "peak_online")}
+    return out
+
+
+@app.get("/api/portal/news/{nid}")
+async def api_portal_news(nid: int, request: Request):
+    if not ctx.settings.get("portal.enabled"):
+        raise HTTPError(404, "The portal page is switched off.")
+    n = await asyncio.to_thread(fportal.get, ctx.db, nid, True)
+    if not n:
+        raise HTTPError(404, "This news item does not exist.")
+    return {**_portal_info(request), "item": n}
+
+
+# ---------------------------------------------------------------- 📰 Portal (admin): only admins are authors
+@app.get("/api/admin/portal")
+async def admin_portal(request: Request):
+    need_admin(request)
+    sec = {"id": "portal", "fields": ctx.settings.describe_section("portal")}
+    s = ctx.settings.all()
+    url = (f"https://{s['portal.domain']}/" if s.get("https.enabled") else f"http://{s['portal.domain']}/") if s.get("portal.domain") else "/portal"
+    return {"settings": sec, "news": await asyncio.to_thread(fportal.list_all, ctx.db), "url": url,
+            "domain": s.get("portal.domain") or "", "categories": [{"id": c, "label": l} for c, l in fportal.CATEGORIES]}
+
+
+@app.post("/api/admin/portal/settings")
+async def admin_portal_settings(request: Request):
+    b = await body(request)
+    changes = b.get("changes") or {}
+    if not isinstance(changes, dict) or any(not str(k).startswith("portal.") or k == "portal.domain" for k in changes):
+        raise HTTPError(400, "Invalid request.")
+    keys = await _save(request, changes)
+    await push({"type": "news"})
+    return {"ok": True, "changed": keys}
+
+
+@app.post("/api/admin/news")
+async def admin_news_save(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        n = await asyncio.to_thread(fportal.save, ctx.db, b, u)
+    except fportal.PortalError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("news_saved", u["username"], f"#{n['id']} {n['title'][:60]}" + (" (published)" if n["published"] else " (draft)"), ip_of(request))
+    await push({"type": "news"})
+    return {"ok": True, "item": n}
+
+
+@app.post("/api/admin/news/{nid}/publish")
+async def admin_news_publish(nid: int, request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        n = await asyncio.to_thread(fportal.set_published, ctx.db, nid, bool(b.get("published")), u)
+    except fportal.PortalError as e:
+        raise HTTPError(404, str(e))
+    ctx.auth.audit("news_published" if n["published"] else "news_unpublished", u["username"], f"#{nid} {n['title'][:60]}", ip_of(request))
+    await push({"type": "news"})
+    return {"ok": True, "item": n}
+
+
+@app.delete("/api/admin/news/{nid}")
+async def admin_news_delete(nid: int, request: Request):
+    u = need_admin(request)
+    old = await asyncio.to_thread(fportal.get, ctx.db, nid)
+    if not old or not await asyncio.to_thread(fportal.delete, ctx.db, nid):
+        raise HTTPError(404, "This news item does not exist (any more).")
+    ctx.auth.audit("news_deleted", u["username"], f"#{nid} {old['title'][:60]}", ip_of(request))
+    await push({"type": "news"})
+    return {"ok": True}
 
 
 _BUILD: Dict[str, Any] = {}
@@ -1663,21 +1818,37 @@ async def admin_domains(request: Request):
     need_admin(request)
     v = ctx.settings.all()
     on, dom = bool(v.get("https.enabled")), str(v.get("https.domain") or "").strip().lower()
+    pdom = str(v.get("portal.domain") or "").strip().lower()
     cert = _cert_info()
     sites = [{"domain": dom, "label": "Dashboard", "https": on and cert is not None, "cert": cert if on else None,
               "dns": await asyncio.to_thread(_dns, dom), "info": "" if on else "HTTPS ist aus"}] if dom else []
+    if pdom:
+        pending = bool(_tls_manager and pdom not in _tls_manager.names()) or bool(_tls_manager and _tls_manager.needs_expand())
+        sites.append({"domain": pdom, "label": "📰 Portal", "https": on and cert is not None and not pending,
+                      "cert": cert if on and not pending else None, "dns": await asyncio.to_thread(_dns, pdom),
+                      "info": ("HTTPS ist aus – Portal nur per HTTP" if not on else
+                               "Zertifikat wird um diese Domain erweitert …" if pending else "gleiches Zertifikat wie das Dashboard")})
     hint = "HTTPS ist an, aber es ist keine Domain eingetragen." if on and not dom else \
         ("HTTPS ist eingeschaltet, läuft aber erst nach einem Neustart des Dashboards." if on and _tls_manager is None else "")
-    return {"intro": "Eigene Domain für das Dashboard mit kostenlosem Zertifikat von Let's Encrypt – das Dashboard macht HTTPS selbst "
-                     "(certbot, ohne nginx). Voraussetzung: die Domain zeigt per DNS auf diesen Server und der HTTP-Port (Let's Encrypt prüft "
-                     "immer auf 80) und der HTTPS-Port sind aus dem Internet erreichbar (siehe 🔌 Ports). Hinter dem HobbyRadioPortal macht "
-                     "das Portal HTTPS – dann hier aus lassen.",
+    if not dom:
+        add = {"allowed": True, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "frn.example.org",
+               "button": "Domain eintragen & Zertifikat holen",
+               "reason": "Zuerst die Domain des Dashboards. Danach kann eine zweite Domain für die 📰 Portal-Seite folgen."}
+    elif not pdom:
+        add = {"allowed": True, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "news.example.org",
+               "button": "Portal-Domain eintragen & Zertifikat holen",
+               "reason": "📰 Portal-Seite (News) unter eigener Domain: die Domain kommt mit auf das Let's-Encrypt-Zertifikat des Dashboards "
+                         "und zeigt direkt die Portal-Seite. Die DNS-Einträge müssen auf diesen Server zeigen."}
+    else:
+        add = {"allowed": False, "reason": "Dashboard und Portal haben ihre Domain. Zum Wechseln die bisherige erst entfernen."}
+    return {"intro": "Eigene Domains für Dashboard und 📰 Portal-Seite mit kostenlosem Zertifikat von Let's Encrypt – das Dashboard macht "
+                     "HTTPS selbst (certbot, ohne nginx). Voraussetzung: die Domains zeigen per DNS auf diesen Server und der HTTP-Port "
+                     "(Let's Encrypt prüft immer auf 80) und der HTTPS-Port sind aus dem Internet erreichbar (siehe 🔌 Ports). Hinter dem "
+                     "HobbyRadioPortal macht das Portal HTTPS – dann hier aus lassen.",
             "hint": hint, "sites": sites, "renew_auto": True if (on and _tls_manager is not None) else None,
             "options": [{"key": "https.enabled", "label": "HTTPS mit Let's Encrypt", "value": on,
                          "help": "Aus = nur http://IP:Web-Port. Ein- und Ausschalten startet das Dashboard neu."}],
-            "add": {"allowed": not dom, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "frn.example.org",
-                    "button": "Domain eintragen & Zertifikat holen",
-                    "reason": "" if not dom else "Das Dashboard hat eine Domain. Zum Wechseln die bisherige erst entfernen."}}
+            "add": add}
 
 
 def _restart_soon(why: str) -> None:
@@ -1692,6 +1863,18 @@ async def admin_domains_add(request: Request):
     dom = str(b.get("domain") or "").strip().lower().rstrip(".")
     if not re.fullmatch(r"(?=.{4,253}$)([a-z0-9-]{1,63}\.)+[a-z]{2,63}", dom):
         raise HTTPError(400, "Keine gültige Domain")
+    main = str(ctx.settings.get("https.domain") or "").strip().lower()
+    if main:                                    # second domain = the portal page
+        if dom == main:
+            raise HTTPError(400, "Das ist schon die Domain des Dashboards.")
+        if ctx.settings.get("portal.domain"):
+            raise HTTPError(400, "Das Portal hat schon eine Domain – erst entfernen.")
+        await _save(request, {"portal.domain": dom, "https.email": str(b.get("email") or ctx.settings.get("https.email") or "").strip()})
+        if ctx.settings.get("https.enabled"):
+            _restart_soon("Portal-Domain eingetragen")
+            return {"ok": True, "message": f"{dom} ist jetzt die Domain der 📰 Portal-Seite. Das Dashboard startet neu und erweitert das "
+                                           f"Zertifikat – in einer Minute unter https://{dom}/ öffnen."}
+        return {"ok": True, "message": f"{dom} ist jetzt die Domain der 📰 Portal-Seite (HTTPS ist aus: http://{dom}/)."}
     await _save(request, {"https.domain": dom, "https.email": str(b.get("email") or "").strip(), "https.staging": bool(b.get("staging")),
                           "https.enabled": True})
     _restart_soon("HTTPS/Domain geändert")
@@ -1704,7 +1887,11 @@ async def admin_domains_renew(domain: str, request: Request):
     need_admin(request)
     if _tls_manager is None:
         raise HTTPError(400, "HTTPS läuft noch nicht – erst einschalten und das Dashboard neu starten.")
-    ok = await (_tls_manager.renew() if _tls_manager.have_cert() else _tls_manager.obtain())
+    if domain.strip().lower() not in _tls_manager.names():
+        _restart_soon("Zertifikat um eine Domain erweitern")
+        return {"ok": True, "message": "Die Domain ist noch nicht im laufenden Zertifikat – das Dashboard startet neu und erweitert es."}
+    fresh = not _tls_manager.have_cert() or _tls_manager.needs_expand()
+    ok = await (_tls_manager.obtain() if fresh else _tls_manager.renew())
     have = _tls_manager.have_cert()
     return {"ok": bool(ok) or have, "message": "Zertifikat geholt bzw. aktuell." if ok or have else
             "certbot ist fehlgeschlagen – zeigt die Domain auf diesen Server und ist Port 80 von außen erreichbar? Einzelheiten im Log."}
@@ -1712,7 +1899,13 @@ async def admin_domains_renew(domain: str, request: Request):
 
 @app.delete("/api/admin/domains/{domain}")
 async def admin_domains_remove(domain: str, request: Request):
-    if domain.strip().lower() != str(ctx.settings.get("https.domain") or "").strip().lower():
+    d = domain.strip().lower()
+    if d and d == str(ctx.settings.get("portal.domain") or "").strip().lower():
+        await _save(request, {"portal.domain": ""})
+        if ctx.settings.get("https.enabled"):
+            _restart_soon("Portal-Domain entfernt")
+        return {"ok": True, "message": f"{domain} entfernt – die Portal-Seite bleibt unter /portal erreichbar."}
+    if d != str(ctx.settings.get("https.domain") or "").strip().lower():
         raise HTTPError(404, "Diese Domain ist nicht eingetragen.")
     await _save(request, {"https.domain": "", "https.enabled": False})
     _restart_soon("HTTPS/Domain geändert")
@@ -2138,6 +2331,8 @@ async def _serve(host: str, port: int) -> None:
         "http_port": ctx.settings.get("https.http_port"),
         "port": ctx.settings.get("https.port"),
         "letsencrypt": True,
+        # the portal page's own domain goes on the same certificate (one more name, SAN)
+        "extra": [ctx.settings.get("portal.domain")] if ctx.settings.get("portal.domain") else [],
     }
     servers, server_tasks, helpers = [], [], []
     stopping = asyncio.Event()
@@ -2197,6 +2392,17 @@ async def _serve(host: str, port: int) -> None:
             if port not in (cm.http_port, cm.https_port):
                 await start(_Server.make(http_app, host=host, port=port, lifespan="off"), optional=True)
             helpers.append(asyncio.create_task(renew_loop(main)))
+
+            async def expand(main_server):
+                """A domain was added (portal): fetch the certificate with all names, then reload it in place."""
+                if await cm.obtain() and main_server.config.ssl is not None:
+                    main_server.config.ssl.load_cert_chain(cm.cert_file, cm.key_file)
+                    log.info("Zertifikat jetzt für %s", ", ".join(cm.names()))
+                elif not stopping.is_set():
+                    log.error("Zertifikat für %s konnte nicht erweitert werden – DNS und Port 80 prüfen", ", ".join(cm.names()))
+
+            if cm.needs_expand():
+                helpers.append(asyncio.create_task(expand(main)))
         else:
             # Keep the dashboard available while certbot obtains its first certificate.
             fallback_port = port if port not in (cm.http_port, cm.https_port) else 8080
