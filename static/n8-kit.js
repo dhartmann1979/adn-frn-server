@@ -65,6 +65,29 @@
     const q = (location.search.match(/[?&]lang=([A-Za-z-]{2,5})/) || [])[1];
     if (q && LANGS.indexOf(q) >= 0) lang = q;
     const locale = () => (LANG_INFO[lang] || LANG_INFO.de)[2];
+    // further languages live in n8-i18n-<lang>.js next to this file and are loaded only when needed
+    const KIT_SRC = (document.currentScript && document.currentScript.src) || '';
+    const loaded = {};
+    function packFile(l) { return l === 'fr-BE' ? 'fr' : l; }
+    function loadLang(l, cb) {
+        if (l === 'de' || l === 'en') { if (cb) cb(); return; }
+        const f = packFile(l);
+        if (loaded[f] === true) { if (cb) cb(); return; }
+        if (loaded[f]) { if (cb) loaded[f].push(cb); return; }
+        loaded[f] = cb ? [cb] : [];
+        const v = (KIT_SRC.match(/[?&]v=([^&]+)/) || [])[1];
+        const url = KIT_SRC.replace(/n8-kit\.js(\?.*)?$/, '') + 'n8-i18n-' + f + '.js' + (v ? '?v=' + encodeURIComponent(v) : '');
+        const done = () => { const l2 = loaded[f]; loaded[f] = true; (l2 || []).forEach(fn => fn()); };
+        if (document.readyState === 'loading' && !cb && document.currentScript) {
+            // first page load: in the parser, so the page is translated before it is shown (no flash of German)
+            document.write('<script src="' + url.replace(/"/g, '&quot;') + '"><\/script>');
+            loaded[f] = true;
+            return;
+        }
+        const sc = document.createElement('script');
+        sc.src = url; sc.onload = done; sc.onerror = done;
+        document.head.appendChild(sc);
+    }
 
     // ------------------------------------------------------------ dictionary
     const packs = [];   // {base, map: Map, rules: [[re, repl]]} per target language
@@ -226,6 +249,9 @@
 
     function setLang(l) {
         if (LANGS.indexOf(l) < 0 || l === lang) return;
+        loadLang(l, () => applyLang(l));
+    }
+    function applyLang(l) {
         lang = l;
         document.cookie = `${COOKIE}=${l}; path=/; max-age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
         try { localStorage.setItem(COOKIE, l); } catch (e) { }
@@ -1264,6 +1290,7 @@
         access: { view: accessView },
         net: { view: netView },
     };
+    loadLang(lang);                 // a further language: its file right after this one
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
 })();
