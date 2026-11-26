@@ -40,9 +40,9 @@ Die ACL-Dateien werden beim Dashboard-Start in SQLite übernommen. Änderungen a
 | Port | `server_port` | 10024 | TCP-Port für die Clients |
 | Owner e-mail | `server_owner` | = Konto-E-Mail | **eine** Adresse, OWNER in allen Räumen |
 | Website | `website` | – | |
-| Backup server / port | `backup_server_addr` / `_port` | – | wird den Clients als Ausweichserver mitgeteilt |
+| Backup server / port | `backup_server_addr` / `_port` | – | wird jedem Client beim Verbinden als Ausweichserver mitgegeben (`BN`/`BP` in der Login-Antwort); leer bei Master & Backup = der Partner |
 | Default room | `default_net` | erster Raum nach net00 | für Clients mit unbekanntem Raum |
-| Client timeout | `client_sotimeout` | 8000 ms | |
+| Client timeout | `client_sotimeout` | 300000 ms (5 min) | Auswahlliste 8 s … 60 min; ein von Hand gesetzter Wert bleibt wählbar. Bis 2.31 war der Standard 8000 ms – dieser alte Standard wird beim Update einmalig auf 300000 ms umgestellt |
 | Voice timeout | `client_txtimeout` | 1000 ms | 0 = aus |
 | No voice to muted … | `voip_skip_muted_crosslink_clients`, `…_gateway_…`, `…_pconly_…` | ja / ja / nein | |
 | – | `xmlFilesDir` | `/var/lib/frnadn/frn/acl` | fest |

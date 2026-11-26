@@ -591,3 +591,16 @@ N8Kit.i18n.add({
             "FRN kann keine einzelne Station umziehen: Der FRN-Server des BACKUP stoppt kurz, damit wechseln alle dort verbundenen Stationen zum MAIN (ihre Ausweichadresse). Wer gerade auf dem BACKUP sendet, wird unterbrochen.",
     },
 });
+
+/* 2.32.0: client timeout presets, backup address pushed at login */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        "5 min (default)": "5 Min. (Standard)", "Pushed to the clients": "An die Clients gegeben",
+        "every client on the MAIN gets the BACKUP at login": "jeder Client am MAIN bekommt beim Verbinden den BACKUP",
+        "every client on the BACKUP gets the MAIN at login": "jeder Client am BACKUP bekommt beim Verbinden den MAIN",
+        "set by hand under FRN server": "von Hand unter FRN-Server gesetzt",
+        "FRN address of the partner not known yet – sync once": "FRN-Adresse des Partners noch unbekannt – einmal abgleichen",
+    },
+    rules: [[/^(\d+) \(custom\)$/, '$1 (eigener Wert)']],
+});

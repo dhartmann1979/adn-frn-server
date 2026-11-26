@@ -2,6 +2,31 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.32.0 – 2026-11-27
+
+### ⏱️ Client-Zeitlimit als Auswahl (Standard 5 Minuten) · 📌 MAIN und BACKUP beim Verbinden an die Clients
+
+**Client-Zeitlimit (`client_sotimeout`)**
+- Unter *FRN-Server* jetzt eine **Auswahlliste**: 8 s, 15 s, 30 s, 1, 2, 3, **5 (Standard)**, 10, 15, 30 und 60 Minuten. Erlaubt sind
+  2000 ms bis 3 600 000 ms (bisher höchstens 120 000 ms); ein von Hand gesetzter anderer Wert bleibt als „eigener Wert“ wählbar.
+- **Neuer Standard: 300 000 ms (5 Minuten)** statt 8000 ms. Wer noch den alten Standard 8000 hatte, wird beim Update **einmalig**
+  auf 300 000 umgestellt (Protokoll: „update 2.32.0“); wer danach wieder 8 s wählt, behält das. Wird – wie alle FRN-Einstellungen –
+  vom Master auf das Backup abgeglichen. Der Java-Server übernimmt es beim nächsten Neustart.
+
+**MAIN und BACKUP an die Clients geben**
+- Geprüft: Das FRN-Protokoll gibt jedem Client in der Login-Antwort **genau eine** Ausweichadresse mit (`BN`/`BP`) – keine URL, kein
+  zweites Feld. Genau das nutzt adn-frn-server jetzt sauber für beide Richtungen: **Am MAIN bekommt jeder Client beim Verbinden den
+  BACKUP, am BACKUP den MAIN.**
+- Neu: Mitgeschickt wird die **echte FRN-Adresse und der FRN-Port des Partners**, die er über die verschlüsselte Verbindung meldet.
+  Bisher waren es der Host aus „Dashboard des Partners“ und der **eigene** Port – falsch, wenn der Partner einen anderen FRN-Port hat
+  oder sein Dashboard unter einem anderen Namen läuft. Ändert sich die Adresse, wird `server.properties` neu geschrieben (Hinweis
+  „Jetzt neu starten“).
+- Im Kasten *Master & Backup* zeigt die neue Zeile **An die Clients gegeben** Adresse und Port (statt „Clients weichen aus auf“).
+- `/api/info` (`cluster.master` / `cluster.backup`, gelesen z. B. von N8 Crosslink) nennt jetzt dieselbe, echte Adresse.
+- Eine Adresse unter *FRN-Server → Ausweichserver* hat weiterhin Vorrang.
+- Doku: [`docs/de/master-backup.md`](docs/de/master-backup.md) Abschnitt „📌 MAIN und BACKUP an die Clients geben“,
+  [`docs/de/konfiguration.md`](docs/de/konfiguration.md) aktualisiert; Tests für Adresse, Auswahl und Umstellung.
+
 ## 2.31.1 – 2026-11-27
 
 ### 👑 MAIN / 🛟 BACKUP im Stationsfenster – mit „Zum MAIN zwingen“

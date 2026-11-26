@@ -12,7 +12,7 @@ Konfiguration des Masters **zu jeder vollen Stunde** und auf Knopfdruck. Die bei
 
 | | |
 |---|---|
-| **Ausfall** | Erledigt **FRN selbst**: Jeder Server nennt seinen Clients eine Ausweichadresse (`backup_server_addr`). Ist der Server weg, verbinden sich die Clients von selbst dorthin. Mit gesetzter Rolle ist das automatisch der Partner (Host aus „Dashboard des Partners“, Port = eigener FRN-Port), solange unter *FRN-Server → Ausweichserver* nichts anderes steht. |
+| **Ausfall** | Erledigt **FRN selbst**: Jeder Server nennt seinen Clients eine Ausweichadresse (`backup_server_addr`). Ist der Server weg, verbinden sich die Clients von selbst dorthin. Mit gesetzter Rolle ist das automatisch der Partner – mit **seiner echten FRN-Adresse und seinem FRN-Port** (siehe „📌 MAIN und BACKUP an die Clients geben“), solange unter *FRN-Server → Ausweichserver* nichts anderes steht. |
 | **Abgleich** | Das Backup holt sich zu jeder vollen Stunde (ein paar Sekunden danach) die Konfiguration vom Master. **🔄 Jetzt abgleichen** geht auf beiden Servern: auf dem Backup holt es sofort, auf dem Master bittet es das Backup darum. |
 | **Wartung** | Von Hand auf dem Master: **🛠️ An das Backup übergeben** und danach **↩️ Vom Backup zurückholen** (siehe unten). |
 | **Verirrte Stationen** | **🧲 Stationen zum Master zwingen** – auf Master und Backup, jederzeit (siehe unten). Auf Wunsch auch automatisch. |
@@ -132,6 +132,28 @@ du gerade angemeldet bist. Jeder Block zeigt die Version des Dashboards (mit Com
 
 Damit das beim Partner geht, muss er selbst schon **2.31.0** oder neuer haben. Ältere Versionen meldet der Block: dann einmal dort
 unter *System → Update* (oder auf seiner Konsole `sudo ./scripts/update.sh`) aktualisieren – danach geht alles von hier aus.
+
+## 📌 MAIN und BACKUP an die Clients geben
+
+**Was FRN kann:** In der Antwort auf die Anmeldung eines Clients schickt der FRN-Server **genau eine** Ausweichadresse mit
+(`BN` = Adresse, `BP` = Port; in `server.properties` `backup_server_addr` / `backup_server_port`). Fällt der Server weg, verbindet
+sich der Client dorthin. Ein zweites Feld, eine Web-Adresse (URL) oder eine Liste kennt das Protokoll nicht.
+
+**So nutzt adn-frn-server das:** Jeder Client bekommt beim Verbinden **den jeweils anderen Server**:
+
+| Client verbunden mit | bekommt beim Verbinden |
+|---|---|
+| 👑 **MAIN** (Master) | 🛟 **BACKUP** – FRN-Adresse und Port des Backups |
+| 🛟 **BACKUP** | 👑 **MAIN** – FRN-Adresse und Port des Masters |
+
+Damit kennt jeder Client beide: den, mit dem er verbunden ist, und den anderen als Ausweichserver. Adresse und Port meldet der
+Partner selbst über die verschlüsselte Verbindung (bei jedem Abgleich und Statusabruf) – auch wenn sein FRN-Port ein anderer ist
+oder sein Dashboard unter einem anderen Namen läuft. Solange der Partner sich noch nicht gemeldet hat, gilt der Host aus
+„Dashboard des Partners“ mit dem eigenen FRN-Port. Ändert sich die Adresse, wird `server.properties` neu geschrieben; der Java-Server
+übernimmt sie beim nächsten Neustart (Hinweis „Jetzt neu starten“).
+
+Im Kasten zeigt die Zeile **An die Clients gegeben**, welche Adresse gerade mitgeschickt wird. Die FRN-Clients übernehmen sie beim
+nächsten Verbinden.
 
 ## 🔗 Partner im Link-Menü
 

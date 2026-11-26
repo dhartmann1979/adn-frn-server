@@ -17,6 +17,7 @@ import asyncio
 import io
 import logging
 import os
+import json
 import re
 import shutil
 import time
@@ -118,6 +119,24 @@ def _peer_host(url) -> str:
         return ""
 
 
+def with_peer(settings) -> Dict[str, Any]:
+    """Settings plus the FRN address of the partner (Master & Backup), as it reported it over the encrypted connection."""
+    s = dict(settings.all())
+    try:
+        p = json.loads(settings.db.kv_get("cluster.peer_account") or "{}")
+    except (ValueError, AttributeError):
+        p = {}
+    host = str(p.get("host") or "").strip()
+    if ":" in host and not host.startswith("["):
+        host = host.split(":", 1)[0]
+    s["cluster.peer_frn_host"] = host if re.fullmatch(r"[A-Za-z0-9.\-]{1,253}", host or "") else ""
+    try:
+        s["cluster.peer_frn_port"] = int(p.get("frn_port") or 0)
+    except (TypeError, ValueError):
+        s["cluster.peer_frn_port"] = 0
+    return s
+
+
 def build_properties(s: Dict[str, Any], rooms: List[Dict[str, Any]], home: Path) -> str:
     lines = ["# server.properties – written by frn_adn from its SQLite database.",
              "# Do not edit: change the settings in the admin portal; this file is overwritten.", ""]
@@ -141,10 +160,11 @@ def build_properties(s: Dict[str, Any], rooms: List[Dict[str, Any]], home: Path)
     if s["frn.backup_host"] and s["frn.backup_port"]:
         put("backup_server_addr", s["frn.backup_host"])
         put("backup_server_port", s["frn.backup_port"])
-    elif s.get("cluster.role") in ("master", "backup") and _peer_host(s.get("cluster.peer_url")):
-        # Master & Backup: the clients go to the partner if this server is gone (FRN does the failover itself)
-        put("backup_server_addr", _peer_host(s.get("cluster.peer_url")))
-        put("backup_server_port", s["frn.backup_port"] or s["frn.port"])
+    elif s.get("cluster.role") in ("master", "backup") and (s.get("cluster.peer_frn_host") or _peer_host(s.get("cluster.peer_url"))):
+        # Master & Backup: every client gets the partner at login (BN/BP) – on the MAIN the BACKUP, on the BACKUP the MAIN.
+        # FRN address and port are those the partner reports over the encrypted connection, else host of its dashboard + own port.
+        put("backup_server_addr", s.get("cluster.peer_frn_host") or _peer_host(s.get("cluster.peer_url")))
+        put("backup_server_port", s["frn.backup_port"] or s.get("cluster.peer_frn_port") or s["frn.port"])
     put("xmlFilesDir", str(home / "acl"))
     put("client_sotimeout", s["frn.client_timeout"])
     put("client_txtimeout", s["frn.tx_timeout"])
@@ -230,7 +250,7 @@ class JavaServer:
         """Write server.properties, log4j.xml and FRNPasswd.xml. True if server.properties or the password list changed."""
         (self.home / "acl").mkdir(parents=True, exist_ok=True)
         (self.home / "logs").mkdir(parents=True, exist_ok=True)
-        s = self.settings.all()
+        s = with_peer(self.settings)
         changed = _write(self.home / "server.properties", build_properties(s, self.store.rooms(), self.home), 0o600)
         _write(self.home / "log4j.xml", LOG4J, 0o644)
         pw = build_passwd(bool(s["frn.passwd_list"]), self.store.accounts(with_password=True))

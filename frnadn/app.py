@@ -48,7 +48,7 @@ from . import __version__, branding as brandstore, clientsw, links as linkstore,
 from .auth import ADMIN_ROLES, Auth, AuthError
 from .db import DB
 from .frn.acl import ACLStore
-from .frn.javasrv import JavaServer
+from .frn.javasrv import JavaServer, with_peer
 from .frn.logwatch import LogWatch
 from .frn.store import MAX_ROOMS, ROOM_COLUMNS, Store
 from .live import Live
@@ -241,10 +241,9 @@ def _cluster_public(s: Dict[str, Any]) -> Dict[str, Any]:
     role = s["cluster.role"]
     if role not in ("master", "backup"):
         return {"role": "off"}
-    host = s["frn.backup_host"] or cluster.peer_host(s["cluster.peer_url"])
-    port = int(s["frn.backup_port"] or s["frn.port"])
+    pb = pushed_backup()                               # the same address the clients get at login
     me = {"host": s["frn.address"] or "", "port": int(s["frn.port"])}
-    peer = {"host": host, "port": port} if host else None
+    peer = {"host": pb["host"], "port": pb["port"]} if pb["host"] else None
     return {"role": role, "master": me if role == "master" else peer, "backup": me if role == "backup" else peer,
             "maintenance": bool(_cluster_get("cluster.maintenance")),
             "peer_url": (s["cluster.peer_url"] or "").rstrip("/") + "/" if s["cluster.peer_url"] else ""}   # also in the link menu
@@ -1234,15 +1233,40 @@ def _me() -> Dict[str, Any]:
     return {"account": _account_tag(), "standalone": bool(s["frn.standalone"]), "role": s["cluster.role"],
             # zur Anzeige im Kasten Master & Backup (nur über die verschlüsselte Verbindung, nur für Admins sichtbar)
             "email": s["sysman.email"] or "", "password_set": bool(s["sysman.password"]), "host": s["frn.address"] or "",
-            "sysman": s["sysman.host"] or ""}
+            "sysman": s["sysman.host"] or "", "frn_port": int(s["frn.port"] or 0)}
 
 
 def _remember_peer(d: Dict[str, Any]) -> None:
     if isinstance(d, dict) and "account" in d:
-        _cluster_set("cluster.peer_account", {"tag": str(d.get("account") or ""), "standalone": bool(d.get("standalone")),
-                                              "email": str(d.get("email") or "")[:200], "password_set": bool(d.get("password_set")),
-                                              "host": str(d.get("host") or "")[:200], "role": str(d.get("role") or ""),
-                                              "time": time.time()})
+        old = _cluster_get("cluster.peer_account")
+        try:
+            port = int(d.get("frn_port") or (d.get("frn") or {}).get("port") or old.get("frn_port") or 0)
+        except (TypeError, ValueError):
+            port = 0
+        new = {"tag": str(d.get("account") or ""), "standalone": bool(d.get("standalone")),
+               "email": str(d.get("email") or "")[:200], "password_set": bool(d.get("password_set")),
+               "host": str(d.get("host") or "")[:200], "role": str(d.get("role") or ""), "frn_port": port, "time": time.time()}
+        _cluster_set("cluster.peer_account", new)
+        if (old.get("host"), old.get("frn_port")) != (new["host"], new["frn_port"]):
+            # the FRN address of the partner is what every client gets at login (BN/BP) – write it, restart when it fits
+            try:
+                if ctx.java.write_config():
+                    ctx.restart_needed = True
+            except OSError as e:
+                log.error("cannot write the FRN server configuration: %s", e)
+
+
+def pushed_backup() -> Dict[str, Any]:
+    """What the FRN server gives every client at login as its backup server (BN/BP in the login answer)."""
+    s = with_peer(ctx.settings)
+    if s["frn.backup_host"] and s["frn.backup_port"]:
+        return {"host": s["frn.backup_host"], "port": int(s["frn.backup_port"]), "source": "manual"}
+    if s["cluster.role"] in ("master", "backup"):
+        host = s["cluster.peer_frn_host"] or cluster.peer_host(s["cluster.peer_url"])
+        if host:
+            return {"host": host, "port": int(s["frn.backup_port"] or s["cluster.peer_frn_port"] or s["frn.port"]),
+                    "source": "partner" if s["cluster.peer_frn_host"] else "dashboard"}
+    return {"host": "", "port": 0, "source": ""}
 
 
 def account_conflict(tag: Optional[str] = None, standalone: Optional[bool] = None) -> bool:
@@ -1453,7 +1477,7 @@ async def cluster_status(request: Request):
                            "hourly": s["cluster.hourly"], "last": _cluster_get("cluster.last"),
                            "last_export": _cluster_get("cluster.last_export"), "maintenance": _cluster_get("cluster.maintenance"),
                            "next": cluster.next_full_hour() if s["cluster.role"] == "backup" and s["cluster.hourly"] else None,
-                           "frn": _frn_state(), "backup_addr": s["frn.backup_host"] or cluster.peer_host(s["cluster.peer_url"]),
+                           "frn": _frn_state(), "backup_addr": s["frn.backup_host"] or cluster.peer_host(s["cluster.peer_url"]), "pushed": pushed_backup(),
                            "peer": None, "last_return": _cluster_get("cluster.last_return"),
                            "return_pending": _cluster_get("cluster.return_pending"), "auto_return": s["cluster.auto_return"],
                            "return_pause": s["cluster.return_pause"]}
@@ -3136,6 +3160,12 @@ async def _startup() -> None:
         ctx = Ctx()
     ctx.auth.on_mail_change = _mail_users_changed      # ✉️ new users / passwords → mailbox list of the mail server
     ctx.store.ensure_rooms()
+    if not ctx.db.kv_get("migr.client_timeout_300k"):   # 2.32.0: new default 5 min instead of 8 s
+        stored = ctx.db.q("SELECT value FROM settings WHERE key='frn.client_timeout'")
+        if stored and str(stored[0]["value"]).strip() in ("8000", "8000.0"):
+            ctx.settings.update({"frn.client_timeout": 300000}, "update 2.32.0")
+            log.info("Client-Zeitlimit: alter Standard 8000 ms → neuer Standard 300000 ms")
+        ctx.db.kv_set("migr.client_timeout_300k", "1")
     for error in ctx.acls.sync_from_files():
         log.warning("ACL import: %s", error)
     configured_links = linkstore.read(LINKS_FILE)

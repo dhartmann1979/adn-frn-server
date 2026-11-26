@@ -334,3 +334,44 @@ def test_station_window_main_backup(client, monkeypatch):
     assert client.get("/api/admin/cluster/where?call=DO1ABC").json()["on"] is None
     r = peer(client, "/api/cluster/hello")
     assert cluster.unseal(r.content, KEY)["data"]["callsigns"] == []
+
+
+def test_partner_frn_address_pushed_at_login(client):
+    """BN/BP in der Login-Antwort: am MAIN bekommt jeder Client den BACKUP, am BACKUP den MAIN – mit der echten FRN-Adresse."""
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://dash-backup.example.org",
+                           "frn.port": 10024, "frn.backup_host": "", "frn.backup_port": 0}, "t")
+    A.ctx.java.write_config()
+    props = lambda: client.get("/api/admin/server/properties").json()["text"]  # noqa: E731
+    assert "backup_server_addr=dash-backup.example.org" in props() and "backup_server_port=10024" in props()
+    assert A.pushed_backup()["source"] == "dashboard"
+    # the partner reports its FRN address and port over the encrypted connection
+    A._remember_peer({"account": "x", "host": "frn-backup.example.org", "frn_port": 10025, "role": "backup"})
+    assert "backup_server_addr=frn-backup.example.org" in props() and "backup_server_port=10025" in props()
+    assert A.pushed_backup() == {"host": "frn-backup.example.org", "port": 10025, "source": "partner"}
+    assert client.get("/api/info").json()["cluster"]["backup"] == {"host": "frn-backup.example.org", "port": 10025}
+    assert client.get("/api/admin/cluster").json()["pushed"]["port"] == 10025
+    # set by hand under FRN server: that wins
+    A.ctx.settings.update({"frn.backup_host": "other.example.org", "frn.backup_port": 10030}, "t")
+    assert A.pushed_backup()["source"] == "manual"
+
+
+def test_client_timeout_presets_and_default(app_mod):
+    from frnadn.settings import BY_KEY
+    f = BY_KEY["frn.client_timeout"]
+    assert f.default == 300000 and 300000 in [c[0] for c in f.choices] and f.max == 3600000
+    s = app_mod.ctx.settings
+    s.update({"frn.client_timeout": 1800000}, "t")
+    assert s.get("frn.client_timeout") == 1800000
+    s.update({"frn.client_timeout": 45000}, "t")                    # a value set by hand stays allowed
+    assert s.get("frn.client_timeout") == 45000
+
+
+def test_old_client_timeout_default_migrated(app_mod):
+    A = app_mod
+    A.ctx.settings.update({"frn.client_timeout": 8000}, "t")
+    with TestClient(A.app):
+        assert A.ctx.settings.get("frn.client_timeout") == 300000
+    A.ctx.settings.update({"frn.client_timeout": 8000}, "t")         # only once – chosen again by hand, it stays
+    with TestClient(A.app):
+        assert A.ctx.settings.get("frn.client_timeout") == 8000

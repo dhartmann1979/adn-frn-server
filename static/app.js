@@ -875,6 +875,10 @@ function fieldHtml(f) {
     else if (f.kind === 'choice') input = `<select id="f_${f.key}" name="${f.key}">${f.choices.map(c => `<option value="${esc(c[0])}" ${String(c[0]) === String(f.value ?? '') ? 'selected' : ''}>${esc(c[1])}</option>`).join('')}</select>`;
     else if (f.kind === 'longtext') return `<div class="row wide">${lbl}<textarea id="f_${f.key}" name="${f.key}" spellcheck="false" style="min-height:70px">${esc(f.value)}</textarea>${help}</div>`;
     else if (f.kind === 'password') input = `<div class="pw-wrap"><input type="password" id="f_${f.key}" name="${f.key}" value="${esc(f.value)}" autocomplete="new-password"><button type="button" class="btn small" onclick="const i=this.previousElementSibling;i.type=i.type==='password'?'text':'password';if(i.value==='••••••••')i.value=''">👁</button></div>`;
+    else if (f.kind === 'int' && f.choices && f.choices.length) {     // presets, a value set by hand stays selectable
+        const opts = f.choices.some(c => String(c[0]) === String(f.value)) ? f.choices : [[f.value, `${f.value} (custom)`], ...f.choices];
+        input = `<select id="f_${f.key}" name="${f.key}">${opts.map(c => `<option value="${esc(c[0])}" ${String(c[0]) === String(f.value ?? '') ? 'selected' : ''}>${esc(c[1])}</option>`).join('')}</select>`;
+    }
     else if (f.kind === 'int') input = `<input type="number" id="f_${f.key}" name="${f.key}" value="${esc(f.value ?? '')}" ${f.min != null ? `min="${f.min}"` : ''} ${f.max != null ? `max="${f.max}"` : ''}>`;
     else input = `<input type="text" id="f_${f.key}" name="${f.key}" value="${esc(f.value ?? '')}">`;
     return `<div class="row">${lbl}${input}${help}</div>`;
@@ -928,7 +932,7 @@ async function loadCluster() {
             <span>Last sync</span><div>${lastTxt}</div>
             ${d.next ? `<span>Next sync</span><div>${fmtDate(d.next)}</div>` : ''}
             ${d.role === 'master' && d.last_export && d.last_export.time ? `<span>Last fetch by the backup</span><div>${fmtDate(d.last_export.time)}</div>` : ''}
-            <span>Clients switch to</span><div class="mono">${esc(d.backup_addr || '–')}</div>
+            <span>Pushed to the clients</span><div>${d.pushed && d.pushed.host ? `<span class="mono">${esc(d.pushed.host)}:${esc(d.pushed.port)}</span> <span class="dim">· <span>${d.role === 'master' ? 'every client on the MAIN gets the BACKUP at login' : 'every client on the BACKUP gets the MAIN at login'}</span>${d.pushed.source === 'manual' ? ' · <span>set by hand under FRN server</span>' : d.pushed.source === 'dashboard' ? ' · <span>FRN address of the partner not known yet – sync once</span>' : ''}</span>` : '–'}</div>
             <span>Transfer</span><div>🔐 <span>encrypted with the sync key</span></div>
         </div>
         <div class="actions" style="justify-content:flex-start">
