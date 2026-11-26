@@ -25,7 +25,8 @@ NAMES = {'fr': 'Français + Français (Belgique)', 'hu': 'Magyar', 'sv': 'Svensk
 def js(o): return json.dumps(o, ensure_ascii=False, separators=(',', ':'))
 def rjs(lst): return '[' + ', '.join(f'[new RegExp({json.dumps(r["re"])}, {json.dumps(r["flags"])}), {json.dumps(r["rep"], ensure_ascii=False)}]' for r in lst) + ']'
 for k, d in TARGETS.items():
-    used = list(dict.fromkeys(strings['kit'] + strings[k]))
+    # every text of every system: the systems share many texts, and a text found in one is often shown in another as well
+    used = list(dict.fromkeys(x for c in chunks for x in c))
     old_all = os.path.join('/home/claude', d, 'n8-i18n-intl.js')
     if os.path.exists(old_all): os.remove(old_all)
     stats = {}
