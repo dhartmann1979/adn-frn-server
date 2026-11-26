@@ -56,6 +56,7 @@ class Auth:
     def __init__(self, db: DB):
         self.db = db
         self._fails: Dict[str, List[float]] = {}
+        self.on_mail_change = None          # set by the app: mailbox passwords changed → write the mail server's user list
         self.db.x("UPDATE users SET role='user' WHERE role='viewer'")
 
     def has_superadmin(self) -> bool:
@@ -75,7 +76,26 @@ class Auth:
                             (username, hash_password(password), "superadmin", display_name[:64], time.time())).lastrowid
         self.db.x("UPDATE users SET role='admin' WHERE role='superadmin' AND id<>?", (uid,))
         self.db.x("DELETE FROM sessions WHERE user_id=?", (uid,))
+        self._set_mail(uid, password)
         self.audit("superadmin_set", username, "installation / command line")
+
+    # ------------------------------------------------------------ mailbox password (2.25)
+    def _set_mail(self, uid: int, password: str) -> None:
+        """Every dashboard user has a mailbox with the same password – Dovecot gets it as SHA512-CRYPT."""
+        from .mailpw import mail_hash
+        self.db.x("UPDATE users SET mail_hash = ? WHERE id = ?", (mail_hash(password), uid))
+        if self.on_mail_change:
+            try:
+                self.on_mail_change()
+            except Exception:  # noqa: BLE001 – the mail server must never block a login
+                pass
+
+    def mail_changed(self) -> None:
+        if self.on_mail_change:
+            try:
+                self.on_mail_change()
+            except Exception:  # noqa: BLE001
+                pass
 
     # ------------------------------------------------------------ helpers
     @staticmethod
@@ -112,6 +132,9 @@ class Auth:
             self.audit("login_failed", (username or "")[:64], "", ip)
             raise AuthError("Wrong username or password.")
         self._fails.pop(key, None)
+        from .mailpw import verify as mail_ok
+        if not row["mail_hash"] or not mail_ok(password, row["mail_hash"]):
+            self._set_mail(row["id"], password)          # users from before 2.25 get their mailbox at the next login
         token = secrets.token_urlsafe(32)
         now = time.time()
         self.db.x("INSERT INTO sessions (token_hash, user_id, created_at, expires_at, ip, user_agent) VALUES (?,?,?,?,?,?)",
@@ -185,7 +208,9 @@ class Auth:
         self.db.x("INSERT INTO users (username, password_hash, role, display_name, created_at) VALUES (?,?,?,?,?)",
                   (username, hash_password(password), role, (display_name or "")[:64], time.time()))
         self.audit("user_created", actor["username"], f"{username} ({role})", ip)
-        return self.public(self.db.q("SELECT * FROM users WHERE username = ?", (username,))[0])
+        row = self.db.q("SELECT * FROM users WHERE username = ?", (username,))[0]
+        self._set_mail(row["id"], password)
+        return self.public(row)
 
     def update(self, actor: Dict[str, Any], uid: int, changes: Dict[str, Any], ip: str = "") -> Dict[str, Any]:
         row = self._get(uid)
@@ -222,6 +247,10 @@ class Auth:
             self.db.x(f"UPDATE users SET {', '.join(sets)} WHERE id = ?", (*args, uid))
             if changes.get("password") or changes.get("disabled"):
                 self.db.x("DELETE FROM sessions WHERE user_id = ?", (uid,))
+            if changes.get("password"):
+                self._set_mail(uid, changes["password"])
+            elif "disabled" in changes or "username" in changes:
+                self.mail_changed()
             self.audit("user_changed", actor["username"], f"{row['username']}: {', '.join(notes) or 'details'}", ip)
         return self.public(self._get(uid))
 
@@ -232,6 +261,7 @@ class Auth:
         self._may_manage(actor, row["role"])
         self.db.x("DELETE FROM users WHERE id = ?", (uid,))
         self.audit("user_deleted", actor["username"], row["username"], ip)
+        self.mail_changed()
 
     def change_own(self, user: Dict[str, Any], old: str, new: str, new_username: str = "", ip: str = "") -> Dict[str, Any]:
         row = self._get(user["id"])
@@ -252,6 +282,7 @@ class Auth:
         if rows:
             self.db.x("UPDATE users SET password_hash=?, disabled=0, default_pw=0 WHERE id=?",
                       (hash_password(password), rows[0]["id"]))
+            self._set_mail(rows[0]["id"], password)
         else:
             raise AuthError(f"Unknown user {username}. The superadmin is created with set-superadmin.")
         self.db.x("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE username = ?)", (username,))

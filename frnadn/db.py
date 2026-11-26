@@ -226,6 +226,7 @@ MIGRATIONS = [
     ("rooms", "idx", "INTEGER"),                                 # netNN of server.properties, 0 = test/parrot room
     ("rooms", "tg_params", "TEXT NOT NULL DEFAULT ''"),          # netNN_tgbot_params
     ("frn_accounts", "password", "TEXT NOT NULL DEFAULT ''"),    # FRNPasswd.xml needs the password itself
+    ("users", "mail_hash", "TEXT NOT NULL DEFAULT ''"),           # 2.25: SHA512-CRYPT of the password for the mailbox (mailpw.py)
 ]
 
 
