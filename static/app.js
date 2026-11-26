@@ -228,7 +228,7 @@ async function boot() {
         connectWS();
         loadToday();
         const h = location.hash.replace('#', '');
-        if (h) { const [t, a] = h.split('/'); if (['stats', 'stations', 'chat'].includes(t)) showTab(t); else if (t === 'admin' && isAdmin()) showTab('admin', a); }
+        if (h) { const [t, a] = h.split('/'); if (['stats', 'stations', 'chat'].includes(t) || (t === 'mail' && S.info.mail)) showTab(t); else if (t === 'admin' && isAdmin()) showTab('admin', a); }
     } catch (e) { console.error(e); setTimeout(boot, 3000); }
 }
 function renderHeader() {
@@ -241,6 +241,7 @@ function renderHeader() {
     $('subtitle').innerHTML = parts.map(p => p.startsWith('<') ? p : esc(p)).join(' · ');
     $('tabAdminBtn').classList.toggle('hidden', !isAdmin());
     $('tabChatBtn').classList.toggle('hidden', !i.chat);
+    if ($('tabMailBtn')) $('tabMailBtn').classList.toggle('hidden', !i.mail);
     if ($('tabNewsLink')) { $('tabNewsLink').classList.toggle('hidden', !i.portal); if (i.portal) $('tabNewsLink').href = i.portal.url; }
     $('setupBanner').classList.toggle('hidden', !i.setup_needed);
 }
@@ -365,8 +366,9 @@ function confirmBox(text, okLabel, cls) {
 function showTab(tab, sub) {
     S.tab = tab;
     document.querySelectorAll('#mainTabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    ['live', 'stats', 'stations', 'chat', 'admin'].forEach(t => $('tab-' + t).classList.toggle('hidden', t !== tab));
+    ['live', 'stats', 'stations', 'chat', 'mail', 'admin'].forEach(t => $('tab-' + t) && $('tab-' + t).classList.toggle('hidden', t !== tab));
     if (tab === 'stats') loadStats();
+    if (tab === 'mail' && window.loadWebmail) loadWebmail();
     if (tab === 'stations') loadDirectory();
     if (tab === 'chat') loadChat();
     if (tab === 'admin') showAdmin(sub || S.admin.tab);
@@ -763,7 +765,7 @@ $('chatFilter').addEventListener('click', e => { const b = e.target.closest('but
 
 // ---------------------------------------------------------------- admin
 // Admin menu: the same tree in every N8 system (N8 Kit) – Betrieb · Benutzer & Zugang · Darstellung · System
-const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys', 'news', 'portalcfg'];
+const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys', 'news', 'portalcfg', 'mailsrv', 'mailboxes', 'maildmarc', 'maildns', 'maildomains'];
 function adminGroups() {
     const G = N8Kit.nav.GROUPS;
     return [
@@ -774,7 +776,10 @@ function adminGroups() {
         { id: 'portal', label: '📰 Portal', items: [{ id: 'news', label: '📝 News' }, { id: 'portalcfg', label: '⚙️ Portal page' }] },
         { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Benutzer' }, { id: 'sessions', label: '🔑 Sitzungen' }, { id: 'audit', label: '📜 Protokoll' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
-        { id: 'netz', label: G.netz, items: [{ id: 'ports', label: '🔌 Ports' }, { id: 'domains', label: '🔒 Domains & HTTPS' }] },
+        // ✉️ N8 Mail: Postfix, Dovecot, Rspamd – every dashboard user has a mailbox
+        { id: 'email', label: '✉️ E-Mail', items: [{ id: 'mailsrv', label: '📮 Mail server' }, { id: 'mailboxes', label: '📬 Mailboxes' },
+            { id: 'maildmarc', label: '🛡️ DMARC & BIMI' }, { id: 'maildns', label: '🧾 DNS templates' }] },
+        { id: 'netz', label: G.netz, items: [{ id: 'ports', label: '🔌 Ports' }, { id: 'domains', label: '🔒 Domains & HTTPS' }, { id: 'maildomains', label: '✉️ Mail domains' }] },
         { id: 'system', label: G.system, items: [{ id: 'system', label: '🖥️ Server & data' }, ...N8Kit.nav.SYS_ITEMS.map(([id, label]) => ({ id, label, ...(id === 'sys-crashes' && S.crashNew ? { badge: String(S.crashNew), badgeClass: 'bad' } : {}) })),
             { id: 'backup', label: '💾 Backup', hidden: !(S.me && S.me.role === 'superadmin') }] },
     ];
@@ -799,7 +804,8 @@ function showAdmin(a) {
     } else if (pane === 'sys') loadSysView(base.slice(4));
     else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
        system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit,
-       news: loadNewsAdmin, portalcfg: loadPortalAdmin })[pane]()
+       news: loadNewsAdmin, portalcfg: loadPortalAdmin, mailsrv: loadMailSrv, mailboxes: loadMailboxes, maildmarc: loadMailDmarc,
+       maildns: loadMailDns, maildomains: loadMailDomains })[pane]()
        .then(() => {
            if (pane === 'system') {             // 💾 Backup has its own entry like in the other N8 systems
                [...$('admin-system').children].forEach(c => { c.hidden = base === 'backup' ? c.id !== 'backupTiles' : c.id === 'backupTiles'; });

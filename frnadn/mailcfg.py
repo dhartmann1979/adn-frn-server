@@ -349,9 +349,8 @@ def bimi_default(title: str, accent: str = "#5ac8fa", text: str = "") -> str:
 <rect width="512" height="512" fill="#0b1224"/>
 <circle cx="256" cy="256" r="228" fill="{accent}"/>
 <circle cx="256" cy="256" r="200" fill="#0b1224"/>
-<path d="M300 112a120 120 0 1 0 100 168a96 96 0 1 1-100-168z" fill="{accent}"/>
-<path d="M178 300l40-90l40 90M196 262h44" stroke="#ffffff" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="256" y="398" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="700" text-anchor="middle" fill="#ffffff">{letters}</text>
+<path d="M296 96a134 134 0 1 0 118 196a106 106 0 1 1-118-196z" fill="{accent}"/>
+<text x="236" y="300" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="700" text-anchor="middle" fill="#ffffff">{letters}</text>
 </svg>
 '''
 
@@ -369,6 +368,7 @@ def _nameservers() -> List[str]:
     return out or ["1.1.1.1", "9.9.9.9"]
 
 
+DNS_PORT = 53
 QTYPES = {"A": 1, "MX": 15, "TXT": 16, "AAAA": 28, "SRV": 33, "PTR": 12}
 
 
@@ -405,10 +405,10 @@ def dns_query(name: str, qtype: str, timeout: float = 3.0) -> List[str]:
             fam = socket.AF_INET6 if ":" in ns else socket.AF_INET
             with socket.socket(fam, socket.SOCK_DGRAM) as so:
                 so.settimeout(timeout)
-                so.sendto(pkt, (ns, 53))
+                so.sendto(pkt, (ns, DNS_PORT))
                 msg, _ = so.recvfrom(4096)
             if msg[2] & 0x02:   # truncated → TCP
-                with socket.create_connection((ns, 53), timeout) as so:
+                with socket.create_connection((ns, DNS_PORT), timeout) as so:
                     so.sendall(struct.pack(">H", len(pkt)) + pkt)
                     ln = struct.unpack(">H", so.recv(2))[0]
                     msg = b""

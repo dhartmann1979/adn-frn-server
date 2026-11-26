@@ -16,7 +16,8 @@ mit denselben Gruppen in derselben Reihenfolge:
 | 📡 **Betrieb** | ⚙️ Einstellungen (Zweige: FRN-Server, SystemManager, Operator, Dashboard, Daten) · 🏠 Räume · 🛡️ Server-Listen · 🔑 FRN-Konten · 📥 Import · 📜 Protokolle |
 | 📰 **Portal** (seit 2.24) | 📝 News · ⚙️ Portal-Seite – nur Admins sind Autoren, siehe [Portal-Seite](portal.md) |
 | 👥 **Benutzer & Zugang** | 👥 Benutzer · 🔑 Sitzungen · 📜 Protokoll |
-| 🌐 **Netz, Ports & Domains** | 🔌 Ports · 🔒 Domains & HTTPS |
+| ✉️ **E-Mail** (seit 2.25) | 📮 Mailserver · 📬 Postfächer · 🛡️ DMARC & BIMI · 🧾 DNS-Vorlagen – siehe [E-Mail](email.md) |
+| 🌐 **Netz, Ports & Domains** | 🔌 Ports · 🔒 Domains & HTTPS · ✉️ Mail-Domains |
 | 🎨 **Darstellung** | 🎨 Aussehen (Theme) · 🔗 Links |
 | 🖥️ **System** | 🖥️ Server & Daten · ⬆️ Update · 🧩 Dienste · 🔐 Berechtigungen & sudo · 💓 Keep-Alive · 💥 Abstürze · 💾 Backup (nur Superadmin) |
 

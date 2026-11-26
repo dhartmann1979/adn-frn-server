@@ -19,6 +19,7 @@
   <a href="docs/de/dashboard.md">Dashboard</a> ·
   <a href="docs/de/adminbereich.md">Admin-Portal</a> ·
   <a href="docs/de/portal.md">Portal-Seite</a> ·
+  <a href="docs/de/email.md">E-Mail</a> ·
   <a href="docs/de/master-backup.md">Master &amp; Backup</a> ·
   <a href="docs/de/updates.md">Updates</a> ·
   <a href="docs/de/anleitungen.md">Anleitungen</a> ·
@@ -91,6 +92,10 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 
 <table>
 <tr>
+<td width="50%"><img src="docs/images/webmail.png" alt="Webmail"><br><b>✉️ Webmail</b>: jeder Benutzer hat ein Postfach, HTML-Mails abgeschottet, SPF/DKIM/DMARC sichtbar.</td>
+<td width="50%"><img src="docs/images/admin-dns-vorlagen.png" alt="DNS-Vorlagen"><br><b>🧾 DNS-Vorlagen</b> für MX, SPF, DKIM, DMARC, BIMI, MTA-STS mit Live-Prüfung.</td>
+</tr>
+<tr>
 <td width="50%"><img src="docs/images/portal.png" alt="Portal-Seite"><br><b>📰 Portal-Seite</b>: News der Betreiber, eigene Domain mit Let's Encrypt, RSS – nur Admins sind Autoren.</td>
 <td width="50%"><img src="docs/images/admin-news-editor.png" alt="News-Editor"><br><b>📝 News-Editor</b> mit Vorschau, Kategorien, Anheften, Entwurf/Veröffentlichen.</td>
 </tr>
@@ -138,6 +143,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
 | 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
+| ✉️ [E-Mail](docs/de/email.md) | Postfach für jeden Benutzer (gleiches Passwort), eigene Mail-Domains, nur TLS mit Let's Encrypt, Upstream-Relay, Empfang per MX, DKIM/DMARC/BIMI/MTA-STS mit DNS-Vorlagen, Webmail |
 | 📰 [Portal-Seite](docs/de/portal.md) | Öffentliche News-Seite – nur Admins sind Autoren, Kategorien, Anheften, Entwürfe, RSS, eigene Domain mit Let's-Encrypt-Zertifikat |
 | 🔁 [Master & Backup](docs/de/master-backup.md) | Zweiter FRN-Server mit derselben Konfiguration: Abgleich jede volle Stunde und auf Knopfdruck, **verschlüsselt mit dem Sync-Schlüssel**, Wartungs-Übergabe von Hand, FRN-Passwort für beide Server |
 | ⚙️ [Admin-Portal](docs/de/adminbereich.md) | Baum-Menü, Rollen, Settings, HTTPS, Rooms, ACL-Listen, FRN-Konten, Benutzer, Portal-Token, System, Theme, Updates, Links, Import, Logs |

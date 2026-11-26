@@ -629,7 +629,8 @@ def status(data: Path) -> Dict[str, Any]:
     st: Dict[str, Any] = {"time": time.time(), "installed": all(inst.values()), "packages": inst, "services": {}, "versions": {}}
     for u in UNITS:
         rc, out = run(["systemctl", "is-active", u], check=False)
-        st["services"][u] = out.strip() or ("active" if rc == 0 else "inactive")
+        word = (out.strip().split() or [""])[0]
+        st["services"][u] = word if word in ("active", "inactive", "failed", "activating", "deactivating", "reloading") else "unknown"
     if inst["postfix"]:
         st["versions"]["postfix"] = run(["postconf", "-h", "mail_version"], check=False)[1].strip()
         rc, out = run(["postqueue", "-j"], check=False)

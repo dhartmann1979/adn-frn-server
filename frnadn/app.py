@@ -23,6 +23,7 @@ import os
 import re
 import socket
 import shutil
+import sys
 import time
 import base64
 from datetime import datetime, timedelta
@@ -39,6 +40,8 @@ from .n8_admin import N8Admin, own_unit
 from . import backup as fbackup
 from . import sysman as fsysman
 from . import portal as fportal
+from . import mailcfg
+from . import webmail as fwebmail
 from . import cluster
 from . import frn_errorlog
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
@@ -254,6 +257,8 @@ def info_for(u) -> Dict[str, Any]:
             # für FRN-Clients wie N8 Crosslink: wer ist Master, wer Backup (die Adresse geht ohnehin als backup_server_addr an
             # jeden FRN-Client) – damit sie nach einem Ausfall von selbst zum Master zurückkehren
             "cluster": _cluster_public(s),
+            # ✉️ N8 Mail: webmail tab for every logged-in user
+            "mail": ({"webmail": True, "address": _mail_address(u)} if u and s["mail.enabled"] and mailcfg.domains(s) and _mail_address(u) else None),
             # 📰 portal page (news) – the tab in the menu leads there
             "portal": ({"url": (f"{'https' if s['https.enabled'] else 'http'}://{s['portal.domain']}/" if s["portal.domain"] else "/portal")}
                        if s["portal.enabled"] else None)}
@@ -311,6 +316,345 @@ def _portal_info(request: Request) -> Dict[str, Any]:
             "user": ({"username": u["username"], "admin": is_admin(u)} if u else None),
             "show_live": bool(s["portal.show_live"]) and (bool(u) or bool(s["dashboard.public"])),
             "show_stats": bool(s["portal.show_stats"]) and (bool(u) or bool(s["dashboard.public"]))}
+
+
+# ---------------------------------------------------------------- ✉️ N8 Mail (mailcfg.py, mailctl.py, webmail.py)
+_mail_task: Optional[asyncio.Task] = None
+
+
+def _mail_address(u) -> str:
+    s = ctx.settings.all()
+    doms = mailcfg.domains(s)
+    lp = mailcfg.local_part(u["username"]) if u else None
+    return f"{lp}@{doms[0]}" if lp and doms and lp not in mailcfg.ROLE_ALIASES else ""
+
+
+def _web_base() -> str:
+    s = ctx.settings.all()
+    if s.get("https.domain") and s.get("https.enabled"):
+        port = "" if int(s.get("https.port") or 443) == 443 else f":{s['https.port']}"
+        return f"https://{s['https.domain']}{port}"
+    return f"http://{s.get('frn.address') or '127.0.0.1'}:{_web_port()}"
+
+
+def _mail_cert() -> Optional[tuple]:
+    if _tls_manager is not None and _tls_manager.have_cert():
+        return _tls_manager.cert_file, _tls_manager.key_file
+    return None
+
+
+async def _mailctl(action: str) -> Dict[str, Any]:
+    if DEMO and action != "status":
+        return {"ok": True, "message": f"Demo: mailctl {action} not run."}
+    if os.geteuid() == 0:                       # tests/containers as root: no sudo needed
+        cmd = [sys.executable, "-I", str(ROOT / "frnadn" / "mailctl.py"), action]
+        p = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+        out, _ = await asyncio.wait_for(p.communicate(), mailcfg.MAILCTL_TIMEOUT)
+        text = out.decode("utf-8", "replace")
+        try:
+            last = json.loads(text.strip().splitlines()[-1])
+        except (ValueError, IndexError):
+            last = {"ok": p.returncode == 0, "message": text[-300:]}
+        return {**last, "log": text[-6000:]}
+    return await mailcfg.run_mailctl(ROOT, action)
+
+
+async def _mail_apply(who: str = "") -> Dict[str, Any]:
+    s = ctx.settings.all()
+    try:
+        spec = await asyncio.to_thread(mailcfg.build_spec, ctx.db, s, _mail_cert(), DATA)
+    except mailcfg.MailError as e:
+        return {"ok": False, "message": str(e)}
+    await asyncio.to_thread(mailcfg.write_spec, DATA, spec)
+    r = await _mailctl("apply")
+    if who:
+        ctx.auth.audit("mail_applied" if r.get("ok") else "mail_apply_failed", who, (r.get("message") or "")[:300])
+    return r
+
+
+async def _mail_after_cert(action: str) -> None:
+    s = ctx.settings.all()
+    if s.get("mail.enabled") and (mailcfg.read_state(DATA).get("configured")):
+        r = await (_mail_apply("certificate") if action == "apply" else _mailctl("certs"))
+        log.info("N8 Mail nach Zertifikat: %s", r.get("message"))
+
+
+def _mail_users_changed() -> None:
+    """Users or passwords changed → rewrite the mailbox list (debounced, in the background)."""
+    global _mail_task
+    s = ctx.settings.all()
+    if not s.get("mail.enabled") or not mailcfg.read_state(DATA).get("configured"):
+        return
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        return
+
+    async def later():
+        await asyncio.sleep(3)
+        r = await _mail_apply()
+        log.info("N8 Mail: Postfächer aktualisiert: %s", r.get("message"))
+    if _mail_task and not _mail_task.done():
+        _mail_task.cancel()
+    _mail_task = loop.create_task(later())
+
+
+@app.get("/.well-known/bimi/{name}")
+async def bimi_logo(name: str):
+    s = ctx.settings.all()
+    dom = name[:-4] if name.endswith(".svg") else ""
+    if not s.get("mail.bimi") or dom not in mailcfg.domains(s):
+        raise HTTPError(404, "not found")
+    svg = ctx.db.kv_get("mail.bimi_svg") or mailcfg.bimi_default(s.get("dashboard.title") or "N8")
+    return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400",
+                                                              "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'"})
+
+
+@app.get("/.well-known/mta-sts.txt")
+async def mta_sts(request: Request):
+    s = ctx.settings.all()
+    host = request.headers.get("host", "").split(":")[0].lower()
+    dom = host[len("mta-sts."):] if host.startswith("mta-sts.") else ""
+    if s.get("mail.mta_sts", "off") == "off" or dom not in mailcfg.domains(s):
+        raise HTTPError(404, "not found")
+    return Response(mailcfg.mta_sts_policy(s, dom), media_type="text/plain")
+
+
+def _mail_view(s: Dict[str, Any]) -> Dict[str, Any]:
+    st = mailcfg.read_state(DATA)
+    mb = mailcfg.mailboxes(ctx.db, s)
+    names = mailcfg.cert_names(s)
+    have = set((st.get("cert") or {}).get("names") or []) or set(_tls_manager.names() if _tls_manager else [])
+    warn = []
+    if s.get("mail.enabled"):
+        if not mailcfg.domains(s):
+            warn.append("Noch keine Mail-Domain – unter 🌐 Netz, Ports & Domains → ✉️ Mail-Domains eintragen.")
+        if not (s.get("https.enabled") and s.get("https.domain")):
+            warn.append("HTTPS mit Let's Encrypt ist aus – der Mailserver braucht das Zertifikat (🔒 Domains & HTTPS).")
+        missing = [n for n in names if n not in have]
+        if missing and s.get("https.enabled"):
+            warn.append("Noch nicht im Zertifikat: " + ", ".join(missing) + " – DNS-Einträge setzen, das Zertifikat wird beim Neustart erweitert.")
+        if not s.get("mail.relay_host"):
+            warn.append("Kein Upstream eingetragen – Mails gehen direkt ins Internet (ausgehend Port 25, viele Anbieter sperren ihn).")
+        if mb["waiting"]:
+            warn.append(f"{len(mb['waiting'])} Benutzer haben noch kein Mail-Passwort – es entsteht bei der nächsten Anmeldung im Dashboard.")
+        if s.get("mail.bimi") and s.get("mail.dmarc_policy") == "none":
+            warn.append("BIMI braucht DMARC „quarantine“ oder „reject“.")
+    boxes = [{k: v for k, v in b.items() if k != "hash"} for b in mb["boxes"]]
+    return {"state": st, "boxes": boxes, "skipped": mb["skipped"], "warnings": warn, "domains": mailcfg.domains(s),
+            "cert_names": names, "fields": ctx.settings.describe_section("mail"), "web_base": _web_base(), "demo": DEMO,
+            "postmaster": (mailcfg.postmaster_box(ctx.db, s, [b for b in mb["boxes"] if b["hash"]]) or {}).get("address", "")}
+
+
+@app.get("/api/admin/mail")
+async def admin_mail(request: Request):
+    need_admin(request)
+    return await asyncio.to_thread(_mail_view, ctx.settings.all())
+
+
+@app.post("/api/admin/mail/settings")
+async def admin_mail_settings(request: Request):
+    b = await body(request)
+    changes = b.get("changes") or {}
+    if not isinstance(changes, dict) or any(not str(k).startswith("mail.") for k in changes):
+        raise HTTPError(400, "Invalid request.")
+    before = mailcfg.cert_names(ctx.settings.all())
+    keys = await _save(request, changes)
+    after = mailcfg.cert_names(ctx.settings.all())
+    restart = set(after) != set(before) and bool(ctx.settings.get("https.enabled"))
+    if restart:
+        _restart_soon("Mail-Domains geändert – Zertifikat erweitern")
+    return {"ok": True, "changed": keys, "restart": restart,
+            "message": ("Gespeichert. Das Dashboard startet neu und erweitert das Let's-Encrypt-Zertifikat um die Mail-Domains."
+                        if restart else "Gespeichert – mit „Übernehmen“ geht es an den Mailserver.")}
+
+
+@app.post("/api/admin/mail/action")
+async def admin_mail_action(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    act = str(b.get("action") or "")
+    if act not in ("status", "apply", "install", "disable"):
+        raise HTTPError(400, "Unknown action.")
+    if act in ("install", "disable") and u["role"] != "superadmin":
+        raise HTTPError(403, "Only the superadmin installs or switches off the mail server.")
+    if act == "apply":
+        r = await _mail_apply(u["username"])
+    elif act == "install":
+        if not ctx.settings.get("mail.enabled"):
+            ctx.settings.update({"mail.enabled": True}, u["username"])
+        try:
+            spec = await asyncio.to_thread(mailcfg.build_spec, ctx.db, ctx.settings.all(), _mail_cert(), DATA)
+            await asyncio.to_thread(mailcfg.write_spec, DATA, spec)
+        except mailcfg.MailError:
+            pass
+        r = await _mailctl("install")
+        ctx.auth.audit("mail_install", u["username"], (r.get("message") or "")[:300], ip_of(request))
+    elif act == "disable":
+        r = await _mailctl("disable")
+        ctx.settings.update({"mail.enabled": False}, u["username"])
+        ctx.auth.audit("mail_disabled", u["username"], (r.get("message") or "")[:300], ip_of(request))
+    else:
+        r = await _mailctl("status")
+    return {**r, "view": await asyncio.to_thread(_mail_view, ctx.settings.all())}
+
+
+@app.get("/api/admin/mail/dns")
+async def admin_mail_dns(request: Request, check: bool = False):
+    need_admin(request)
+    s = ctx.settings.all()
+    tpl = await asyncio.to_thread(mailcfg.dns_templates, s, mailcfg.read_state(DATA), _web_base())
+    if check:
+        async def one(r):
+            r["check"] = await asyncio.to_thread(mailcfg.check_record, r)
+        await asyncio.gather(*[one(r) for t in tpl for r in t["records"]])
+    return {"templates": tpl, "zones": {t["domain"]: mailcfg.zone_text(t) for t in tpl}, "checked": check}
+
+
+@app.get("/api/admin/mail/bimi")
+async def admin_mail_bimi(request: Request):
+    need_admin(request)
+    s = ctx.settings.all()
+    own = ctx.db.kv_get("mail.bimi_svg")
+    svg = own or mailcfg.bimi_default(s.get("dashboard.title") or "N8")
+    return {"svg": svg, "own": bool(own), "problems": mailcfg.bimi_check(svg),
+            "urls": {d: mailcfg.bimi_url(_web_base(), d) for d in mailcfg.domains(s)}}
+
+
+@app.post("/api/admin/mail/bimi")
+async def admin_mail_bimi_save(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    if b.get("reset"):
+        ctx.db.x("DELETE FROM kv WHERE key = 'mail.bimi_svg'")
+        return {"ok": True, "message": "Standard-Logo"}
+    if b.get("generate"):
+        svg = mailcfg.bimi_default(str(b.get("title") or ctx.settings.get("dashboard.title") or "N8"), str(b.get("accent") or ""),
+                                   str(b.get("text") or ""))
+    else:
+        svg = str(b.get("svg") or "")
+    problems = mailcfg.bimi_check(svg)
+    if problems:
+        raise HTTPError(400, "Not usable for BIMI: " + "; ".join(problems))
+    ctx.db.kv_set("mail.bimi_svg", svg)
+    ctx.auth.audit("mail_bimi", u["username"], "logo saved", ip_of(request))
+    return {"ok": True, "message": "BIMI-Logo gespeichert"}
+
+
+# ---------------------------------------------------------------- ✉️ webmail (every logged-in user)
+def _need_mail(request: Request):
+    u = user_of(request)
+    if not u:
+        raise HTTPError(401, "Please log in.")
+    s = ctx.settings.all()
+    addr = _mail_address(u)
+    if not s.get("mail.enabled") or not addr:
+        raise HTTPError(404, "No mailbox.")
+    return u, addr
+
+
+async def _box(addr: str, fn, *a):
+    def work():
+        with fwebmail.Box(addr, mailcfg.webmail_secret(ctx.db)) as b:
+            return fn(b, *a)
+    try:
+        return await asyncio.to_thread(work)
+    except fwebmail.MailboxError as e:
+        raise HTTPError(400, str(e))
+
+
+@app.get("/api/mail/me")
+async def mail_me(request: Request):
+    u, addr = _need_mail(request)
+    s = ctx.settings.all()
+    out = await _box(addr, lambda b: {"folders": b.folders(), "quota": b.quota()})
+    return {"address": addr, "name": u.get("display_name") or u["username"],
+            "aliases": [f"{mailcfg.local_part(u['username'])}@{d}" for d in mailcfg.domains(s)[1:]],
+            "server": {"host": mailcfg.host_of(mailcfg.domains(s)[0]), "imap": 993, "smtps": 465, "submission": 587}, **out}
+
+
+@app.get("/api/mail/list")
+async def mail_list(request: Request, folder: str = "INBOX", page: int = 0, q: str = ""):
+    _, addr = _need_mail(request)
+    return await _box(addr, lambda b: b.list(folder, max(0, page), 40, q))
+
+
+@app.get("/api/mail/msg")
+async def mail_msg(request: Request, folder: str, uid: int):
+    _, addr = _need_mail(request)
+    return await _box(addr, lambda b: b.message(folder, uid))
+
+
+@app.get("/api/mail/html")
+async def mail_html(request: Request, folder: str, uid: int, images: int = 0):
+    _, addr = _need_mail(request)
+    doc = await _box(addr, lambda b: b.html(folder, uid, bool(images)))
+    img = "data: https:" if images else "data:"
+    return Response(doc, media_type="text/html; charset=utf-8", headers={
+        "Content-Security-Policy": f"default-src 'none'; style-src 'unsafe-inline'; img-src {img}; font-src data:; "
+                                   "frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox allow-popups allow-popups-to-escape-sandbox",
+        "Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
+
+
+@app.get("/api/mail/att")
+async def mail_att(request: Request, folder: str, uid: int, part: int):
+    _, addr = _need_mail(request)
+    name, data = await _box(addr, lambda b: b.attachment(folder, uid, part))
+    from urllib.parse import quote
+    return Response(data, media_type="application/octet-stream",
+                    headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(name)}", "Cache-Control": "no-store"})
+
+
+@app.post("/api/mail/send")
+async def mail_send(request: Request):
+    u, addr = _need_mail(request)
+    b = await body(request)
+    try:
+        msg, rcpts = fwebmail.compose(addr, u.get("display_name") or "", b)
+    except (fwebmail.MailboxError, ValueError) as e:
+        raise HTTPError(400, str(e))
+    try:
+        await asyncio.to_thread(fwebmail.send, addr, msg, rcpts)
+    except fwebmail.MailboxError as e:
+        raise HTTPError(400, str(e))
+
+    def after(box):
+        box.append(box.role_folder("sent"), msg.as_bytes())
+        if b.get("reply_folder") and b.get("reply_uid"):
+            try:
+                box.imap.select(fwebmail._q(str(b["reply_folder"])))
+                box.imap.uid("STORE", str(int(b["reply_uid"])), "+FLAGS", "(\\Answered)")
+            except Exception:  # noqa: BLE001
+                pass
+    try:
+        await _box(addr, after)
+    except HTTPError:
+        pass
+    return {"ok": True, "message": f"Gesendet an {len(rcpts)} Empfänger"}
+
+
+@app.post("/api/mail/act")
+async def mail_act(request: Request):
+    _, addr = _need_mail(request)
+    b = await body(request)
+    folder, uids, act = str(b.get("folder") or "INBOX"), [int(x) for x in (b.get("uids") or [])][:500], str(b.get("action") or "")
+    if not uids:
+        raise HTTPError(400, "Nothing selected.")
+    if act in ("seen", "unseen", "flag", "unflag"):
+        add = {"seen": ["seen"], "flag": ["flagged"]}.get(act, [])
+        rem = {"unseen": ["seen"], "unflag": ["flagged"]}.get(act, [])
+        await _box(addr, lambda x: x.flags(folder, uids, add, rem))
+        return {"ok": True}
+    if act == "delete":
+        r = await _box(addr, lambda x: x.delete(folder, uids))
+        return {"ok": True, "result": r}
+    if act in ("move", "spam", "inbox"):
+        def mv(x):
+            to = str(b.get("to") or "") if act == "move" else (x.role_folder("junk") if act == "spam" else "INBOX")
+            x.move(folder, uids, to)
+        await _box(addr, mv)
+        return {"ok": True}
+    raise HTTPError(400, "Unknown action.")
 
 
 @app.get("/portal/rss.xml")
@@ -1757,6 +2101,15 @@ async def admin_ports(request: Request):
             elif k in vals:
                 out.append({"key": k, "label": lab, "dir": d, "proto": pr, "help": h, "value": vals[k], "min": 0 if k == "frn.backup_port" else 1})
         groups.append({"title": title, "help": help_, "rows": out})
+    if vals.get("mail.enabled"):
+        groups.append({"title": "✉️ E-Mail (N8 Mail)", "help": "Nur verschlüsselt: IMAP und SMTP für Mailprogramme nur mit TLS, Port 25 mit STARTTLS.",
+                       "rows": [{"key": "mail.25", "label": "SMTP (MX)", "dir": "in", "proto": "TCP", "help": "Mail aus dem Internet (STARTTLS)", "value": 25, "readonly": True},
+                                {"key": "mail.465", "label": "SMTPS", "dir": "in", "proto": "TCP", "help": "Senden aus Mailprogrammen, TLS von Anfang an", "value": 465, "readonly": True},
+                                {"key": "mail.587", "label": "Submission", "dir": "in", "proto": "TCP", "help": "Senden aus Mailprogrammen, STARTTLS Pflicht", "value": 587, "readonly": True},
+                                {"key": "mail.993", "label": "IMAPS", "dir": "in", "proto": "TCP", "help": "Lesen in Mailprogrammen (TLS)", "value": 993, "readonly": True},
+                                {"key": "mail.up", "label": "Upstream", "dir": "out", "proto": "TCP",
+                                 "help": vals.get("mail.relay_host") or "direkt zustellen (ausgehend Port 25)",
+                                 "value": vals.get("mail.relay_port") if vals.get("mail.relay_host") else 25, "readonly": True}]})
     note = "Gespeichert, aber noch nicht aktiv – Dashboard bzw. FRN-Server neu starten." if (ctx.dashboard_restart_needed or ctx.restart_needed) else ""
     return {"intro": "Alle Ports des ADN-FRN-Servers an einer Stelle. Eingehend: in Firewall und Router freigeben, wenn das von außen "
                      "erreichbar sein soll. Ausgehend: die Gegenstelle muss erreichbar sein.",
@@ -1828,6 +2181,13 @@ async def admin_domains(request: Request):
                       "cert": cert if on and not pending else None, "dns": await asyncio.to_thread(_dns, pdom),
                       "info": ("HTTPS ist aus – Portal nur per HTTP" if not on else
                                "Zertifikat wird um diese Domain erweitert …" if pending else "gleiches Zertifikat wie das Dashboard")})
+    for mh in mailcfg.cert_names(v):
+        pending = bool(_tls_manager and (mh not in _tls_manager.names() or _tls_manager.needs_expand()))
+        sites.append({"domain": mh, "label": "✉️ Mail" if mh.startswith("mail.") else "✉️ MTA-STS",
+                      "https": on and cert is not None and not pending, "cert": cert if on and not pending else None,
+                      "dns": await asyncio.to_thread(_dns, mh), "remove": False,
+                      "info": ("HTTPS ist aus – der Mailserver braucht das Let's-Encrypt-Zertifikat" if not on else
+                               "Zertifikat wird um diese Domain erweitert …" if pending else "gleiches Zertifikat – Postfix und Dovecot nutzen es")})
     hint = "HTTPS ist an, aber es ist keine Domain eingetragen." if on and not dom else \
         ("HTTPS ist eingeschaltet, läuft aber erst nach einem Neustart des Dashboards." if on and _tls_manager is None else "")
     if not dom:
@@ -2224,6 +2584,7 @@ async def _startup() -> None:
     global ctx
     if ctx is None:
         ctx = Ctx()
+    ctx.auth.on_mail_change = _mail_users_changed      # ✉️ new users / passwords → mailbox list of the mail server
     ctx.store.ensure_rooms()
     for error in ctx.acls.sync_from_files():
         log.warning("ACL import: %s", error)
@@ -2332,7 +2693,8 @@ async def _serve(host: str, port: int) -> None:
         "port": ctx.settings.get("https.port"),
         "letsencrypt": True,
         # the portal page's own domain goes on the same certificate (one more name, SAN)
-        "extra": [ctx.settings.get("portal.domain")] if ctx.settings.get("portal.domain") else [],
+        "extra": ([ctx.settings.get("portal.domain")] if ctx.settings.get("portal.domain") else [])
+                 + mailcfg.cert_names(ctx.settings.all()),          # ✉️ mail.<domain> (and mta-sts.<domain>) of N8 Mail
     }
     servers, server_tasks, helpers = [], [], []
     stopping = asyncio.Event()
@@ -2385,6 +2747,7 @@ async def _serve(host: str, port: int) -> None:
                 if await cm.renew() and main_server.config.ssl is not None:
                     main_server.config.ssl.load_cert_chain(cm.cert_file, cm.key_file)
                     log.info("Let's Encrypt Zertifikat neu geladen.")
+                    await _mail_after_cert("certs")
 
         if cm.have_cert():
             main = await start(tls_server("on"))
@@ -2398,6 +2761,7 @@ async def _serve(host: str, port: int) -> None:
                 if await cm.obtain() and main_server.config.ssl is not None:
                     main_server.config.ssl.load_cert_chain(cm.cert_file, cm.key_file)
                     log.info("Zertifikat jetzt für %s", ", ".join(cm.names()))
+                    await _mail_after_cert("apply")
                 elif not stopping.is_set():
                     log.error("Zertifikat für %s konnte nicht erweitert werden – DNS und Port 80 prüfen", ", ".join(cm.names()))
 

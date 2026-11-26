@@ -1,0 +1,78 @@
+/* adn-frn-server – ✉️ N8 Mail: webmail and admin panes. Same glass look, full width, equal heights. */
+.wm { display: grid; grid-template-columns: 230px minmax(300px, 400px) minmax(0, 1fr); gap: 14px; margin-top: 16px; height: calc(100vh - 190px); min-height: 520px; }
+.wm > .tile { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 14px; }
+.wm-side { gap: 10px; }
+.wm-new { width: 100%; justify-content: center; }
+.wm-me { font-size: 12.5px; overflow-wrap: anywhere; }
+.wm-side nav { display: flex; flex-direction: column; gap: 2px; overflow: auto; }
+.wm-folder { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: transparent; border: 0; color: var(--text); padding: 8px 10px;
+    border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600; text-align: left; }
+.wm-folder:hover { background: rgba(255, 255, 255, .06); }
+.wm-folder.active { background: var(--theme-accent-soft, rgba(90, 200, 250, .18)); box-shadow: inset 0 0 0 1px var(--theme-accent-border, rgba(90, 200, 250, .38)); }
+.wm-quota { margin-top: auto; font-size: 12px; }
+.wm-qbar { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden; margin-bottom: 4px; }
+.wm-qbar i { display: block; height: 100%; background: var(--accent); }
+.wm-help { font-size: 12px; } .wm-help summary { cursor: pointer; color: var(--text-dim); }
+.wm-tools { display: flex; gap: 8px; margin-bottom: 8px; }
+.wm-tools input { flex: 1; }
+.wm-bulk { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 0 8px; font-size: 12.5px; }
+#wmItems { overflow: auto; flex: 1; margin: 0 -6px; }
+.wm-item { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; grid-template-areas: "ck who when" "ck subj subj"; gap: 2px 8px; padding: 9px 10px;
+    border-radius: 12px; cursor: pointer; border: 1px solid transparent; }
+.wm-item:hover { background: rgba(255, 255, 255, .05); }
+.wm-item.active { background: var(--theme-accent-soft, rgba(90, 200, 250, .16)); border-color: var(--theme-accent-border, rgba(90, 200, 250, .38)); }
+.wm-item .wm-ck { grid-area: ck; margin-top: 3px; }
+.wm-who { grid-area: who; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wm-when { grid-area: when; color: var(--text-dim); font-size: 12px; font-family: var(--n8-mono, var(--mono)); }
+.wm-subj { grid-area: subj; color: var(--text-dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wm-item.unseen .wm-who, .wm-item.unseen .wm-subj { font-weight: 750; color: var(--text); }
+.wm-item.unseen .wm-who::before { content: "●"; color: var(--accent); margin-right: 6px; font-size: 10px; }
+.wm-pager { display: flex; gap: 8px; align-items: center; justify-content: center; padding-top: 8px; }
+.wm-read { overflow: auto !important; }
+.wm-empty { margin: auto; color: var(--text-dim); text-align: center; padding: 30px; }
+.wm-rtools { display: flex; gap: 6px; flex-wrap: wrap; }
+.wm-back { display: none; }
+.wm-h { margin: 12px 0 6px; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
+.wm-meta { font-size: 13px; display: flex; flex-direction: column; gap: 3px; overflow-wrap: anywhere; }
+.wm-atts { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 0; }
+.wm-atts a { text-decoration: none; }
+.wm-htmlbar { display: flex; gap: 6px; margin-top: 10px; }
+.wm-body { flex: 1; display: flex; flex-direction: column; margin-top: 10px; min-height: 260px; }
+.wm-text { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 14.5px; line-height: 1.55; margin: 0; }
+.wm-frame { flex: 1; width: 100%; min-height: 420px; border: 0; border-radius: 12px; background: #fff; }
+.wm-compose textarea { width: 100%; min-height: 300px; margin-top: 8px; font-family: inherit; font-size: 14px; line-height: 1.5; }
+.wm-compose .row { grid-template-columns: 90px minmax(0, 1fr); padding: 4px 0; border-bottom: 0; }
+.wm-catts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.modal.wide:has(.wm-compose) { width: min(900px, 100%); }
+.grow { flex: 1; }
+@media (max-width: 1100px) { .wm { grid-template-columns: 200px minmax(0, 1fr); } .wm-read { display: none !important; }
+    .wm.reading .wm-list { display: none !important; } .wm.reading .wm-read { display: flex !important; grid-column: 2; } .wm-back { display: inline-flex; } }
+@media (max-width: 720px) { .wm { grid-template-columns: 1fr; height: auto; } .wm-side { order: 0; } .wm.reading .wm-read { grid-column: 1; } .wm-side nav { flex-direction: row; flex-wrap: wrap; } }
+
+/* admin */
+.mail-svcs { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.mail-out { max-height: 260px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
+.mail-client td { white-space: nowrap; }
+.mail-list { margin: 6px 0; padding-left: 20px; font-size: 13px; line-height: 1.55; }
+.mail-add { display: flex; gap: 8px; margin-top: 12px; } .mail-add input { flex: 1; }
+.bimi-wrap { display: flex; gap: 16px; align-items: center; margin: 10px 0; }
+.bimi-prev { width: 120px; height: 120px; border-radius: 22px; overflow: hidden; flex: none; background: rgba(0, 0, 0, .2); }
+.bimi-prev img { width: 100%; height: 100%; display: block; }
+.bimi-info { min-width: 0; overflow-wrap: anywhere; }
+.mail-dns { margin-top: 14px; }
+.dns-tbl td { white-space: normal; vertical-align: top; }
+.dns-tbl .dns-name code, .dns-tbl .dns-val code { overflow-wrap: anywhere; word-break: break-all; font-size: 12px; }
+.dns-tbl .dns-val { min-width: 300px; }
+.dns-tbl tr.dns-opt td { opacity: .85; }
+#admin-mailsrv a.btn, #admin-maildns a.btn { text-decoration: none; }
+.dns-tbl .dns-name { min-width: 230px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 650;
+    background: rgba(255, 255, 255, .08); border: 1px solid var(--glass-border); color: var(--text); white-space: nowrap; }
+.badge.ok { background: rgba(48, 209, 88, .18); border-color: rgba(48, 209, 88, .45); color: #8ff0ac; }
+.badge.warn { background: rgba(255, 214, 10, .14); border-color: rgba(255, 214, 10, .4); color: #ffe36a; }
+.badge.err { background: rgba(255, 69, 58, .18); border-color: rgba(255, 69, 58, .45); color: #ff9a92; }
+.wm-tools input, .mail-add input { background: var(--theme-input-bg, rgba(0,0,0,.28)); border: 1px solid var(--theme-input-border, rgba(255,255,255,.14));
+    color: var(--text); border-radius: 10px; padding: 8px 12px; font: inherit; }
+#admin-maildomains .tiles { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+#admin-maildomains .news-act { white-space: nowrap; }
+@media (max-width: 1000px) { #admin-maildomains .tiles { grid-template-columns: 1fr; } }

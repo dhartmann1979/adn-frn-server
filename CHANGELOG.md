@@ -2,6 +2,45 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.25.0 – 2026-11-26
+
+### ✉️ Neu: N8 Mail – Postfachsystem mit Upstream, nur TLS, DKIM/DMARC/BIMI und DNS-Vorlagen
+- **Jeder Dashboard-Benutzer hat ein Postfach** `benutzername@hauptdomain` mit **demselben Passwort** wie im Dashboard. Dafür speichert
+  das Dashboard zusätzlich einen SHA512-CRYPT-Hash (eigene Umsetzung, gegen `openssl passwd -6` geprüft); Benutzer von vor 2.25 bekommen
+  ihn bei der nächsten Anmeldung. Neue Benutzer, Passwörter, Sperren und Löschen erreichen den Mailserver von selbst.
+- **Postfix + Dovecot + Rspamd** auf demselben Rechner, eingerichtet aus dem Admin-Portal: **⚙️ Mailserver installieren** (apt),
+  **✅ Übernehmen**, **⏻ Ausschalten** (zurück zur Postfix-Konfiguration von vorher).
+- **Anpassbare Mail-Domains** unter *🌐 Netz, Ports & Domains → ✉️ Mail-Domains*: erste = Hauptdomain, weitere = Aliase.
+  `mail.<domain>` (und `mta-sts.<domain>`) kommen **auf das Let's-Encrypt-Zertifikat** des Dashboards; nach jeder Erneuerung bekommen
+  Postfix und Dovecot das neue Zertifikat automatisch. In *🔒 Domains & HTTPS* stehen die Namen mit dem Etikett ✉️ Mail.
+- **Ausschließlich TLS:** IMAPS 993 (IMAP 143 aus), SMTPS 465, Submission 587 mit STARTTLS-Pflicht, Anmeldung nur nach TLS, TLS 1.2+;
+  Port 25 mit STARTTLS (wahlweise Pflicht). **Upstream (Smarthost)** für den Versand ins Internet – immer verschlüsselt (STARTTLS oder
+  TLS, Zertifikat geprüft), mit Benutzer/Passwort.
+- **Empfang direkt per MX** (Port 25), kein offenes Relay, Absender nur die eigene Adresse/Aliase, Systembenutzer können sich nicht
+  anmelden, Rollenadressen postmaster@, abuse@, hostmaster@, dmarc@, tls-reports@ an den Postmaster.
+- **Rspamd:** DKIM-Signatur je Domain (RSA 2048, Schlüssel bleiben), SPF/DKIM/DMARC-Prüfung eingehender Mails, Spam ab Wert 6 in den
+  Ordner „Spam“ (Sieve), ab 15 abgelehnt – beide Werte einstellbar.
+- **DMARC & BIMI** automatisch vorbereitet: DMARC-Richtlinie (Standard quarantine), Abgleich, Berichtsadresse; **BIMI-Logo** wird als
+  SVG Tiny PS **automatisch erzeugt** (oder hochgeladen und streng geprüft) und unter `/.well-known/bimi/<domain>.svg` ausgeliefert,
+  VMC/CMC optional; **MTA-STS** (testing/enforce) mit Richtlinie unter `mta-sts.<domain>` und **TLS-RPT**.
+- **🧾 DNS-Vorlagen** je Domain: A/AAAA, MX, SPF (mit dem SPF des Upstreams), DKIM, DMARC, BIMI, MTA-STS, TLS-RPT, SRV für
+  Mailprogramme und PTR-Hinweis – mit 📋 Kopieren, ⬇ Zonendatei (BIND) und **🔎 DNS jetzt prüfen** (eigener kleiner DNS-Client, kein
+  zusätzliches Paket): gesetzt / weicht ab / fehlt.
+- **✉️ Webmail** als Menüpunkt für jeden angemeldeten Benutzer: Ordner mit Ungelesenen, Speicherbalken, Suche, Lesen als Text oder HTML
+  in einem abgeschotteten Rahmen (keine Skripte, entfernte Bilder erst auf Knopfdruck), Anhänge, SPF/DKIM/DMARC-Abzeichen, Schreiben,
+  Antworten, Allen antworten, Weiterleiten mit Anhängen, Markieren, Spam/kein Spam, Löschen; Gesendetes in „Gesendet“. Das Webmail nutzt
+  einen eigenen Master-Zugang am Dovecot – nie das Passwort des Benutzers. Auf dem Handy einspaltig.
+- **Sicher eingebaut:** Das Dashboard schreibt nur eine Vorgabe (`<daten>/mail/spec.json`); der Root-Helfer `frnadn/mailctl.py`
+  (nur stdlib, feste sudo-Regeln für status/apply/certs/install/disable) prüft jeden Wert, sichert alle Dateien, prüft mit
+  `postfix check`, `doveconf -n`, `rspamadm configtest` und stellt bei Fehlern alles wieder her. **Dovecot 2.3 und 2.4** werden erkannt;
+  geprüft mit Postfix 3.8/3.10, Dovecot 2.3.21/2.4.1 (Debian 13) und Rspamd 3.8/3.12 – Empfang, Alias, IMAPS, Submission, DKIM-Signatur,
+  Quota und abgewiesene Fremdabsender im echten Durchlauf.
+- **Ports**-Seite zeigt 25/465/587/993 und den Upstream, **Keep-Alive** prüft SMTP, IMAPS und den Rspamd-Milter, **🧩 Dienste** zeigt
+  Postfix, Dovecot und Rspamd, sobald N8 Mail eingerichtet ist.
+- Neue Admin-Rubrik **✉️ E-Mail** (📮 Mailserver · 📬 Postfächer · 🛡️ DMARC & BIMI · 🧾 DNS-Vorlagen), deutsche Texte für alles Neue.
+- Tests `tests/test_mail.py` (SHA512-CRYPT, Vorgabe, Abwehr manipulierter Vorgaben, Konfiguration 2.3/2.4, DNS-Vorlagen, DNS-Client,
+  BIMI, API). Alle 101 Tests grün. Doku: neue Seite [E-Mail](docs/de/email.md), neue Screenshots.
+
 ## 2.24.0 – 2026-11-26
 
 ### 📰 Neu: Portal-Seite mit News – nur Admins sind Autoren

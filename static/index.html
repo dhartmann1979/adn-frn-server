@@ -35,6 +35,7 @@
             <button data-tab="stats">📈 <span class="t-long">Statistics</span><span class="t-short">Stats</span></button>
             <button data-tab="stations">📇 <span class="t-long">Stations</span><span class="t-short">Stations</span></button>
             <button data-tab="chat" id="tabChatBtn" class="hidden">💬 Chat</button>
+            <button data-tab="mail" id="tabMailBtn" class="hidden">✉️ Mail</button>
             <button data-tab="admin" id="tabAdminBtn" class="hidden n8-menu-admin">⚙️ Admin</button>
         </nav>
         <div class="chips">
@@ -147,6 +148,9 @@
         <div class="card" style="padding:16px"><div class="chat-list" id="chatList"></div></div>
     </section>
 
+    <!-- ================= MAIL (N8 Mail webmail) ================= -->
+    <section id="tab-mail" class="hidden"><div class="wm" id="wm"></div></section>
+
     <!-- ================= ADMIN ================= -->
     <section id="tab-admin" class="hidden">
         <div class="n8-admin">
@@ -166,6 +170,11 @@
         <div id="admin-sys" class="hidden"></div>
         <div id="admin-news" class="hidden"></div>
         <div id="admin-portalcfg" class="hidden"></div>
+        <div id="admin-mailsrv" class="hidden"></div>
+        <div id="admin-mailboxes" class="hidden"></div>
+        <div id="admin-maildmarc" class="hidden"></div>
+        <div id="admin-maildns" class="hidden"></div>
+        <div id="admin-maildomains" class="hidden"></div>
         </div></div>
     </section>
 
@@ -182,6 +191,9 @@
 <script src="/static/extras.js?v={{V}}"></script>
 <script src="/static/portal-md.js?v={{V}}"></script>
 <script src="/static/portal-admin.js?v={{V}}"></script>
+<script src="/static/mail-admin.js?v={{V}}"></script>
+<script src="/static/webmail.js?v={{V}}"></script>
+<link rel="stylesheet" href="/static/mail.css?v={{V}}">
 <script>
     // N8 Kit: DE | EN next to Links and the login (the same switch in all N8schicht pages)
     N8Kit.langSwitch(document.querySelector('header .chips'), { before: document.getElementById('userArea') });
