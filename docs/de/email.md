@@ -19,7 +19,7 @@ Seit **2.25.0** bringt der ADN-FRN-Server ein eigenes **Postfachsystem** mit: **
 
 1. **DNS:** `mail.<domain>` (A, ggf. AAAA) auf diesen Server; MX der Domain auf `mail.<domain>`.
 2. **🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS:** das Dashboard hat seine Domain, HTTPS mit Let's Encrypt ist an.
-3. **🌐 Netz, Ports & Domains → ✉️ Mail-Domains:** Mail-Domain(s) eintragen. Das Dashboard startet neu und **erweitert das Zertifikat**
+3. **🌐 Netz, Ports & Domains → ✉️ Mail-Domains:** Mail-Domain(s) eintragen – oder automatisch ergänzen lassen (siehe unten). Das Zertifikat wird **ohne Neustart erweitert**, sobald der DNS stimmt,
    um `mail.<domain>` (und `mta-sts.<domain>`, wenn MTA-STS an ist). In *🔒 Domains & HTTPS* stehen diese Namen mit dem Etikett ✉️ Mail.
 4. **✉️ E-Mail → 📮 Mailserver:** **⚙️ Mailserver installieren** (nur Superadmin; installiert `postfix dovecot-imapd dovecot-lmtpd
    dovecot-sieve rspamd` mit apt), Upstream eintragen, **✅ Übernehmen**.
@@ -28,6 +28,19 @@ Seit **2.25.0** bringt der ADN-FRN-Server ein eigenes **Postfachsystem** mit: **
 6. **🔌 Ports:** 25, 465, 587, 993 eingehend in Firewall und Router freigeben (die Ports-Seite listet sie, sobald der Mailserver an ist).
 
 <p align="center"><img src="../images/admin-mail-domains.png" alt="Mail-Domains" width="95%"></p>
+
+## 🔄 Automatisch: Mail-Domains und Zertifikate
+
+Seit **2.27.0** läuft das meiste von selbst (Schalter *Mail-Domains automatisch ergänzen* unter ✉️ Mail-Domains, Standard an):
+
+1. Jede Domain unter **🔒 Domains & HTTPS** bringt ihre Hauptdomain als **Mail-Domain** mit (`news.example.org` → `example.org`).
+2. **Sobald der DNS-Eintrag** von `mail.<domain>` (bzw. `mta-sts.<domain>`) auf diesen Server zeigt, holt das Dashboard das
+   **Let's-Encrypt-Zertifikat** mit dem neuen Namen – **im laufenden Betrieb, ohne Neustart**. Namen ohne DNS warten (⏳ wartet auf DNS),
+   damit sie das Zertifikat der übrigen Domains nicht blockieren.
+3. Danach **übernimmt der Mailserver** die neue Domain und das Zertifikat von selbst (Adressen, Aliase, DKIM-Schlüssel).
+
+Geprüft wird alle 30 Minuten, sofort nach jeder Änderung und mit **🔄 Jetzt prüfen**. Eine von Hand entfernte Mail-Domain wird nicht
+wieder ergänzt. Jeder Schritt steht im 📜 Protokoll.
 
 ## 📮 Mailserver
 

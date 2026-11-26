@@ -173,3 +173,50 @@ def test_mail_api(client):
     client.post("/api/auth/login", json={"username": "chef", "password": "chef-passwort-1"}, headers=H)
     h = client.A.ctx.db.q("SELECT mail_hash FROM users WHERE username='chef'")[0]["mail_hash"]
     assert verify("chef-passwort-1", h)
+
+
+def test_base_and_auto_domains():
+    assert mailcfg.base_domain("news.example.org") == "example.org"
+    assert mailcfg.base_domain("frn.auf-der-nachtschicht.de") == "auf-der-nachtschicht.de"
+    assert mailcfg.base_domain("www.shop.example.co.uk") == "example.co.uk"
+    assert mailcfg.auto_domains(["frn.a.de", "news.b.org", "x.a.de"], ["a.de"], []) == ["a.de", "b.org"]
+    assert mailcfg.auto_domains(["news.b.org"], ["a.de"], ["b.org"]) == ["a.de"]
+
+
+def test_mail_domains_and_certificate_automatic(client, monkeypatch):
+    A = client.A
+    client.post("/api/auth/login", json={"username": "chef", "password": "chef-passwort-1"}, headers=H)
+    A.ctx.settings.update({"https.domain": "frn.example.org", "mail.enabled": True}, "test")
+    assert client.post("/api/admin/domains", json={"domain": "news.other.net", "target": "portal"}, headers=H).json()["ok"]
+    # DNS: only mail.example.org points to this server so far
+    monkeypatch.setattr(A, "_my_ips", lambda: {"192.0.2.5"})
+    monkeypatch.setattr(mailcfg, "resolve", lambda n: {"192.0.2.5"} if n == "mail.example.org" else set())
+
+    class FakeCM:
+        domain, extra, obtained = "frn.example.org", [], []
+        cert_file = key_file = "x"
+        def names(self): return [self.domain, *self.extra]
+        def needs_expand(self): return False
+        def have_cert(self): return False
+        async def obtain(self):
+            self.obtained.append(list(self.extra))
+            return True
+    cm = FakeCM()
+    monkeypatch.setattr(A, "_tls_manager", cm)
+    r = client.post("/api/admin/mail/auto", json={}, headers=H).json()
+    assert r["added"] == ["example.org", "other.net"] and r["certificate"]
+    assert A.ctx.settings.get("mail.domains") == "example.org, other.net"
+    assert cm.extra == ["news.other.net", "mail.example.org"]                     # mail.other.net waits for its DNS
+    assert set(json.loads(A.ctx.db.kv_get("mail.dns_waiting"))) == {"mail.other.net", "mta-sts.example.org", "mta-sts.other.net"}
+    d = client.get("/api/admin/domains").json()
+    assert any(s["domain"] == "mail.other.net" and "wartet auf DNS" in s["info"] for s in d["sites"])
+    # the DNS of mail.other.net arrives → next run extends the certificate, nothing else changes
+    monkeypatch.setattr(mailcfg, "resolve", lambda n: {"192.0.2.5"})
+    r = client.post("/api/admin/mail/auto", json={}, headers=H).json()
+    assert r["added"] == [] and r["certificate"] and "mail.other.net" in cm.extra
+    assert client.post("/api/admin/mail/auto", json={}, headers=H).json()["certificate"] is False   # nothing to do
+    # removed by hand → stays removed
+    client.post("/api/admin/mail/settings", json={"changes": {"mail.domains": "example.org"}}, headers=H)
+    client.post("/api/admin/mail/auto", json={}, headers=H)
+    assert A.ctx.settings.get("mail.domains") == "example.org"
+    assert "mail.other.net" not in cm.extra

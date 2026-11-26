@@ -76,3 +76,4 @@
 #admin-maildomains .tiles { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 #admin-maildomains .news-act { white-space: nowrap; }
 @media (max-width: 1000px) { #admin-maildomains .tiles { grid-template-columns: 1fr; } }
+.mail-auto { margin-top: 12px; border-top: 1px solid rgba(255,255,255,.06); padding-top: 6px; }

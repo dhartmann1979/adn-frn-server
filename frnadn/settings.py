@@ -126,6 +126,9 @@ FIELDS: List[Field] = [
     Field("mail.domains", "mail", "Mail domains", "text", "",
           "Comma separated, the first one is the main domain – each one gets mail.<domain> on the Let's Encrypt certificate",
           pattern=r"[A-Za-z0-9.\-]+\.[A-Za-z]{2,63}(\s*,\s*[A-Za-z0-9.\-]+\.[A-Za-z]{2,63})*"),
+    Field("mail.auto_domains", "mail", "Add mail domains automatically", "bool", True,
+          "Every domain under 🔒 Domains & HTTPS also becomes a mail domain (news.example.org → example.org); mail.<domain> gets on the "
+          "Let's Encrypt certificate by itself as soon as its DNS points to this server"),
     Field("mail.relay_host", "mail", "Upstream (smarthost)", "text", "",
           "All outgoing mail goes through this server of your provider, e.g. smtp.provider.de – empty = deliver directly",
           pattern=r"[A-Za-z0-9.\-]+"),

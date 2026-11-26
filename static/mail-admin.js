@@ -200,6 +200,8 @@ async function loadMailDomains() {
     const v = await mailView(true);
     const doms = v.domains || [];
     const have = new Set(((v.state || {}).cert || {}).names || []);
+    const wait = new Set(v.dns_waiting || []);
+    const autoF = (v.fields || []).find(f => f.key === 'mail.auto_domains');
     $('admin-maildomains').innerHTML = `<div class="tiles tiles-even">
       <div class="tile">
         <h3>✉️ Mail domains</h3>
@@ -207,18 +209,21 @@ async function loadMailDomains() {
         ${mailWarnings(v)}
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Domain</th><th>Mail server</th><th>Certificate</th><th></th></tr></thead><tbody>
         ${doms.map((d, i) => `<tr><td><b>${esc(d)}</b> ${i === 0 ? '<span class="badge">main domain</span>' : ''}</td><td><code>mail.${esc(d)}</code></td>
-            <td>${have.has('mail.' + d) ? '<span class="badge ok">✓ in the certificate</span>' : '<span class="badge warn">not yet</span>'}</td>
+            <td>${have.has('mail.' + d) ? '<span class="badge ok">✓ in the certificate</span>' : wait.has('mail.' + d) ? '<span class="badge warn">⏳ waits for DNS</span>' : '<span class="badge warn">not yet</span>'}</td>
             <td class="news-act">${i > 0 ? `<button class="btn small" data-up="${i}" title="Make main domain">⬆</button>` : ''}<button class="btn small danger" data-rm="${i}">Remove</button></td></tr>`).join('')
             || '<tr><td colspan="4" class="dim">No mail domain yet.</td></tr>'}</tbody></table></div>
         <div class="mail-add"><input type="text" id="mailDomNew" placeholder="example.org" autocomplete="off"><button class="btn primary" id="mailDomAdd">➕ Add mail domain</button></div>
-        <div class="dim" style="margin-top:8px">After a change the dashboard restarts and extends the certificate (DNS of mail.&lt;domain&gt; must point to this server, port 80 reachable). Then 📮 Mail server → ✅ Apply.</div>
+        <form id="mailAutoForm" class="mail-auto" onsubmit="event.preventDefault(); saveMailForm(this, loadMailDomains)">${autoF ? fieldHtml(autoF) : ''}
+          <div class="actions" style="justify-content:flex-start"><button class="btn small">Save</button><button type="button" class="btn small primary" id="mailAutoNow">🔄 Check now</button></div></form>
+        <div class="dim" style="margin-top:8px">Fully automatic: new domains under 🔒 Domains &amp; HTTPS become mail domains, mail.&lt;domain&gt; gets on the Let's Encrypt certificate as soon as its DNS points to this server (checked every 30 minutes, without a restart), and the mail server takes it over by itself.</div>
+        ${(v.auto_skip || []).length ? `<div class="dim" style="margin-top:6px">Removed by hand, not added again: ${v.auto_skip.map(esc).join(', ')}</div>` : ''}
       </div>
       <div class="tile">
         <h3>🧭 Order</h3>
         <ol class="mail-list">
           <li>DNS: mail.&lt;domain&gt; (A/AAAA) → this server; MX → mail.&lt;domain&gt;.</li>
           <li>🔒 Domains & HTTPS: the dashboard has its domain and HTTPS is on.</li>
-          <li>Add the mail domain here – the certificate is extended.</li>
+          <li>Add the mail domain here (or let it be added automatically) – the certificate is extended by itself as soon as the DNS is right.</li>
           <li>📮 Mail server: ⚙️ Install, upstream, ✅ Apply.</li>
           <li>🧾 DNS templates: SPF, DKIM, DMARC, BIMI … at the DNS provider, PTR at the hosting provider.</li>
           <li>🔌 Ports: 25, 465, 587, 993 open in firewall and router.</li>
@@ -228,6 +233,11 @@ async function loadMailDomains() {
     const save = async list => {
         try { const r = await api('POST', '/api/admin/mail/settings', { changes: { 'mail.domains': list.join(', ') } }); toast(r.message || 'Saved'); loadMailDomains(); }
         catch (e) { toast(e.message, true); }
+    };
+    $('mailAutoNow').onclick = async e => {
+        e.target.disabled = true; e.target.textContent = '⏳ …';
+        try { const r = await api('POST', '/api/admin/mail/auto', {}); MAIL.view = r.view; toast('✅ ' + r.message); loadMailDomains(); }
+        catch (x) { toast(x.message, true); e.target.disabled = false; }
     };
     $('mailDomAdd').onclick = () => {
         const d = $('mailDomNew').value.trim().toLowerCase().replace(/^mail\./, '').replace(/\.$/, '');

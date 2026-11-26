@@ -46,6 +46,44 @@ def domains(s: Dict[str, Any]) -> List[str]:
     return out
 
 
+# second-level public suffixes (the common ones) – foo.example.co.uk → example.co.uk
+_SLD = {"co.uk", "org.uk", "me.uk", "ac.uk", "gov.uk", "ltd.uk", "plc.uk", "net.uk", "com.au", "net.au", "org.au", "co.nz", "org.nz",
+        "co.at", "or.at", "co.jp", "ne.jp", "or.jp", "com.br", "net.br", "co.za", "com.pl", "net.pl", "org.pl", "com.tr", "co.il",
+        "com.cn", "com.mx", "co.in", "co.kr", "com.ar", "com.es", "com.pt", "com.gr", "com.ua", "co.id", "com.sg", "com.my", "com.hk", "com.tw"}
+
+
+def base_domain(host: str) -> str:
+    """news.example.org → example.org; www.example.co.uk → example.co.uk; mail.x.de → x.de."""
+    labels = str(host or "").strip().lower().rstrip(".").split(".")
+    if len(labels) < 2:
+        return ""
+    n = 3 if ".".join(labels[-2:]) in _SLD and len(labels) >= 3 else 2
+    d = ".".join(labels[-n:])
+    return d if DOMAIN_RE.fullmatch(d) else ""
+
+
+def auto_domains(hosts: List[str], current: List[str], skip: List[str]) -> List[str]:
+    """Mail domains after adding the base domains of all web domains (keeps the order, the main domain stays first)."""
+    out = list(current)
+    for h in hosts:
+        b = base_domain(h)
+        if b and b not in out and b not in skip:
+            out.append(b)
+    return out
+
+
+def resolve(name: str) -> set:
+    try:
+        return {a[4][0] for a in socket.getaddrinfo(name, None, proto=socket.IPPROTO_TCP)}
+    except OSError:
+        return set()
+
+
+def dns_ready(name: str, mine: set) -> bool:
+    """Does the name point to this server? (Only then Let's Encrypt can check it – a name without DNS would stop the whole certificate.)"""
+    return bool(resolve(name) & mine)
+
+
 def host_of(domain: str) -> str:
     return f"mail.{domain}"
 

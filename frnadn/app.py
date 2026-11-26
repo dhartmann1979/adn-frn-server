@@ -443,6 +443,103 @@ def _mail_users_changed() -> None:
     _mail_task = loop.create_task(later())
 
 
+# ---------------------------------------------------------------- ✉️ automatic mail domains and certificates (2.27)
+_tls_main = None                       # the running HTTPS server – its certificate is swapped in place
+_mail_kick: Optional[asyncio.Event] = None
+
+
+def _my_ips() -> set:
+    """Addresses that mean "this server": its public addresses and what the dashboard's own domain resolves to."""
+    ips = set(sum(mailcfg._ips().values(), []))
+    main = str(ctx.settings.get("https.domain") or "")
+    if main:
+        ips |= mailcfg.resolve(main)
+    return ips
+
+
+def _cert_plan() -> Dict[str, Any]:
+    """Names for the certificate: all web domains, and every mail name whose DNS already points here."""
+    s = ctx.settings.all()
+    web = [d for d, _ in web_hosts(s)][1:]
+    mine = _my_ips()
+    ready, waiting = [], []
+    for n in mailcfg.cert_names(s):
+        (ready if mailcfg.dns_ready(n, mine) else waiting).append(n)
+    return {"extra": web + ready, "waiting": waiting}
+
+
+async def tls_refresh(reason: str = "") -> bool:
+    """Extend (or shrink) the Let's Encrypt certificate to the wanted names – in place, without a restart."""
+    cm, main = _tls_manager, _tls_main
+    if cm is None:
+        return False
+    plan = await asyncio.to_thread(_cert_plan)
+    ctx.db.kv_set("mail.dns_waiting", json.dumps(plan["waiting"]))
+    from .tls import _DOMAIN_RE as _TLS_RE
+    want = [d for d in plan["extra"] if _TLS_RE.fullmatch(d) and d != cm.domain]
+    if set(want) == set(cm.extra) and not cm.needs_expand():
+        return False
+    old = list(cm.extra)
+    cm.extra = want
+    log.info("Zertifikat wird angepasst (%s): %s", reason or "Domains", ", ".join(cm.names()))
+    if await cm.obtain():
+        if main is not None and main.config.ssl is not None:
+            main.config.ssl.load_cert_chain(cm.cert_file, cm.key_file)
+        ctx.auth.audit("certificate_extended", "system", ", ".join(cm.names())[:480])
+        return True
+    cm.extra = old
+    log.error("Zertifikat für %s nicht erweitert – DNS und Port 80 prüfen", ", ".join(want))
+    return False
+
+
+async def mail_auto(reason: str = "") -> Dict[str, Any]:
+    """Add the base domains of all web domains as mail domains, extend the certificate, give the mail server the result."""
+    s = ctx.settings.all()
+    out: Dict[str, Any] = {"added": [], "certificate": False, "applied": None}
+    if not s.get("mail.enabled"):
+        return out
+    if s.get("mail.auto_domains"):
+        cur = mailcfg.domains(s)
+        try:
+            skip = json.loads(ctx.db.kv_get("mail.auto_skip") or "[]")
+        except ValueError:
+            skip = []
+        new = mailcfg.auto_domains([d for d, _ in web_hosts(s)], cur, skip)
+        if new != cur:
+            ctx.settings.update({"mail.domains": ", ".join(new)}, "auto")
+            out["added"] = [d for d in new if d not in cur]
+            ctx.auth.audit("mail_domains_auto", "system", ", ".join(out["added"]))
+            log.info("N8 Mail: Mail-Domains automatisch ergänzt: %s", ", ".join(out["added"]))
+    out["certificate"] = await tls_refresh(reason or "Mail-Domains")
+    if (out["added"] or out["certificate"]) and mailcfg.read_state(DATA).get("configured"):
+        r = await _mail_apply("auto")
+        out["applied"] = r.get("message")
+    return out
+
+
+def mail_kick() -> None:
+    if _mail_kick is not None:
+        _mail_kick.set()
+
+
+async def mail_auto_loop() -> None:
+    """Every 30 minutes (and right after a change): new mail domains, certificate, mail server."""
+    global _mail_kick
+    _mail_kick = asyncio.Event()
+    await asyncio.sleep(20)
+    while True:
+        try:
+            await mail_auto("automatisch")
+        except Exception as e:  # noqa: BLE001
+            log.warning("N8 Mail automatisch: %s", e)
+        try:
+            await asyncio.wait_for(_mail_kick.wait(), 1800)
+        except asyncio.TimeoutError:
+            pass
+        _mail_kick.clear()
+        await asyncio.sleep(2)
+
+
 @app.get("/.well-known/bimi/{name}")
 async def bimi_logo(name: str):
     s = ctx.settings.all()
@@ -477,7 +574,8 @@ def _mail_view(s: Dict[str, Any]) -> Dict[str, Any]:
             warn.append("HTTPS mit Let's Encrypt ist aus – der Mailserver braucht das Zertifikat (🔒 Domains & HTTPS).")
         missing = [n for n in names if n not in have]
         if missing and s.get("https.enabled"):
-            warn.append("Noch nicht im Zertifikat: " + ", ".join(missing) + " – DNS-Einträge setzen, das Zertifikat wird beim Neustart erweitert.")
+            warn.append("Noch nicht im Zertifikat: " + ", ".join(missing) + " – sobald der DNS-Eintrag auf diesen Server zeigt, "
+                        "holt das Dashboard das Zertifikat automatisch (Prüfung alle 30 Minuten oder „🔄 Jetzt prüfen“).")
         if not s.get("mail.relay_host"):
             warn.append("Kein Upstream eingetragen – Mails gehen direkt ins Internet (ausgehend Port 25, viele Anbieter sperren ihn).")
         if mb["waiting"]:
@@ -486,7 +584,9 @@ def _mail_view(s: Dict[str, Any]) -> Dict[str, Any]:
             warn.append("BIMI braucht DMARC „quarantine“ oder „reject“.")
     boxes = [{k: v for k, v in b.items() if k != "hash"} for b in mb["boxes"]]
     return {"state": st, "boxes": boxes, "skipped": mb["skipped"], "warnings": warn, "domains": mailcfg.domains(s),
-            "cert_names": names, "fields": ctx.settings.describe_section("mail"), "web_base": _web_base(), "demo": DEMO,
+            "cert_names": names, "fields": ctx.settings.describe_section("mail"),
+            "dns_waiting": json.loads(ctx.db.kv_get("mail.dns_waiting") or "[]"),
+            "auto_skip": json.loads(ctx.db.kv_get("mail.auto_skip") or "[]"), "web_base": _web_base(), "demo": DEMO,
             "postmaster": (mailcfg.postmaster_box(ctx.db, s, [b for b in mb["boxes"] if b["hash"]]) or {}).get("address", "")}
 
 
@@ -502,15 +602,38 @@ async def admin_mail_settings(request: Request):
     changes = b.get("changes") or {}
     if not isinstance(changes, dict) or any(not str(k).startswith("mail.") for k in changes):
         raise HTTPError(400, "Invalid request.")
-    before = mailcfg.cert_names(ctx.settings.all())
+    before = mailcfg.domains(ctx.settings.all())
     keys = await _save(request, changes)
-    after = mailcfg.cert_names(ctx.settings.all())
-    restart = set(after) != set(before) and bool(ctx.settings.get("https.enabled"))
-    if restart:
-        _restart_soon("Mail-Domains geändert – Zertifikat erweitern")
-    return {"ok": True, "changed": keys, "restart": restart,
-            "message": ("Gespeichert. Das Dashboard startet neu und erweitert das Let's-Encrypt-Zertifikat um die Mail-Domains."
-                        if restart else "Gespeichert – mit „Übernehmen“ geht es an den Mailserver.")}
+    after = mailcfg.domains(ctx.settings.all())
+    if before != after:                         # removed by hand → not added again automatically; added again → allowed
+        try:
+            skip = set(json.loads(ctx.db.kv_get("mail.auto_skip") or "[]"))
+        except ValueError:
+            skip = set()
+        skip = (skip | (set(before) - set(after))) - set(after)
+        ctx.db.kv_set("mail.auto_skip", json.dumps(sorted(skip)))
+    mail_kick()
+    return {"ok": True, "changed": keys, "restart": False,
+            "message": "Gespeichert. Mail-Domains, Let's-Encrypt-Zertifikat und Mailserver werden jetzt automatisch angepasst – "
+                       "mail.<domain> kommt aufs Zertifikat, sobald sein DNS auf diesen Server zeigt."}
+
+
+@app.post("/api/admin/mail/auto")
+async def admin_mail_auto(request: Request):
+    """Run the automatic step now (button „Jetzt prüfen“)."""
+    u = need_admin(request)
+    r = await mail_auto("von Hand")
+    ctx.auth.audit("mail_auto", u["username"], json.dumps(r)[:400], ip_of(request))
+    msg = []
+    if r["added"]:
+        msg.append("Neue Mail-Domains: " + ", ".join(r["added"]))
+    msg.append("Zertifikat erweitert." if r["certificate"] else "Zertifikat unverändert.")
+    if r["applied"]:
+        msg.append(r["applied"])
+    waiting = json.loads(ctx.db.kv_get("mail.dns_waiting") or "[]")
+    if waiting:
+        msg.append("Wartet auf DNS: " + ", ".join(waiting))
+    return {"ok": True, "message": " ".join(msg), **r, "view": await asyncio.to_thread(_mail_view, ctx.settings.all())}
 
 
 @app.post("/api/admin/mail/action")
@@ -2228,8 +2351,14 @@ async def admin_domains(request: Request):
         sites.append({"domain": d, "label": "🔒 Hauptname" if d == dom else "", "target": t, "targets": targets,
                       "https": on and cert is not None and not pending, "cert": cert if on and not pending else None,
                       "dns": await asyncio.to_thread(_dns, d), "info": info})
+    waiting = set(json.loads(ctx.db.kv_get("mail.dns_waiting") or "[]"))
     for mh in mailcfg.cert_names(v):
         pending = bool(_tls_manager and (mh not in _tls_manager.names() or _tls_manager.needs_expand()))
+        if mh in waiting:
+            sites.append({"domain": mh, "label": "", "target_label": "✉️ Mail" if mh.startswith("mail.") else "✉️ MTA-STS",
+                          "https": False, "cert": None, "dns": await asyncio.to_thread(_dns, mh), "remove": False, "renew": False,
+                          "info": "wartet auf DNS – kommt automatisch aufs Zertifikat, sobald der Eintrag auf diesen Server zeigt"})
+            continue
         sites.append({"domain": mh, "label": "", "target_label": "✉️ Mail" if mh.startswith("mail.") else "✉️ MTA-STS",
                       "https": on and cert is not None and not pending, "cert": cert if on and not pending else None,
                       "dns": await asyncio.to_thread(_dns, mh), "remove": False,
@@ -2275,9 +2404,14 @@ async def admin_domains_add(request: Request):
     what = "📰 Portal-Seite" if target == "portal" else "🎙️ Live-Dashboard"
     main = str(ctx.settings.get("https.domain") or "").strip().lower()
     if main:                                    # a further domain on the same certificate
+        mail_kick()
         await _save(request, {**_hosts_changes(hosts + [(dom, target)]),
                               "https.email": str(b.get("email") or ctx.settings.get("https.email") or "").strip()})
         if ctx.settings.get("https.enabled"):
+            if _tls_main is not None:            # 2.27: the certificate is extended in place – no restart
+                ctx.tasks.append(asyncio.ensure_future(tls_refresh(f"Domain {dom}")))
+                return {"ok": True, "message": f"{dom} zeigt jetzt die {what}. Das Zertifikat wird im laufenden Betrieb erweitert – "
+                                               f"in einer Minute unter https://{dom}/ öffnen."}
             _restart_soon("Domain hinzugefügt")
             return {"ok": True, "message": f"{dom} zeigt jetzt die {what}. Das Dashboard startet neu und erweitert das Zertifikat – "
                                            f"in einer Minute unter https://{dom}/ öffnen."}
@@ -2331,7 +2465,10 @@ async def admin_domains_remove(domain: str, request: Request):
     if d != main:
         await _save(request, _hosts_changes(rest))
         if ctx.settings.get("https.enabled"):
-            _restart_soon("Domain entfernt")
+            if _tls_main is not None:
+                ctx.tasks.append(asyncio.ensure_future(tls_refresh(f"Domain {d} entfernt")))
+            else:
+                _restart_soon("Domain entfernt")
         return {"ok": True, "message": f"{domain} entfernt." + (" Die Portal-Seite bleibt unter /portal erreichbar." if dict(hosts)[d] == "portal" else "")}
     if rest:                                    # the next domain becomes the certificate's main name
         await _save(request, {**_hosts_changes(rest), "https.domain": rest[0][0]})
@@ -2679,6 +2816,7 @@ async def _startup() -> None:
     ctx.tasks.append(asyncio.ensure_future(hourly_update_check()))
     ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
     ctx.tasks.append(asyncio.ensure_future(cluster_hourly()))
+    ctx.tasks.append(asyncio.ensure_future(mail_auto_loop()))      # ✉️ new mail domains → certificate → mail server
 
 
 async def _shutdown() -> None:
@@ -2747,7 +2885,7 @@ async def _serve(host: str, port: int) -> None:
     """Run the dashboard and (when enabled) the ACME HTTP listener + HTTPS server."""
     _SELF.update(host=host, port=port)
     import signal
-    global ctx, _tls_manager
+    global ctx, _tls_manager, _tls_main
     if ctx is None:
         res = fbackup.apply_pending(DATA, FRN_HOME)      # restore prepared in the web interface: before the DB opens
         if res:
@@ -2763,8 +2901,7 @@ async def _serve(host: str, port: int) -> None:
         "port": ctx.settings.get("https.port"),
         "letsencrypt": True,
         # the portal page's own domain goes on the same certificate (one more name, SAN)
-        "extra": [d for d, _ in web_hosts()][1:]                 # further domains (Live or 📰 portal) on the same certificate
-                 + mailcfg.cert_names(ctx.settings.all()),          # ✉️ mail.<domain> (and mta-sts.<domain>) of N8 Mail
+        "extra": _cert_plan()["extra"],          # further domains (Live, 📰 portal) and ✉️ mail names whose DNS is ready          # ✉️ mail.<domain> (and mta-sts.<domain>) of N8 Mail
     }
     servers, server_tasks, helpers = [], [], []
     stopping = asyncio.Event()
@@ -2821,6 +2958,7 @@ async def _serve(host: str, port: int) -> None:
 
         if cm.have_cert():
             main = await start(tls_server("on"))
+            _tls_main = main
             log.info("Dashboard HTTPS aktiv: %s", cm.https_url())
             if port not in (cm.http_port, cm.https_port):
                 await start(_Server.make(http_app, host=host, port=port, lifespan="off"), optional=True)
@@ -2847,6 +2985,8 @@ async def _serve(host: str, port: int) -> None:
                 if await cm.obtain() and not stopping.is_set():
                     main = await start(tls_server("off"), optional=True)
                     if main:
+                        global _tls_main
+                        _tls_main = main
                         log.info("Let's Encrypt HTTPS ist aktiv: %s", cm.https_url())
                         await renew_loop(main)
                     else:

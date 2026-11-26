@@ -443,6 +443,12 @@ N8Kit.i18n.add({
         'Make main domain': 'Zur Hauptdomain machen', 'Not a valid domain': 'Keine gültige Domain', 'Already there': 'Schon vorhanden',
         'Switch the mail server off?': 'Mailserver ausschalten?', 'Install the mail server?': 'Mailserver installieren?', 'Install': 'Installieren',
         'Running – this can take a few minutes …': 'Läuft – das kann ein paar Minuten dauern …',
+        // 2.27: automatic mail domains and certificates
+        'waits for DNS': 'wartet auf DNS', 'Check now': 'Jetzt prüfen', 'Add mail domains automatically': 'Mail-Domains automatisch ergänzen',
+        "Every domain under 🔒 Domains & HTTPS also becomes a mail domain (news.example.org → example.org); mail.<domain> gets on the Let's Encrypt certificate by itself as soon as its DNS points to this server": "Jede Domain unter 🔒 Domains & HTTPS wird auch Mail-Domain (news.example.org → example.org); mail.<domain> kommt von selbst aufs Let's-Encrypt-Zertifikat, sobald sein DNS auf diesen Server zeigt",
+        "Fully automatic: new domains under 🔒 Domains & HTTPS become mail domains, mail.<domain> gets on the Let's Encrypt certificate as soon as its DNS points to this server (checked every 30 minutes, without a restart), and the mail server takes it over by itself.": "Vollautomatisch: neue Domains unter 🔒 Domains & HTTPS werden Mail-Domains, mail.<domain> kommt aufs Let's-Encrypt-Zertifikat, sobald sein DNS auf diesen Server zeigt (Prüfung alle 30 Minuten, ohne Neustart), und der Mailserver übernimmt es von selbst.",
+        'Add the mail domain here (or let it be added automatically) – the certificate is extended by itself as soon as the DNS is right.': 'Hier die Mail-Domain eintragen (oder automatisch ergänzen lassen) – das Zertifikat wird von selbst erweitert, sobald der DNS stimmt.',
+        'Save': 'Speichern',
         // 2.26: what each domain shows
         'Live dashboard': 'Live-Dashboard', 'Portal (news)': 'Portal (News)', 'Shows': 'Zeigt',
         "Every domain or subdomain shows what you choose under 🔒 Domains & HTTPS → “Shows”: the Live dashboard or the portal page – any number of domains, all with Let's Encrypt.": "Jede Domain oder Subdomain zeigt, was du unter 🔒 Domains & HTTPS → „Zeigt“ wählst: das Live-Dashboard oder die Portal-Seite – beliebig viele Domains, alle mit Let's Encrypt.",
@@ -467,6 +473,7 @@ N8Kit.i18n.add({
         [/^FRN account of this server \((Master|Backup)\)$/, 'FRN-Konto dieses Servers ($1)'],
         [/^•+ \(unchanged\)$/, '•••••••• (unverändert)'],
         [/^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$/, (m, w) => `Dieses FRN-Konto verwendet schon der ${w === 'master' ? 'Master' : 'Backup'} – jeder Server braucht sein eigenes FRN-Konto (📧 FRN-Passwort ${w === 'master' ? 'Master' : 'Backup'}).`],
+        [/^Removed by hand, not added again: (.+)$/, 'Von Hand entfernt, wird nicht wieder ergänzt: $1'],
         [/^(\d+) waiting$/, '$1 wartend'], [/^(\d+) active( · .+)?$/, (m, n, r) => `${n} aktiv${r || ''}`], [/^(\d+) days$/, '$1 Tage'],
         [/^(\d+) mailboxes$/, '$1 Postfächer'], [/^(\d+) selected$/, '$1 ausgewählt'], [/^(\d+) messages$/, '$1 Nachrichten'],
         [/^Remove (.+)\?$/, '$1 entfernen?'], [/^Mail server configured: (\d+) domain\(s\), (\d+) mailbox\(es\), Dovecot ([\d.]+)\.(.*)$/, 'Mailserver eingerichtet: $1 Domain(s), $2 Postfach/Postfächer, Dovecot $3.$4'],

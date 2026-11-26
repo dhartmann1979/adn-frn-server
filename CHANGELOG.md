@@ -2,6 +2,25 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.27.0 – 2026-11-26
+
+### ✉️ Mail-Domains und Zertifikate automatisch
+- **Mail-Domains werden automatisch ergänzt** (neu: *Mail-Domains automatisch ergänzen*, Standard an): jede Domain unter 🔒 Domains &
+  HTTPS bringt ihre Hauptdomain als Mail-Domain mit – `news.example.org` → `example.org`, `frn.auf-der-nachtschicht.de` →
+  `auf-der-nachtschicht.de` (auch bei Endungen wie `.co.uk`). Die erste Mail-Domain bleibt die Hauptdomain.
+- **Let's-Encrypt-Zertifikate automatisch:** `mail.<domain>` (und `mta-sts.<domain>`) kommen aufs Zertifikat, **sobald ihr DNS auf diesen
+  Server zeigt** – vorher nicht, damit ein fehlender DNS-Eintrag nie das ganze Zertifikat blockiert. Geprüft wird **alle 30 Minuten**, sofort
+  nach jeder Änderung und auf Knopfdruck (**🔄 Jetzt prüfen**).
+- **Ohne Neustart:** Das Zertifikat wird im laufenden Betrieb erweitert (oder verkleinert) und neu geladen – auch beim Hinzufügen und
+  Entfernen von Web-Domains. Danach übernimmt der Mailserver neue Domains und das neue Zertifikat von selbst (Postfächer, Aliase,
+  DKIM-Schlüssel der neuen Domain).
+- In 🔒 Domains & HTTPS und ✉️ Mail-Domains steht bei noch fehlendem DNS **⏳ wartet auf DNS**.
+- **Von Hand entfernte Mail-Domains** werden nicht wieder automatisch ergänzt (die Liste steht unter ✉️ Mail-Domains); trägt man sie wieder
+  ein, gilt das wieder.
+- Jeder automatische Schritt steht im 📜 Protokoll (*mail_domains_auto*, *certificate_extended*, *mail_applied*).
+- Tests: Hauptdomain-Ableitung, automatisches Ergänzen, Zertifikat erst nach DNS, nichts tun wenn nichts neu ist, von Hand entfernte bleiben weg.
+- Doku: [E-Mail](docs/de/email.md#-automatisch-mail-domains-und-zertifikate), neuer Screenshot.
+
 ## 2.26.0 – 2026-11-26
 
 ### 🌐 Domains: je Domain wählen, ob sie Live oder das Portal zeigt
