@@ -93,6 +93,20 @@ sind, und beim Backup „⚠️ verirrt – sie gehören auf den Master“.
 Wer gerade auf dem Backup sendet, wird dabei unterbrochen – die Rückfrage sagt das. Jeder Vorgang steht unter **Zuletzt
 zurückgeschickt** und im Protokoll (`cluster_return`).
 
+### 👑 MAIN / 🛟 BACKUP im Stationsfenster
+
+<p align="center"><img src="../images/station-main-backup.png" alt="Stationsfenster mit MAIN- und BACKUP-Knopf" width="60%"></p>
+
+Klickst du irgendwo im Dashboard auf eine Station, steht im Fenster direkt unter dem Kopf die Leiste **SERVER** mit zwei Knöpfen:
+
+- **👑 MAIN** und **🛟 BACKUP** öffnen das Dashboard des jeweiligen Servers (der eigene im selben Tab, der Partner in einem neuen).
+- Der Server, mit dem die Station **gerade verbunden** ist, ist grün umrandet und hat einen Punkt ●. Daneben steht
+  „mit dem MAIN verbunden“ oder gelb „mit dem BACKUP verbunden – gehört auf den MAIN“. Admins sehen das auf **beiden** Servern
+  (der Partner wird verschlüsselt gefragt, welche Rufzeichen dort verbunden sind); Gäste sehen nur, ob sie auf diesem Server ist.
+- Ist die Station auf dem BACKUP (und keine Wartung), gibt es für Admins **🧲 Zum MAIN zwingen**. FRN kann keine **einzelne**
+  Station umziehen – der Knopf macht dasselbe wie *Stationen zum Master zwingen*: Der FRN-Server des BACKUP stoppt kurz, **alle**
+  dort verbundenen Stationen wechseln zum MAIN. Die Rückfrage sagt das.
+
 **Automatisch:** Mit *Verirrte Stationen selbst zurückschicken* (Einstellung auf dem **Backup**) prüft das Backup alle 5 Minuten:
 Sind Stationen hier, obwohl der Master läuft? Zurückgeschickt wird nur, wenn der Master **seit mindestens 10 Minuten** läuft, **nicht
 in Wartung** ist und auf dem Backup **gerade niemand sendet**. Standard: aus.

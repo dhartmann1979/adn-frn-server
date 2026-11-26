@@ -321,3 +321,16 @@ def test_old_partner_without_remote_update(client, monkeypatch):
     monkeypatch.setattr(cluster, "call", old)
     d = client.post("/api/admin/cluster/update", json={"server": "master", "action": "check"}, headers=H).json()
     assert d["ok"] is False and "older version" in d["error"]
+
+
+def test_station_window_main_backup(client, monkeypatch):
+    """Stations-Fenster: MAIN- und BACKUP-Knopf, und wo die Station gerade ist."""
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+    assert client.get("/api/info").json()["cluster"]["peer_url"] == "https://frn-backup.example.org/"
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: {"ok": True, "role": "backup", "callsigns": ["DL1XYZ"], "maintenance": False})
+    w = client.get("/api/admin/cluster/where?call=dl1xyz").json()
+    assert w["on"] == "backup" and w["peer"] is True and w["here"] is False
+    assert client.get("/api/admin/cluster/where?call=DO1ABC").json()["on"] is None
+    r = peer(client, "/api/cluster/hello")
+    assert cluster.unseal(r.content, KEY)["data"]["callsigns"] == []

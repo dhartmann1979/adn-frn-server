@@ -547,6 +547,35 @@ async function openStation(call) {
         ${d.recent.length ? `<div class="tbl-wrap" style="margin-top:10px"><table class="tbl"><thead><tr><th>Time</th><th>Room</th><th class="num">Duration</th></tr></thead><tbody>
             ${d.recent.map(r => `<tr><td>${fmtDate(r.ts)}</td><td>${esc(r.net)}</td><td class="num">${fmtDur(r.duration)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No talks recorded yet.</div>'}
         <div class="dim" style="font-size:12px;margin-top:8px">First seen ${fmtDate(s.first_ts)} · ${num(d.talks_total)} talks, ${fmtDur(d.duration_total, true)} in total</div>`;
+    stationServers(s.callsign, d.online.length > 0);
+}
+// 🔁 Master & Backup in the station window: MAIN and BACKUP as push buttons (dashboard of each), admins can force to MAIN
+async function stationServers(call, onHere) {
+    const cl = S.info && S.info.cluster, m = $('ov') && $('ov').querySelector('.modal');
+    if (!cl || !['master', 'backup'].includes(cl.role) || !m) return;
+    const own = location.origin + '/', url = { master: cl.role === 'master' ? own : cl.peer_url, backup: cl.role === 'backup' ? own : cl.peer_url };
+    const bar = document.createElement('div'); bar.className = 'st-srv';
+    const draw = (on, w) => {
+        const b = (k, icon, label) => `<a class="btn small st-srv-b ${on === k ? 'on' : ''}" ${url[k] ? `href="${esc(url[k])}"` : ''} ${k !== cl.role ? 'target="_blank" rel="noopener"' : ''}
+            title="${esc(url[k] || '')}">${icon} ${label}${on === k ? ' <span class="st-srv-dot">●</span>' : ''}</a>`;
+        bar.innerHTML = `<span class="dim st-srv-l">Server</span>${b('master', '👑', 'MAIN')}${b('backup', '🛟', 'BACKUP')}
+            <span class="dim st-srv-t">${on === 'master' ? '<span>connected to the MAIN</span>' : on === 'backup' ? '<span class="cl-warn">connected to the BACKUP – belongs on the MAIN</span>'
+                : w && w.error ? `<span class="cl-bad">${esc(w.error)}</span>` : onHere ? '' : '<span>not connected</span>'}</span>
+            ${isAdmin() && on === 'backup' && !(w && w.maintenance) ? '<button type="button" class="btn small danger st-srv-f" onclick="stationForceMain(this)">🧲 Force to the MAIN</button>' : ''}`;
+    };
+    draw(onHere ? cl.role : null, null);
+    const head = m.querySelector('.st-head'); head ? head.after(bar) : m.appendChild(bar);
+    if (!isAdmin()) return;
+    try { const w = await api('GET', `/api/admin/cluster/where?call=${encodeURIComponent(call)}`); if (bar.isConnected) draw(w.on, w); } catch (e) { /* only the buttons */ }
+}
+async function stationForceMain(btn) {
+    if (!await confirmBox({ title: 'Force to the MAIN?', body: 'FRN cannot move a single station: the FRN server of the BACKUP stops for a short time, so all stations connected there switch to the MAIN (their backup address). Whoever is transmitting on the BACKUP right now is cut off.' }, 'Force to the MAIN', 'danger')) return;
+    btn.disabled = true;
+    try {
+        const r = await api('POST', '/api/admin/cluster/return', {});
+        toast(r.stopped ? `Stations sent back – ${r.clients} on the way to the master` : (r.detail || 'Nothing to send back'), r.ok === false);
+    } catch (e) { toast(e.message, true); }
+    btn.disabled = false;
 }
 
 // ---------------------------------------------------------------- statistics (same charts as the N8schicht dashboard)

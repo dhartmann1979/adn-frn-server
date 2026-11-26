@@ -579,3 +579,15 @@ N8Kit.i18n.add({
         [/^(\d+) commits$/, '$1 Commits'],
     ],
 });
+
+/* 2.31.1: MAIN / BACKUP in the station window */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        "Server": "Server", "connected to the MAIN": "mit dem MAIN verbunden",
+        "connected to the BACKUP – belongs on the MAIN": "mit dem BACKUP verbunden – gehört auf den MAIN",
+        "not connected": "nicht verbunden", "Force to the MAIN": "Zum MAIN zwingen",
+        "FRN cannot move a single station: the FRN server of the BACKUP stops for a short time, so all stations connected there switch to the MAIN (their backup address). Whoever is transmitting on the BACKUP right now is cut off.":
+            "FRN kann keine einzelne Station umziehen: Der FRN-Server des BACKUP stoppt kurz, damit wechseln alle dort verbundenen Stationen zum MAIN (ihre Ausweichadresse). Wer gerade auf dem BACKUP sendet, wird unterbrochen.",
+    },
+});

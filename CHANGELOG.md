@@ -2,6 +2,22 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.31.1 – 2026-11-27
+
+### 👑 MAIN / 🛟 BACKUP im Stationsfenster – mit „Zum MAIN zwingen“
+
+- Im Stationsfenster (Klick auf eine Station in Live, Last Heard, Stationen oder Statistik) gibt es bei Master & Backup direkt unter
+  dem Kopf die Leiste **SERVER** mit zwei Knöpfen **👑 MAIN** und **🛟 BACKUP**. Sie öffnen das Dashboard des jeweiligen Servers
+  (der Partner in einem neuen Tab).
+- Der Server, mit dem die Station gerade verbunden ist, ist grün markiert (●); daneben „mit dem MAIN verbunden“ bzw. gelb
+  „mit dem BACKUP verbunden – gehört auf den MAIN“. Für Admins wird auch der Partner gefragt (neu: `/api/admin/cluster/where`,
+  der Partner meldet über die verschlüsselte Verbindung die bei ihm verbundenen Rufzeichen).
+- Ist die Station auf dem BACKUP, haben Admins dort den Knopf **🧲 Zum MAIN zwingen**. Da FRN keine einzelne Station umziehen kann,
+  wechseln dabei **alle** Stationen des BACKUP zum MAIN (stoppen – Pause – starten, wie *Stationen zum Master zwingen*); die
+  Rückfrage weist darauf hin. In der Wartung erscheint der Knopf nicht.
+- `/api/info` nennt unter `cluster` zusätzlich die Dashboard-Adresse des Partners (`peer_url`, steht ohnehin im Link-Menü).
+- Doku [`docs/de/master-backup.md`](docs/de/master-backup.md) mit neuem Abschnitt und Bildschirmfoto, Test ergänzt, Texte auf Deutsch.
+
 ## 2.31.0 – 2026-11-27
 
 ### 🔁 Master & Backup: verirrte Stationen zum Master zwingen, Updates beider Server aus einem Kasten

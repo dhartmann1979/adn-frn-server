@@ -246,7 +246,8 @@ def _cluster_public(s: Dict[str, Any]) -> Dict[str, Any]:
     me = {"host": s["frn.address"] or "", "port": int(s["frn.port"])}
     peer = {"host": host, "port": port} if host else None
     return {"role": role, "master": me if role == "master" else peer, "backup": me if role == "backup" else peer,
-            "maintenance": bool(_cluster_get("cluster.maintenance"))}
+            "maintenance": bool(_cluster_get("cluster.maintenance")),
+            "peer_url": (s["cluster.peer_url"] or "").rstrip("/") + "/" if s["cluster.peer_url"] else ""}   # also in the link menu
 
 
 def info_for(u) -> Dict[str, Any]:
@@ -1304,7 +1305,38 @@ async def cluster_hello(request: Request):
     return _cluster_answer(msg, {"ok": True, "role": ctx.settings.get("cluster.role"), "version": __version__,
             "title": ctx.settings.get("dashboard.title"), "frn": _frn_state(), "time": time.time(),
             "maintenance": bool(_cluster_get("cluster.maintenance")), "last": _cluster_get("cluster.last"),
-            **_me()})
+            "callsigns": _online_callsigns(), **_me()})
+
+
+def _online_callsigns() -> List[str]:
+    """Callsigns connected here – for the station window of the partner (only over the encrypted connection)."""
+    try:
+        return sorted({c.callsign.upper() for r in ctx.server.rooms.values() for c in r.clients if c.callsign})
+    except AttributeError:
+        return []
+
+
+@app.get("/api/admin/cluster/where")
+async def cluster_where(call: str, request: Request):
+    """Station window: is this station on the MAIN (master) or on the BACKUP right now?"""
+    need_admin(request)
+    s = ctx.settings.all()
+    call = call.strip().upper()
+    role = s["cluster.role"]
+    out: Dict[str, Any] = {"role": role, "here": call in _online_callsigns(), "peer": None, "on": None,
+                           "maintenance": bool(_cluster_get("cluster.maintenance")), "error": ""}
+    if role in ("master", "backup") and s["cluster.peer_url"] and s["cluster.key"]:
+        try:
+            h = await asyncio.to_thread(cluster.call, s["cluster.peer_url"], "/api/cluster/hello", s["cluster.key"], "POST", _me(), 6)
+            _remember_peer(h)
+            out["peer"] = call in (h.get("callsigns") or [])
+            out["maintenance"] = out["maintenance"] or bool(h.get("maintenance"))
+            out["peer_frn"] = h.get("frn") or {}
+        except cluster.ClusterError as e:
+            out["error"] = str(e)
+    other = "backup" if role == "master" else "master"
+    out["on"] = role if out["here"] else other if out["peer"] else None
+    return out
 
 
 @app.post("/api/cluster/export")
