@@ -1,13 +1,21 @@
 /*
- * N8 Kit 1.5.0 – shared by the N8schicht web interfaces
+ * N8 Kit 1.6.0 – shared by the N8schicht web interfaces
  * (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
- *   N8Kit.lang()                 'de' | 'en'   (cookie n8_lang, valid for every port of the host → all four pages)
- *   N8Kit.setLang('en')          switch without reloading
+ *   N8Kit.lang()                 'de' | 'en' | 'fr' | 'fr-BE' | 'hu' | 'sv' | 'nl' | 'it' | 'es'
+ *                                (cookie n8_lang, valid for every port of the host → all four pages)
+ *   N8Kit.locale()               'de-DE', 'en-GB', 'fr-FR', … – for toLocaleString()
+ *   N8Kit.setLang('fr')          switch without reloading
  *   N8Kit.i18n.add({ base: 'en', de: { 'Last heard': 'Zuletzt gehört' }, rules: [[/^(\d+) stations$/, '$1 Stationen']] })
+ *                                more languages: { base: 'en', fr: {…}, hu: {…}, rules: { fr: [[re, repl]], … } } – always keyed by
+ *                                the English text: a German text is first looked up in English, then in the target language;
+ *                                a text without translation stays English (fr-BE falls back to fr).
  *   N8Kit.t('text')              translate one string (for alert/confirm, canvas, …)
- *   N8Kit.langSwitch(container)  DE | EN switch (put into the header, next to Links/Login)
+ *   N8Kit.langSwitch(container)  language menu (🌐 DE ▾ with all nine languages; put into the header, next to Links/Login)
+ *   N8Kit.login.open(opts)       the same login window everywhere (logo, title, eye for the password, Caps Lock hint, stay logged in,
+ *                                language menu, lockout message); opts.submit({username, password, password2, remember}) → Promise
+ *   N8Kit.userMenu(el, me, opts) header: 🔐 Login button, or avatar + name ▾ with my account, admin, … and log out
  *   N8Kit.update.banner(el, state, handlers)   update banner under the status strip
  *   N8Kit.update.panel(el, state, handlers)    Admin → Updates
  *   N8Kit.update.run(opts)                     install with progress, health check and reload
@@ -26,21 +34,37 @@
     'use strict';
     if (window.N8Kit) return;
     const COOKIE = 'n8_lang';
-    const LANGS = ['de', 'en'];
+    const LANGS = ['de', 'en', 'fr', 'fr-BE', 'hu', 'sv', 'nl', 'it', 'es'];
+    // native name, short code in the header, locale for dates and numbers
+    const LANG_INFO = {
+        'de': ['Deutsch', 'DE', 'de-DE'], 'en': ['English', 'EN', 'en-GB'], 'fr': ['Français', 'FR', 'fr-FR'],
+        'fr-BE': ['Français (Belgique)', 'BE', 'fr-BE'], 'hu': ['Magyar', 'HU', 'hu-HU'], 'sv': ['Svenska', 'SV', 'sv-SE'],
+        'nl': ['Nederlands', 'NL', 'nl-NL'], 'it': ['Italiano', 'IT', 'it-IT'], 'es': ['Español', 'ES', 'es-ES'],
+    };
+    const FALLBACK = { 'fr-BE': ['fr-BE', 'fr'] };
     const SKIP = new Set(['SCRIPT', 'STYLE', 'CODE', 'PRE', 'TEXTAREA', 'NOSCRIPT', 'SVG', 'KBD', 'SAMP']);
     const ATTRS = ['title', 'placeholder', 'aria-label', 'alt', 'data-label'];
     const ORIG = '__n8o', DONE = '__n8t';
 
     // ------------------------------------------------------------ language
     function readCookie() {
-        const m = document.cookie.match(/(?:^|;\s*)n8_lang=(de|en)\b/);
+        const m = document.cookie.match(/(?:^|;\s*)n8_lang=([A-Za-z-]{2,5})/);
         return m ? m[1] : null;
     }
     let lang = readCookie();
     if (!lang) { try { lang = localStorage.getItem(COOKIE); } catch (e) { } }
-    if (LANGS.indexOf(lang) < 0) lang = 'de';
-    const q = (location.search.match(/[?&]lang=(de|en)\b/) || [])[1];
-    if (q) lang = q;
+    if (LANGS.indexOf(lang) < 0) {
+        // first visit: the browser language, if we have it
+        const nav = (navigator.languages || [navigator.language || '']).map(x => String(x));
+        lang = 'de';
+        for (const x of nav) {
+            const full = LANGS.find(l => l.toLowerCase() === x.toLowerCase()), short = LANGS.find(l => l === x.slice(0, 2).toLowerCase());
+            if (full || short) { lang = full || short; break; }
+        }
+    }
+    const q = (location.search.match(/[?&]lang=([A-Za-z-]{2,5})/) || [])[1];
+    if (q && LANGS.indexOf(q) >= 0) lang = q;
+    const locale = () => (LANG_INFO[lang] || LANG_INFO.de)[2];
 
     // ------------------------------------------------------------ dictionary
     const packs = [];   // {base, map: Map, rules: [[re, repl]]} per target language
@@ -59,46 +83,60 @@
     function norm(s) { return String(s).replace(/\s+/g, ' ').trim(); }
     const SPLIT = /^([^\p{L}0-9"'„(\[]*)([\s\S]*?)([\s:：…·.,!?)\]*▾›]*)$/u;
 
-    function lookup(core) {
+    function lookup(core, L) {
         for (let i = packs.length - 1; i >= 0; i--) {
             const p = packs[i];
-            if (p.to !== lang) continue;
+            if (p.to !== L) continue;
             if (p.map.has(core)) return p.map.get(core);
         }
         for (let i = packs.length - 1; i >= 0; i--) {
             const p = packs[i];
-            if (p.to !== lang) continue;
+            if (p.to !== L) continue;
             for (const [re, rep] of p.rules) {
                 if (re.test(core)) { re.lastIndex = 0; return core.replace(re, typeof rep === 'function' ? rep : rep); }
             }
         }
         return null;
     }
+    // one language: exact text, then without leading symbols and trailing punctuation
+    function tr1(n, L) {
+        let r = lookup(n, L);
+        if (r == null) {
+            const m = n.match(SPLIT);
+            if (m && m[2]) {
+                let c = lookup(m[2], L);
+                if (c != null) r = m[1] + c + m[3];
+                else if (m[3] && (c = lookup(m[2] + m[3].trim(), L)) != null) r = m[1] + c + (m[3].match(/\s*$/) || [''])[0];
+            }
+        }
+        return r;
+    }
+    // target language with fallbacks: fr-BE → fr; German source → English → target; nothing → English
+    function trn(n) {
+        const chain = FALLBACK[lang] || [lang];
+        for (const L of chain) { const r = tr1(n, L); if (r != null) return r; }
+        if (lang === 'de' || lang === 'en') return null;
+        const e = tr1(n, 'en');
+        if (e == null) return null;
+        for (const L of chain) { const r = tr1(norm(e), L); if (r != null) return r; }
+        return e;
+    }
     function t(s) {
         if (s == null) return s;
         s = String(s);
-        if (!packs.some(p => p.to === lang) || !/\p{L}/u.test(s)) return s;
+        if (!packs.some(p => p.to === lang || p.to === 'en') || !/\p{L}/u.test(s)) return s;
         const key = lang + '\u0000' + s;
         if (cache.has(key)) return cache.get(key);
         if (s.indexOf('\n') >= 0) {
             // a paragraph written over several source lines counts as one text; otherwise line by line
-            const whole = lookup(norm(s));
+            const whole = trn(norm(s));
             const out = whole != null ? s.match(/^\s*/)[0] + whole + s.match(/\s*$/)[0] : s.split('\n').map(t).join('\n');
             cache.set(key, out);
             return out;
         }
         let out = s;
         const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0];
-        const n = norm(s);
-        let r = lookup(n);
-        if (r == null) {
-            const m = n.match(SPLIT);
-            if (m && m[2]) {
-                let c = lookup(m[2]);
-                if (c != null) r = m[1] + c + m[3];
-                else if (m[3] && (c = lookup(m[2] + m[3].trim())) != null) r = m[1] + c + (m[3].match(/\s*$/) || [''])[0];
-            }
-        }
+        const r = trn(norm(s));
         if (r != null) out = lead + r + trail;
         if (cache.size > 20000) cache.clear();
         cache.set(key, out);
@@ -189,7 +227,7 @@
     function setLang(l) {
         if (LANGS.indexOf(l) < 0 || l === lang) return;
         lang = l;
-        document.cookie = `${COOKIE}=${l}; path=/; max-age=31536000; SameSite=Lax`;
+        document.cookie = `${COOKIE}=${l}; path=/; max-age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
         try { localStorage.setItem(COOKIE, l); } catch (e) { }
         cache.clear();
         retranslate();
@@ -204,25 +242,60 @@
         window[fn] = function (msg, ...rest) { return orig.call(window, t(msg), ...rest); };
     });
 
-    // ------------------------------------------------------------ language switch
+    // ------------------------------------------------------------ language menu (1.6: dropdown with all languages)
+    let menuSeq = 0;
     function paintSwitch(el) {
-        el.querySelectorAll('button').forEach(b => {
+        const info = LANG_INFO[lang] || LANG_INFO.de;
+        const cur = el.querySelector('.n8-lang-cur');
+        if (cur) cur.textContent = info[1];
+        el.querySelectorAll('[data-l]').forEach(b => {
             const on = b.dataset.l === lang;
             b.classList.toggle('on', on);
-            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            b.setAttribute('aria-checked', on ? 'true' : 'false');
         });
+    }
+    // small dropdown helper: trigger + panel, closes on outside click / Escape, arrow keys move between the entries
+    function dropdown(root, trigger, panel) {
+        const items = () => Array.from(panel.querySelectorAll('[role^=menuitem]:not([hidden]):not(:disabled)'));
+        const close = (focus) => { if (!root.classList.contains('open')) return; root.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); if (focus) trigger.focus(); };
+        const open = () => {
+            document.querySelectorAll('.n8-dd.open').forEach(o => { if (o !== root) o.classList.remove('open'); });
+            root.classList.add('open'); trigger.setAttribute('aria-expanded', 'true');
+            const r = trigger.getBoundingClientRect();
+            panel.classList.toggle('left', r.left + r.width / 2 < window.innerWidth / 2);
+            const on = panel.querySelector('.on') || items()[0]; if (on) setTimeout(() => on.focus({ preventScroll: true }), 0);
+        };
+        trigger.setAttribute('aria-haspopup', 'menu'); trigger.setAttribute('aria-expanded', 'false');
+        if (!panel.id) panel.id = 'n8dd' + (++menuSeq);
+        trigger.setAttribute('aria-controls', panel.id);
+        trigger.addEventListener('click', e => { e.stopPropagation(); root.classList.contains('open') ? close() : open(); });
+        trigger.addEventListener('keydown', e => { if (e.key === 'ArrowDown') { e.preventDefault(); open(); } });
+        panel.addEventListener('keydown', e => {
+            const list = items(), i = list.indexOf(document.activeElement);
+            if (e.key === 'Escape') { e.preventDefault(); close(true); }
+            else if (e.key === 'ArrowDown') { e.preventDefault(); (list[i + 1] || list[0]).focus(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); (list[i - 1] || list[list.length - 1]).focus(); }
+            else if (e.key === 'Tab') close();
+        });
+        panel.addEventListener('click', e => { if (e.target.closest('[role^=menuitem]')) close(); });
+        document.addEventListener('click', e => { if (!root.contains(e.target)) close(); });
+        return { open, close };
     }
     function langSwitch(container, opts) {
         if (!container) return null;
         let el = container.querySelector('.n8-lang');
+        if (el && !el.classList.contains('n8-dd')) { el.remove(); el = null; }      // old DE | EN switch
         if (!el) {
-            el = document.createElement('span');
-            el.className = 'n8-lang notranslate';
-            el.setAttribute('role', 'group');
+            el = document.createElement('div');
+            el.className = 'n8-lang n8-dd notranslate';
             el.setAttribute('translate', 'no');
-            el.title = 'Sprache / Language';
-            el.innerHTML = '<button type="button" data-l="de">DE</button><button type="button" data-l="en">EN</button>';
-            el.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLang(b.dataset.l); });
+            el.innerHTML = '<button type="button" class="n8-lang-btn" title="Sprache · Language · Langue · Nyelv · Språk · Taal · Lingua · Idioma">'
+                + '<span class="n8-lang-ic" aria-hidden="true">🌐</span><span class="n8-lang-cur"></span><span class="n8-dd-car" aria-hidden="true">▾</span></button>'
+                + '<div class="n8-dd-pop n8-lang-pop" role="menu" aria-label="Language">'
+                + LANGS.map(l => `<button type="button" role="menuitemradio" data-l="${l}" lang="${LANG_INFO[l][2]}"><span class="n8-lang-code">${LANG_INFO[l][1]}</span>${LANG_INFO[l][0]}</button>`).join('')
+                + '</div>';
+            dropdown(el, el.firstChild, el.querySelector('.n8-lang-pop'));
+            el.querySelector('.n8-lang-pop').addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (b) setLang(b.dataset.l); });
             if (opts && opts.before && opts.before.parentNode === container) container.insertBefore(el, opts.before);
             else if (opts && opts.prepend) container.insertBefore(el, container.firstChild);
             else container.appendChild(el);
@@ -231,13 +304,111 @@
         return el;
     }
 
+    // ------------------------------------------------------------ user menu in the header (1.6)
+    // me = null → 🔐 Login button; otherwise avatar + name ▾ with a small card (name, role) and the entries in opts.items
+    function userInitials(n) { return String(n || '?').trim().split(/[\s._@-]+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase() || '?'; }
+    function userMenu(el, me, opts) {
+        if (!el) return;
+        opts = opts || {};
+        if (!me) {
+            el.innerHTML = `<button type="button" class="n8-login-btn ${opts.btnClass || 'btn primary hdr-btn login'}"><span aria-hidden="true">🔐</span><span class="u-name">${esc(opts.loginLabel || 'Anmelden')}</span></button>`;
+            el.firstChild.addEventListener('click', () => opts.onLogin && opts.onLogin());
+            return;
+        }
+        const name = me.name || me.username || '';
+        const av = opts.avatar || `<span class="n8-av">${esc(userInitials(name))}</span>`;
+        const items = (opts.items || []).filter(x => x && !x.hidden);
+        el.innerHTML = `<div class="n8-user n8-dd">
+            <button type="button" class="n8-user-btn ${opts.btnClass || 'btn hdr-btn'}" title="${esc(name)}${me.role ? ' · ' + esc(me.role) : ''}">${av}<span class="u-name">${esc(name)}</span><span class="n8-dd-car" aria-hidden="true">▾</span></button>
+            <div class="n8-dd-pop n8-user-pop" role="menu">
+                <div class="n8-user-card">${av.replace('class="n8-av', 'class="n8-av big')}<div><b>${esc(name)}</b>${me.role ? `<span class="n8-role n8-role-${esc(String(me.role).toLowerCase())}">${esc(opts.roleLabel || me.role)}</span>` : ''}${me.sub ? `<small>${esc(me.sub)}</small>` : ''}</div></div>
+                ${items.map((x, i) => `${x.sep ? '<hr>' : ''}<button type="button" role="menuitem" data-i="${i}"${x.disabled ? ' disabled' : ''}><span class="n8-mi-ic" aria-hidden="true">${x.icon || ''}</span>${esc(x.label)}</button>`).join('')}
+                <hr><button type="button" role="menuitem" class="n8-mi-out" data-i="out"><span class="n8-mi-ic" aria-hidden="true">⏻</span>${esc(opts.logoutLabel || 'Abmelden')}</button>
+            </div></div>`;
+        const root = el.firstChild;
+        dropdown(root, root.querySelector('.n8-user-btn'), root.querySelector('.n8-user-pop'));
+        root.querySelector('.n8-user-pop').addEventListener('click', e => {
+            const b = e.target.closest('[data-i]'); if (!b) return;
+            if (b.dataset.i === 'out') { if (opts.onLogout) opts.onLogout(); }
+            else { const x = items[+b.dataset.i]; if (x && x.onClick) x.onClick(); }
+        });
+    }
+
+    // ------------------------------------------------------------ login window (1.6) – the same in every N8 system
+    // opts: title, subtitle, logo, remember (text or false), closable (default true), setup (true → repeat password, minLength),
+    //       submit({username, password, password2, remember}) → Promise (throw Error(message) on failure), user (prefill)
+    function loginOpen(opts) {
+        opts = opts || {};
+        loginClose();
+        const closable = opts.closable !== false;
+        const ov = document.createElement('div');
+        ov.className = 'n8-login-ov';
+        ov.innerHTML = `<form class="n8-login" autocomplete="on" novalidate role="dialog" aria-modal="true" aria-labelledby="n8LoginT">
+            ${closable ? '<button type="button" class="n8-login-x" aria-label="Schließen" title="Schließen">✕</button>' : ''}
+            ${opts.logo ? `<img class="n8-login-logo" src="${esc(opts.logo)}" alt="">` : ''}
+            <h2 id="n8LoginT">${esc(opts.title || 'Anmelden')}</h2>
+            ${opts.subtitle ? `<p class="n8-login-sub">${esc(opts.subtitle)}</p>` : ''}
+            <label class="n8-field"><span>${esc(opts.userLabel || 'Benutzername')}</span>
+                <span class="n8-inp"><span class="n8-inp-ic" aria-hidden="true">👤</span><input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required value="${esc(opts.user || '')}"></span></label>
+            <label class="n8-field"><span>${esc('Passwort')}</span>
+                <span class="n8-inp"><span class="n8-inp-ic" aria-hidden="true">🔑</span><input name="password" type="password" autocomplete="${opts.setup ? 'new-password' : 'current-password'}" required${opts.minLength ? ` minlength="${+opts.minLength}"` : ''}>
+                <button type="button" class="n8-eye" aria-label="Passwort anzeigen" title="Passwort anzeigen">👁</button></span></label>
+            ${opts.setup ? `<label class="n8-field"><span>${esc('Passwort wiederholen')}</span>
+                <span class="n8-inp"><span class="n8-inp-ic" aria-hidden="true">🔑</span><input name="password2" type="password" autocomplete="new-password" required></span></label>` : ''}
+            <div class="n8-caps" hidden>⇪ ${esc('Feststelltaste ist an')}</div>
+            ${opts.remember ? `<label class="n8-login-rem"><input type="checkbox" name="remember"><span class="n8-sw-ui" aria-hidden="true"></span><span>${esc(opts.remember === true ? 'Angemeldet bleiben' : opts.remember)}</span></label>` : ''}
+            <div class="n8-login-err" role="alert" hidden></div>
+            <button type="submit" class="n8-login-go"><span class="n8-spin" aria-hidden="true"></span><span>${esc(opts.button || (opts.setup ? 'Anlegen' : 'Anmelden'))}</span></button>
+            <div class="n8-login-foot"><span class="n8-login-lock">🔒 ${esc(location.protocol === 'https:' ? 'Verschlüsselte Verbindung' : 'Unverschlüsselte Verbindung (HTTP)')}</span></div>
+        </form>`;
+        document.body.appendChild(ov);
+        const f = ov.querySelector('form'), err = f.querySelector('.n8-login-err'), go = f.querySelector('.n8-login-go');
+        langSwitch(f.querySelector('.n8-login-foot'));
+        const pw = f.password;
+        f.querySelector('.n8-eye').addEventListener('click', e => {
+            const show = pw.type === 'password'; pw.type = show ? 'text' : 'password';
+            if (f.password2) f.password2.type = pw.type;
+            e.currentTarget.classList.toggle('on', show); pw.focus();
+        });
+        const caps = e => { if (e.getModifierState) f.querySelector('.n8-caps').hidden = !e.getModifierState('CapsLock'); };
+        f.addEventListener('keydown', caps); f.addEventListener('keyup', caps);
+        if (closable) {
+            f.querySelector('.n8-login-x').addEventListener('click', loginClose);
+            ov.addEventListener('mousedown', e => { if (e.target === ov) loginClose(); });
+            ov.addEventListener('keydown', e => { if (e.key === 'Escape') loginClose(); });
+        }
+        const fail = m => {
+            err.textContent = m; err.hidden = false;
+            f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake');
+        };
+        f.addEventListener('submit', async e => {
+            e.preventDefault();
+            err.hidden = true;
+            const v = { username: f.username.value.trim(), password: pw.value, password2: f.password2 ? f.password2.value : undefined, remember: !!(f.remember && f.remember.checked) };
+            if (!v.username || !v.password) { fail(t('Bitte Benutzername und Passwort eingeben.')); (v.username ? pw : f.username).focus(); return; }
+            if (opts.setup && opts.minLength && v.password.length < opts.minLength) { fail(t('Das Passwort ist zu kurz.') + ` (min. ${opts.minLength})`); pw.focus(); return; }
+            if (opts.setup && v.password !== v.password2) { fail(t('Die Passwörter stimmen nicht überein.')); f.password2.focus(); return; }
+            go.disabled = true; f.classList.add('busy');
+            try {
+                await opts.submit(v);
+                loginClose();
+            } catch (x) {
+                fail(t((x && x.message) || 'Anmeldung fehlgeschlagen.'));
+                pw.select();
+            } finally { go.disabled = false; f.classList.remove('busy'); }
+        });
+        setTimeout(() => (opts.user ? pw : f.username).focus(), 30);
+        return ov;
+    }
+    function loginClose() { document.querySelectorAll('.n8-login-ov').forEach(o => o.remove()); }
+
     // ------------------------------------------------------------ helpers
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     function fmtTime(v) {
         if (!v) return '–';
         const d = typeof v === 'number' ? new Date(v < 1e12 ? v * 1000 : v) : new Date(v);
         if (isNaN(d)) return String(v);
-        return d.toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleString(locale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
     // ------------------------------------------------------------ updates
@@ -476,7 +647,7 @@
     const SVC = { active: 'läuft', inactive: 'gestoppt', failed: 'Fehler', activating: 'startet', deactivating: 'stoppt', reloading: 'lädt neu' };
     const AREA = { user: '👤 Dienstbenutzer', prog: '📦 Programm', data: '💾 Daten', systemd: '⚙️ systemd', sudo: '🛡️ sudo', hw: '🔌 Hardware',
                    source: '🧬 Quellordner', usb: '🔌 USB-Vocoder', https: '🔒 Domains & HTTPS' };
-    const fmt = ts => ts ? new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
+    const fmt = ts => ts ? new Date(ts * 1000).toLocaleString(locale(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
     function card(title, body, badge) {
         return `<section class="n8-card"><h3>${esc(title)}${badge ? ' ' + badge : ''}</h3>${body}</section>`;
     }
@@ -619,7 +790,7 @@
                    thread: ['🧵', 'Thread abgestürzt', 'warn'], helper: ['⚙️', 'Hilfsprozess abgestürzt', 'warn'], keepalive: ['💓', 'Keep-Alive-Neustart', 'warn'],
                    restart: ['↻', 'Neustart', 'warn'], intern: ['⚠️', 'Fehler', 'warn'] };
     const kindOf = k => KIND[k] || ['⚠️', k || '?', 'warn'];
-    const fmtFull = ts => ts ? new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '–';
+    const fmtFull = ts => ts ? new Date(ts * 1000).toLocaleString(locale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '–';
     function crashRow(e) {
         const k = kindOf(e.kind);
         return `<details class="n8-crash ${e.new ? 'new' : ''}" data-id="${esc(e.id)}"><summary>
@@ -718,7 +889,7 @@
     //   opts.columns = [{ label, html(u) }]   zusätzliche Spalten · opts.actions(u) → [{ label, run(u) }] zusätzliche Knöpfe · opts.minPw (8)
     const FIELD = { display_name: ['Anzeigename', 'text'], dmr_id: ['DMR-ID', 'numeric'], callsign: ['Rufzeichen', 'text'] };
     const ago = ts => ts ? fmtShort(ts) : '–';
-    function fmtShort(ts) { return new Date(ts * 1000).toLocaleString(lang === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+    function fmtShort(ts) { return new Date(ts * 1000).toLocaleString(locale(), { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }); }
     function shortUA(ua) {
         if (!ua) return '–';
         const b = /Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
@@ -1028,11 +1199,30 @@
                 'Every minute as root: checks every service for real (web interface and the connections of the protocols), restarts sick services after a few minutes (at most 4× per hour), notices internet outages and restarts the network services afterwards, and reports to a heartbeat address (Uptime Kuma “push”, Healthchecks.io …). A service stopped by hand stays stopped.',
             'Meldung': 'Message', 'Noch kein Update über die Weboberfläche.': 'No update through the web interface yet.', 'Neu laden': 'Reload',
             '📜 Update-Protokoll': '📜 Update log',
+            // 1.6: login window, user menu, language menu
+            'Anmelden': 'Log in', 'Abmelden': 'Log out', 'Benutzername': 'Username', 'Passwort': 'Password', 'Passwort anzeigen': 'Show password',
+            'Passwort wiederholen': 'Repeat password', 'Schließen': 'Close', 'Feststelltaste ist an': 'Caps Lock is on', 'Angemeldet bleiben': 'Stay logged in',
+            'Anlegen': 'Create', 'Verschlüsselte Verbindung': 'Encrypted connection', 'Unverschlüsselte Verbindung (HTTP)': 'Unencrypted connection (HTTP)',
+            'Bitte Benutzername und Passwort eingeben.': 'Please enter username and password.', 'Das Passwort ist zu kurz.': 'The password is too short.',
+            'Die Passwörter stimmen nicht überein.': 'The passwords do not match.', 'Anmeldung fehlgeschlagen.': 'Login failed.', 'Mein Konto': 'My account',
+            'Passwort ändern': 'Change password', 'Sprache': 'Language', 'Zu viele Fehlversuche – bitte 15 Minuten warten': 'Too many failed attempts – please wait 15 minutes',
         }
     });
     add({
         base: 'en', de: {
-            'Update available': 'Update verfügbar', "What's new?": 'Was ist neu?', 'Update now': 'Jetzt aktualisieren', 'Later': 'Später',
+            'Update available': 'Update verfügbar',
+            // 1.6: login window and user menu of all N8 systems
+            'Log in': 'Anmelden', 'Log out': 'Abmelden', 'Login': 'Anmelden', 'My account': 'Mein Konto', 'Webmail': 'Webmail', 'Admin': 'Admin',
+            'Stay logged in': 'Angemeldet bleiben', 'Stay logged in (30 days)': 'Angemeldet bleiben (30 Tage)', 'Username': 'Benutzername', 'Password': 'Passwort',
+            'Log in to manage the FRN server.': 'Anmelden, um den FRN-Server zu verwalten.', 'This dashboard is private. Please log in.': 'Dieses Dashboard ist privat. Bitte anmelden.',
+            'Log in to change settings.': 'Anmelden, um Einstellungen zu ändern.', 'This hotspot is private. Please log in.': 'Dieser Hotspot ist privat. Bitte anmelden.',
+            'Log in to see IP addresses and the admin area.': 'Anmelden, um IP-Adressen und den Adminbereich zu sehen.',
+            'Please log in to view the dashboard.': 'Bitte anmelden, um das Dashboard zu sehen.', 'Wrong username or password.': 'Benutzername oder Passwort falsch.',
+            'Wrong username or password': 'Benutzername oder Passwort falsch', 'Change password': 'Passwort ändern', 'Superadmin': 'Superadmin', 'User': 'Benutzer',
+            'Too many failed logins. Try again in 15 minutes.': 'Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.',
+            'Too many wrong passwords. Try again in 15 minutes.': 'Zu viele falsche Passwörter. Bitte in 15 Minuten erneut versuchen.',
+            'Too many requests – please wait a moment.': 'Zu viele Anfragen – bitte einen Moment warten.',
+            'Too many failed attempts. Please wait 15 minutes.': 'Zu viele Fehlversuche. Bitte 15 Minuten warten.', "What's new?": 'Was ist neu?', 'Update now': 'Jetzt aktualisieren', 'Later': 'Später',
             'Check now': 'Jetzt prüfen', 'Installed': 'Installiert', 'On GitHub': 'Auf GitHub', 'Last checked': 'Zuletzt geprüft',
             'up to date': 'aktuell', 'Close': 'Schließen', 'Cancel': 'Abbrechen', 'Save': 'Speichern', 'Delete': 'Löschen', 'Edit': 'Bearbeiten',
             'Login': 'Anmelden', 'Log in': 'Anmelden', 'Log out': 'Abmelden', 'Logout': 'Abmelden', 'Username': 'Benutzername', 'Password': 'Passwort',
@@ -1063,8 +1253,10 @@
     });
 
     window.N8Kit = {
-        version: '1.4.0',
-        lang: () => lang, setLang, t, langSwitch, esc, fmtTime,
+        version: '1.6.0',
+        lang: () => lang, langs: () => LANGS.map(l => ({ code: l, name: LANG_INFO[l][0], short: LANG_INFO[l][1], locale: LANG_INFO[l][2] })),
+        locale, setLang, t, langSwitch, esc, fmtTime, userMenu, dropdown,
+        login: { open: loginOpen, close: loginClose },
         i18n: { add, retranslate: () => { cache.clear(); retranslate(); }, t },
         update: { banner, panel, run },
         nav: { tree, GROUPS, SYS_ITEMS },

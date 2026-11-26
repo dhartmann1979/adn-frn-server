@@ -1,21 +1,118 @@
 /*
- * N8 Kit 1.4 – shared by the N8schicht web interfaces (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
+ * N8 Kit 1.6 – shared by the N8schicht web interfaces (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * Same file in every repository. Uses the N8 Theme 2 variables (--accent, --accent-rgb, --glass-*, --text, --text-dim).
  */
 
-/* ---------- language switch DE | EN (header, next to Links / Login) ---------- */
-.n8-lang { display: inline-flex; align-items: center; flex: none; height: 30px; padding: 2px; gap: 2px; border-radius: 999px;
-           background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); }
-.n8-lang button { all: unset; cursor: pointer; padding: 0 9px; height: 24px; line-height: 24px; border-radius: 999px;
-                  font-family: inherit; font-weight: 700; font-size: 11.5px; line-height: 24px; letter-spacing: .04em; color: var(--text-dim, rgba(235, 240, 250, .62)); }
-.n8-lang button:hover { color: var(--text, #f5f7fb); }
-.n8-lang button.on { color: #fff; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff)));
-                     box-shadow: 0 2px 8px rgba(var(--accent-rgb, 90, 200, 250), .35); }
-.n8-lang button:focus-visible { outline: 2px solid var(--accent, #5ac8fa); outline-offset: 1px; }
-html[data-theme-mode=light] .n8-lang { background: rgba(0, 0, 0, .05); }
-@media (max-width: 600px) { .n8-lang { height: 26px; } .n8-lang button { padding: 0 6px; height: 20px; line-height: 20px; font-size: 10.5px; } }
+/* ---------- lang/* ---------- 1.6: dropdowns in the header (language, user) ---------- */
+.n8-dd { position: relative; display: inline-flex; flex: none; }
+.n8-dd-car { font-size: 9px; opacity: .7; transition: transform .18s ease; margin-left: 1px; }
+.n8-dd.open .n8-dd-car { transform: rotate(180deg); }
+.n8-dd-pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 400; min-width: 220px; max-height: min(70vh, 560px); overflow: auto;
+  display: flex; flex-direction: column; gap: 1px; padding: 6px; border-radius: 16px; box-sizing: border-box;
+  background: rgba(18, 24, 44, .96); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .08);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4);
+  opacity: 0; visibility: hidden; transform: translateY(-6px) scale(.98); transform-origin: top right; transition: opacity .15s ease, transform .15s ease, visibility 0s .15s; }
+.n8-dd-pop.left { right: auto; left: 0; transform-origin: top left; }
+.n8-dd.open > .n8-dd-pop { opacity: 1; visibility: visible; transform: none; transition: opacity .15s ease, transform .15s ease; }
+.n8-dd-pop > button { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border-radius: 10px;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text, #f5f7fb); cursor: pointer; white-space: nowrap; }
+.n8-dd-pop > button:hover, .n8-dd-pop > button:focus-visible { background: rgba(var(--accent-rgb, 90, 200, 250), .16); outline: none; }
+.n8-dd-pop > button:disabled { opacity: .45; cursor: default; }
+.n8-dd-pop > button.on { background: rgba(var(--accent-rgb, 90, 200, 250), .22); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb, 90, 200, 250), .45); }
+.n8-dd-pop > button.on::after { content: "✓"; margin-left: auto; color: var(--accent, #5ac8fa); font-weight: 800; }
+.n8-dd-pop hr { border: 0; border-top: 1px solid var(--glass-border, rgba(255, 255, 255, .12)); margin: 5px 4px; width: auto; }
+html[data-theme-mode=light] .n8-dd-pop { background: rgba(255, 255, 255, .97); box-shadow: 0 18px 50px rgba(20, 30, 60, .22); }
 
-/* ---------- buttons, badges, key/value list used by the kit ---------- */
+/* language: 🌐 DE ▾ */
+.n8-lang-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; height: 31px; padding: 0 10px 0 9px;
+  border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 750; letter-spacing: .04em; color: var(--text, #f5f7fb);
+  background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); transition: background .15s, border-color .15s; }
+.n8-lang-btn:hover, .n8-lang.open .n8-lang-btn { background: rgba(var(--accent-rgb, 90, 200, 250), .16); border-color: rgba(var(--accent-rgb, 90, 200, 250), .45); }
+.n8-lang-btn:focus-visible { outline: 2px solid var(--accent, #5ac8fa); outline-offset: 2px; }
+.n8-lang-ic { font-size: 13px; line-height: 1; }
+.n8-lang-pop { min-width: 210px; }
+.n8-lang-code { display: inline-grid; place-items: center; width: 28px; height: 20px; border-radius: 6px; font-size: 10.5px; font-weight: 800; letter-spacing: .05em;
+  background: rgba(255, 255, 255, .08); color: var(--text-dim, rgba(235, 240, 250, .75)); flex: none; }
+.n8-lang-pop > button.on .n8-lang-code { background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); color: #fff; }
+html[data-theme-mode=light] .n8-lang-btn { background: rgba(0, 0, 0, .05); }
+html[data-theme-mode=light] .n8-lang-code { background: rgba(0, 0, 0, .06); }
+
+/* user: avatar + name ▾ */
+.n8-user-btn { display: inline-flex !important; align-items: center !important; gap: 7px !important; padding-left: 4px !important; }
+.n8-user-btn .n8-av { width: 23px; height: 23px; font-size: 10px; background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); color: #fff; }
+.n8-user-btn img { width: 23px; height: 23px; border-radius: 50%; object-fit: cover; }
+.n8-user-pop { min-width: 250px; }
+.n8-user-card { display: flex; align-items: center; gap: 11px; padding: 8px 8px 10px; }
+.n8-user-card > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; align-items: flex-start; }
+.n8-user-card b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+.n8-user-card small { color: var(--text-dim, #aab); font-size: 11.5px; }
+.n8-av.big, .n8-user-card img { width: 40px !important; height: 40px !important; font-size: 15px !important; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); color: #fff; }
+.n8-mi-ic { width: 20px; text-align: center; flex: none; }
+.n8-dd-pop > button.n8-mi-out { color: #ff9f97; }
+.n8-dd-pop > button.n8-mi-out:hover, .n8-dd-pop > button.n8-mi-out:focus-visible { background: rgba(255, 69, 58, .16); }
+
+/* ---------- 1.6: login window – the same in every N8 system ---------- */
+.n8-login-ov { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; box-sizing: border-box; overflow: auto;
+  background: rgba(5, 8, 18, .55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); animation: n8-fade .18s ease; }
+.n8-login { position: relative; width: min(400px, 100%); box-sizing: border-box; padding: 30px 28px 18px; border-radius: 26px; display: flex; flex-direction: column; gap: 12px;
+  color: var(--text, #f5f7fb); background: linear-gradient(160deg, rgba(34, 44, 78, .92), rgba(16, 20, 38, .94));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); box-shadow: 0 30px 90px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .12);
+  animation: n8-pop .22s cubic-bezier(.2, .9, .3, 1.2); }
+.n8-login::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; border-radius: 26px 26px 0 0;
+  background: linear-gradient(90deg, var(--accent, #5ac8fa), var(--accent2, #bf5af2)); opacity: .85; }
+.n8-login-x { all: unset; position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  font-size: 13px; color: var(--text-dim, #aab); }
+.n8-login-x:hover { background: rgba(255, 255, 255, .08); color: var(--text, #fff); }
+.n8-login-logo { width: 72px; height: 72px; object-fit: contain; align-self: center; border-radius: 18px; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .4)); }
+.n8-login h2 { margin: 2px 0 0; text-align: center; font-size: 21px; font-weight: 750; letter-spacing: -.02em; }
+.n8-login-sub { margin: -6px 0 6px; text-align: center; font-size: 13px; color: var(--text-dim, rgba(235, 240, 250, .7)); line-height: 1.45; }
+.n8-field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 650; color: var(--text-dim, rgba(235, 240, 250, .75)); }
+.n8-inp { position: relative; display: flex; align-items: center; }
+.n8-inp-ic { position: absolute; left: 12px; font-size: 14px; opacity: .75; pointer-events: none; }
+.n8-inp input { width: 100%; box-sizing: border-box; height: 44px; padding: 0 44px 0 38px; border-radius: 13px; font: inherit; font-size: 15px; font-weight: 500;
+  color: var(--text, #f5f7fb); background: rgba(0, 0, 0, .28); border: 1px solid var(--glass-border, rgba(255, 255, 255, .14)); outline: none; transition: border-color .15s, box-shadow .15s; }
+.n8-inp input:focus { border-color: var(--accent, #5ac8fa); box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 90, 200, 250), .22); }
+.n8-eye { all: unset; position: absolute; right: 6px; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; font-size: 15px; opacity: .55; }
+.n8-eye:hover, .n8-eye.on { opacity: 1; background: rgba(255, 255, 255, .07); }
+.n8-caps { font-size: 12px; font-weight: 650; color: #ffd60a; margin-top: -4px; }
+.n8-login-rem { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim, rgba(235, 240, 250, .8)); cursor: pointer; user-select: none; }
+.n8-login-rem input { position: absolute; opacity: 0; pointer-events: none; }
+.n8-sw-ui { width: 36px; height: 21px; border-radius: 999px; flex: none; position: relative; background: rgba(255, 255, 255, .14); transition: background .18s; }
+.n8-sw-ui::after { content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: transform .18s; }
+.n8-login-rem input:checked + .n8-sw-ui { background: var(--accent, #5ac8fa); }
+.n8-login-rem input:checked + .n8-sw-ui::after { transform: translateX(15px); }
+.n8-login-rem input:focus-visible + .n8-sw-ui { outline: 2px solid var(--accent, #5ac8fa); outline-offset: 2px; }
+.n8-login-err { padding: 9px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; line-height: 1.4; color: #ffb4ad; background: rgba(255, 69, 58, .14); border: 1px solid rgba(255, 69, 58, .35); }
+.n8-login-go { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: 14px; cursor: pointer;
+  font-family: inherit; font-size: 15px; font-weight: 750; color: #fff; margin-top: 4px;
+  background: linear-gradient(135deg, var(--accent, #5ac8fa), var(--accent2, var(--accent, #0a84ff))); box-shadow: 0 8px 24px rgba(var(--accent-rgb, 90, 200, 250), .35);
+  transition: transform .1s, filter .15s; }
+.n8-login-go:hover { filter: brightness(1.08); }
+.n8-login-go:active { transform: scale(.985); }
+.n8-login-go:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.n8-login-go:disabled { cursor: progress; filter: saturate(.6); }
+.n8-spin { display: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff; animation: n8-rot .7s linear infinite; }
+.n8-login.busy .n8-spin { display: inline-block; }
+.n8-login-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--glass-border, rgba(255, 255, 255, .1)); }
+.n8-login-lock { font-size: 11.5px; color: var(--text-dim, #aab); }
+.n8-login-foot .n8-dd-pop { top: auto; bottom: calc(100% + 8px); transform-origin: bottom right; }
+.n8-login.shake { animation: n8-shake .38s ease; }
+html[data-theme-mode=light] .n8-login { background: linear-gradient(160deg, rgba(255, 255, 255, .98), rgba(238, 243, 252, .98)); box-shadow: 0 30px 90px rgba(20, 30, 60, .3); }
+html[data-theme-mode=light] .n8-inp input { background: #fff; }
+html[data-theme-mode=light] .n8-sw-ui { background: rgba(0, 0, 0, .15); }
+@keyframes n8-fade { from { opacity: 0; } }
+@keyframes n8-pop { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes n8-rot { to { transform: rotate(360deg); } }
+@keyframes n8-shake { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+@media (prefers-reduced-motion: reduce) { .n8-login, .n8-login-ov, .n8-login.shake, .n8-dd-pop { animation: none !important; transition: none !important; } }
+@media (max-width: 600px) {
+  .n8-lang-btn { height: 28px; padding: 0 8px; font-size: 11px; gap: 3px; }
+  .n8-lang-ic { display: none; }
+  .n8-login { padding: 24px 18px 14px; border-radius: 22px; }
+}
+tons, badges, key/value list used by the kit ---------- */
 .n8-btn { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-family: inherit; font-weight: 650; font-size: 13px; line-height: 1.2;
           color: var(--text, #f5f7fb); background: rgba(255, 255, 255, .08); border: 1px solid var(--glass-border, rgba(255, 255, 255, .16)); }
 .n8-btn:hover:not(:disabled) { background: rgba(var(--accent-rgb, 90, 200, 250), .18); border-color: rgba(var(--accent-rgb, 90, 200, 250), .5); }
@@ -194,12 +291,41 @@ body .site-footer { max-width: none !important; }
     :is(.n8-topbar, .topbar) > header > nav > :is(.active, .on, [aria-current=page], [aria-selected=true]) { color: var(--text, #f5f7fb) !important;
         background: rgba(var(--accent-rgb, 90, 200, 250), .18) !important; box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb, 90, 200, 250), .38) !important; }
     :is(.n8-topbar, .topbar) > header > :last-child { display: flex !important; align-items: center !important; gap: 6px !important; flex: none !important; margin-left: 0 !important; }
-    :is(.n8-topbar, .topbar) > header > :last-child :is(.links-trigger, .links-btn, .hbtn, .hdr-btn, .btn, #userArea button, #userDd > button):not(:is(.links-pop, .dd-menu, .listen-pop, .links-pop *, .dd-menu *, .listen-pop *)) {
+    :is(.n8-topbar, .topbar) > header > :last-child :is(.links-trigger, .links-btn, .hbtn, .hdr-btn, .btn, #userArea button, #userDd > button):not(:is(.links-pop, .dd-menu, .listen-pop, .n8-dd-pop, .links-pop *, .dd-menu *, .listen-pop *, .n8-dd-pop *)) {
         height: 31px !important; min-height: 31px !important; padding: 5px 11px !important; font-size: 12px !important; font-weight: 650 !important; line-height: 1 !important;
         border-radius: 999px !important; box-sizing: border-box; display: inline-flex; align-items: center !important; gap: 6px; white-space: nowrap; }
     :is(.n8-topbar, .topbar) > :is(.n8-strip, .status-strip, .strip) { height: 22px !important; line-height: 22px !important; font-size: 11.5px !important; margin: -1px 24px 0 !important; padding: 0 14px !important; border-radius: 0 0 14px 14px !important; }
 }
 html[data-theme-mode=light] :is(.n8-topbar, .topbar) > header > nav { background: rgba(0, 0, 0, .04) !important; }
+/* 1.6: phones and tablets – the same two-row header everywhere: logo + title | language · links · user; below the menu as a pill row */
+@media (max-width: 900px) {
+    :is(.n8-topbar, .topbar) > header { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "b a" "n n" !important;
+        align-items: center !important; gap: 8px !important; padding: 8px 10px 9px !important; height: auto !important; min-height: 0 !important; border-radius: 18px !important; }
+    :is(.n8-topbar, .topbar) > header > :first-child { grid-area: b !important; display: flex !important; align-items: center !important; gap: 9px !important; min-width: 0 !important; margin: 0 !important; }
+    :is(.n8-topbar, .topbar) > header > :first-child img { width: 36px !important; height: 36px !important; border-radius: 10px !important; flex: none; }
+    :is(.n8-topbar, .topbar) > header > :first-child > div { min-width: 0; }
+    :is(.n8-topbar, .topbar) > header h1 { margin: 0 !important; font-size: 16px !important; line-height: 1.2 !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+    :is(.n8-topbar, .topbar) > header > :first-child h1 + * { font-size: 11px !important; margin: 0 !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; opacity: .8; }
+    :is(.n8-topbar, .topbar) > header > nav { grid-area: n !important; display: flex !important; justify-content: flex-start !important; gap: 2px !important; margin: 0 !important; padding: 3px !important;
+        border-radius: 999px !important; width: auto !important; max-width: 100% !important; overflow-x: auto !important; scrollbar-width: none; flex-wrap: nowrap !important;
+        background: rgba(255, 255, 255, .04) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, .12)) !important; }
+    :is(.n8-topbar, .topbar) > header > nav::-webkit-scrollbar { display: none; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(button, a) { flex: 1 0 auto !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
+        padding: 6px 10px !important; margin: 0 !important; font-size: 12px !important; font-weight: 650 !important; border-radius: 999px !important; border: 0 !important; white-space: nowrap !important;
+        background: transparent !important; box-shadow: none !important; color: var(--text-dim, rgba(245, 247, 251, .7)) !important; min-height: 0 !important; height: auto !important; text-decoration: none !important; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(.hidden, [hidden]) { display: none !important; }
+    :is(.n8-topbar, .topbar) > header > nav > :is(.active, .on, [aria-current=page], [aria-selected=true]) { color: var(--text, #f5f7fb) !important;
+        background: rgba(var(--accent-rgb, 90, 200, 250), .18) !important; box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb, 90, 200, 250), .38) !important; }
+    :is(.n8-topbar, .topbar) > header > :last-child { grid-area: a !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 5px !important;
+        flex-wrap: nowrap !important; margin: 0 !important; width: auto !important; }
+    :is(.n8-topbar, .topbar) > header > :last-child :is(.links-trigger, .links-btn, .hbtn, .hdr-btn, .btn, #userArea button, .network-info-btn):not(:is(.links-pop, .dd-menu, .listen-pop, .n8-dd-pop, .links-pop *, .dd-menu *, .listen-pop *, .n8-dd-pop *)) {
+        height: 30px !important; min-height: 30px !important; padding: 0 9px !important; font-size: 12px !important; border-radius: 999px !important; box-sizing: border-box; display: inline-flex !important;
+        align-items: center !important; gap: 4px !important; white-space: nowrap; }
+    :is(.n8-topbar, .topbar) > header :is(.u-name, .t-long) { display: none !important; }
+    :is(.n8-topbar, .topbar) > header > :last-child .links-label:not(:first-child) { display: none !important; }
+    .n8-user-btn { padding: 0 6px 0 3px !important; }
+}
+@media (max-width: 420px) { :is(.n8-topbar, .topbar) > header > :first-child h1 + * { display: none !important; } }
 
 /* ---- 1.3: Abstürze (System → 💥 Abstürze, Hinweisfenster nach der Anmeldung) ---- */
 .n8-crash-list { display: grid; gap: 6px; margin: 8px 0; }

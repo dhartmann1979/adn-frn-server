@@ -25,8 +25,8 @@ function fmtDur(s, short) {
     return short || !sec ? `${m} m` : `${m} m ${sec} s`;
 }
 function fmtClock(sec) { sec = Math.max(0, Math.floor(sec)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; }
-function fmtTime(ts) { return new Date(ts * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
-function fmtDate(ts) { return ts ? new Date(ts * 1000).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–'; }
+function fmtTime(ts) { return new Date(ts * 1000).toLocaleTimeString(N8Kit.locale(), { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+function fmtDate(ts) { return ts ? new Date(ts * 1000).toLocaleString(N8Kit.locale(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–'; }
 function ago(ts) {
     const d = Date.now() / 1000 - ts;
     if (d < 60) return 'just now'; if (d < 3600) return `${Math.floor(d / 60)} min ago`;
@@ -34,7 +34,7 @@ function ago(ts) {
 }
 function since(ts) { if (!ts) return ''; const d = Date.now() / 1000 - ts; return d < 60 ? 'now' : d < 3600 ? `${Math.floor(d / 60)} min` : d < 86400 ? `${Math.floor(d / 3600)} h ${Math.floor((d % 3600) / 60)} m` : `${Math.floor(d / 86400)} d`; }
 function fmtBytes(b) { if (b == null) return '–'; const u = ['B', 'KB', 'MB', 'GB', 'TB']; let i = 0; while (b >= 1024 && i < 4) { b /= 1024; i++; } return `${b.toFixed(b < 10 && i ? 1 : 0)} ${u[i]}`; }
-function num(n) { return Number(n || 0).toLocaleString('de-DE'); }
+function num(n) { return Number(n || 0).toLocaleString(N8Kit.locale()); }
 function initials(c) { return esc((c || '?').replace(/[^A-Za-z0-9]/g, '').replace(/^([A-Z]{1,2}\d)/, '').slice(0, 2).toUpperCase() || (c || '?').slice(0, 2)); }
 function hashStr(s) { let h = 0; for (const ch of String(s || '')) h = (h * 31 + ch.charCodeAt(0)) | 0; return Math.abs(h); }
 function avatarColor(call) { const h = (hashStr(call) * 47) % 360; return `linear-gradient(135deg, hsl(${h} 70% 50%), hsl(${(h + 40) % 360} 75% 42%))`; }
@@ -206,7 +206,7 @@ function renderFooter(info) {
     const d = b.date ? new Date(b.date) : new Date();
     $('footerYear').textContent = d.getFullYear();
     $('ver').textContent = `ADN FRN Server v${(info && info.version) || '?'}${b.commit ? ' (' + b.commit + ')' : ''}`;
-    $('footerDate').textContent = b.date ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+    $('footerDate').textContent = b.date ? d.toLocaleDateString(N8Kit.locale(), { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 }
 function isAdmin() { return S.me && (S.me.role === 'admin' || S.me.role === 'superadmin'); }
 function bindSeg(id, fn) {
@@ -257,25 +257,19 @@ function renderUser() {
     const el = $('userArea');
     if (isAdmin() && !S.crashChecked) { S.crashChecked = true; setTimeout(() => checkCrashes(), 900); }
     if (!S.me) S.crashChecked = false;
-    if (!S.me) { el.innerHTML = '<button class="btn primary" onclick="openLogin()" title="Login">🔐<span class="u-name">&nbsp;Login</span></button>'; return; }
-    // logged in: name (click = my account) and log out – no drop-down; ⚙️ Admin is a menu item
-    const name = esc(S.me.display_name || S.me.username);
-    el.innerHTML = `<span class="n8-user"><button class="btn" onclick="openAccount()" title="${name} · ${esc(S.me.role)} – my account">👤<span class="u-name">&nbsp;${name}</span></button>
-        <button class="btn n8-logout" onclick="logout()" title="Log out" aria-label="Log out">⏻</button></span>`;
+    // N8 Kit 1.6: 🔐 Login, or avatar + name ▾ (my account, admin, mail, log out) – the same in every N8 system
+    const ROLE = { superadmin: 'Superadmin', admin: 'Admin', user: 'User' };
+    N8Kit.userMenu(el, S.me && { name: S.me.display_name || S.me.username, role: S.me.role, sub: S.me.display_name ? S.me.username : '' }, {
+        btnClass: S.me ? 'btn' : 'btn primary', loginLabel: 'Log in', logoutLabel: 'Log out', roleLabel: S.me && (ROLE[S.me.role] || S.me.role),
+        onLogin: () => openLogin(), onLogout: logout,
+        items: [
+            { icon: '🔑', label: 'My account', onClick: openAccount },
+            { icon: '✉️', label: 'Webmail', onClick: () => showTab('mail'), hidden: !(S.info && S.info.mail) },
+            { icon: '⚙️', label: 'Admin', onClick: () => showTab('admin'), hidden: !isAdmin(), sep: true },
+        ],
+    });
+    if (!S.me) return;
     window.dispatchEvent(new Event('n8:login'));   // update notice for admins (N8 Kit)
-}
-function userMenu(ev) {
-    ev.stopPropagation(); closeModal();
-    const r = ev.target.getBoundingClientRect();
-    const m = document.createElement('div');
-    m.className = 'glass';
-    m.style.cssText = `position:fixed;top:${r.bottom + 8}px;right:${Math.max(8, innerWidth - r.right)}px;z-index:300;border-radius:16px;padding:6px;min-width:200px;background:var(--theme-popover)`;
-    m.innerHTML = `<div style="padding:8px 12px" class="dim">${esc(S.me.username)} · ${esc(S.me.role)}</div>
-        ${isAdmin() ? '<button class="btn" style="width:100%;border-radius:10px;margin:2px 0" onclick="showTab(\'admin\')">⚙️ Admin</button>' : ''}
-        <button class="btn" style="width:100%;border-radius:10px;margin:2px 0" onclick="openAccount()">🔑 My account</button>
-        <button class="btn" style="width:100%;border-radius:10px;margin:2px 0" onclick="logout()">🚪 Log out</button>`;
-    document.body.appendChild(m);
-    setTimeout(() => document.addEventListener('click', () => m.remove(), { once: true }), 0);
 }
 
 // ---------------------------------------------------------------- modals
@@ -316,25 +310,17 @@ function modal(html, locked, wide) {
 function closeModal() { $('modalRoot').innerHTML = ''; }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ov')?.dataset.locked) closeModal(); });
 function openLogin(locked) {
-    modal(`<img class="logo" src="/branding/logo" alt="">
-        <h2 style="text-align:center">${esc((S.info && S.info.title) || 'Auf der NachtSchicht')}</h2>
-        <p class="dim" style="text-align:center;margin:0 0 12px">${locked ? 'This dashboard is private. Please log in.' : 'Log in to manage the FRN server.'}</p>
-        <form onsubmit="event.preventDefault(); doLogin(this)">
-            <div class="row"><label>Username</label><input type="text" name="username" autocomplete="username" required autofocus></div>
-            <div class="row"><label>Password</label><input type="password" name="password" autocomplete="current-password" required></div>
-            <label style="display:flex;gap:8px;align-items:center;margin-top:6px" class="dim"><input type="checkbox" name="remember"> Stay logged in (30 days)</label>
-            <div class="err" id="loginErr"></div>
-            <div class="actions">${locked ? '' : '<button type="button" class="btn" onclick="closeModal()">Cancel</button>'}<button class="btn primary">Log in</button></div>
-        </form>`, locked);
-    setTimeout(() => document.querySelector('#ov input[name=username]')?.focus(), 50);
-}
-async function doLogin(f) {
-    try {
-        const r = await api('POST', '/api/auth/login', { username: f.username.value, password: f.password.value, remember: f.remember.checked });
-        S.me = r.user; closeModal();
-        if (S.ws) { const w = S.ws; S.ws = null; try { w.close(); } catch (e) {} }
-        await boot();
-    } catch (e) { $('loginErr').textContent = e.message; }
+    N8Kit.login.open({
+        logo: '/branding/logo', title: (S.info && S.info.title) || 'Auf der NachtSchicht',
+        subtitle: locked ? 'This dashboard is private. Please log in.' : 'Log in to manage the FRN server.',
+        remember: 'Stay logged in (30 days)', closable: !locked,
+        submit: async v => {
+            const r = await api('POST', '/api/auth/login', { username: v.username, password: v.password, remember: v.remember });
+            S.me = r.user; closeModal();
+            if (S.ws) { const w = S.ws; S.ws = null; try { w.close(); } catch (e) {} }
+            setTimeout(boot, 0);
+        },
+    });
 }
 async function logout() { await api('POST', '/api/auth/logout', {}); location.hash = ''; location.reload(); }
 function openAccount() {
@@ -528,7 +514,7 @@ async function loadToday() {
     try {
         const d = await api('GET', '/api/stats?range=today'), T = d.totals;
         $('sTalks').textContent = num(T.talks); $('sAir').textContent = fmtDur(T.duration, true);
-        $('sSt').textContent = T.stations; $('sPeak').innerHTML = `${T.peak_online}${T.peak_ts ? `<small>${new Date(T.peak_ts * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</small>` : ''}`;
+        $('sSt').textContent = T.stations; $('sPeak').innerHTML = `${T.peak_online}${T.peak_ts ? `<small>${new Date(T.peak_ts * 1000).toLocaleTimeString(N8Kit.locale(), { hour: '2-digit', minute: '2-digit' })}</small>` : ''}`;
     } catch (e) {}
 }
 setInterval(loadToday, 5 * 60 * 1000);
@@ -577,7 +563,7 @@ function assignColors(series) {
 async function loadStats() { try { S.stats.data = await api('GET', `/api/stats?range=${S.stats.range}`); renderStats(); } catch (e) { console.warn(e); } }
 bindSeg('stRange', v => { S.stats.range = v; loadStats(); });
 bindSeg('stMetric', v => { S.stats.metric = v; renderStats(); });
-function sFmt(v) { return S.stats.metric === 'talks' ? Math.round(v).toLocaleString('de-DE') : fmtDur(v, true); }
+function sFmt(v) { return S.stats.metric === 'talks' ? Math.round(v).toLocaleString(N8Kit.locale()) : fmtDur(v, true); }
 function renderStats() {
     const d = S.stats.data; if (!d) return;
     assignColors(d.series || []);
@@ -615,9 +601,9 @@ function renderBars(d) {
 }
 function bucketLabel(d, i, long) {
     const t = new Date(d.buckets[i] * 1000);
-    if (d.bucket === 'hour') { const h = String(t.getHours()).padStart(2, '0'); return long ? `${t.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })} ${h}:00–${String((t.getHours() + 1) % 24).padStart(2, '0')}:00` : h; }
-    if (d.bucket === 'month') return t.toLocaleDateString('de-DE', long ? { month: 'long', year: 'numeric' } : { month: 'short' });
-    return long ? t.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' }) : t.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }).replace(/\.$/, '');
+    if (d.bucket === 'hour') { const h = String(t.getHours()).padStart(2, '0'); return long ? `${t.toLocaleDateString(N8Kit.locale(), { weekday: 'short', day: '2-digit', month: '2-digit' })} ${h}:00–${String((t.getHours() + 1) % 24).padStart(2, '0')}:00` : h; }
+    if (d.bucket === 'month') return t.toLocaleDateString(N8Kit.locale(), long ? { month: 'long', year: 'numeric' } : { month: 'short' });
+    return long ? t.toLocaleDateString(N8Kit.locale(), { weekday: 'long', day: '2-digit', month: '2-digit' }) : t.toLocaleDateString(N8Kit.locale(), { day: '2-digit', month: '2-digit' }).replace(/\.$/, '');
 }
 function niceMax(v, dur) {
     if (dur) { for (const s of [60, 120, 300, 600, 900, 1200, 1800, 3600, 7200, 10800, 18000, 36000, 72000, 144000, 360000]) if (s * 4 >= v) return s * 4; return Math.ceil(v / 4 / 36000) * 36000 * 4; }

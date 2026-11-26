@@ -24,7 +24,7 @@ function applyTheme(theme) {               // the same colours as the dashboard 
     set('--theme-popover', light ? 'rgba(255,255,255,.985)' : 'rgba(16,22,40,.985)');
     set('--theme-header', light ? 'rgba(255,255,255,.72)' : 'rgba(20,26,45,.55)');
 }
-const fmtDate = ts => ts ? new Date(ts * 1000).toLocaleDateString(N8Kit.lang && N8Kit.lang() === 'de' ? 'de-DE' : 'en-GB',
+const fmtDate = ts => ts ? new Date(ts * 1000).toLocaleDateString(N8Kit.locale(),
     { day: '2-digit', month: 'long', year: 'numeric' }) : '';
 function fmtDur(s) {
     s = Math.round(s || 0);

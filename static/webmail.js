@@ -11,7 +11,7 @@ const FOLDER_NAME = { inbox: 'Inbox', drafts: 'Drafts', sent: 'Sent', junk: 'Jun
 function wmDate(ts) {
     if (!ts) return '';
     const d = new Date(ts * 1000), now = new Date();
-    const de = N8Kit.lang && N8Kit.lang() === 'de' ? 'de-DE' : 'en-GB';
+    const de = N8Kit.locale();
     if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString(de, { hour: '2-digit', minute: '2-digit' });
     if (now - d < 6 * 864e5) return d.toLocaleDateString(de, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
     return d.toLocaleDateString(de, { day: '2-digit', month: '2-digit', year: '2-digit' });
@@ -116,7 +116,7 @@ async function wmOpen(uid) {
             <button class="btn small danger" id="wmDel">🗑️</button></div>
         <h2 class="wm-h" translate="no">${esc(m.subject || '(no subject)')}</h2>
         <div class="wm-meta" translate="no"><div><b>${esc(m.from)}</b></div><div class="dim">${esc(wmT('to'))} ${esc(m.to)}${m.cc ? ' · cc ' + esc(m.cc) : ''}</div>
-            <div class="dim">${m.date ? esc(new Date(m.date * 1000).toLocaleString(N8Kit.lang && N8Kit.lang() === 'de' ? 'de-DE' : 'en-GB')) : ''} ${chk}${m.spam ? ' <span class="badge warn">Spam</span>' : ''}</div></div>
+            <div class="dim">${m.date ? esc(new Date(m.date * 1000).toLocaleString(N8Kit.locale())) : ''} ${chk}${m.spam ? ' <span class="badge warn">Spam</span>' : ''}</div></div>
         ${m.attachments.length ? `<div class="wm-atts">${m.attachments.map(a => `<a class="btn small" href="/api/mail/att?folder=${encodeURIComponent(WM.folder)}&uid=${m.uid}&part=${a.part}" translate="no">📎 ${esc(a.name)} <span class="dim">${wmSize(a.size)}</span></a>`).join('')}</div>` : ''}
         ${m.html ? `<div class="wm-htmlbar"><button class="btn small" id="wmText">📝 Text</button><button class="btn small" id="wmHtml">🌐 HTML</button><button class="btn small" id="wmImg" hidden>🖼️ ${esc(wmT('Load images'))}</button></div>` : ''}
         <div class="wm-body" id="wmBody"></div>`;
@@ -135,7 +135,7 @@ async function wmOpen(uid) {
     if (!WM.list.items.find(x => x.uid === uid)?.seen) setTimeout(wmRefresh, 400);
 }
 function wmQuote(m) {
-    return '\n\n' + wmT('On') + ' ' + (m.date ? new Date(m.date * 1000).toLocaleString(N8Kit.lang && N8Kit.lang() === 'de' ? 'de-DE' : 'en-GB') : '') + ', ' + m.from + ':\n' + (m.text || '').split('\n').map(l => '> ' + l).join('\n');
+    return '\n\n' + wmT('On') + ' ' + (m.date ? new Date(m.date * 1000).toLocaleString(N8Kit.locale()) : '') + ', ' + m.from + ':\n' + (m.text || '').split('\n').map(l => '> ' + l).join('\n');
 }
 function wmCompose(kind) {
     const m = WM.msg;
