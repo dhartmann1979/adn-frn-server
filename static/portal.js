@@ -93,12 +93,13 @@ function renderCats(i) {
 }
 function card(n) {
     const c = catOf(n.category);
-    return `<article class="card news-card ${n.pinned ? 'pinned' : ''} cat-${esc(n.category)}" data-id="${n.id}" tabindex="0">
-        <div class="nc-meta">${n.pinned ? `<span class="nc-pin">📌 ${esc(t('Pinned'))}</span>` : ''}<span class="nc-cat ${esc(n.category)}">${esc(t(c.label))}</span>
+    return `<article class="card news-card ${n.pinned ? 'pinned' : ''} ${n.image_url ? 'has-img' : ''} cat-${esc(n.category)}" data-id="${n.id}" tabindex="0">
+        ${n.image_url ? `<div class="nc-img"><img src="${esc(n.image_url)}" alt="${esc(n.image_alt || '')}" loading="lazy" translate="no"></div>` : ''}
+        <div class="nc-txt"><div class="nc-meta">${n.pinned ? `<span class="nc-pin">📌 ${esc(t('Pinned'))}</span>` : ''}<span class="nc-cat ${esc(n.category)}">${esc(t(c.label))}</span>
             <span>${esc(fmtDate(n.published_at))}</span>${n.author_name ? `<span>· ✍️ ${esc(n.author_name)}</span>` : ''}</div>
         <h3>${n.icon ? `<span class="ic">${esc(n.icon)}</span>` : ''}<span translate="no">${esc(n.title)}</span></h3>
         ${n.teaser ? `<div class="teaser" translate="no">${esc(n.teaser)}</div>` : n.body ? `<div class="teaser" translate="no">${esc(n.body.replace(/[#*>`_\[\]]/g, '').slice(0, 260))}${n.body.length > 260 ? ' …' : ''}</div>` : ''}
-        ${n.body ? `<div class="nc-more">${esc(t('Read more'))} →</div>` : ''}
+        ${n.body ? `<div class="nc-more">${esc(t('Read more'))} →</div>` : ''}</div>
     </article>`;
 }
 function renderList() {
@@ -113,6 +114,7 @@ function renderArticle(n) {
     $('newsHead').textContent = t('News');
     $('catFilter').hidden = true; $('moreBtn').hidden = true;
     $('newsList').innerHTML = `<article class="card news-full">
+        ${n.image_url ? `<div class="nf-img"><img src="${esc(n.image_url)}" alt="${esc(n.image_alt || '')}" translate="no"></div>` : ''}
         <a class="btn small back" href="/portal">← ${esc(t('All news'))}</a>
         <div class="nc-meta" style="margin-top:10px">${n.pinned ? `<span class="nc-pin">📌 ${esc(t('Pinned'))}</span>` : ''}<span class="nc-cat ${esc(n.category)}">${esc(t(c.label))}</span>
             <span>${esc(fmtDate(n.published_at))}</span>${n.author_name ? `<span>· ✍️ ${esc(n.author_name)}</span>` : ''}

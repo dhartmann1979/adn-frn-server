@@ -153,3 +153,10 @@ header .chips { flex: 0 1 auto; justify-content: flex-end; flex-wrap: nowrap; }
 .tabs a.tab-link.hidden { display: none; }
 #admin-news a.btn, #admin-portalcfg a.btn { text-decoration: none; }
 .tiles.tiles-even { align-items: stretch; }
+.news-img-row { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; align-items: start; margin: 6px 0; }
+.news-img { aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,.22); border: 1px dashed var(--glass-border);
+    display: grid; place-items: center; text-align: center; color: var(--text-dim); font-size: 12px; }
+.news-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.news-img-side .row { padding: 6px 0 0; }
+.news-thumb { width: 64px; height: 36px; object-fit: cover; border-radius: 6px; float: left; margin: 2px 10px 2px 0; }
+@media (max-width: 860px) { .news-img-row { grid-template-columns: 1fr; } }

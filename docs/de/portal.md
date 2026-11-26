@@ -38,7 +38,7 @@ Neue Gruppe im Admin-Menü: **📰 Portal** mit **📝 News** und **⚙️ Porta
 
 ### Schreiben
 
-**＋ Neue News** bzw. **✏️ Bearbeiten** öffnet den Editor: Symbol (Emoji), Titel, Kategorie, Anreißer (kurz, steht auf der Karte), Text
+**＋ Neue News** bzw. **✏️ Bearbeiten** öffnet den Editor: Symbol (Emoji), Titel, Kategorie, **🖼️ Themenbild** (seit 2.28: JPEG, PNG oder WebP, wird im Browser auf höchstens 1600 px verkleinert, mit Bildbeschreibung für Screenreader – oben auf der Karte, bei angehefteten News links daneben, im Artikel als breites Titelbild), Anreißer (kurz, steht auf der Karte), Text
 und links daneben die **Vorschau**. *📌 Oben anheften* und *🚀 Veröffentlicht*; **💾 Als Entwurf speichern** oder
 **🚀 Speichern & veröffentlichen**.
 

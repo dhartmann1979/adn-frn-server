@@ -863,7 +863,8 @@ async def portal_rss(request: Request):
     body_xml = "".join(
         f"<item><title>{xesc(n['title'])}</title><link>{base}/news/{n['id']}</link><guid isPermaLink=\"true\">{base}/news/{n['id']}</guid>"
         f"<pubDate>{formatdate(n['published_at'] or 0, usegmt=True)}</pubDate><category>{xesc(n['category'])}</category>"
-        f"<description>{xesc(n['teaser'] or n['body'][:500])}</description></item>" for n in items)
+        + (f"<enclosure url=\"{base}{xesc(n['image_url'])}\" type=\"image/jpeg\" length=\"0\"/>" if n.get("image_url") else "")
+        + f"<description>{xesc(n['teaser'] or n['body'][:500])}</description></item>" for n in items)
     xml = (f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{xesc(info["title"])}</title>'
            f"<link>{base}/portal</link><description>{xesc(info['subtitle'] or 'News')}</description>{body_xml}</channel></rss>")
     return Response(xml, media_type="application/rss+xml; charset=utf-8")
@@ -888,6 +889,16 @@ async def api_portal(request: Request, offset: int = 0, category: str = ""):
         t = (await asyncio.to_thread(ctx.stats.summary, "today", ctx.live.hidden_rooms())).get("totals", {})
         out["today"] = {k: t.get(k) for k in ("talks", "duration", "stations", "peak_online")}
     return out
+
+
+@app.get("/api/portal/news/{nid}/image")
+async def api_portal_news_image(nid: int, request: Request):
+    """Topic image of a news item – published ones for everybody, drafts only for admins."""
+    img = await asyncio.to_thread(fportal.get_image, ctx.db, nid, not is_admin(user_of(request)))
+    if not img:
+        raise HTTPError(404, "No image.")
+    return Response(img[1], media_type=img[0], headers={"Cache-Control": "public, max-age=604800",
+                                                        "Content-Security-Policy": "default-src 'none'"})
 
 
 @app.get("/api/portal/news/{nid}")

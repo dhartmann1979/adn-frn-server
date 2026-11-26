@@ -20,7 +20,7 @@ async function loadNewsAdmin() {
 function renderNewsAdmin() {
     const n = PORTAL.news, pub = n.filter(x => x.published).length;
     const row = x => `<tr class="${x.published ? '' : 'news-draft'}">
-        <td class="news-tt"><b translate="no">${x.icon ? esc(x.icon) + ' ' : ''}${esc(x.title)}</b>${x.teaser ? `<div class="dim" translate="no">${esc(x.teaser.slice(0, 140))}${x.teaser.length > 140 ? ' …' : ''}</div>` : ''}</td>
+        <td class="news-tt">${x.image_url ? `<img class="news-thumb" src="${esc(x.image_url)}" alt="">` : ''}<b translate="no">${x.icon ? esc(x.icon) + ' ' : ''}${esc(x.title)}</b>${x.teaser ? `<div class="dim" translate="no">${esc(x.teaser.slice(0, 140))}${x.teaser.length > 140 ? ' …' : ''}</div>` : ''}</td>
         <td><span class="nc-cat ${esc(x.category)}">${esc(catLabel(x.category))}</span></td>
         <td>${x.published ? '<span class="badge ok">Published</span>' : '<span class="badge warn">Draft</span>'}${x.pinned ? ' <span class="badge">📌 Pinned</span>' : ''}</td>
         <td class="nowrap">${esc(fmtDate(x.published_at || x.created_at))}<div class="dim">✍️ ${esc(x.author_name || x.author)}${x.updated_by && x.updated_by !== x.author ? ` · ✏️ ${esc(x.updated_by)}` : ''}</div></td>
@@ -49,6 +49,16 @@ function newsEditor(x) {
                 <div class="row grow"><label for="nf_title">Title</label><input type="text" id="nf_title" maxlength="140" required value="${esc(x.title)}" translate="no"></div>
                 <div class="row"><label for="nf_cat">Category</label><select id="nf_cat">${PORTAL.cats.map(c => `<option value="${esc(c.id)}" ${c.id === x.category ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select></div>
             </div>
+            <div class="news-img-row">
+                <div class="news-img" id="nf_img">${x.image_url ? `<img src="${esc(x.image_url)}" alt="">` : '<span>🖼️<br>Topic image</span>'}</div>
+                <div class="news-img-side">
+                    <div class="actions" style="justify-content:flex-start;margin:0">
+                        <label class="btn">📤 Choose image<input type="file" id="nf_file" accept="image/jpeg,image/png,image/webp" hidden></label>
+                        <button type="button" class="btn" id="nf_imgdel" ${x.image_url ? '' : 'hidden'}>🗑 Remove image</button></div>
+                    <div class="row"><label for="nf_alt">Image description <span class="dim">(for screen readers)</span></label><input type="text" id="nf_alt" maxlength="200" value="${esc(x.image_alt || '')}" translate="no"></div>
+                    <div class="help">JPEG, PNG or WebP – made smaller in the browser (max. 1600 px wide); shown at the top of the card and the article, 16:9.</div>
+                </div>
+            </div>
             <div class="row"><label for="nf_teaser">Teaser <span class="dim">(short summary on the card, optional)</span></label><input type="text" id="nf_teaser" maxlength="400" value="${esc(x.teaser)}" translate="no"></div>
             <div class="news-split">
                 <div class="row"><label for="nf_body">Text</label><textarea id="nf_body" maxlength="20000" spellcheck="true" translate="no">${esc(x.body)}</textarea>
@@ -62,10 +72,21 @@ function newsEditor(x) {
                 <button type="button" class="btn primary" id="nf_save">🚀 Save &amp; publish</button></div>
         </form>`, false, true);
     const prev = () => { $('nf_prev').innerHTML = PortalMD.render($('nf_body').value) || '<span class="dim">…</span>'; };
+    let image = 'keep';
+    $('nf_file').onchange = async e => {
+        const f = e.target.files[0]; if (!f) return;
+        try {
+            image = await newsShrink(f);
+            $('nf_img').innerHTML = `<img src="${image}" alt="">`; $('nf_imgdel').hidden = false;
+        } catch (x) { toast(x.message, true); }
+        e.target.value = '';
+    };
+    $('nf_imgdel').onclick = () => { image = ''; $('nf_img').innerHTML = '<span>🖼️<br>Topic image</span>'; $('nf_imgdel').hidden = true; };
     $('nf_body').addEventListener('input', prev); prev();
     const save = async publish => {
         const b = { id: x.id, title: $('nf_title').value, teaser: $('nf_teaser').value, body: $('nf_body').value, icon: $('nf_icon').value,
-            category: $('nf_cat').value, pinned: $('nf_pin').checked, published: publish === undefined ? $('nf_pub').checked : publish };
+            category: $('nf_cat').value, pinned: $('nf_pin').checked, published: publish === undefined ? $('nf_pub').checked : publish,
+            image, image_alt: $('nf_alt').value };
         if (!b.title.trim()) { $('nf_title').focus(); return; }
         try {
             const r = await api('POST', '/api/admin/news', b);
@@ -121,4 +142,25 @@ async function savePortalSettings(form) {
         const r = await api('POST', '/api/admin/portal/settings', { changes: formValues(form) });
         toast(r.changed.length ? `Saved (${r.changed.length})` : 'No changes');
     } catch (e) { toast(e.message, true); }
+}
+
+// topic image: made smaller in the browser (max. 1600 × 900 px area, JPEG/WebP ~85 %) before it is uploaded
+function newsShrink(file) {
+    return new Promise((resolve, reject) => {
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return reject(new Error('JPEG, PNG or WebP only.'));
+        const img = new Image(), url = URL.createObjectURL(file);
+        img.onload = () => {
+            const scale = Math.min(1, 1600 / img.width, 1200 / img.height);
+            const c = document.createElement('canvas');
+            c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            let out = c.toDataURL('image/webp', 0.85);
+            if (!out.startsWith('data:image/webp')) out = c.toDataURL('image/jpeg', 0.85);
+            if (out.length > 1.9e6) out = c.toDataURL('image/jpeg', 0.7);
+            resolve(out);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('The image cannot be read.')); };
+        img.src = url;
+    });
 }

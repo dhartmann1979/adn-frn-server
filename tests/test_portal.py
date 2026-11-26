@@ -113,3 +113,28 @@ def test_cert_names_and_redirect_host(tmp_path):
     assert cm.https_url("/x", "evil.example.com") == "https://frn.example.org/x"
     c = TestClient(build_http_app(cm))
     assert c.get("/a", headers={"host": "news.example.org"}, follow_redirects=False).headers["location"] == "https://news.example.org/a"
+
+
+def test_topic_image(client):
+    import base64
+    login(client)
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"\0" * 64).decode()
+    r = client.post("/api/admin/news", json={"title": "Mit Bild", "image": f"data:image/png;base64,{png}", "image_alt": "Antenne"}, headers=H)
+    assert r.status_code == 200, r.text
+    n = r.json()["item"]
+    assert n["has_image"] and n["image_url"].startswith(f"/api/portal/news/{n['id']}/image") and "image" not in n
+    assert client.get(n["image_url"]).headers["content-type"] == "image/png"          # admin sees the draft image
+    # fake image, wrong type, too big
+    for bad in ("data:image/png;base64," + base64.b64encode(b"<svg onload=alert(1)>").decode(), "data:image/svg+xml;base64,PHN2Zz4=",
+                "data:image/jpeg;base64," + base64.b64encode(b"\xff\xd8\xff" + b"0" * 1_600_000).decode()):
+        assert client.post("/api/admin/news", json={"id": n["id"], "title": "x", "image": bad}, headers=H).status_code == 400
+    # keep the image when editing without a new one
+    client.post("/api/admin/news", json={"id": n["id"], "title": "Mit Bild 2", "published": True}, headers=H)
+    client.post("/api/auth/logout", json={}, headers=H)
+    pub = client.get("/api/portal").json()["news"][0]
+    assert pub["image_url"] and pub["image_alt"] == "Antenne"
+    assert client.get(pub["image_url"]).content.startswith(b"\x89PNG")
+    assert "<enclosure" in client.get("/portal/rss.xml").text
+    login(client)
+    client.post("/api/admin/news", json={"id": n["id"], "title": "Ohne Bild", "published": True, "image": ""}, headers=H)
+    assert client.get(f"/api/portal/news/{n['id']}/image").status_code == 404

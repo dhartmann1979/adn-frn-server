@@ -2,6 +2,20 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.28.0 – 2026-11-26
+
+### 🖼️ Themenbild für die News im Portal
+- Jede News kann ein **Themenbild** haben: im News-Editor **📤 Bild wählen** (JPEG, PNG oder WebP), Vorschau im Format 16:9,
+  **🗑 Bild entfernen** und eine **Bildbeschreibung** für Screenreader. Beim Bearbeiten ohne neues Bild bleibt das alte.
+- Das Bild wird **im Browser verkleinert** (höchstens 1600 × 1200 px, WebP bzw. JPEG 85 %) und erst dann hochgeladen; der Server nimmt nur
+  echte JPEG/PNG/WebP-Dateien bis 1,5 MB an (Dateikopf wird geprüft – keine SVG, kein HTML).
+- **Portal:** Karten mit Bild oben (16:9, leichter Zoom beim Überfahren), die **angeheftete News mit Bild links neben dem Text**; im
+  **Artikel** ein breites Titelbild (21:9). Auf dem Handy immer Bild über Text.
+- Bilder kommen über `/api/portal/news/<id>/image` mit Cache (Entwürfe nur für Admins), im **RSS** als `enclosure`; die News-Liste im
+  Admin zeigt ein Vorschaubild. Mit Master & Backup gehen die Bilder beim Abgleich mit.
+- Tests: Bild hochladen, falsche/zu große/gefälschte Dateien abgewiesen, Bild bleibt beim Bearbeiten, öffentlich erst nach dem Veröffentlichen, RSS.
+- Doku: [Portal-Seite](docs/de/portal.md#schreiben), Screenshots neu.
+
 ## 2.27.1 – 2026-11-26
 
 ### ✉️ Mailserver: Hinweise aus dem MXToolbox-Test

@@ -443,6 +443,12 @@ N8Kit.i18n.add({
         'Make main domain': 'Zur Hauptdomain machen', 'Not a valid domain': 'Keine gültige Domain', 'Already there': 'Schon vorhanden',
         'Switch the mail server off?': 'Mailserver ausschalten?', 'Install the mail server?': 'Mailserver installieren?', 'Install': 'Installieren',
         'Running – this can take a few minutes …': 'Läuft – das kann ein paar Minuten dauern …',
+        // 2.28: topic image of the news
+        'Topic image': 'Themenbild', 'Choose image': 'Bild wählen', 'Remove image': 'Bild entfernen', 'Image description': 'Bildbeschreibung',
+        '(for screen readers)': '(für Screenreader)', 'JPEG, PNG or WebP only': 'Nur JPEG, PNG oder WebP', 'The image cannot be read': 'Das Bild lässt sich nicht lesen',
+        'JPEG, PNG or WebP – made smaller in the browser (max. 1600 px wide); shown at the top of the card and the article, 16:9.': 'JPEG, PNG oder WebP – wird im Browser verkleinert (max. 1600 px breit); steht oben auf der Karte und im Artikel, 16:9.',
+        'Topic image: JPEG, PNG or WebP only': 'Themenbild: nur JPEG, PNG oder WebP', 'Topic image: at most 1.5 MB': 'Themenbild: höchstens 1,5 MB',
+        'Topic image: the file is not what it claims to be': 'Themenbild: die Datei ist nicht das, was sie vorgibt', 'Topic image: damaged file': 'Themenbild: beschädigte Datei',
         // 2.27: automatic mail domains and certificates
         'waits for DNS': 'wartet auf DNS', 'Check now': 'Jetzt prüfen', 'Add mail domains automatically': 'Mail-Domains automatisch ergänzen',
         "Every domain under 🔒 Domains & HTTPS also becomes a mail domain (news.example.org → example.org); mail.<domain> gets on the Let's Encrypt certificate by itself as soon as its DNS points to this server": "Jede Domain unter 🔒 Domains & HTTPS wird auch Mail-Domain (news.example.org → example.org); mail.<domain> kommt von selbst aufs Let's-Encrypt-Zertifikat, sobald sein DNS auf diesen Server zeigt",

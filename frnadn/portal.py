@@ -14,7 +14,11 @@ CATEGORIES = [("info", "ℹ️ Info"), ("important", "⚠️ Important"), ("tech
               ("net", "📻 Net & rooms")]
 CAT_IDS = {c for c, _ in CATEGORIES}
 LIMITS = {"title": 140, "teaser": 400, "body": 20000, "icon": 8}
-COLS = "id, title, teaser, body, category, icon, author, author_name, published, pinned, created_at, updated_at, published_at, updated_by"
+COLS = ("id, title, teaser, body, category, icon, author, author_name, published, pinned, created_at, updated_at, published_at, updated_by, "
+        "image_alt, (image != '') AS has_image")
+IMAGE_RE = re.compile(r"^data:(image/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$")
+IMAGE_MAX = 1_500_000            # bytes after decoding – the browser makes the picture small (max. 1600 px) before uploading
+MAGIC = {"image/jpeg": (b"\xff\xd8\xff",), "image/png": (b"\x89PNG\r\n\x1a\n",), "image/webp": (b"RIFF",)}
 
 
 class PortalError(Exception):
@@ -23,12 +27,14 @@ class PortalError(Exception):
 
 def _row(r) -> Dict[str, Any]:
     d = dict(r)
-    d["published"], d["pinned"] = bool(d["published"]), bool(d["pinned"])
+    d["published"], d["pinned"], d["has_image"] = bool(d["published"]), bool(d["pinned"]), bool(d.get("has_image"))
+    d["image_url"] = f"/api/portal/news/{d['id']}/image?v={int(d['updated_at'])}" if d["has_image"] else ""
     return d
 
 
 def _public(d: Dict[str, Any]) -> Dict[str, Any]:
-    return {k: d[k] for k in ("id", "title", "teaser", "body", "category", "icon", "author_name", "pinned", "published_at", "updated_at")}
+    return {k: d[k] for k in ("id", "title", "teaser", "body", "category", "icon", "author_name", "pinned", "published_at", "updated_at",
+                              "image_url", "image_alt")}
 
 
 def list_all(db) -> List[Dict[str, Any]]:
@@ -72,9 +78,44 @@ def _clean(b: Dict[str, Any]) -> Dict[str, Any]:
     if cat not in CAT_IDS:
         raise PortalError("Unknown category.")
     out["category"] = cat
+    out["image_alt"] = re.sub(r"\s+", " ", str(b.get("image_alt") or "")).strip()[:200] if "image_alt" in b else None
+    img = b.get("image")
+    if img is None or img == "keep":
+        out["image"] = None                          # unchanged
+    elif img == "":
+        out["image"] = ""                            # removed
+    else:
+        out["image"] = check_image(str(img))
     out["pinned"] = 1 if b.get("pinned") else 0
     out["published"] = 1 if b.get("published") else 0
     return out
+
+
+def check_image(data_url: str) -> str:
+    """Only JPEG, PNG or WebP as data URL, at most 1.5 MB, and the bytes must really be that format."""
+    import base64
+    m = IMAGE_RE.fullmatch(data_url.strip())
+    if not m:
+        raise PortalError("Topic image: JPEG, PNG or WebP only.")
+    try:
+        raw = base64.b64decode(m.group(2), validate=True)
+    except ValueError:
+        raise PortalError("Topic image: damaged file.")
+    if len(raw) > IMAGE_MAX:
+        raise PortalError("Topic image: at most 1.5 MB.")
+    if not any(raw.startswith(x) for x in MAGIC[m.group(1)]) or (m.group(1) == "image/webp" and raw[8:12] != b"WEBP"):
+        raise PortalError("Topic image: the file is not what it claims to be.")
+    return data_url.strip()
+
+
+def get_image(db, nid: int, public: bool = True):
+    """(content type, bytes) of the topic image or None."""
+    import base64
+    r = db.q("SELECT image FROM news WHERE id = ?" + (" AND published = 1" if public else ""), (int(nid),))
+    if not r or not r[0]["image"]:
+        return None
+    m = IMAGE_RE.fullmatch(r[0]["image"])
+    return (m.group(1), base64.b64decode(m.group(2))) if m else None
 
 
 def save(db, b: Dict[str, Any], user: Dict[str, Any]) -> Dict[str, Any]:
@@ -89,13 +130,16 @@ def save(db, b: Dict[str, Any], user: Dict[str, Any]) -> Dict[str, Any]:
             raise PortalError("This news item does not exist (any more).")
         pub_at = old["published_at"] if old["published"] and c["published"] else (now if c["published"] else old["published_at"])
         db.x("UPDATE news SET title=?, teaser=?, body=?, category=?, icon=?, published=?, pinned=?, updated_at=?, published_at=?, "
-             "updated_by=? WHERE id=?", (c["title"], c["teaser"], c["body"], c["category"], c["icon"], c["published"], c["pinned"],
-                                         now, pub_at, user.get("username", ""), int(nid)))
+             "updated_by=?, image_alt=COALESCE(?, image_alt) WHERE id=?",
+             (c["title"], c["teaser"], c["body"], c["category"], c["icon"], c["published"], c["pinned"], now, pub_at,
+              user.get("username", ""), c["image_alt"], int(nid)))
+        if c["image"] is not None:
+            db.x("UPDATE news SET image=? WHERE id=?", (c["image"], int(nid)))
         return get(db, int(nid))
     cur = db.x("INSERT INTO news (title, teaser, body, category, icon, author, author_name, published, pinned, created_at, updated_at, "
-               "published_at, updated_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+               "published_at, updated_by, image, image_alt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                (c["title"], c["teaser"], c["body"], c["category"], c["icon"], user.get("username", ""), name, c["published"],
-                c["pinned"], now, now, now if c["published"] else None, user.get("username", "")))
+                c["pinned"], now, now, now if c["published"] else None, user.get("username", ""), c["image"] or "", c["image_alt"] or ""))
     return get(db, cur.lastrowid)
 
 
