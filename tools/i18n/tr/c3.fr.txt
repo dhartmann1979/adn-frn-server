@@ -1,0 +1,234 @@
+Le maître et le serveur de secours utilisent le même compte FRN
+Le SystemManager ne laisse qu’un seul d’entre eux en ligne – l’autre reçoit « mauvais identifiants » et son serveur FRN s’arrête. Demandez un mot de passe FRN propre pour le serveur de secours et saisissez-le là-bas sous SystemManager
+Maître et secours
+Deuxième serveur FRN avec la même configuration – synchronisation toutes les heures pile et par bouton
+Rôle de ce serveur
+Maître : les salons, listes et comptes sont modifiés ici. Secours : les reprend du maître
+Serveur unique
+Tableau de bord du partenaire
+Sur le maître le secours, sur le secours le maître, p. ex. https://frn-backup.example.org
+Clé de synchronisation
+Chiffre chaque transfert entre les deux serveurs – la même sur les deux (au moins 24 caractères) ; « 🎲 Nouvelle clé » en crée une
+chiffré avec la clé de synchronisation
+La réponse du partenaire n’est pas chiffrée avec la clé de synchronisation (mauvaise adresse ou clé
+La réponse du partenaire ne correspond pas à cette requête
+Synchroniser toutes les heures pile
+Le serveur de secours récupère la configuration du maître à chaque heure pile – l’écart est d’au plus une heure
+Envoyé aux clients : où aller si ce serveur est hors service. Vide avec Maître et secours = le partenaire
+Transfert
+Partenaire
+Dernière synchronisation
+Prochaine synchronisation
+Dernière récupération par le secours
+Les clients basculent vers
+inchangé
+repris
+Serveur FRN redémarré
+redémarrage en attente – stations connectées
+FRN arrêté
+maintenance – les stations sont sur le secours
+Saisissez le partenaire et la clé de synchronisation, puis enregistrez
+Choisissez ci-dessous le rôle de ce serveur : le maître fournit sa configuration, le secours la reprend toutes les heures pile. La bascule elle-même est assurée par FRN : les clients vont à l’adresse de secours quand ce serveur disparaît
+Synchroniser maintenant
+Passer la main au secours
+Reprendre depuis le secours
+Chaque serveur a besoin de son propre compte FRN
+Mot de passe FRN Maître
+Mot de passe FRN Backup
+Nouvelle clé
+Synchronisation
+Synchronisation : inchangé
+Synchronisation : configuration reprise
+Échec de la synchronisation
+Créer une nouvelle clé de synchronisation
+La clé est enregistrée ici. Saisissez la même clé sur l’autre serveur – d’ici là, la synchronisation ne fonctionne pas
+Nouvelle clé de synchronisation
+Copiez-la et saisissez-la sur l’autre serveur sous Maître et secours
+Terminé
+La configuration est d’abord synchronisée vers le secours. Ensuite, le serveur FRN d’ici s’arrête – les stations basculent d’elles-mêmes vers le secours (adresse de secours FRN). Le tableau de bord continue de fonctionner
+Le serveur FRN d’ici redémarre. Ensuite, le secours redémarre son serveur FRN, afin que ses stations reviennent ici
+Passer la main
+Reprendre
+Passage de main
+Reprise
+Main passée au secours
+Repris
+Configuration synchronisée vers le secours
+Le serveur FRN du secours fonctionne
+Serveur FRN d’ici arrêté – les stations basculent vers le secours
+Serveur FRN d’ici démarré
+Le secours renvoie ses stations
+aucun serveur FRN n’y fonctionne
+ne fonctionne pas après 30 s
+Ce compte est destiné à l’autre serveur : saisissez l’e-mail et le mot de passe là-bas sous SystemManager
+Demander un mot de passe FRN – Maître
+Demander un mot de passe FRN – Backup
+Définissez d’abord le rôle (Maître ou Secours)
+Seul le maître passe la main au secours
+Le serveur FRN du secours ne fonctionne pas – rien n’a basculé
+Clé de synchronisation : au moins 24 caractères
+Aucune clé de synchronisation définie
+Le partenaire ne connaît pas encore Maître et secours – mettez-le à jour vers la même version
+Le maître n’a envoyé aucun salon – rien n’a été repris (protection contre un maître vide
+Utilisez https:// pour le partenaire – la synchronisation transporte les comptes FRN (http uniquement dans le LAN
+Portail
+Actualités
+Page du portail
+Dernières actualités
+Toutes les actualités
+Lire la suite
+Épinglé
+mis à jour
+Pas encore d’actualités
+Actualités plus anciennes
+Se connecter
+Ouvrir le tableau de bord en direct
+Aucun salon
+Aucun lien configuré
+ℹ️ Info
+Important
+Technique
+Réseau et salons
+Seuls les admins rédigent et publient les actualités – elles apparaissent sur la page du portail. Les brouillons ne sont visibles qu’ici
+Ouvrir la page du portail ↗
+Nouvelle actualité
+Modifier l’actualité
+Publier
+Dépublier
+Publiée
+Dépubliée
+Brouillon
+publiées
+brouillons
+Catégorie
+Date
+Accroche
+Texte
+(court résumé sur la carte, facultatif
+Épingler en haut
+Enregistrer comme brouillon
+Enregistrée comme brouillon
+Enregistrer et publier
+Supprimer l’actualité
+Supprimée
+Pas encore d’actualités – « ＋ Nouvelle actualité » rédige la première
+Domaine propre : 🌐 Réseau, ports et domaines → 🔒 Domaines et HTTPS
+Page publique avec les actualités des exploitants – sous /portal et sur son propre domaine
+Domaine du portail
+Domaine du portail
+Auteurs
+Le portail peut avoir son propre domaine (p. ex. news.example.org) avec un certificat Let’s Encrypt – il affiche directement la page du portail
+Pas encore de domaine propre – le portail se trouve sous /portal du tableau de bord
+Seuls les admins (rôle Admin ou Superadmin) rédigent, modifient, publient et suppriment des actualités. Les utilisateurs et visiteurs ne font que lire. Chaque modification figure dans le 📜 journal
+Actualités publiées sous forme de flux
+Page du portail activée
+Titre du portail
+Sous-titre
+Texte d’accueil
+Afficher les salons et les stations en ligne
+Afficher les chiffres du jour
+Actualités par page
+Page publique avec les actualités des exploitants sous /portal (et sur le domaine du portail
+Vide = le titre du tableau de bord
+p. ex. « Actualités du serveur FRN Auf der NachtSchicht »
+Affiché au-dessus des actualités. Mise en forme comme dans les actualités : **gras**, *italique*, [lien](https://…), listes avec -
+Encadré latéral avec les salons, les stations en ligne et qui est à l’antenne (uniquement si le tableau de bord est public
+Passages, temps d’émission et stations du jour
+Veuillez saisir un titre
+Cette actualité n’existe pas (ou plus
+La page du portail est désactivée
+Mail
+Écrire
+Boîte de réception
+Brouillons
+Envoyés
+Indésirables
+Corbeille
+Choisissez un message
+Rien trouvé
+Aucun message
+messages
+sélectionnés
+lu
+non lu
+Spam
+Pas un spam
+Répondre
+Répondre à tous
+Transférer
+Charger les images
+à
+Le
+Message transféré
+Nouveau message
+À
+Objet
+Joindre
+Envoyer
+Logiciel de messagerie
+Utilisateur : votre adresse · mot de passe : votre mot de passe du tableau de bord
+Pièces jointes de plus de 20 Mo
+Veuillez saisir un destinataire
+Boîte aux lettres injoignable
+Pas de boîte aux lettres
+Message introuvable
+Rien de sélectionné
+E-mail
+Serveur de messagerie
+Boîtes aux lettres
+DMARC et BIMI
+Modèles DNS
+Domaines de messagerie
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (spam, contrôle DKIM, SPF/DMARC) sur cette machine. Chaque utilisateur du tableau de bord a une boîte aux lettres avec le même mot de passe
+Configuré
+File d’attente
+en attente
+Dernière application
+État vérifié
+pas encore
+Vérifier l’état
+Installer le serveur de messagerie
+Réinstaller / réparer
+Désactiver
+Relais, TLS et limites
+Le courrier sortant passe par le serveur de votre fournisseur (smarthost) – toujours chiffré. Les logiciels de messagerie se connectent uniquement avec TLS
+Logiciels de messagerie
+Entrant (IMAP
+Sortant (SMTP
+ou
+Authentification
+mot de passe normal
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – le nom d’utilisateur est l’adresse e-mail (ou le nom d’utilisateur du tableau de bord), le mot de passe celui du tableau de bord
+Sécurité
+Serveur de messagerie activé
+Relais (smarthost
+Port du relais
+Chiffrement du relais
+Utilisateur du relais
+Mot de passe du relais
+SPF du relais
+Port 25 : chiffrement obligatoire
+Taille de la boîte (Mo
+Plus grand message (Mo
+Postmaster
+Score de spam → dossier Indésirables
+Score de spam → refuser
+Postfix + Dovecot + Rspamd sur cette machine : chaque utilisateur du tableau de bord reçoit une boîte aux lettres avec le même mot de passe
+Tout le courrier sortant passe par ce serveur de votre fournisseur, p. ex. smtp.provider.de – vide = remise directe
+587 = STARTTLS, 465 = TLS dès le départ
+Toujours chiffré – jamais en clair
+Pour le modèle DNS, p. ex. include:_spf.provider.de – votre fournisseur l’indique
+Activé : les autres serveurs de messagerie doivent utiliser TLS (STARTTLS) pour livrer – les rares sans TLS sont refusés. Les logiciels de messagerie ont toujours besoin de TLS
+Utilisateur du tableau de bord qui reçoit postmaster@, abuse@ et les rapports DMARC – vide = le superadmin
+STARTTLS (port 587
+TLS / SMTPS (port 465
+Chaque utilisateur du tableau de bord dispose automatiquement d’une boîte aux lettres – le nom d’utilisateur est l’adresse, le mot de passe celui du tableau de bord. Nouveaux utilisateurs, nouveaux mots de passe, utilisateurs verrouillés ou supprimés parviennent d’eux-mêmes au serveur de messagerie
+verrouillé
+attend la connexion
+Sans boîte aux lettres
+Pas encore de domaine de messagerie
+DKIM, DMARC et MTA-STS
+Clés DKIM
+clé prête (RSA 2048
+créée au prochain « Appliquer »
+Le serveur signe chaque courrier sortant (DKIM), vérifie SPF, DKIM et DMARC du courrier entrant et indique aux autres comment traiter le courrier falsifié. Les enregistrements DNS sont préparés pour vous sous 🧾 Modèles DNS

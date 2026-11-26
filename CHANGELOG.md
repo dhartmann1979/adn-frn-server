@@ -2,6 +2,46 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.30.0 – 2026-11-26
+
+### 🌐 Neun Sprachen, neue Kopfleiste und ein Anmeldefenster für alle N8-Systeme (N8 Kit 1.6.0)
+
+**Sprachmenü mit neun Sprachen**
+- Statt des Umschalters **DE | EN** gibt es das Sprachmenü **🌐 DE ▾** mit **Deutsch, English, Français, Français (Belgique), Magyar, Svenska,
+  Nederlands, Italiano und Español** – in der Kopfleiste und unten im Anmeldefenster. Bedienbar auch mit der Tastatur (↓ ↑, Esc).
+- Übersetzt sind über **2200 Texte** der vier N8-Systeme mit den Fachbegriffen des Funkbetriebs (Rufzeichen → *indicatif*, *hívójel*,
+  *anropssignal*, *roepnaam*, *nominativo*, *indicativo*; Talkgroup, Time Slot und Color Code bleiben wie im DMR-Alltag), dazu Regeln für
+  Zahlen und Zeitangaben („vor 5 Min.“ → „il y a 5 min“, „5 perce“ …). **Français (Belgique)** nutzt das Französische mit belgischen
+  Abweichungen (z. B. „GSM“) und dem belgischen Datumsformat.
+- **Beim ersten Besuch gilt die Sprache des Browsers**, wenn es eine der neun ist, sonst Deutsch. Die Wahl gilt sofort und per Cookie für alle
+  N8-Oberflächen auf demselben Server; `?lang=fr` (bzw. `hu`, `sv`, `nl`, `it`, `es`, `fr-BE`) im Link wählt die Sprache direkt.
+- **Datum, Uhrzeit und Zahlen** folgen der Sprache (bisher immer deutsches Format).
+- Jede weitere Sprache liegt in einer eigenen Datei `static/n8-i18n-<sprache>.js` (rund 80 KB) und wird **nur geladen, wenn sie gewählt ist** –
+  beim ersten Aufruf noch vor dem Anzeigen der Seite, damit nichts auf Deutsch aufblitzt.
+- Mit einem Sprach-Scan aller Seiten wurden außerdem Texte gefunden, denen bisher die deutsche oder englische Übersetzung fehlte; sie sind ergänzt.
+
+**Einheitliches Anmeldefenster**
+- In allen N8-Systemen dasselbe Fenster: Logo und Titel, Benutzername und Passwort mit **👁** zum Anzeigen, Hinweis bei eingeschalteter
+  **Feststelltaste**, Schalter **„Angemeldet bleiben“**, Sprachmenü und ein Hinweis, ob die Verbindung verschlüsselt ist (🔒 HTTPS / HTTP).
+- Fehler und Sperren (Login-Sperre des N8 Guard) erscheinen direkt im Fenster, das Fenster wackelt kurz; während der Anmeldung dreht ein
+  Ladekreis im Knopf. Esc oder ✕ schließt (außer, wenn das Dashboard privat ist und die Anmeldung verlangt).
+
+**Benutzermenü ▾ in der Kopfleiste**
+- Angemeldet zeigt die Kopfleiste **Avatar + Name ▾**. Das Menü darunter: Name, Rolle (Superadmin, Admin, …) und die passenden Einträge –
+  Konto bzw. Passwort, Adminbereich und **⏻ Abmelden**. Vorher waren es zwei lose Knöpfe.
+
+**Kopfleiste auf Handy und Tablet**
+- Unter 900 px Breite ist die Kopfleiste überall gleich aufgebaut: oben Logo, Titel und rechts Sprache · Links · Anmeldung als kompakte
+  Knöpfe, darunter die Reiter als wischbare Leiste. Bisher sah jedes System auf dem Handy anders aus.
+
+**Im ADN-FRN-Server**
+- Benutzermenü mit 🔑 Mein Konto, ✉️ Webmail (wenn der Mailserver an ist), ⚙️ Admin und Abmelden; das alte Klappmenü im Code ist entfernt.
+- Bisher unübersetzt: „Log in to manage the FRN server.“, „Stay logged in (30 days)“, „Nobody in this room“, „Parrot echo test is on“,
+  „Top stations“ u. a. – jetzt auf Deutsch und in allen Sprachen.
+- Webmail, Portal und Statistik zeigen Datum und Uhrzeit im Format der gewählten Sprache.
+- `tools/i18n/`: die Übersetzungstabellen und das Skript, das die Sprachdateien aller vier N8-Systeme erzeugt.
+- Doku: [Sicherheit & N8 Kit](docs/de/sicherheit.md) – Sprachen, Anmeldefenster, Benutzermenü, neue Bilder; Kopfleisten-Bilder erneuert.
+
 ## 2.29.0 – 2026-11-26
 
 ### 🔐 Sicherheits-Update: Flooding, Brute-Force, Mail

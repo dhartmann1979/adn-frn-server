@@ -1,0 +1,332 @@
+Update beschikbaar
+Wat is er nieuw
+Nu bijwerken
+Details
+Later
+Verbergen tot morgen
+Geïnstalleerd
+Op GitHub
+Laatst gecontroleerd
+Automatische controle
+elk heel uur
+actueel
+Laatste update
+geslaagd
+teruggedraaid
+Nu controleren
+Controleren
+Update nu installeren
+Updatelogboek
+Elk heel uur gecontroleerd. Updates worden alleen geïnstalleerd als u op de knop drukt. De dienst herstart daarna; als de webinterface niet antwoordt, wordt de vorige versie automatisch hersteld
+Update downloaden en toepassen
+Annuleren
+De dienst herstart (ongeveer een minuut). Als de webinterface daarna niet antwoordt, wordt de vorige versie automatisch hersteld
+Uw wachtwoord (bevestiging
+Dienst herstart
+Webinterface controleren
+Sluiten
+Update geïnstalleerd. Pagina wordt herladen
+Update geïnstalleerd
+De update is teruggedraaid – de vorige versie draait weer
+Niet bijgewerkt – de vorige versie blijft ongewijzigd draaien
+Deze registratie verwijderen
+Getoonde verwijderen
+Alles verwijderen
+De getoonde registraties met hun logboeken verwijderen
+Alle registraties met hun logboeken verwijderen? Dit kan niet ongedaan worden gemaakt
+Deze registratie met haar logboek verwijderen
+Details in het updatelogboek (Systeem → Update
+bestanden met de hand gewijzigd – update gestopt
+De dienst antwoordt nog niet. Herlaad over een paar minuten of bekijk het updatelogboek
+Taal / Language
+altijd
+uit
+nooit
+Menu
+Bedrijf
+Gebruikers en toegang
+Weergave
+Netwerk en domeinen
+Systeem
+Update
+Diensten
+Rechten en sudo
+Keep-alive
+actief
+gestopt
+Fout
+starten
+stoppen
+herladen
+Autostart
+autostart aan
+Herstarten
+Stoppen
+Starten
+De dienst stoppen
+Status, autostart bij het opstarten en starten · stoppen · herstarten – alleen wat dit systeem toestaat. Een hier gestopte dienst wordt door de keep-alive niet opnieuw gestart
+Nog niet ingericht – eenmaal uitvoeren in de console
+Autostart uitschakelen? Na een herstart start de dienst niet vanzelf
+niet gecontroleerd
+alles in orde
+Console
+controles in orde
+Opnieuw controleren
+Herstellen
+Herstellen bezig
+Controleert de dienstgebruiker, het programma (root, alleen-lezen voor de dienst), gegevens en wachtwoorden, systemd-diensten, „Nu bijwerken”, keep-alive en de sudo-regels. Herstellen repareert wat fout is en controleert opnieuw
+Dienstgebruiker
+Programma
+Gegevens
+Hardware
+Bronmap
+USB-vocoder
+Domeinen en HTTPS
+niet ingericht
+gepauzeerd
+draait niet
+actief
+Internet
+bereikbaar
+offline sinds
+Laatste controle
+zojuist
+Heartbeat
+gezond
+geen herstart
+met de hand gestopt – keep-alive wacht
+herstart
+Eenmaal inrichten in de console
+Netwerk, poorten en domeinen
+Gebruikers
+Sessies
+Logboek
+Gebruiker
+Rol
+Laatste aanmelding
+Bewerken
+uitgeschakeld
+Weergavenaam
+Roepnaam
+Gebruikersnaam
+Wachtwoord (min. {n}
+Nieuw wachtwoord (optioneel
+Gebruiker toevoegen
+Verwijderen
+Echt verwijderen
+Gebruiker aangemaakt
+Gebruiker verwijderd
+alleen superadmin
+Superadmin
+Admin
+Kijker
+Auteur
+Redacteur
+Wie mag zich aanmelden. Admins zien IP-adressen en poorten en wijzigen instellingen; gebruikers zien alleen het dashboard
+Alle huidige aanmeldingen. „Afmelden” beëindigt er direct één
+Geen actieve sessies
+Laatst actief
+Verloopt
+Afmelden
+Sessie beëindigd
+deze sessie
+Aanmeldingen, mislukte pogingen en elke wijziging in het beheergedeelte – met tijd, persoon en IP-adres
+Tijd
+Gebeurtenis
+Poorten
+inkomend
+uitgaand
+Poorten opslaan
+Alle poorten op één plek. Inkomend: openen in firewall en router als hij van buitenaf bereikbaar moet zijn. Uitgaand: de andere kant moet bereikbaar zijn
+Dienst herstarten
+De dienst herstart – herlaad daarna de pagina
+Domein
+Certificaat
+geen certificaat
+testcertificaat
+geldig
+verlopen
+alleen HTTP
+tot
+Vernieuwen
+Certificaat aanvragen
+Verwijderen
+Nog geen domein
+DNS: geen record gevonden
+Domein toevoegen
+E-mail voor Let’s Encrypt
+Testcertificaat (Let’s Encrypt staging
+Domein toevoegen en certificaat aanvragen
+Certificaat aanvragen bezig
+Bezig – dit kan tot een minuut duren
+Certificaten worden automatisch vernieuwd
+Automatische vernieuwing is niet ingericht
+Toont
+Eigen domeinen met een gratis certificaat van Let’s Encrypt
+{d} verwijderen? Doorsturing en certificaat worden verwijderd
+Crashes
+Crash
+Watchdog
+Geen geheugen meer
+Beëindigd
+Time-out
+Vastgelopen
+Onderdeel gecrasht
+Thread gecrasht
+Hulpproces gecrasht
+Herstart door keep-alive
+nieuw
+alles gelezen
+alle
+Laatste 7 dagen
+Geen crashes geregistreerd
+Alles als gelezen markeren
+Geen logboek beschikbaar
+Crashbewaking
+Elke crash, elke blokkade en elke noodherstart van elke dienst wordt hier vastgelegd – met het deel van de applicatie waar het gebeurde en het volledige logboek (journal, Python-stack). De dienst wordt automatisch herstart. Nieuwe bevindingen verschijnen na het aanmelden als melding tot ze als gelezen zijn gemarkeerd
+Deze diensten worden bewaakt. Na elk onverwacht einde legt systemd de bevinding vast en herstart de dienst; blijft hij uit, dan herstart de keep-alive hem
+De crashbewaking is nog niet ingericht. De volgende update richt haar in – of eenmaal in de console
+1 nieuwe crash
+n} nieuwe crashes
+meer
+Alle crashes bekijken
+Als gelezen markeren
+Sinds uw laatste bezoek is een dienst gecrasht of vastgelopen. Hij is automatisch herstart. De bevinding noemt het deel van de applicatie en bevat het volledige logboek
+De webinterface wordt gestopt
+De webinterface herstart – een ogenblik
+Keep-alive aan
+Netwerkdiensten herstarten na een internetstoring
+Heartbeat-adres
+Heartbeat bij fouten (optioneel
+Hervatten
+1 u pauzeren (onderhoud
+Opslaan
+Keep-alive-logboek
+Elke minuut als root: controleert elke dienst echt (webinterface en de verbindingen van de protocollen), herstart zieke diensten na enkele minuten (hoogstens 4× per uur), merkt internetstoringen op en herstart daarna de netwerkdiensten, en meldt zich bij een heartbeat-adres (Uptime Kuma „push”, Healthchecks.io …). Een met de hand gestopte dienst blijft gestopt
+Bericht
+Nog geen update via de webinterface
+Herladen
+Aanmelden
+Wachtwoord
+Wachtwoord tonen
+Wachtwoord herhalen
+Caps Lock staat aan
+Aangemeld blijven
+Aanmaken
+Versleutelde verbinding
+Onversleutelde verbinding (HTTP
+Voer gebruikersnaam en wachtwoord in
+Het wachtwoord is te kort
+De wachtwoorden komen niet overeen
+Aanmelden mislukt
+Mijn account
+Wachtwoord wijzigen
+Taal
+Te veel mislukte pogingen – wacht 15 minuten
+Aanmelden
+Webmail
+Aangemeld blijven (30 dagen
+Meld u aan om de FRN-server te beheren
+Dit dashboard is privé. Meld u aan
+Meld u aan om instellingen te wijzigen
+Deze hotspot is privé. Meld u aan
+Meld u aan om IP-adressen en het beheergedeelte te zien
+Meld u aan om het dashboard te bekijken
+Onjuiste gebruikersnaam of wachtwoord
+Te veel mislukte aanmeldingen. Probeer het over 15 minuten opnieuw
+Te veel onjuiste wachtwoorden. Probeer het over 15 minuten opnieuw
+Te veel verzoeken – even geduld
+Te veel mislukte pogingen. Wacht 15 minuten
+Afmelden
+Links
+Instellingen
+Updates
+Logboeken
+Wijzigingslogboek
+Live
+Live-gegevens
+Statistieken
+Stats
+Laatst gehoord
+Laatst gehoord
+In de lucht
+Vandaag
+24 u
+7 dagen
+30 dagen
+90 dagen
+1 jaar
+Duur
+Zendtijd
+Gesprekken
+Doorgangen
+Station
+Stations
+Naam
+Status
+Online
+Offline
+Rustig
+Meldingen
+Laden
+Links laden
+Nog niets gehoord
+geen
+ja
+nee
+aan
+Ja
+Nee
+OK
+Terug
+Vernieuwen
+Nu herstarten
+Uploaden
+Downloaden
+Zoeken
+Filter
+Alle
+Totaal
+Versie
+Looptijd
+Huidig wachtwoord
+Nieuw wachtwoord
+Nieuw wachtwoord herhalen
+Aangemaakt
+Toevoegen
+Opgeslagen
+Instellingen opgeslagen
+Waarschuwing
+Info
+Talkgroup
+Talkgroups
+Slot
+Bron
+Doel
+Richting
+seconden
+minuten
+uren
+dagen
+geleden
+Licht
+Donker
+Automatisch
+Kleuren
+Kleuren
+Logo
+Titel
+Voorbeeld
+Terugzetten
+Toepassen
+Kopiëren
+Gekopieerd
+Tonen
+Verbergen
+Meer
+Minder
+Alles tonen
+Minder tonen
+Beschrijving
+Ingeschakeld
+Uitgeschakeld

@@ -1,0 +1,219 @@
+Szerver és adatok
+Java frissítése most
+Java FRN-szerver
+Percenként rootként: valóban ellenőriz minden szolgáltatást (vezérlőpult, Java FRN-szerver fut és fogad állomásokat), 3 perc után újraindítja a hibásakat (óránként legfeljebb 4×), észleli az internetkimaradásokat és utána újraindítja a hálózati szolgáltatásokat, és jelentést küld egy heartbeat-címre
+Keep-Alive
+kézzel leállítva – a Keep-Alive vár
+Keep-Alive be
+Percenként meghívva, amíg minden rendben van (Uptime Kuma „Push”, Healthchecks.io …) – riaszt, ha a hívások elmaradnak
+Keep-Alive napló
+Keep-Alive mentve
+Keep-Alive 1 órára szüneteltetve
+Keep-Alive ismét aktív
+Nyilvános FRN-hibanapló
+Probléma esetén mindig először itt nézzen: a freeradionetwork.de FRN SystemManagere ide írja a szerverek és kliensek minden elutasított bejelentkezését (hibás FRN-jelszó, többszörös kapcsolat, nem elérhető port …) – azt az okot, amelyet maga az FRN-szerver nem közöl. Megjelennek az ezen szervercímre, az üzemeltető hívójelére és az itt elutasított állomásokra vonatkozó bejegyzések. Az új bejegyzések lent az eseményeknél is megjelennek
+A teljes hibanapló megnyitása ↗
+nem elérhető
+bejegyzés erről a szerverről
+semmi erről a szerverről
+óta
+Ki
+Nincs bejegyzés erről a szerverről a napló legutóbbi bejegyzései között
+Hívójelek
+más állomások a naplóban
+betöltés
+Az ok a nyilvános FRN-hibanaplóban található
+Naplók → FRN-hibanapló
+a teljes napló megnyitása ↗
+Elutasította a SystemManager? Az ok a freeradionetwork.de nyilvános FRN-hibanaplójában található (Súgó → Hibanapló
+FRN-hibanapló
+megnyitás ↗
+Hibás FRN-jelszó – kérjen jelszót a SystemManagertől (📧 FRN-jelszó igénylése), és pontosan a kiosztott jelszót adja meg ugyanazzal az e-mail-címmel és ugyanazzal a hívójellel/névvel
+Többszörös kapcsolat: már aktív egy kapcsolat ugyanazokkal az adatokkal – fut egy második példány (régi szerver, második szerver vagy tartalékszerver ugyanazzal a fiókkal)? Minden FRN-szervernek saját fiók kell
+A SystemManager nem éri el a szervert ezen a címen és porton az internetről – ellenőrizze a tűzfalat, a porttovábbítást (TCP) és a szervercímet
+Hozzáférés letiltva – forduljon az FRN-hálózat üzemeltetőjéhez
+A fiók ismeretlen a SystemManager számára – kérjen jelszót, vagy ellenőrizze az e-mail-cím, a hívójel és a név írásmódját
+A protokollverzió elutasítva – frissítse az FRN-szervert/klienst
+Az e-mail-cím elutasítva – pontosan az FRN-jelszóhoz tartozó címet használja
+Állapot, automatikus indítás rendszerindításkor és indítás, leállítás, újraindítás – csak az ehhez a vezérlőpulthoz engedélyezett szolgáltatások
+Ellenőrzi a szolgáltatás felhasználóját, a program és az adatok jogosultságait, a systemd egységeket és a sudo szabályokat
+kijavítja a hibákat és újra ellenőriz. Konzol
+sikertelen
+Automatikus indítás rendszerindításkor
+hibák
+ellenőrzés
+ellenőrzés és javítás
+A jogosultságok rendben vannak
+Nem minden javítható
+Még nem volt frissítés a vezérlőpultról
+Letiltás
+Az ezen a szerveren lévő állomások elveszíthetik a kapcsolatot
+A vezérlőpult utána nem érhető el – indítsa újra a konzolon: sudo systemctl start frnadn
+FRN-jelszó igénylése
+Jelszó igénylése
+FRN-jelszó igényelve
+E-mail (ide küldik a jelszót
+Sáv / csatorna
+Ország
+Város - városrész
+Minden FRN-szervernek saját FRN-fiók kell – ugyanazt az e-mailt és jelszót két szerveren elutasítják („ugyanezek az adatok már online egy másik szerveren”
+Ezután adja meg fent a SystemManager alatt az e-mailt és a jelszót, majd mentsen. Második szerverhez használjon másik nevet (pl. „Server Test”) – a hívójelnek és a névnek együtt újnak kell lennie
+A SystemManager e-mailben küld jelszót egy új FRN-fiókhoz
+Méret
+Biztonsági mentés letöltve
+Biztonsági mentés törölve
+Visszaállítás elindítva
+Biztonsági mentés visszaállítva
+Biztonsági mentés
+Visszaállítás
+Biztonsági mentés készítése
+Visszaállítás most
+Ellenőrzés
+Minden egy titkosított fájlban (.frnbak): beállítások, felhasználók, szobák, hozzáférési listák, FRN-fiókok, statisztika, chat, klienslogók, arculat és az FRN-szerver konfigurációja. Válasszon jelszót – nélküle a mentés nem nyitható meg, tartsa a jelszókezelőjében. A legutóbbi mentések a szerveren maradnak
+A biztonsági mentés jelszava (min. 10 karakter
+Ismét
+Még nincs biztonsági mentés
+Az adatbázist, az arculatot és az FRN-konfigurációt a mentésre cseréli. A vezérlőpult újraindul, alkalmazza a mentést, majd újraindítja az FRN-szervert – a csatlakozott állomások maguktól újracsatlakoznak. Az aktuális állapot a before-restore-… alatt marad meg az adatkönyvtárban. Utána a mentésben lévő fiókokkal jelentkezik be
+Biztonsági mentés fájlja (.frnbak
+A biztonsági mentés jelszava
+A megerősítéshez írja be: RESTORE
+Utolsó visszaállítás
+Az utolsó visszaállítás sikertelen
+Szobák
+FRN-fiókok
+Biztonsági mentés elkészült
+A jelszavak eltérnek
+Biztonsági mentés törlése
+Biztonsági mentés visszaállítása most
+A vezérlőpult újraindul, és minden adatot a mentésre cserél; az FRN-szerver is újraindul
+Visszaállítás – a vezérlőpult újraindul
+Sikertelen feltöltés
+Hibás jelszó vagy sérült fájl
+Ez nem az adn-frn-server biztonsági mentése (.frnbak
+Előbb töltse fel a mentésfájlt
+A megerősítéshez írja be: RESTORE
+A mentés jelszavának legalább 10 karakteresnek kell lennie
+A biztonsági mentések minden hozzáférési adatot tartalmaznak – csak superadmin
+Visszavonás
+Token visszavonása
+A szolgáltatás azonnal elveszíti a hozzáférést
+Token visszavonva
+Utoljára használva
+Token
+Másolja ki most a tokent – csak egyszer jelenik meg
+API-token
+API-token visszavonva
+Listák
+FRN-szerver
+Chat
+Most online
+Mai adások
+Mai adásidő
+Hallott állomások
+Online csúcs
+Szoba
+Sáv
+Továbbiak
+Utolsó
+a freeradionetwork.de-ről
+kevesebb
+most
+online
+Némítva
+Letiltva
+Üzemeltető
+Még nincs superadmin
+Fejezze be a vezetett telepítést a szerveren
+vagy hozzon létre egyet ezzel:
+Szerverbeállítások vagy ACL-ek mentve
+Indítsa újra az FRN-szervert a módosítások alkalmazásához (a csatlakozott állomások maguktól újracsatlakoznak
+belépett
+kilépett
+Legaktívabb állomások
+Aktivitás szobánként
+Online állomások
+maximum, 5 percenként mintavételezve
+Mikor beszélnek
+Arány
+Legaktívabb állomások
+Leginkább itt:
+Érkezések és távozások
+be- és kijelentkezések, élőben
+adásidő szerint
+adásidő, elmúlt 30 nap
+Napi összesítők
+H
+K
+Sze
+Cs
+P
+Szo
+V
+Keresés: hívójel, név, város vagy ország
+Utoljára látva
+Beszédidő (30 n
+Adások (30 n
+Város
+Klienstípus
+Óta
+Bejelentkezések
+Crosslink
+Átjáró
+Átjáró (rádió
+Csak PC
+Csak PC
+PC / app
+Németország
+Ausztria
+Svájc
+Hollandia
+Belgium
+Lengyelország
+Egyesült Királyság
+Egyesült Államok
+Szobachat
+Chatüzenetek
+A szobákban írt szöveges üzenetek
+FRN-szobák
+Szerverlisták
+Szerver-hozzáférési listák
+Adminok
+Téma
+Munkamenetek és napló
+Változásnapló
+Aktív munkamenetek
+Események (élő
+Konfiguráció
+Cím, nyilvános nézet és amit a látogatók látnak
+Nyilvános nézet
+Be: bejelentkezés nélkül mindenki látja a szobákat és a statisztikát
+Rejtett szobák nyilvános megjelenítése
+Állomások fül
+E-maillel és címmel – csak adminok számára látható
+Bejelentkezés érvényessége (óra
+Regisztráció a sysman.freeradionetwork.de-n vagy önálló üzem
+Önálló (SystemManager nélkül
+Be: a szerver önállóan fut, a jelszavak a saját listából jönnek (FRN-fiókok). Ki: regisztrálva a SystemManagernél
+Saját jelszólista használata (önálló
+Ki: önálló módban minden FRN-jelszó elfogadott
+Csak önálló módhoz, pl. otthoni hálózat szerveréhez
+önálló
+A SystemManagernél regisztrálva a szerver megjelenik az FRN-rendszerben, és ott ellenőrzi a bejelentkezéseket. A SystemManager teszteli, hogy a cím és a port elérhető-e az internetről – előbb állítsa be a porttovábbítást
+SystemManager
+SystemManager (sysman_server_addr
+sysman.freeradionetwork.de = alternatív FRN-rendszer (DE
+Cím, port és időkorlátok – a server.properties fájlba írva
+Szervercím (server_addr
+A szerver hosztneve vagy nyilvános IP-címe, pl. frn.die-n8schicht.de – a SystemManager ellenőrzi az elérhetőségét
+Port (server_port
+TCP-port az FRN-kliensekhez; nyissa meg a routerben és a tűzfalon
+Tartalékszerver (backup_server_addr
+Tartalékszerver portja
+A klienseknek elküldve: hová menjenek, ha ez a szerver nem működik
+Kliens időkorlát (client_sotimeout, ms
+Az ennyi ideig semmit sem küldő klienst lecsatlakoztatja
+Beszéd-időkorlát (client_txtimeout, ms
+Ennyi idő beszéd nélkül befejezi az adást; 0 = ki
+Alapértelmezés 180
+Alapértelmezett szoba (default_net
+A nem létező szobát kérő kliensek ide kerülnek

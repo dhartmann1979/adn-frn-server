@@ -1,0 +1,332 @@
+Uppdatering tillgänglig
+Nyheter
+Uppdatera nu
+Detaljer
+Senare
+Dölj till i morgon
+Installerad
+På GitHub
+Senast kontrollerad
+Automatisk kontroll
+varje hel timme
+aktuell
+Senaste uppdatering
+lyckades
+återställd
+Kontrollera nu
+Kontrollerar
+Installera uppdateringen nu
+Uppdateringslogg
+Kontrolleras varje hel timme. Uppdateringar installeras bara när du trycker på knappen. Tjänsten startas sedan om; om webbgränssnittet inte svarar återställs den tidigare versionen automatiskt
+Laddar ner och tillämpar uppdateringen
+Avbryt
+Tjänsten startas om (cirka en minut). Om webbgränssnittet inte svarar efteråt återställs den tidigare versionen automatiskt
+Ditt lösenord (bekräftelse
+Tjänsten startas om
+Kontrollerar webbgränssnittet
+Stäng
+Uppdateringen installerad. Sidan laddas om
+Uppdateringen installerad
+Uppdateringen återställdes – den tidigare versionen körs igen
+Inte uppdaterad – den tidigare versionen fortsätter att köras oförändrad
+Ta bort denna post
+Ta bort visade
+Ta bort alla
+Ta bort de visade posterna med deras loggar
+Ta bort alla poster med deras loggar? Detta kan inte ångras
+Ta bort denna post med dess logg
+Detaljer i uppdateringsloggen (System → Uppdatering
+filer ändrade för hand – uppdateringen stoppad
+Tjänsten svarar inte ännu. Ladda om om några minuter eller titta i uppdateringsloggen
+Språk / Language
+alltid
+av
+aldrig
+Meny
+Drift
+Användare och åtkomst
+Utseende
+Nätverk och domäner
+System
+Uppdatering
+Tjänster
+Behörigheter och sudo
+Keep-alive
+körs
+stoppad
+Fel
+startar
+stoppar
+laddar om
+Autostart
+autostart på
+Starta om
+Stoppa
+Starta
+Stoppa tjänsten
+Status, autostart vid uppstart och starta · stoppa · starta om – bara det som detta system tillåter. En tjänst som stoppas här startas inte igen av keep-alive
+Inte konfigurerad än – kör en gång i konsolen
+Stänga av autostart? Efter en omstart startar tjänsten inte av sig själv
+inte kontrollerad
+allt i ordning
+Konsol
+kontroller OK
+Kontrollera igen
+Åtgärda
+Åtgärdar
+Kontrollerar tjänsteanvändaren, programmet (root, skrivskyddat för tjänsten), data och lösenord, systemd-tjänster, ”Uppdatera nu”, keep-alive och sudo-reglerna. Åtgärda reparerar det som är fel och kontrollerar igen
+Tjänsteanvändare
+Program
+Data
+Hårdvara
+Källmapp
+USB-vocoder
+Domäner och HTTPS
+inte konfigurerad
+pausad
+körs inte
+aktiv
+Internet
+nåbar
+nere sedan
+Senaste kontroll
+just nu
+Heartbeat
+frisk
+ingen omstart
+stoppad för hand – keep-alive väntar
+omstartad
+Konfigurera en gång i konsolen
+Nätverk, portar och domäner
+Användare
+Sessioner
+Logg
+Användare
+Roll
+Senaste inloggning
+Redigera
+inaktiverad
+Visningsnamn
+Anropssignal
+Användarnamn
+Lösenord (minst {n}
+Nytt lösenord (valfritt
+Lägg till användare
+Ta bort
+Verkligen ta bort
+Användare skapad
+Användare borttagen
+endast superadmin
+Superadmin
+Admin
+Läsare
+Författare
+Redaktör
+Vem som får logga in. Administratörer ser IP-adresser och portar och ändrar inställningar; användare ser bara instrumentpanelen
+Alla aktuella inloggningar. ”Logga ut” avslutar en direkt
+Inga aktiva sessioner
+Senast aktiv
+Upphör
+Logga ut
+Sessionen avslutad
+denna session
+Inloggningar, misslyckade försök och varje ändring i administrationen – med tid, person och IP-adress
+Tid
+Händelse
+Portar
+inkommande
+utgående
+Spara portar
+Alla portar på ett ställe. Inkommande: öppna i brandvägg och router om den ska nås utifrån. Utgående: motsidan måste vara nåbar
+Starta om tjänsten
+Tjänsten startas om – ladda om sidan efteråt
+Domän
+Certifikat
+inget certifikat
+testcertifikat
+giltigt
+utgånget
+endast HTTP
+till
+Förnya
+Hämta certifikat
+Ta bort
+Ingen domän än
+DNS: ingen post hittades
+Lägg till domän
+E-post för Let’s Encrypt
+Testcertifikat (Let’s Encrypt staging
+Lägg till domän och hämta certifikat
+Hämtar certifikat
+Pågår – detta kan ta upp till en minut
+Certifikat förnyas automatiskt
+Automatisk förnyelse är inte konfigurerad
+Visar
+Egna domäner med ett gratis certifikat från Let’s Encrypt
+Ta bort {d}? Vidarebefordran och certifikat raderas
+Krascher
+Krasch
+Watchdog
+Slut på minne
+Avslutad
+Tidsgräns
+Hängning
+Komponent kraschade
+Tråd kraschade
+Hjälpprocess kraschade
+Omstart av keep-alive
+ny
+alla lästa
+alla
+Senaste 7 dagarna
+Inga krascher registrerade
+Markera alla som lästa
+Ingen logg tillgänglig
+Kraschövervakning
+Varje krasch, hängning och nödomstart av varje tjänst registreras här – med den del av applikationen där det hände och den fullständiga loggen (journal, Python-stack). Tjänsten startas om automatiskt. Nya fynd visas som meddelande efter inloggning tills de markerats som lästa
+Dessa tjänster övervakas. Efter varje oväntat avslut registrerar systemd fyndet och startar om tjänsten; om den förblir nere startar keep-alive om den
+Kraschövervakningen är inte konfigurerad än. Nästa uppdatering konfigurerar den – eller en gång i konsolen
+1 ny krasch
+n} nya krascher
+mer
+Visa alla krascher
+Markera som läst
+Sedan du senast tittade har en tjänst kraschat eller hängt sig. Den startades om automatiskt. Fyndet anger delen av applikationen och innehåller den fullständiga loggen
+Webbgränssnittet stoppas
+Webbgränssnittet startas om – ett ögonblick
+Keep-alive på
+Starta om nätverkstjänster efter internetavbrott
+Heartbeat-adress
+Heartbeat vid fel (valfritt
+Återuppta
+Pausa 1 h (underhåll
+Spara
+Keep-alive-logg
+Varje minut som root: kontrollerar verkligen varje tjänst (webbgränssnitt och protokollens anslutningar), startar om sjuka tjänster efter några minuter (högst 4× per timme), upptäcker internetavbrott och startar sedan om nätverkstjänsterna, och rapporterar till en heartbeat-adress (Uptime Kuma ”push”, Healthchecks.io …). En tjänst som stoppats för hand förblir stoppad
+Meddelande
+Ingen uppdatering via webbgränssnittet än
+Ladda om
+Logga in
+Lösenord
+Visa lösenord
+Upprepa lösenord
+Caps Lock är på
+Förbli inloggad
+Skapa
+Krypterad anslutning
+Okrypterad anslutning (HTTP
+Ange användarnamn och lösenord
+Lösenordet är för kort
+Lösenorden stämmer inte överens
+Inloggningen misslyckades
+Mitt konto
+Byt lösenord
+Språk
+För många misslyckade försök – vänta 15 minuter
+Inloggning
+Webbmail
+Förbli inloggad (30 dagar
+Logga in för att hantera FRN-servern
+Denna instrumentpanel är privat. Logga in
+Logga in för att ändra inställningar
+Denna hotspot är privat. Logga in
+Logga in för att se IP-adresser och administrationen
+Logga in för att se instrumentpanelen
+Fel användarnamn eller lösenord
+För många misslyckade inloggningar. Försök igen om 15 minuter
+För många felaktiga lösenord. Försök igen om 15 minuter
+För många förfrågningar – vänta ett ögonblick
+För många misslyckade försök. Vänta 15 minuter
+Utloggning
+Länkar
+Inställningar
+Uppdateringar
+Loggar
+Ändringslogg
+Live
+Livedata
+Statistik
+Statistik
+Senast hörda
+Senast hörda
+I sändning
+Idag
+24 h
+7 dagar
+30 dagar
+90 dagar
+1 år
+Varaktighet
+Sändningstid
+Samtal
+Sändningar
+Station
+Stationer
+Namn
+Status
+Online
+Offline
+Tyst
+Aviseringar
+Laddar
+Laddar länkar
+Inget hört än
+inga
+ja
+nej
+på
+Ja
+Nej
+OK
+Tillbaka
+Uppdatera
+Starta om nu
+Ladda upp
+Ladda ner
+Sök
+Filter
+Alla
+Totalt
+Version
+Drifttid
+Nuvarande lösenord
+Nytt lösenord
+Upprepa nytt lösenord
+Skapad
+Lägg till
+Sparat
+Inställningar sparade
+Varning
+Info
+Talkgroup
+Talkgroups
+Slot
+Källa
+Mål
+Riktning
+sekunder
+minuter
+timmar
+dagar
+sedan
+Ljust
+Mörkt
+Automatiskt
+Färger
+Färger
+Logotyp
+Titel
+Förhandsvisning
+Återställ
+Tillämpa
+Kopiera
+Kopierat
+Visa
+Dölj
+Mer
+Mindre
+Visa alla
+Visa färre
+Beskrivning
+Aktiverad
+Inaktiverad

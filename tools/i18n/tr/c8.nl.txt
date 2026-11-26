@@ -1,0 +1,180 @@
+Gecontroleerd
+Herstart hem (sudo systemctl restart hblink4-dash
+Kies een profiel en wijzig dan elke kleur naar wens – of bouw een volledig eigen schema. U ziet het resultaat meteen
+Titels
+Wat de kop en het browsertabblad tonen
+Grote tekst naast het logo
+Kleine regel onder de titel
+Titel van het browsertabblad
+Leeg = titel van het dashboard
+Logo en browsericoon
+Upload eigen afbeeldingen of ga op elk moment terug naar het N8schicht-logo
+Browsericoon (favicon
+Afbeelding uploaden
+N8-logo
+of adres van een afbeelding (https://… of /static/
+Leeg = N8schicht-logo · PNG, JPEG, WebP, GIF, SVG · max. 1 MB
+Leeg = zelfde als het logo · PNG, JPEG, WebP, GIF, SVG, ICO · max. 1 MB
+Logogrootte (px
+Logohoeken (%
+0 = zoals getekend, 50 = rond
+Uw eigen links in de kop, bv. naar de website van het netwerk, een chatgroep of een wiki
+Uw eigen links in de kop: website, chatgroep, wiki, donatiepagina… Iedereen ziet ze, ook zonder aanmelding
+Rij knoppen onder de kop
+Eén knop naast de statusbadges (oudere optie
+Extra knop in de kop
+(enkele extra knop
+Knoplink
+Nog geen links. Voeg hieronder de eerste toe
+Tonen/verbergen
+OpenBridge verbindt deze server met een ander netwerk, bv. een FreeDMR-server
+Nieuwe trunk
+Trunks opslaan
+Alleen talkgroups in deze lijst passeren de trunk (beide richtingen); al het andere wordt verworpen. In te stellen in het beheergedeelte → Patronen, links en trunks →
+Expert: alle trunks als JSON – of plak een hblink.cfg-sectie
+In het formulier overnemen
+Hier ziet u alle trunks als JSON. U kunt ook OpenBridge-secties uit een FreeDMR/HBlink3 plakken
+worden genegeerd. Een sectie werkt de trunk met dezelfde naam bij – of die op dezelfde poort of netwerk-ID; anders voegt ze een trunk toe
+Regels die beginnen met
+Een HBlink3-voorbeeld laden
+Een configuratie importeren
+Verhuist u van een andere DMR-server? Laad diens configuratiebestand; HBlink4 toont wat het kan overnemen. Er verandert niets voordat u klikt
+Bestand
+Bestand kiezen
+rules.py kiezen
+Analyseren
+Wat wordt overgenomen
+Configuratiebestand
+hblink.cfg, freedmr.cfg, adn-server.yaml of config.json – of sleep het hierheen
+HBlink3/FreeDMR: voeg rules.py toe (conferentiebruggen
+optioneel – de talkgroups worden talkgrouplijsten
+Alleen gelezen, nooit uitgevoerd
+alles van een andere HBlink4: server, toegang, patronen, zwarte lijst, links, trunks
+lijsten met radio- en repeater-ID’s worden vermeldingen op de zwarte lijst
+Niet overgenomen: reporting, logger, MySQL, AllStar, proxy’s, alias-downloads – HBlink4 doet dat zelf of heeft het niet nodig. U ziet de lijst na de analyse
+APRS (kaart, DAPRS, server
+APRS-server
+Tabblad APRS in het dashboard
+Server-ID
+Server-ID (uw roepnaam
+Roepnaam met SSID, bv. DB0ABC-10. Aanmeldnaam bij APRS-IS (de passcode wordt berekend) en naam in het pakketpad
+Standaard uit. Schakelt de kaart, de stationsdatabase en de gateway DMR → APRS in. De TCP-poorten en de uplink hieronder zijn aparte schakelaars
+Een APRS-IS-compatibele server in Python: APRS-apps, iGates en trackers verbinden ermee zoals met elke APRS-IS-server
+De APRS-IS-poorten openen (TCP
+APRSdroid, Xastir, YAAC, iGates en trackers verbinden hier. Open de poorten in de firewall
+Filterpoort
+Full-feedpoort
+Max. clients
+Duplicaatvenster (s
+Hetzelfde pakket opnieuw binnen deze tijd wordt verworpen (APRS-IS-standaard: 30 s
+Clients kiezen met een filter wat ze krijgen (r/lat/lon/km
+Alles wat de server heeft, ongefilterd. 0 = uit
+Clients
+Verbonden clients
+Op dit moment geen APRS-app of iGate verbonden
+Uplink en downlink
+Verbind deze server met een APRS-netwerk: posities uit DMR gaan omhoog, stations van daar komen omlaag op de kaart
+Verbinding met een APRS-netwerk – APRS-IS, CB-APRS of eigen servers: DMR-posities gaan omhoog, stations komen omlaag op de kaart
+APRS-IS (zendamateurs, wereldwijd
+CB-APRS (27 MC, eu.cbaprs.net
+Handmatig – eigen servers, meerdere links, omhoog/omlaag apart
+APRS-IS-server
+CB-APRS-server
+euro.aprs2.net (Europa), rotate.aprs2.net (wereldwijd) of uw eigen Tier-2-server
+eu.cbaprs.net (Europa) of us.cbaprs.net
+Passcode
+Leeg = berekend uit de aanmelding; -1 = alleen ontvangen
+Aanmelding (CB-roepnaam
+Leeg = de server-ID
+Downlinkfilter
+Wat omlaag komt: r/lat/lon/km = straal rond een punt (standaard: Duitsland). Leeg = er komt niets omlaag
+Wat er van CB-APRS omlaag komt. Leeg = niets
+Omhoog sturen (uplink
+Alleen zolang de uplink verbonden en geverifieerd is
+APRS-apps hebben hem nodig om te zenden. Geef hem alleen aan gelicentieerde zendamateurs
+Passcode voor een roepnaam
+Berekenen
+Eén regel per server: host, poort, aanmelding, passcode (leeg = berekend), filter en richting
+Uplink en downlink zijn uitgeschakeld – de kaart toont alleen DMR en eigen clients
+geen uplink
+Alles (DMR, eigen clients en downlink
+Alleen DMR en eigen clients
+Omhoog verzonden
+Pakketten binnen
+Stations per bron
+DMR-posities
+APRS-server herstarten
+poorten gesloten
+DAPRS – GPS van portofoons
+DAPRS-decodering
+GPS-posities decoderen (DAPRS
+De DMR-server vindt GPS-posities in het radioverkeer (DAPRS). Wat ermee gebeurt, stelt u in op het tabblad APRS
+Wordt samen met APRS ingeschakeld (tabblad APRS → Server). Vindt posities die portofoons via DMR versturen en geeft ze aan de APRS-server van het dashboard
+GPS in spraakgesprekken (ingebedde GPS LC
+Portofoons met GPS die hun positie tijdens een gesprek versturen (Motorola, Hytera, AnyTone
+GPS-datagesprekken (NMEA, LRRP
+Positierapporten verstuurd als datagesprek, bv. AnyTone/TYT „Digital APRS” naar 900999 of Motorola LRRP
+GPS-gegevens accepteren die verstuurd zijn naar
+DMR-ID’s/talkgroups waarnaar de portofoons hun GPS-gegevens sturen. all = elke bestemming; bv. 900999, 5057
+Posities uit DMR
+DMR-posities worden APRS-posities
+Posities die de DMR-server vindt (DAPRS) komen op de kaart als CALL-SSID; de roepnaam komt uit de ID-lijst
+Wat er met de GPS-posities van DMR-portofoons gebeurt: roepnaam uit de ID-lijst, SSID, symbool, commentaar, APRS-IS
+CALL-7 voor een handheld; 0 = geen SSID. Per ID hieronder
+Symbool
+Commentaar
+Hoogstens elke (s) omhoog
+Tabel- en symboolcode: /[ persoon, /> auto, /k vrachtwagen, /b fiets, /- huis, /r antenne
+Plaatshouders: {tg} talkgroup, {repeater} roepnaam van hotspot/repeater, {dmrid}, {slot}, {server}
+Per DMR-ID
+Eigen roepnaam, SSID, symbool of commentaar voor losse ID’s, of er een uitschakelen
+ID zonder roepnaam
+Repeaterobjecten
+Repeaters op de kaart
+Hotspots op de kaart
+Hotspotposities zijn vaak huisadressen – standaard uit
+Als APRS-objecten op de positie die ze bij het aanmelden melden, met frequentie en color code
+Repeatersymbool
+Hotspotsymbool
+Objectcommentaar
+Na frequentie en color code
+Objectbaken elke (min
+Deze objecten omhoog sturen (uplink
+Repeaterobjecten nu versturen
+Stations die met het gastwachtwoord (FreeRadioID) zijn aangemeld, verschijnen alleen op de lokale kaart
+De APRS-kaart: wie hem ziet, wat hij toont en hoe lang stations blijven staan
+Kaart zichtbaar zonder aanmelding
+Onafhankelijk van het dashboard: de kaart kan openbaar zijn terwijl het dashboard dat niet is
+Stations op de kaart
+Stations van de laatste (u) tonen
+Sporen tonen
+Lijn van de laatste posities van bewegende stations
+Ruwe pakketten tonen
+Pakketlogboek onder de kaart en in het stationsvenster
+Kaartmidden (lat, lon
+Waar de kaart opent, bv. 52.29, 8.92
+Zoom
+2 = wereld, 6 = Duitsland, 10 = regio
+Kaartstijl
+Automatisch – donkere kaart voor donkere kleurprofielen, lichte kaart voor Daylight
+Donker (OpenStreetMap, verdonkerd) – past bij het N8-ontwerp
+Topografisch (OpenTopoMap
+Eigen tegelserver
+Eigen tegel-URL
+Hoogste zoom van de eigen tegelserver
+Verder in worden de tegels vergroot in plaats van te ontbreken (OpenStreetMap 19, OpenTopoMap 17 – automatisch ingesteld
+https://…/{z}/{x}/{y}.png – alleen voor „Eigen tegelserver” (bv. met uw eigen API-sleutel
+Per station. De lokale kaart toont altijd de nieuwste positie
+Stations bewaren (dagen
+Sporen bewaren (dagen
+Ruwe pakketten bewaren (dagen
+APRS-domeinen
+Tot drie domeinen die direct de kaart openen, elk met eigen titel en logo en desgewenst een Let’s Encrypt-certificaat
+Domein 1
+Domein 2
+Domein 3
+Domein 1: HTTPS met Let’s Encrypt
+Domein 2: HTTPS met Let’s Encrypt
+Domein 3: HTTPS met Let’s Encrypt
+bv. map.example.org – opent de kaart op /. Moet naar deze server wijzen (DNS). Leeg = uit
+bv. aprs.example.org – opent de kaart op /. Moet naar deze server wijzen (DNS). Leeg = uit

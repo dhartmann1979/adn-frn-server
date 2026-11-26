@@ -1,0 +1,75 @@
+Várakozás a következő adásra
+ma még nem volt adás
+Ma óránként
+Nincs FRN-kapcsolat
+Vétel (egy állomás beszél
+Adás a többi hálózat felé
+Forrás → (FRN: mélyvágó, közép, magas) → bemeneti AGC → elosztás → kimeneti AGC hálózatonként → limiter → hálózat
+A DMR felé ezen felül a kódoló előtti közép-/magaskiemelés következik (🎛️ Vokóder → A kódoló előtt). A módosítások azonnal, újraindítás nélkül érvényesek
+Az a szint, amelyre minden forrás szabályozódik az elosztás előtt. A −20 dBFS jó érték
+Szint minden hálózat felé. AMBE-hez és Zellóhoz −18 dBFS; a limiter a csúcsokat a plafon alatt tartja
+Legnagyobb erősítés (dB
+Ennyivel emeli meg az AGC legfeljebb a halk állomásokat (15 dB
+Legnagyobb csillapítás (dB
+Ennyivel veszi vissza legfeljebb a hangos állomásokat (20 dB
+Milyen gyorsan szabályoz vissza a túl hangos részeknél – gyors: 5–15 ms
+Visszatérési idő (ms
+Milyen gyorsan emel utána újra – a 200–500 ms természetes hangzású, a rövidebb „pumpál”
+Ez alatt szünetnek/zajnak számít: az erősítés megáll, a zajt nem húzza fel (−50 dBFS
+Egyetlen csúcs sem megy fölé – semmi sem vezérel túl (−1 dBFS
+Eltávolítja a dübörgést, búgást és szélzajt az FRN-hangból (GSM) – 100–150 Hz
+A GSM tompán szól – a jelenlét érthetőbbé teszi a hangokat, Zellóhoz és AMBE-hez (3 dB
+FRN: magasak kiemelése (dB, 3 kHz-től
+Egy kicsit több fényesség az FRN-hangnak (2 dB). A túl sok hallhatóvá teszi a zajt
+Probléma esetén először itt nézzen: a freeradionetwork.de nyilvános hibanaplója megnevezi az elutasított bejelentkezések okát (hibás FRN-jelszó, többszörös kapcsolat, nem elérhető port …), amelyet maga az FRN-szerver nem közöl. Megjelennek az Ön hívójelére és FRN-szervereire vonatkozó bejegyzések; az N8 Crosslink minden elutasítás után magától belenéz, és az okot beírja az eseménynaplóba
+Megkérdezi az FRN-szerver vezérlőpultját (ADN FRN Server 2.21 vagy újabb), melyik a master és melyik a tartalék. A master mindig 1-es prioritású: kiesés után a híd a tartalékra megy, és amint a master ismét fut (3 ellenőrzés percenként), két adás között visszatér a masterre. Felismerés nélkül a „Szerver” megelőzi a „Tartalékszervert”
+Lista az FRN-szervertől – a „🔄” újraolvassa. Ha egy szoba hiányzik (pl. rejtett), válassza a „✏️ Másik szoba …” lehetőséget
+Szobák kiolvasása az FRN-szerverről
+Másik szoba
+0 = bármely szabad port · fix pl. tűzfalszabályokhoz (minden port: 🔌 Portok
+Ki jelentkezhet be az admin területre. A superadminok ezen felül visszaállíthatnak mentéseket, mindent alaphelyzetbe állíthatnak és más superadminokat kezelhetnek
+jelentése: nyissa meg a tűzfalon/routeren, ha kívülről elérhetőnek kell lennie
+a másik oldalnak elérhetőnek kell lennie. Minden egy gombbal mentődik; ami újraindítást igényel, utána fent látható
+0.0.0.0 = minden interfész (IPv4) · :: = mind (IPv4 és IPv6) · 127.0.0.1 = csak ez a gép (akkor csak a domainen át
+Webes felület és élő adatok (http://IP:port). 1024 alatt (pl. 80) root nélkül is működik – az nginx-nek akkor más portok kellenek. A szolgáltatás újraindítása
+A domainek http:// címe és a Let’s Encrypt ellenőrzés. A Let’s Encrypt mindig a 80-as portra jön – más port csak a routerben beállított továbbítással (kívül 80 → belül ez a port
+A domainek https:// címe (alapértelmezés 443; különben https://domain:port). Azonnal minden domainre érvényes
+a tartalékszerverhez, ha meg van adva
+bejelentkezés/jelszó a SystemManagernél (alapértelmezés 10025
+A híd forrásportja · 0 = bármely (alapértelmezés) · fix tűzfalszabályokhoz vagy NAT-hoz
+csak AMBEserver üzemmódban (127.0.0.1, alapértelmezés 2460) – jelenleg nincs használatban
+WebSocket wss://zello.io/ws – a port a címben szerepel (💬 Zello
+Saját domainek ehhez a webes felülethez ingyenes tanúsítvánnyal innen:
+Az nginx a 80/443-as porton fogadja a domaint, és továbbítja az N8 Crosslinkhez (127.0.0.1:); a certbot beszerzi a tanúsítványt, és lejárat előtt automatikusan megújítja. Feltétel: a domain DNS-sel erre a szerverre mutat, és a 80-as (a Let’s Encrypt mindig ott ellenőriz – különben továbbítás a routerben) és a 443-as port elérhető az internetről
+A Domainek és HTTPS még nincs engedélyezve – futtassa egyszer: sudo /opt/n8crosslink/update.sh
+az nginx figyel ezen:
+és továbbít ide: 127.0.0.1: – módosítás itt:
+Értesítésekhez a tanúsítvány lejáratáról
+Teszttanúsítvány (Let’s Encrypt staging, korlátok nélküli kipróbáláshoz
+A sudo még nincs beállítva – egyszer a konzolon: sudo /opt/n8crosslink/install.sh --fix-perms
+Offline ekkor óta
+Helyőrzők: {call} = hívójel, {name} = név – pl. „{call}” vagy „{call} {name}”
+FRN-szerver portja
+DMR-szerver portja
+Webes felület
+Az N8 Hotspot összes portja egy helyen. A hotspotnak nincs szüksége porttovábbításra a routerben: csak kifelé csatlakozik (DMR-szerver); a webes felület az otthoni hálózatnak szól
+a systemd szolgáltatásban beállítva (N8HS_PORT
+Szerver és jelszó az Üzem → Beállítások → DMR-hálózat alatt
+Kapcsolatok a hotspot szolgáltatásai között – semmit se nyisson meg
+Élő adatok az MMDVMHosttól és a DMRGatewaytől a webes felületnek (127.0.0.1
+Frissítés indítója („Frissítés most”
+Demó – nincs valódi ellenőrzés
+DMRGateway (DMR-szerver
+Senki sincs ebben a szobában
+A papagáj visszhangteszt be van kapcsolva
+7 jegyű ID a radioid.net / FreeRadioID.net oldalról
+Az MMDVMHost és a DMRGateway leáll, amíg a kalibrálás fut
+A hotspot ezután az új eltolással indul újra
+az ID-lista következő frissítésével
+Még nem hallottunk felhasználót
+DMR-szerver: a vezérlőpult nem csatlakozik a DMR-szerverhez
+A FreeRadioID.net által igazolt bejelentkezések / vendégbejelentkezések az alapértelmezett passphrase-szel
+Ebben az időszakban még nem volt csoporthívás
+a rádiók által küldött nevek
+Ebben az időszakban nem érkezett Talker Alias
+A gyári bejelentkezést használja. Válasszon saját felhasználónevet és jelszót – a gyári bejelentkezés ezután nem működik

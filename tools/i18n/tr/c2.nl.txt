@@ -1,0 +1,214 @@
+E-mail van de eigenaar (server_owner
+Servereigenaar (krijgt OWNER-rechten in elke kamer
+Slechts één adres; leeg = het e-mailadres van het FRN-account hierboven. OWNER-rechten in elke kamer
+E-mail van het FRN-account (sysman_auth_emailaddr
+Wachtwoord van het FRN-account (sysman_auth_password
+E-mailadres van uw FRN-gebruikersaccount bij de SystemManager
+Het wachtwoord van dit FRN-account (zoals verstuurd door de SystemManager
+Naar de SystemManager gestuurd en op het dashboard getoond
+Op het dashboard getoond
+HTTPS en web
+HTTPS inschakelen met Let’s Encrypt
+Automatische HTTPS-certificaten met Let’s Encrypt (vereist openbare DNS en poorten 80/443
+Openbaar domein
+Voorbeeld: dashboard.example.org. Geen http:// of pad invoeren
+E-mail voor het certificaat
+Verloop van Let’s Encrypt en belangrijke certificaatmeldingen
+Testcertificaten gebruiken (staging
+Alleen om te testen; browsers vertrouwen staging-certificaten niet
+HTTPS-poort
+Openbare HTTPS-poort. Standaard is 443
+HTTP-challenge-/omleidingspoort
+Openbare TCP-poort voor de HTTP-01-challenge en de omleiding HTTP → HTTPS
+Vereist een openbare DNS-naam die naar deze server wijst en inkomende TCP-poorten 80 en 443. Opslaan en daarna frnadn herstarten
+Database
+Hoe lang doorgangen en aanmeldingen bewaard blijven
+Losse doorgangen bewaren (dagen
+Aanmeldingen bewaren (dagen
+Chatberichten bewaren (dagen
+Dagtotalen worden voor altijd bewaard, ze zijn klein
+Wijzigingen verwerpen
+niet opgeslagen
+uit profiel
+ingebouwd
+leeg
+Nieuwe kamer
+Naam (net00
+Emoji voor de naam
+Kamer is open (_enable
+Uit: de server biedt deze kamer niet aan
+Verborgen op het dashboard
+Alleen na aanmelden op het dashboard (de FRN-clients zien hem nog steeds
+Kamereigenaren (_owner
+E-mailadressen, gescheiden door komma’s; NETOWNER-rechten in deze kamer. Leeg = servereigenaar
+Toegestane crosslinks (_acl_cl
+Toegestane gateways (_acl_gw
+Leeg = alle, none = geen crosslinks, of e-mailadressen
+Leeg = alle, none = geen gateways, of e-mailadressen
+Bericht voor geweigerde crosslinks/gateways (_acl_info
+Max. uitzending (_tot, s
+Dempen opheffen na (_unmute, min
+0 = gedempt tot opheffen
+Geen spraak naar gedempte alleen-pc-clients
+Geen spraak naar gedempte crosslinks
+Geen spraak naar gedempte gateways
+Spreekpauze (_speechpause, ms
+Bericht bij spreekpauze
+Naar alleen-pc-clients gestuurd; {callsign} wordt vervangen
+Papegaai / echotest
+Papegaai aan/uit (_parrot_startstop_enable
+De papegaai kan met een tekstbericht aan- en uitgezet worden
+Telegram-bot (_tgbot_params
+min. uitzending ms;min. rust ms;bot-token;kanaal-ID – bv. 6000;30000;123:ABC;-100123
+Infobericht (_show_infomessage
+Spreekrecht vereisen
+Mag zenden
+Omhoog
+Omlaag
+Volgorde op het dashboard; de FRN-clients zien de kamers op naam gesorteerd. ⭐ = standaardkamer, 🦜 = net00, de test-/papegaaikamer
+Toegangslijst
+Alleen vermeldingen op de toegangslijst toestaan
+Toegangsbericht
+Wie ziet het infobericht van de toegangslijst
+Iedereen
+alleen clients die door de toegangslijst geraakt worden
+Blokkeerpatroon (_bl_regexp
+Reguliere expressie op naam, e-mail en stad
+Bericht voor geblokkeerde clients (_bl_info
+Een LAN-adres toestaan (allowLANAddr
+Toegangsinstellingen opslaan
+Vermelding toevoegen
+Aan lijst toevoegen
+Geen vermeldingen in deze lijst
+Een online station kopiëren
+Een verbonden station kiezen
+Lijsten worden in SQLite opgeslagen en in het XML-formaat van de FRN-server geschreven. Bestaande XML-vermeldingen worden automatisch geïmporteerd. Wijzigingen werken na een herstart van de FRN-server; de oorspronkelijke XML-bestanden worden vóór vervanging geback-upt
+FRN-eigenaren en -admins kunnen deze lijsten nog steeds in de FRN-client wijzigen. Het dashboard importeert wijzigingen uit de XML-bestanden voordat ze getoond of bewerkt worden
+Nieuw FRN-account
+Nog geen accounts
+E-mail (aanmelding van de FRN-client
+FRN-wachtwoord
+FRN-client-ID
+De wachtwoordlijst van de server voor
+modus (acl/FRNPasswd.xml
+op deze server
+De server is geregistreerd bij de SystemManager: aanmeldingen worden daar gecontroleerd, deze lijst wordt niet gebruikt
+De server heeft het wachtwoord zelf nodig in FRNPasswd.xml (bestand alleen leesbaar voor de dienst
+Nieuwe gebruiker
+Wachtwoord (min. 10
+Nieuw wachtwoord (min. 10
+Alleen admins
+Superadmin: alles, ook admins. Admins: alles behalve andere admins. Gebruikers: zien het dashboard ook als het privé is, en verborgen kamers
+superadmin
+Aangemelde gebruikers
+Wat
+Van
+Einde
+installatie / opdrachtregel
+Machine
+Host
+Belasting
+Geheugen
+Schijf
+Herstarten
+Afsluiten
+Dienst
+Actief sinds
+FRN-server herstarten
+Dashboard herstarten
+Journal frn-server
+Journal frnadn
+Java-FRN-server door
+Geïnstalleerd: onbekend
+Geïnstalleerde versie
+update beschikbaar
+Repository
+Gegevens (SQLite
+Statistiekcache
+server.log van de FRN-server
+server.properties tonen
+Up
+Down
+Oude server.properties importeren
+server.properties importeren
+Kies het oude server.properties-bestand
+Optioneel: instellingen van de vorige FRN-installatie in deze nieuwe installatie importeren. Alleen ondersteunde eigenschappen en kamerdefinities worden overgenomen. De oude database, Java-JAR, ACL-lijsten en wachtwoord-XML-bestanden worden niet gekopieerd
+Kleurprofiel
+Kies een kleurprofiel en wijzig dan elke kleur naar wens – of bouw een volledig eigen schema. De hele pagina toont het meteen; het blijft pas bewaard na
+Dezelfde kleurenmotor als HBlink4-FreeRadioID en N8-HotSpot
+Eigen kleuren
+Klik op een kleur om die te wijzigen; ↺ neemt hem weer uit het profiel
+Terug naar de profielkleur
+Accent
+Accent 2
+Achtergrond
+Paginakleur achter alles
+Knoppen, getallen, actieve tabbladen
+Tweede kleur van knoppen en de titel
+Gloed linksboven
+Gloed rechtsboven
+Gloed onder
+Kaarttint
+Kleur die in de glaskaarten wordt gemengd
+Kaarthelderheid
+Hoe sterk de glaskaarten opvallen
+Glasvervaging
+Achtergrondgloed
+0 = vlakke achtergrond
+Afronding
+Hoeken van kaarten en knoppen
+Uit = sneller op oude telefoons
+Leesbaar (contrast 18.3 : 1
+N8-standaard
+Logo en site-icoon
+Dashboardlogo
+Huidig dashboardlogo
+Standaardlogo gebruiken
+Site-icoon / favicon
+Huidig site-icoon
+Standaardicoon gebruiken
+PNG-afbeelding, tot 2 MB. Getoond in de kop en het aanmeldvenster
+PNG of ICO, tot 2 MB. Gebruikt in browsertabbladen en bladwijzers
+Kleuren, logo en icoon opslaan
+Leeg = past automatisch bij de achtergrond
+Clientlogo’s
+Stations tonen als avatar de software of het netwerk waar ze vandaan komen – herkend aan band, beschrijving en clienttype (crosslink, gateway, pc). De ingebouwde afbeeldingen zijn eenvoudige badges. U kunt elk ervan vervangen door een eigen afbeelding (PNG, JPEG, WebP, GIF, ICO of eenvoudige SVG, max. 512 KB) – bijvoorbeeld een officieel logo, als u dat mag gebruiken
+Icoon
+Linkmenu
+Linkmenu tonen
+Tekst van de menuknop
+Knop met uitklapmenu
+Rij knoppen onder de kop
+(volgorde = volgorde in het menu
+Naam, bv. Website
+Openen in een nieuw browsertabblad
+nieuw tabblad
+Link toevoegen
+Links opslaan
+Opslaan en site-iconen vernieuwen
+De gecachete favicon van deze website tonen
+site-icoon
+Eenvoudige HTML
+Uw eigen links in de kop: website, chatgroep, wiki, donatiepagina … Iedereen ziet ze, ook zonder aanmelding
+Website
+E-mail
+Adres
+Instellingen kopiëren van
+Niet registreren
+(schakelt naar dat tabblad) en
+Onbekende eigenaar: het e-mailadres van de servereigenaar (server_owner – Instellingen → Beheerder, leeg = het FRN-account) is geen bekend FRN-account bij de SystemManager – voer het e-mailadres van een bestaand FRN-account in
+De reden voor geweigerde aanmeldingen (verkeerd FRN-wachtwoord, onbekende eigenaar, meervoudige verbinding …) – ook op de achtergrond gecontroleerd: direct na een probleem van de FRN-server, daarna elke 2 minuten; nieuwe redenen verschijnen bij de gebeurtenissen
+onbekend – synchroniseer of open de partner één keer
+zelfstandig (geen SystemManager
+wachtwoord ingesteld
+geen wachtwoord
+geen FRN-account ingevoerd
+FRN-accounts bij de SystemManager
+nooit aangeraakt door de synchronisatie, elke server houdt zijn eigen
+Account opslaan
+FRN-account opgeslagen – herstart de FRN-server om ermee aan te melden
+Geen wijzigingen
+FRN-server hier gestopt en vergrendeld
+hij start vanzelf zodra er onder SystemManager een eigen FRN-account is opgeslagen
+De back-up stopt en vergrendelt zelf zijn FRN-server (bij de volgende synchronisatie of statuscontrole) – de master blijft online
+Vergrendeld: deze back-up gebruikt hetzelfde FRN-account als de master. Voer eerst onder SystemManager een eigen FRN-account in (📧 FRN-wachtwoord Backup

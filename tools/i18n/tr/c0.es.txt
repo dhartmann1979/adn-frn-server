@@ -1,0 +1,332 @@
+Actualización disponible
+Novedades
+Actualizar ahora
+Detalles
+Más tarde
+Ocultar hasta mañana
+Instalada
+En GitHub
+Última comprobación
+Comprobación automática
+cada hora en punto
+al día
+Última actualización
+correcta
+revertida
+Comprobar ahora
+Comprobando
+Instalar la actualización ahora
+Registro de actualizaciones
+Se comprueba cada hora en punto. Las actualizaciones solo se instalan cuando pulsa el botón. Después el servicio se reinicia; si la interfaz web no responde, se restaura automáticamente la versión anterior
+Descargando y aplicando la actualización
+Cancelar
+El servicio se reinicia (aproximadamente un minuto). Si después la interfaz web no responde, se restaura automáticamente la versión anterior
+Su contraseña (confirmación
+El servicio se reinicia
+Comprobando la interfaz web
+Cerrar
+Actualización instalada. Recargando la página
+Actualización instalada
+La actualización se ha revertido – vuelve a funcionar la versión anterior
+Sin actualizar – la versión anterior sigue funcionando sin cambios
+Eliminar este registro
+Eliminar los mostrados
+Eliminar todo
+Eliminar los registros mostrados con sus logs
+¿Eliminar todos los registros con sus logs? No se puede deshacer
+Eliminar este registro con su log
+Detalles en el registro de actualizaciones (Sistema → Actualización
+archivos modificados a mano – actualización detenida
+El servicio aún no responde. Recargue en unos minutos o consulte el registro de actualizaciones
+Idioma / Language
+siempre
+apagado
+nunca
+Menú
+Operación
+Usuarios y acceso
+Apariencia
+Red y dominios
+Sistema
+Actualización
+Servicios
+Permisos y sudo
+Keep-alive
+en marcha
+detenido
+Error
+iniciando
+deteniendo
+recargando
+Inicio automático
+inicio automático activado
+Reiniciar
+Detener
+Iniciar
+Detener el servicio
+Estado, inicio automático al arrancar e iniciar · detener · reiniciar – solo lo que este sistema permite. Un servicio detenido aquí no lo vuelve a iniciar el keep-alive
+Aún no configurado – ejecutar una vez en la consola
+¿Desactivar el inicio automático? Tras un reinicio, el servicio no arrancará solo
+sin comprobar
+todo en orden
+Consola
+comprobaciones correctas
+Comprobar de nuevo
+Corregir
+Corrigiendo
+Comprueba el usuario del servicio, el programa (root, solo lectura para el servicio), datos y contraseñas, servicios systemd, «Actualizar ahora», keep-alive y las reglas sudo. Corregir repara lo que esté mal y vuelve a comprobar
+Usuario del servicio
+Programa
+Datos
+Hardware
+Carpeta de origen
+Vocoder USB
+Dominios y HTTPS
+no configurado
+en pausa
+no está en marcha
+activo
+Internet
+accesible
+caído desde
+Última comprobación
+justo ahora
+Heartbeat
+sano
+sin reinicio
+detenido a mano – el keep-alive espera
+reiniciado
+Configurar una vez en la consola
+Red, puertos y dominios
+Usuarios
+Sesiones
+Registro
+Usuario
+Rol
+Último acceso
+Editar
+desactivado
+Nombre visible
+Indicativo
+Nombre de usuario
+Contraseña (mín. {n}
+Nueva contraseña (opcional
+Añadir usuario
+Eliminar
+¿Eliminar de verdad
+Usuario creado
+Usuario eliminado
+solo superadmin
+Superadmin
+Admin
+Lector
+Autor
+Editor
+Quién puede iniciar sesión. Los admins ven direcciones IP y puertos y cambian los ajustes; los usuarios solo ven el panel
+Todos los accesos actuales. «Cerrar sesión» termina uno al instante
+No hay sesiones activas
+Última actividad
+Caduca
+Cerrar sesión
+Sesión terminada
+esta sesión
+Accesos, intentos fallidos y cada cambio en el área de administración – con hora, persona y dirección IP
+Hora
+Evento
+Puertos
+entrante
+saliente
+Guardar puertos
+Todos los puertos en un solo lugar. Entrante: abrir en el cortafuegos y el router si debe ser accesible desde fuera. Saliente: el otro extremo debe ser accesible
+Reiniciar el servicio
+El servicio se reinicia – recargue después la página
+Dominio
+Certificado
+sin certificado
+certificado de prueba
+válido
+caducado
+solo HTTP
+hasta
+Renovar
+Obtener certificado
+Quitar
+Aún no hay dominio
+DNS: no se encontró ningún registro
+Añadir dominio
+Correo para Let’s Encrypt
+Certificado de prueba (Let’s Encrypt staging
+Añadir dominio y obtener certificado
+Obteniendo certificado
+En curso – puede tardar hasta un minuto
+Los certificados se renuevan automáticamente
+La renovación automática no está configurada
+Muestra
+Dominios propios con un certificado gratuito de Let’s Encrypt
+¿Quitar {d}? Se eliminan la redirección y el certificado
+Fallos
+Fallo
+Watchdog
+Sin memoria
+Finalizado
+Tiempo agotado
+Bloqueo
+Componente caído
+Hilo caído
+Proceso auxiliar caído
+Reinicio por keep-alive
+nuevo
+todo leído
+todos
+Últimos 7 días
+No hay fallos registrados
+Marcar todo como leído
+No hay registro disponible
+Vigilancia de fallos
+Cada fallo, bloqueo y reinicio de emergencia de cada servicio se registra aquí – con la parte de la aplicación donde ocurrió y el registro completo (journal, pila de Python). El servicio se reinicia automáticamente. Los nuevos hallazgos aparecen como aviso tras iniciar sesión hasta que se marcan como leídos
+Estos servicios están vigilados. Tras cada parada inesperada, systemd registra el hallazgo y reinicia el servicio; si sigue caído, lo reinicia el keep-alive
+La vigilancia de fallos aún no está configurada. La próxima actualización la configura – o una vez en la consola
+1 fallo nuevo
+n} fallos nuevos
+más
+Ver todos los fallos
+Marcar como leído
+Desde su última visita, un servicio falló o se bloqueó. Se reinició automáticamente. El hallazgo indica la parte de la aplicación y contiene el registro completo
+La interfaz web se está deteniendo
+La interfaz web se reinicia – un momento
+Keep-alive activado
+Reiniciar los servicios de red tras un corte de Internet
+Dirección heartbeat
+Heartbeat en caso de error (opcional
+Reanudar
+Pausa 1 h (mantenimiento
+Guardar
+Registro del keep-alive
+Cada minuto como root: comprueba de verdad cada servicio (interfaz web y conexiones de los protocolos), reinicia los servicios enfermos tras unos minutos (como máximo 4× por hora), detecta cortes de Internet y después reinicia los servicios de red, e informa a una dirección heartbeat (Uptime Kuma «push», Healthchecks.io …). Un servicio detenido a mano sigue detenido
+Mensaje
+Aún no hay actualizaciones a través de la interfaz web
+Recargar
+Iniciar sesión
+Contraseña
+Mostrar contraseña
+Repetir contraseña
+Bloq Mayús está activado
+Mantener la sesión iniciada
+Crear
+Conexión cifrada
+Conexión sin cifrar (HTTP
+Introduzca el nombre de usuario y la contraseña
+La contraseña es demasiado corta
+Las contraseñas no coinciden
+Error al iniciar sesión
+Mi cuenta
+Cambiar contraseña
+Idioma
+Demasiados intentos fallidos – espere 15 minutos
+Inicio de sesión
+Webmail
+Mantener la sesión iniciada (30 días
+Inicie sesión para administrar el servidor FRN
+Este panel es privado. Inicie sesión
+Inicie sesión para cambiar los ajustes
+Este hotspot es privado. Inicie sesión
+Inicie sesión para ver las direcciones IP y el área de administración
+Inicie sesión para ver el panel
+Nombre de usuario o contraseña incorrectos
+Demasiados inicios de sesión fallidos. Inténtelo de nuevo en 15 minutos
+Demasiadas contraseñas incorrectas. Inténtelo de nuevo en 15 minutos
+Demasiadas solicitudes – espere un momento
+Demasiados intentos fallidos. Espere 15 minutos
+Cierre de sesión
+Enlaces
+Ajustes
+Actualizaciones
+Registros
+Registro de cambios
+En vivo
+Datos en vivo
+Estadísticas
+Estadísticas
+Últimos escuchados
+Últimos escuchados
+En el aire
+Hoy
+24 h
+7 días
+30 días
+90 días
+1 año
+Duración
+Tiempo de emisión
+Llamadas
+Pasadas
+Estación
+Estaciones
+Nombre
+Estado
+En línea
+Fuera de línea
+En calma
+Notificaciones
+Cargando
+Cargando enlaces
+Aún no se ha escuchado nada
+ninguno
+sí
+no
+activado
+Sí
+No
+OK
+Atrás
+Actualizar
+Reiniciar ahora
+Subir
+Descargar
+Buscar
+Filtro
+Todos
+Total
+Versión
+Tiempo activo
+Contraseña actual
+Nueva contraseña
+Repetir nueva contraseña
+Creado
+Añadir
+Guardado
+Ajustes guardados
+Advertencia
+Info
+Talkgroup
+Talkgroups
+Slot
+Origen
+Destino
+Dirección
+segundos
+minutos
+horas
+días
+hace
+Claro
+Oscuro
+Automático
+Colores
+Colores
+Logotipo
+Título
+Vista previa
+Restablecer
+Aplicar
+Copiar
+Copiado
+Mostrar
+Ocultar
+Más
+Menos
+Mostrar todo
+Mostrar menos
+Descripción
+Activado
+Desactivado

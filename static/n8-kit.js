@@ -1277,6 +1277,10 @@
             [/^(\d+) min ago$/, 'vor $1 Min.'], [/^(\d+) s ago$/, 'vor $1 s'], [/^(\d+) h ago$/, 'vor $1 Std.'], [/^(\d+) d ago$/, 'vor $1 T.'],
         ]
     });
+    add({ base: 'de', en: {}, rules: [
+        [/^Keep-Alive: (.+) – keine Antwort \(seit (\d+) min\) – neu gestartet$/, "Keep-Alive: $1 – no answer (for $2 min) – restarted"],
+        [/^systemd-Watchdog: keine Rückmeldung mehr – der Prozess hing und wurde beendet \(SIGABRT\) – Event-Loop stand (\d+) s$/, "systemd watchdog: no response any more – the process hung and was ended (SIGABRT) – event loop stood still for $1 s"]
+    ] });
 
     window.N8Kit = {
         version: '1.6.0',

@@ -9,7 +9,7 @@ unter einer **eigenen Domain mit Let's-Encrypt-Zertifikat** (z. B. `news.auf-der
 
 ## Was Besucher sehen
 
-- **Kopfzeile wie im Dashboard** (Logo, Titel mit [Master]/[Backup]/[Standalone], 📰 News · 🎙️ Live · 📈 Statistik, Links-Menü, DE | EN, Anmelden)
+- **Kopfzeile wie im Dashboard** (Logo, Titel mit [Master]/[Backup]/[Standalone], 📰 News · 🎙️ Live · 📈 Statistik, Links-Menü, Sprachmenü 🌐 mit neun Sprachen, Anmelden)
   und die schmale Statuszeile (FRN-Server, online, wer sendet).
 - **Begrüßung** mit Titel, Untertitel, Begrüßungstext und zwei Kennzahlen (jetzt online, Durchgänge heute).
 - **News als Karten** über die ganze Breite: angeheftete News oben über die volle Breite, die übrigen gleich breit nebeneinander.

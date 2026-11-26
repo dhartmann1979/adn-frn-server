@@ -1,0 +1,234 @@
+Master en back-up gebruiken hetzelfde FRN-account
+De SystemManager laat er maar één online – de andere krijgt „verkeerde gegevens” en zijn FRN-server stopt. Vraag een eigen FRN-wachtwoord aan voor de back-up en voer het daar in onder SystemManager
+Master en back-up
+Tweede FRN-server met dezelfde configuratie – synchronisatie elk heel uur en via knop
+Rol van deze server
+Master: kamers, lijsten en accounts worden hier bewerkt. Back-up: neemt ze over van de master
+Enkele server
+Dashboard van de partner
+Op de master de back-up, op de back-up de master, bv. https://frn-backup.example.org
+Synchronisatiesleutel
+Versleutelt elke overdracht tussen de twee servers – op beide dezelfde (minstens 24 tekens); „🎲 Nieuwe sleutel” maakt er een
+versleuteld met de synchronisatiesleutel
+Het antwoord van de partner is niet versleuteld met de synchronisatiesleutel (verkeerd adres of verkeerde sleutel
+Het antwoord van de partner hoort niet bij dit verzoek
+Elk heel uur synchroniseren
+De back-up haalt elk heel uur de configuratie van de master op – het verschil is hoogstens een uur
+Naar de clients gestuurd: waarheen als deze server uitvalt. Leeg bij Master en back-up = de partner
+Overdracht
+Partner
+Laatste synchronisatie
+Volgende synchronisatie
+Laatste ophaling door de back-up
+Clients schakelen over naar
+ongewijzigd
+overgenomen
+FRN-server herstart
+herstart in afwachting – stations verbonden
+FRN gestopt
+onderhoud – de stations zitten op de back-up
+Voer de partner en de synchronisatiesleutel in en sla op
+Kies hieronder de rol van deze server: de master levert zijn configuratie, de back-up neemt die elk heel uur over. De overschakeling zelf regelt FRN: de clients gaan naar het back-upadres als deze server wegvalt
+Nu synchroniseren
+Overdragen aan de back-up
+Terugnemen van de back-up
+Elke server heeft een eigen FRN-account nodig
+FRN-wachtwoord Master
+FRN-wachtwoord Backup
+Nieuwe sleutel
+Synchroniseren
+Synchronisatie: ongewijzigd
+Synchronisatie: configuratie overgenomen
+Synchronisatie mislukt
+Een nieuwe synchronisatiesleutel maken
+De sleutel is hier opgeslagen. Voer dezelfde sleutel in op de andere server – tot dan werkt de synchronisatie niet
+Nieuwe synchronisatiesleutel
+Kopieer hem en voer hem in op de andere server onder Master en back-up
+Klaar
+De configuratie wordt eerst naar de back-up gesynchroniseerd. Daarna stopt de FRN-server hier – de stations schakelen vanzelf over naar de back-up (FRN-back-upadres). Het dashboard blijft draaien
+De FRN-server hier start weer. Daarna herstart de back-up zijn FRN-server, zodat zijn stations hierheen terugkomen
+Overdragen
+Terugnemen
+Overdragen bezig
+Terugnemen bezig
+Overgedragen aan de back-up
+Teruggenomen
+Configuratie naar de back-up gesynchroniseerd
+FRN-server op de back-up draait
+FRN-server hier gestopt – de stations schakelen over naar de back-up
+FRN-server hier gestart
+Back-up stuurt zijn stations terug
+daar draait geen FRN-server
+draait niet na 30 s
+Dit account is voor de andere server: voer e-mail en wachtwoord daar in onder SystemManager
+FRN-wachtwoord aanvragen – Master
+FRN-wachtwoord aanvragen – Backup
+Stel eerst de rol in (Master of back-up)
+Alleen de master draagt over aan de back-up
+De FRN-server op de back-up draait niet – er is niets overgeschakeld
+Synchronisatiesleutel: minstens 24 tekens
+Geen synchronisatiesleutel ingesteld
+De partner kent Master en back-up nog niet – werk hem bij naar dezelfde versie
+De master stuurde geen kamers – niets overgenomen (bescherming tegen een lege master
+Gebruik https:// voor de partner – de synchronisatie vervoert de FRN-accounts (http alleen binnen het LAN
+Portaal
+Nieuws
+Portaalpagina
+Laatste nieuws
+Al het nieuws
+Lees meer
+Vastgezet
+bijgewerkt
+Nog geen nieuws
+Ouder nieuws
+Verbinden
+Live-dashboard openen
+Geen kamers
+Geen links ingesteld
+ℹ️ Info
+Belangrijk
+Techniek
+Net en kamers
+Alleen admins schrijven en publiceren nieuws – het verschijnt op de portaalpagina. Concepten zijn alleen hier zichtbaar
+Portaalpagina openen ↗
+Nieuw bericht
+Bericht bewerken
+Publiceren
+Publicatie intrekken
+Gepubliceerd
+Ingetrokken
+Concept
+gepubliceerd
+concepten
+Categorie
+Datum
+Intro
+Tekst
+(korte samenvatting op de kaart, optioneel
+Bovenaan vastzetten
+Opslaan als concept
+Opgeslagen als concept
+Opslaan en publiceren
+Het bericht verwijderen
+Verwijderd
+Nog geen nieuws – „＋ Nieuw bericht” schrijft het eerste
+Eigen domein: 🌐 Netwerk, poorten en domeinen → 🔒 Domeinen en HTTPS
+Openbare pagina met het nieuws van de beheerders – op /portal en op een eigen domein
+Domein van het portaal
+Portaaldomein
+Auteurs
+Het portaal kan een eigen domein hebben (bv. news.example.org) met een Let’s Encrypt-certificaat – het toont direct de portaalpagina
+Nog geen eigen domein – het portaal staat op /portal van het dashboard
+Alleen admins (rol Admin of Superadmin) schrijven, bewerken, publiceren en verwijderen nieuws. Gebruikers en bezoekers lezen alleen. Elke wijziging staat in het 📜 logboek
+Gepubliceerd nieuws als feed
+Portaalpagina aan
+Titel van het portaal
+Ondertitel
+Welkomsttekst
+Kamers en online stations tonen
+Cijfers van vandaag tonen
+Berichten per pagina
+Openbare pagina met het nieuws van de beheerders op /portal (en op het portaaldomein
+Leeg = de titel van het dashboard
+bv. „Nieuws van de FRN-server Auf der NachtSchicht”
+Getoond boven het nieuws. Opmaak zoals in het nieuws: **vet**, *cursief*, [link](https://…), lijsten met -
+Zijkader met de kamers, online stations en wie er in de lucht is (alleen als het dashboard openbaar is
+Doorgangen, zendtijd en stations van vandaag
+Voer een titel in
+Dit bericht bestaat niet (meer
+De portaalpagina is uitgeschakeld
+Mail
+Schrijven
+Postvak IN
+Concepten
+Verzonden
+Ongewenst
+Prullenbak
+Kies een bericht
+Niets gevonden
+Geen berichten
+berichten
+geselecteerd
+gelezen
+ongelezen
+Spam
+Geen spam
+Beantwoorden
+Allen beantwoorden
+Doorsturen
+Afbeeldingen laden
+aan
+Op
+Doorgestuurd bericht
+Nieuw bericht
+Aan
+Onderwerp
+Bijvoegen
+Versturen
+Mailprogramma
+Gebruiker: uw adres · wachtwoord: uw dashboardwachtwoord
+Bijlagen groter dan 20 MB
+Voer een ontvanger in
+Postvak niet bereikbaar
+Geen postvak
+Bericht niet gevonden
+Niets geselecteerd
+E-mail
+Mailserver
+Postvakken
+DMARC en BIMI
+DNS-sjablonen
+Maildomeinen
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (spam, DKIM-, SPF/DMARC-controle) op deze machine. Elke dashboardgebruiker heeft een postvak met hetzelfde wachtwoord
+Ingesteld
+Wachtrij
+wachtend
+Laatst toegepast
+Status gecontroleerd
+nog niet
+Status controleren
+Mailserver installeren
+Opnieuw installeren / repareren
+Uitschakelen
+Relay, TLS en limieten
+Uitgaande mail gaat via de server van uw provider (smarthost) – altijd versleuteld. Mailprogramma’s verbinden alleen met TLS
+Mailprogramma’s
+Inkomend (IMAP
+Uitgaand (SMTP
+of
+Authenticatie
+normaal wachtwoord
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – de gebruikersnaam is het e-mailadres (of de gebruikersnaam van het dashboard), het wachtwoord het dashboardwachtwoord
+Beveiliging
+Mailserver aan
+Relay (smarthost
+Relaypoort
+Relayversleuteling
+Relaygebruiker
+Relaywachtwoord
+SPF van de relay
+Poort 25: versleuteling vereist
+Postvakgrootte (MB
+Grootste bericht (MB
+Postmaster
+Spamscore → map Ongewenst
+Spamscore → weigeren
+Postfix + Dovecot + Rspamd op deze machine: elke dashboardgebruiker krijgt een postvak met hetzelfde wachtwoord
+Alle uitgaande mail gaat via deze server van uw provider, bv. smtp.provider.de – leeg = direct afleveren
+587 = STARTTLS, 465 = TLS vanaf het begin
+Altijd versleuteld – nooit platte tekst
+Voor het DNS-sjabloon, bv. include:_spf.provider.de – uw provider noemt het
+Aan: andere mailservers moeten TLS (STARTTLS) gebruiken om af te leveren – de weinige zonder TLS worden geweigerd. Mailprogramma’s hebben altijd TLS nodig
+Dashboardgebruiker die postmaster@, abuse@ en de DMARC-rapporten krijgt – leeg = de superadmin
+STARTTLS (poort 587
+TLS / SMTPS (poort 465
+Elke dashboardgebruiker heeft automatisch een postvak – de gebruikersnaam is het adres, het wachtwoord het dashboardwachtwoord. Nieuwe gebruikers, nieuwe wachtwoorden, vergrendelde of verwijderde gebruikers komen vanzelf bij de mailserver aan
+vergrendeld
+wacht op aanmelding
+Zonder postvak
+Nog geen maildomein
+DKIM, DMARC en MTA-STS
+DKIM-sleutels
+sleutel klaar (RSA 2048
+gemaakt bij het volgende „Toepassen”
+De server ondertekent elke uitgaande mail (DKIM), controleert SPF, DKIM en DMARC van inkomende mail en vertelt anderen hoe vervalste mail te behandelen. De DNS-records worden voor u klaargezet onder 🧾 DNS-sjablonen

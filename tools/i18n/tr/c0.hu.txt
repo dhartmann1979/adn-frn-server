@@ -1,0 +1,332 @@
+Frissítés érhető el
+Újdonságok
+Frissítés most
+Részletek
+Később
+Elrejtés holnapig
+Telepítve
+GitHubon
+Utolsó ellenőrzés
+Automatikus ellenőrzés
+minden egész órában
+naprakész
+Utolsó frissítés
+sikeres
+visszavonva
+Ellenőrzés most
+Ellenőrzés
+Frissítés telepítése most
+Frissítési napló
+Minden egész órában ellenőrizve. A frissítések csak a gomb megnyomásakor települnek. A szolgáltatás ezután újraindul; ha a webes felület nem válaszol, az előző verzió automatikusan visszaáll
+Frissítés letöltése és alkalmazása
+Mégse
+A szolgáltatás újraindul (kb. egy perc). Ha a webes felület ezután nem válaszol, az előző verzió automatikusan visszaáll
+Jelszava (megerősítés
+A szolgáltatás újraindul
+Webes felület ellenőrzése
+Bezárás
+Frissítés telepítve. Az oldal újratöltése
+Frissítés telepítve
+A frissítés visszavonva – ismét az előző verzió fut
+Nincs frissítés – az előző verzió változatlanul fut tovább
+Bejegyzés törlése
+Megjelenítettek törlése
+Összes törlése
+A megjelenített bejegyzések törlése a naplóikkal együtt
+Minden bejegyzés törlése a naplóikkal együtt? Ez nem vonható vissza
+Bejegyzés törlése a naplójával együtt
+Részletek a frissítési naplóban (Rendszer → Frissítés
+kézzel módosított fájlok – frissítés leállítva
+A szolgáltatás még nem válaszol. Töltse újra néhány perc múlva, vagy nézze meg a frissítési naplót
+Nyelv / Language
+mindig
+ki
+soha
+Menü
+Üzem
+Felhasználók és hozzáférés
+Megjelenés
+Hálózat és domainek
+Rendszer
+Frissítés
+Szolgáltatások
+Jogosultságok és sudo
+Keep-alive
+fut
+leállítva
+Hiba
+indul
+leáll
+újratöltés
+Automatikus indítás
+automatikus indítás be
+Újraindítás
+Leállítás
+Indítás
+Szolgáltatás leállítása
+Állapot, automatikus indítás rendszerindításkor és indítás · leállítás · újraindítás – csak amit ez a rendszer megenged. Az itt leállított szolgáltatást a keep-alive nem indítja újra
+Még nincs beállítva – egyszer futtassa a konzolon
+Kikapcsolja az automatikus indítást? Újraindítás után a szolgáltatás nem indul el magától
+nincs ellenőrizve
+minden rendben
+Konzol
+ellenőrzés rendben
+Újraellenőrzés
+Javítás
+Javítás folyamatban
+Ellenőrzi a szolgáltatás felhasználóját, a programot (root, a szolgáltatás számára csak olvasható), az adatokat és jelszavakat, a systemd szolgáltatásokat, a „Frissítés most” funkciót, a keep-alive-ot és a sudo szabályokat. A Javítás kijavítja a hibákat, majd újra ellenőriz
+Szolgáltatás felhasználója
+Program
+Adatok
+Hardver
+Forrásmappa
+USB vokóder
+Domainek és HTTPS
+nincs beállítva
+szüneteltetve
+nem fut
+aktív
+Internet
+elérhető
+nem elérhető ekkor óta:
+Utolsó ellenőrzés
+épp most
+Heartbeat
+egészséges
+nincs újraindítás
+kézzel leállítva – a keep-alive vár
+újraindítva
+Egyszer beállítandó a konzolon
+Hálózat, portok és domainek
+Felhasználók
+Munkamenetek
+Napló
+Felhasználó
+Szerepkör
+Utolsó bejelentkezés
+Szerkesztés
+letiltva
+Megjelenített név
+Hívójel
+Felhasználónév
+Jelszó (min. {n}
+Új jelszó (opcionális
+Felhasználó hozzáadása
+Törlés
+Biztosan törli
+Felhasználó létrehozva
+Felhasználó törölve
+csak superadmin
+Superadmin
+Admin
+Megtekintő
+Szerző
+Szerkesztő
+Ki jelentkezhet be. Az adminok látják az IP-címeket és portokat, és módosítják a beállításokat; a felhasználók csak a vezérlőpultot látják
+Minden aktuális bejelentkezés. A „Kijelentkezés” azonnal befejez egyet
+Nincs aktív munkamenet
+Utoljára aktív
+Lejár
+Kijelentkezés
+Munkamenet befejezve
+ez a munkamenet
+Bejelentkezések, sikertelen kísérletek és minden változtatás az admin területen – időponttal, személlyel és IP-címmel
+Idő
+Esemény
+Portok
+bejövő
+kimenő
+Portok mentése
+Minden port egy helyen. Bejövő: nyissa meg a tűzfalon és a routeren, ha kívülről elérhetőnek kell lennie. Kimenő: a másik oldalnak elérhetőnek kell lennie
+Szolgáltatás újraindítása
+A szolgáltatás újraindul – utána töltse újra az oldalt
+Domain
+Tanúsítvány
+nincs tanúsítvány
+teszttanúsítvány
+érvényes
+lejárt
+csak HTTP
+eddig:
+Megújítás
+Tanúsítvány igénylése
+Eltávolítás
+Még nincs domain
+DNS: nem található rekord
+Domain hozzáadása
+E-mail a Let’s Encrypt számára
+Teszttanúsítvány (Let’s Encrypt staging
+Domain hozzáadása és tanúsítvány igénylése
+Tanúsítvány igénylése folyamatban
+Folyamatban – ez akár egy percig is tarthat
+A tanúsítványok automatikusan megújulnak
+Az automatikus megújítás nincs beállítva
+Megjeleníti
+Saját domainek ingyenes Let’s Encrypt tanúsítvánnyal
+Eltávolítja: {d}? Az átirányítás és a tanúsítvány törlődik
+Összeomlások
+Összeomlás
+Watchdog
+Elfogyott a memória
+Kilépett
+Időtúllépés
+Lefagyás
+Összeomlott komponens
+Összeomlott szál
+Összeomlott segédfolyamat
+Keep-alive újraindítás
+új
+mind olvasott
+mind
+Elmúlt 7 nap
+Nincs rögzített összeomlás
+Mind olvasottnak jelölése
+Nincs elérhető napló
+Összeomlás-figyelés
+Minden szolgáltatás minden összeomlása, lefagyása és vészhelyzeti újraindítása itt rögzül – az alkalmazás érintett részével és a teljes naplóval (journal, Python stack). A szolgáltatás automatikusan újraindul. Az új észlelések bejelentkezés után értesítésként jelennek meg, amíg olvasottnak nem jelöli őket
+Ezek a szolgáltatások figyelés alatt állnak. Minden váratlan leállás után a systemd rögzíti az észlelést és újraindítja a szolgáltatást; ha leállva marad, a keep-alive indítja újra
+Az összeomlás-figyelés még nincs beállítva. A következő frissítés beállítja – vagy egyszer a konzolon
+1 új összeomlás
+n} új összeomlás
+több
+Összes összeomlás megtekintése
+Olvasottnak jelölés
+Legutóbbi látogatása óta egy szolgáltatás összeomlott vagy lefagyott. Automatikusan újraindult. Az észlelés megnevezi az alkalmazás érintett részét, és tartalmazza a teljes naplót
+A webes felület leáll
+A webes felület újraindul – egy pillanat
+Keep-alive be
+Hálózati szolgáltatások újraindítása internetkimaradás után
+Heartbeat-cím
+Heartbeat hiba esetén (opcionális
+Folytatás
+Szünet 1 órára (karbantartás
+Mentés
+Keep-alive napló
+Percenként rootként: valóban ellenőriz minden szolgáltatást (webes felület és a protokollok kapcsolatai), néhány perc után újraindítja a hibás szolgáltatásokat (óránként legfeljebb 4×), észleli az internetkimaradásokat és utána újraindítja a hálózati szolgáltatásokat, és jelentést küld egy heartbeat-címre (Uptime Kuma „push”, Healthchecks.io …). A kézzel leállított szolgáltatás leállítva marad
+Üzenet
+Még nem volt frissítés a webes felületen keresztül
+Újratöltés
+Bejelentkezés
+Jelszó
+Jelszó megjelenítése
+Jelszó ismét
+A Caps Lock be van kapcsolva
+Bejelentkezve maradok
+Létrehozás
+Titkosított kapcsolat
+Titkosítatlan kapcsolat (HTTP
+Adja meg a felhasználónevet és a jelszót
+A jelszó túl rövid
+A jelszavak nem egyeznek
+Sikertelen bejelentkezés
+Fiókom
+Jelszó módosítása
+Nyelv
+Túl sok sikertelen kísérlet – várjon 15 percet
+Bejelentkezés
+Webmail
+Bejelentkezve maradok (30 nap
+Jelentkezzen be az FRN-szerver kezeléséhez
+Ez a vezérlőpult privát. Kérjük, jelentkezzen be
+Jelentkezzen be a beállítások módosításához
+Ez a hotspot privát. Kérjük, jelentkezzen be
+Jelentkezzen be az IP-címek és az admin terület megtekintéséhez
+Kérjük, jelentkezzen be a vezérlőpult megtekintéséhez
+Hibás felhasználónév vagy jelszó
+Túl sok sikertelen bejelentkezés. Próbálja újra 15 perc múlva
+Túl sok hibás jelszó. Próbálja újra 15 perc múlva
+Túl sok kérés – kérjük, várjon egy pillanatot
+Túl sok sikertelen kísérlet. Kérjük, várjon 15 percet
+Kijelentkezés
+Linkek
+Beállítások
+Frissítések
+Naplók
+Változásnapló
+Élő
+Élő adatok
+Statisztika
+Statisztika
+Utoljára hallott
+Utoljára hallott
+Adásban
+Ma
+24 óra
+7 nap
+30 nap
+90 nap
+1 év
+Időtartam
+Adásidő
+Hívások
+Adások
+Állomás
+Állomások
+Név
+Állapot
+Online
+Offline
+Csend
+Értesítések
+Betöltés
+Linkek betöltése
+Még semmit sem hallottunk
+nincs
+igen
+nem
+be
+Igen
+Nem
+OK
+Vissza
+Frissítés
+Újraindítás most
+Feltöltés
+Letöltés
+Keresés
+Szűrő
+Mind
+Összesen
+Verzió
+Üzemidő
+Jelenlegi jelszó
+Új jelszó
+Új jelszó ismét
+Létrehozva
+Hozzáadás
+Mentve
+Beállítások mentve
+Figyelmeztetés
+Info
+Talkgroup
+Talkgroupok
+Slot
+Forrás
+Cél
+Irány
+másodperc
+perc
+óra
+nap
+ezelőtt
+Világos
+Sötét
+Automatikus
+Színek
+Színek
+Logó
+Cím
+Előnézet
+Visszaállítás
+Alkalmaz
+Másolás
+Másolva
+Megjelenítés
+Elrejtés
+Több
+Kevesebb
+Összes megjelenítése
+Kevesebb megjelenítése
+Leírás
+Engedélyezve
+Letiltva

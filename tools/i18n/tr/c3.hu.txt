@@ -1,0 +1,234 @@
+A master és a tartalék ugyanazt az FRN-fiókot használja
+A SystemManager csak az egyiket engedi online – a másik „hibás hitelesítő adatokat” kap, és leáll az FRN-szervere. Kérjen saját FRN-jelszót a tartaléknak, és ott adja meg a SystemManager alatt
+Master és tartalék
+Második FRN-szerver ugyanazzal a konfigurációval – szinkronizálás minden egész órában és gombnyomásra
+A szerver szerepe
+Master: a szobákat, listákat és fiókokat itt szerkesztik. Tartalék: átveszi őket a mastertől
+Egyetlen szerver
+A partner vezérlőpultja
+A masteren a tartalék, a tartalékon a master, pl. https://frn-backup.example.org
+Szinkronkulcs
+Titkosít minden átvitelt a két szerver között – mindkettőn ugyanaz (legalább 24 karakter); az „🎲 Új kulcs” létrehoz egyet
+a szinkronkulccsal titkosítva
+A partner válasza nincs a szinkronkulccsal titkosítva (hibás cím vagy kulcs
+A partner válasza nem ehhez a kéréshez tartozik
+Szinkronizálás minden egész órában
+A tartalék minden egész órában lekéri a master konfigurációját – az eltérés legfeljebb egy óra
+A klienseknek elküldve: hová menjenek, ha ez a szerver nem működik. Üres master és tartalék esetén = a partner
+Átvitel
+Partner
+Utolsó szinkronizálás
+Következő szinkronizálás
+A tartalék utolsó lekérése
+A kliensek átváltanak ide:
+változatlan
+átvéve
+FRN-szerver újraindítva
+újraindítás függőben – állomások csatlakozva
+FRN leállítva
+karbantartás – az állomások a tartalékon vannak
+Adja meg a partnert és a szinkronkulcsot, majd mentsen
+Válassza ki lent a szerver szerepét: a master adja a konfigurációját, a tartalék minden egész órában átveszi. Magát az átváltást az FRN végzi: a kliensek a tartalékcímre mennek, ha ez a szerver eltűnik
+Szinkronizálás most
+Átadás a tartaléknak
+Visszavétel a tartaléktól
+Minden szervernek saját FRN-fiók kell
+FRN-jelszó Master
+FRN-jelszó Backup
+Új kulcs
+Szinkronizálás
+Szinkronizálás: változatlan
+Szinkronizálás: konfiguráció átvéve
+Sikertelen szinkronizálás
+Új szinkronkulcs létrehozása
+A kulcs itt mentve. Adja meg ugyanezt a kulcsot a másik szerveren – addig a szinkronizálás nem működik
+Új szinkronkulcs
+Másolja ki, és adja meg a másik szerveren a Master és tartalék alatt
+Kész
+A konfiguráció először a tartalékra szinkronizálódik. Ezután az itteni FRN-szerver leáll – az állomások maguktól átváltanak a tartalékra (FRN tartalékcím). A vezérlőpult tovább fut
+Az itteni FRN-szerver újraindul. Ezután a tartalék újraindítja FRN-szerverét, így állomásai visszajönnek ide
+Átadás
+Visszavétel
+Átadás folyamatban
+Visszavétel folyamatban
+Átadva a tartaléknak
+Visszavéve
+Konfiguráció szinkronizálva a tartalékra
+A tartalék FRN-szervere fut
+Az itteni FRN-szerver leállítva – az állomások átváltanak a tartalékra
+Az itteni FRN-szerver elindítva
+A tartalék visszaküldi állomásait
+ott nem fut FRN-szerver
+30 s után sem fut
+Ez a fiók a másik szerverhez tartozik: ott adja meg az e-mailt és a jelszót a SystemManager alatt
+FRN-jelszó igénylése – Master
+FRN-jelszó igénylése – Backup
+Előbb állítsa be a szerepet (Master vagy tartalék)
+Csak a master adhat át a tartaléknak
+A tartalék FRN-szervere nem fut – semmi sem váltott át
+Szinkronkulcs: legalább 24 karakter
+Nincs beállítva szinkronkulcs
+A partner még nem ismeri a Master és tartalék funkciót – frissítse ugyanarra a verzióra
+A master nem küldött szobákat – semmi sem lett átvéve (védelem üres master ellen
+Használjon https://-t a partnerhez – a szinkronizálás az FRN-fiókokat is viszi (http csak a LAN-on belül
+Portál
+Hírek
+Portáloldal
+Legfrissebb hírek
+Összes hír
+Tovább
+Kitűzve
+frissítve
+Még nincsenek hírek
+Régebbi hírek
+Csatlakozás
+Élő vezérlőpult megnyitása
+Nincsenek szobák
+Nincsenek beállított linkek
+ℹ️ Info
+Fontos
+Technika
+Hálózat és szobák
+Csak az adminok írnak és tesznek közzé híreket – ezek a portáloldalon jelennek meg. A piszkozatok csak itt láthatók
+Portáloldal megnyitása ↗
+Új hír
+Hír szerkesztése
+Közzététel
+Visszavonás
+Közzétéve
+Visszavonva
+Piszkozat
+közzétett
+piszkozatok
+Kategória
+Dátum
+Bevezető
+Szöveg
+(rövid összefoglaló a kártyán, opcionális
+Kitűzés felülre
+Mentés piszkozatként
+Piszkozatként mentve
+Mentés és közzététel
+Hír törlése
+Törölve
+Még nincsenek hírek – az „＋ Új hír” megírja az elsőt
+Saját domain: 🌐 Hálózat, portok és domainek → 🔒 Domainek és HTTPS
+Nyilvános oldal az üzemeltetők híreivel – a /portal alatt és saját domainen
+A portál domainje
+Portáldomain
+Szerzők
+A portálnak lehet saját domainje (pl. news.example.org) Let’s Encrypt tanúsítvánnyal – közvetlenül a portáloldalt mutatja
+Még nincs saját domain – a portál a vezérlőpult /portal címén érhető el
+Csak az adminok (Admin vagy Superadmin szerepkör) írnak, szerkesztenek, tesznek közzé és törölnek híreket. A felhasználók és látogatók csak olvasnak. Minden változás a 📜 naplóban van
+Közzétett hírek hírcsatornaként
+Portáloldal be
+A portál címe
+Alcím
+Üdvözlő szöveg
+Szobák és online állomások megjelenítése
+Mai számok megjelenítése
+Hírek oldalanként
+Nyilvános oldal az üzemeltetők híreivel a /portal alatt (és a portáldomainen
+Üres = a vezérlőpult címe
+pl. „Hírek az Auf der NachtSchicht FRN-szerverről”
+A hírek fölött jelenik meg. Formázás mint a hírekben: **félkövér**, *dőlt*, [link](https://…), listák - jellel
+Oldaldoboz a szobákkal, az online állomásokkal és azzal, aki adásban van (csak ha a vezérlőpult nyilvános
+A mai adások, adásidő és állomások
+Adjon meg címet
+Ez a hír nem létezik (már
+A portáloldal ki van kapcsolva
+Levelezés
+Írás
+Beérkezett
+Piszkozatok
+Elküldött
+Levélszemét
+Kuka
+Válasszon üzenetet
+Nincs találat
+Nincsenek üzenetek
+üzenet
+kijelölve
+olvasott
+olvasatlan
+Spam
+Nem spam
+Válasz
+Válasz mindenkinek
+Továbbítás
+Képek betöltése
+címzett
+Ekkor:
+Továbbított üzenet
+Új üzenet
+Címzett
+Tárgy
+Csatolás
+Küldés
+Levelezőprogram
+Felhasználó: az Ön címe · jelszó: a vezérlőpult jelszava
+20 MB-nál nagyobb mellékletek
+Adjon meg címzettet
+A postafiók nem érhető el
+Nincs postafiók
+Az üzenet nem található
+Nincs kijelölés
+E-mail
+Levelezőszerver
+Postafiókok
+DMARC és BIMI
+DNS-sablonok
+Levelezési domainek
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (spam, DKIM-, SPF/DMARC-ellenőrzés) ezen a gépen. Minden vezérlőpult-felhasználónak van postafiókja ugyanazzal a jelszóval
+Beállítva
+Várólista
+várakozik
+Utolsó alkalmazás
+Állapot ellenőrizve
+még nem
+Állapot ellenőrzése
+Levelezőszerver telepítése
+Újratelepítés / javítás
+Kikapcsolás
+Továbbító, TLS és korlátok
+A kimenő levelek a szolgáltató szerverén (smarthost) mennek át – mindig titkosítva. A levelezőprogramok csak TLS-sel kapcsolódnak
+Levelezőprogramok
+Bejövő (IMAP
+Kimenő (SMTP
+vagy
+Hitelesítés
+normál jelszó
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – a felhasználónév az e-mail-cím (vagy a vezérlőpult felhasználóneve), a jelszó a vezérlőpult jelszava
+Biztonság
+Levelezőszerver be
+Továbbító (smarthost
+Továbbító portja
+Továbbító titkosítása
+Továbbító felhasználója
+Továbbító jelszava
+A továbbító SPF-je
+25-ös port: titkosítás kötelező
+Postafiók mérete (MB
+Legnagyobb üzenet (MB
+Postmaster
+Spampontszám → Levélszemét mappa
+Spampontszám → elutasítás
+Postfix + Dovecot + Rspamd ezen a gépen: minden vezérlőpult-felhasználó postafiókot kap ugyanazzal a jelszóval
+Minden kimenő levél a szolgáltató ezen szerverén megy át, pl. smtp.provider.de – üres = közvetlen kézbesítés
+587 = STARTTLS, 465 = TLS az elejétől
+Mindig titkosítva – soha nem nyílt szövegben
+A DNS-sablonhoz, pl. include:_spf.provider.de – a szolgáltató megadja
+Be: a többi levelezőszervernek TLS-t (STARTTLS) kell használnia a kézbesítéshez – a kevés TLS nélküli elutasításra kerül. A levelezőprogramoknak mindig TLS kell
+Vezérlőpult-felhasználó, aki a postmaster@, abuse@ címeket és a DMARC-jelentéseket kapja – üres = a superadmin
+STARTTLS (587-es port
+TLS / SMTPS (465-ös port
+Minden vezérlőpult-felhasználónak automatikusan van postafiókja – a felhasználónév a cím, a jelszó a vezérlőpult jelszava. Az új felhasználók, új jelszavak, zárolt vagy törölt felhasználók maguktól eljutnak a levelezőszerverhez
+zárolva
+bejelentkezésre vár
+Postafiók nélkül
+Még nincs levelezési domain
+DKIM, DMARC és MTA-STS
+DKIM-kulcsok
+kulcs kész (RSA 2048
+a következő „Alkalmaz”-nál készül
+A szerver minden kimenő levelet aláír (DKIM), ellenőrzi a bejövő levelek SPF-, DKIM- és DMARC-adatait, és megmondja másoknak, hogyan kezeljék a hamisított leveleket. A DNS-rekordokat elkészítjük Önnek a 🧾 DNS-sablonok alatt

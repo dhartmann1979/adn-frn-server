@@ -1,0 +1,126 @@
+t.ex. aprs2.example.org – öppnar kartan på /. Måste peka på denna server (DNS). Tom = av
+Titel 1
+Titel 2
+Titel 3
+Underrubrik 1
+Underrubrik 2
+Underrubrik 3
+Logotyp 1
+Logotyp 2
+Logotyp 3
+Tom = APRS-karta · domän
+Tom = N8schichts APRS-logotyp
+Tom = titeln
+Tom = underrubriken (Utseende → Underrubrik
+Läggs in i instrumentpanelens certifikat (Inställningar → HTTPS och webb måste vara på
+Ingen egen domän. Kartan finns alltid på
+Status för HTTPS, åtkomst och DMR-servern, installerad version och uppdateringar samt omstartsknappar
+Serverprogramvara
+DMR-server (HBlink4
+Anslutna system
+Inga anslutna system
+TX MHz
+Utgående nätverk
+Inkommande nätverk
+Okänd enhet
+OpenBridge
+Repeater
+App
+Utgående länk
+ingen trafik
+Missade keep-alive-pingar
+FRID
+Alla talkgroups tillåtna (ingen konfiguration
+Alla talkgroups nekade (tom konfiguration
+Stationer med en position från en DMR-radio
+Liveanslutning till servern
+Anslutning till APRS-nätverket
+Visa eller dölj stationslistan
+Anropssignal, DMR-ID eller kommentar
+stationer
+Råpaket
+Spår
+Hastighet
+Kurs
+Höjd
+Väg
+Position
+Avstånd
+Via
+Hotspot
+Typ av GPS-rapport
+Skapa och ladda ner säkerhetskopia
+Ladda ner säkerhetskopian igen
+Sparade säkerhetskopior
+Uppdatera status
+Fullständiga säkerhetskopior innehåller alla inloggningsuppgifter. Detta område är reserverat för superadmin
+Säkerhetskopiera din HBlink4-installation och flytta den till en annan HBlink4-server. Inkluderat är programkod, konfigurationer, användare, inloggningsuppgifter, databaser, APRS-data och dina egna filer
+Arkivet innehåller konfidentiella data och är inte krypterat. Förvara det säkert. Python-miljöer byggs om på målet. Operativsystem, brandvägg och DNS ingår inte i säkerhetskopian
+Skapar säkerhetskopian. Håll detta fönster öppet
+Automatisk säkerhetskopia före återställning
+Ladda ner krypterad AutoBackup
+Lokal säkerhetskopia borttagen
+Ta bort lokal säkerhetskopia
+Borttagningen tar bara bort den lokala säkerhetskopiefilen. Kopior på SFTP eller Google Drive finns kvar
+Återställningen ersätter denna HBlink4-installation. Först skapas en säkerhetskopia av det aktuella läget. Om något misslyckas kommer det tidigare läget tillbaka. Efteråt loggar du in med källserverns användarkonto
+Målservern behöver Linux med systemd och Python 3.9 eller nyare. Med en annan Python-version kontrolleras kod och sparade paketversioner för kompatibilitet innan tjänsterna stoppas. Båda tjänsterna avbryts under återställningen; installationen av Python-paketen kan ta flera minuter
+Tjänstehjälparen saknas. Kör en gång i HBlink4-mappen på målservern
+Uppdatera sedan detta område
+För krypterade AutoBackups: separat återställningsnyckel (.agekey
+Ladda upp och kontrollera filen
+Laddar upp och kontrollerar arkivet fullständigt
+Välj först en säkerhetskopiefil
+Filen är större än 2 GiB
+Kontrollsummor, filsökvägar och databaser är giltiga. Inget har återställts än
+Ditt nuvarande superadmin-lösenord
+Nuvarande superadmin-lösenord
+Återställ den kontrollerade säkerhetskopian
+Återställningen startad. Båda tjänsterna startas om. Ladda om sidan när det är klart och logga in med källserverns konto. Om något misslyckas startar det tidigare läget igen; meddelandet visas här efter inloggning
+Överför återställningsnyckeln bara via HTTPS eller en lokal SSH-tunnel
+AutoBackup
+Förbered AutoBackup
+Aktivera AutoBackup
+AutoBackup sparad
+Spara AutoBackup-inställningar
+AutoBackup körs i bakgrunden. Uppdatera statusen när den är klar
+Skapa fullständiga säkerhetskopior enligt schema, kryptera dem och skicka dem till SFTP eller Google Drive. Schemat körs i instrumentpanelens tjänst, även utan öppen webbläsare. AutoBackups inloggningsuppgifter lagras krypterade; återställningsnyckeln ligger utanför programdata
+Dagligen
+Veckovis
+Dagliga säkerhetskopior att behålla
+Veckovisa säkerhetskopior att behålla
+Mål aktivt
+Ta bort mål
+SFTP-mål
+Google Drive
+Testa sparat mål
+Skrivning, läsning och borttagning fungerade
+Sparat – lämna tomt för att behålla
+Tomma lösenords-/tokenfält behåller de sparade värdena. Gamla säkerhetskopior rensas bara efter en lyckad uppladdning och innehållskontroll; manuella säkerhetskopior finns kvar
+Kontrollera först värdnyckeln med serveroperatören. SSH-nyckelfiler måste vara läsbara för instrumentpanelens tjänsteanvändare
+Eget Google OAuth-klient-ID
+OAuth-klienthemlighet
+OAuth-token-JSON med refresh_token
+På en dator med webbläsare
+Ange token-JSON här
+Utan mapp-ID skapas målmappen automatiskt
+Målen använder en egen undermapp
+för denna server
+Kör krypterad säkerhetskopia nu
+Ladda ner återställningsnyckel
+Superadmin-lösenord för nyckelexport
+Nyckeln nedladdad. Förvara den utanför denna server
+Nyckeln exporterades
+Exportera nyckeln först
+Exportera nyckeln bara via HTTPS eller en lokal SSH-tunnel
+Överför nyckeln bara via HTTPS eller en lokal SSH-tunnel
+Exporten misslyckades
+Använd HTTPS eller en lokal SSH-tunnel för inloggningsuppgifter och nyckelexport
+Spara inloggningsuppgifter bara via HTTPS eller en lokal SSH-tunnel
+Lås upp sparade mål
+Ursprunglig återställningsnyckel
+Efter upplåsning, exportera denna servers nyckel och aktivera schemat igen
+Målen upplåsta. Exportera denna servers nyckel och aktivera schemat igen
+Eller konfigurera på nytt: skriv RESET
+Återställ mål och schema
+Befintliga säkerhetskopiefiler finns kvar
+Återställning bara via HTTPS eller en lokal SSH-tunnel

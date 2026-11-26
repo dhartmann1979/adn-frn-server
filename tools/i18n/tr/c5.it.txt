@@ -1,0 +1,243 @@
+JSON nel formato di talkgroup_ids.json
+Nomi di talkgroup propri
+Uno per riga: 26500 = N8schicht Ortsrunde. Sovrascrive la lista o aggiunge talkgroup mancanti
+Nomi di circa 1400 talkgroup (github.com/dhartmann1979/n8schicht), aggiornati ogni giorno con la lista ID
+Esperto
+Righe aggiuntive per i file ini
+Righe aggiuntive per MMDVM-Host.ini
+Righe aggiuntive per DMRGateway.ini
+[Sezione] seguita da righe Chiave=Valore; sostituiscono o aggiungono valori
+Annulla
+Opzioni
+Modalità
+Calibrazione
+Calibrazione della frequenza
+Trova l’offset del tuo modem con il test BER di MMDVMCal
+Frequenza di partenza (MHz
+Premi Avvia
+Premi
+Programma un
+canale simplex
+nella tua radio su
+Trasmetti con la radio per qualche secondo (non serve parlare). Il BER compare a destra
+Sposta la frequenza con
+finché il BER è al minimo (idealmente sotto l’1 %). Trasmetti di nuovo dopo ogni passo
+Trasmetti con la radio – il BER compare qui
+BER ora
+Offset
+Salva offset
+Salva offset (RX e TX
+Offset salvati
+Altri test
+Per utenti esperti: deviazione, RSSI e pattern di test (il modem trasmette
+Deviazione +
+Deviazione −
+Potenza +
+Potenza −
+Deviazione DMR (D
+TX on/off (spazio
+Adotta
+Gli admin modificano tutto, i lettori vedono solo la dashboard (anche quando è privata
+Nuova password (min. 8
+password di fabbrica
+Schema colori
+Scegli un preset e modifica i colori a piacere. L’anteprima è live – nulla viene salvato prima di «Salva». Lo stesso motore dei temi gira in HBlink4-FreeRadioID e nella dashboard FRN, quindi un codice colore appare uguale ovunque
+Predefinito
+Copia lo schema in un’altra dashboard N8 (HBlink4-FreeRadioID → Aspetto, FRN → Tema) o incollane uno da lì
+Esporta / importa
+Testo del pulsante
+Link
+Apri in una nuova scheda
+Nuova scheda
+Icona del sito
+Recupera la favicon della pagina
+Aggiorna ora le icone dei siti
+Mostrato a tutti nell’intestazione. Con «icona del sito» l’hotspot recupera una volta la favicon della pagina collegata, la conserva nel suo database e la mostra nel menu (l’emoji è il ripiego, p. es. offline
+Scheda
+Temperatura CPU
+Scheda SD
+Dati MQTT live
+Broker MQTT (mosquitto
+Interfaccia web di N8-Hotspot
+Chiamate salvate
+ID
+Aggiornato
+Nessuna console Linux sulla UART del modem
+Permessi
+Cosa può fare l’interfaccia web: aprire le porte del modem (ricerca, calibrazione), riavviare i servizi dopo un aggiornamento, aggiornare la propria cartella
+L’interfaccia web è nel gruppo dialout (ricerca modem, calibrazione
+Regola sudo per il riavvio dei servizi (/etc/sudoers.d/n8hotspot
+La cartella del programma /opt/n8hotspot è scrivibile (Aggiorna ora
+L’ambiente Python è scrivibile (nuovi pacchetti dopo un aggiornamento
+Tutto in ordine
+presente
+gruppo dialout, modalità 660
+Impostazioni di aggiornamento
+Cerca aggiornamenti
+Interroga GitHub ogni ora esatta (senza accesso, nessun dato sul tuo hotspot viene inviato
+Controlla ogni (ore
+Installa automaticamente
+Installa da sola una nuova versione durante l’ora scelta – solo quando nessuno trasmette e non è in corso una calibrazione
+Ora per gli aggiornamenti automatici
+Riavvia MMDVMHost e DMRGateway
+Dopo un aggiornamento i file ini vengono riscritti ed entrambi i servizi radio si riavviano; l’interfaccia web si riavvia sempre
+Ramo
+Data della versione installata
+Mostra il journal di sistema
+File di configurazione
+Generati dalle impostazioni. Righe aggiuntive: Impostazioni → Esperto
+Cartella
+Questa installazione non è un checkout git – aggiorna con <code>sudo /opt/n8hotspot/scripts/update.sh</code>
+Riavvia N8-Hotspot a mano: sudo systemctl restart n8hotspot
+1. Scarica esattamente
+(solo fast-forward, nessuna modifica locale
+2. Pacchetti Python se requirements.txt è cambiato
+3. File ini di nuovo, riavvio di MMDVMHost e DMRGateway
+3. File ini di nuovo
+4. Riavvio dell’interfaccia web – la pagina si ricarica da sola
+Ricezione da una radio (RF
+Trasmissione verso le radio (dalla rete
+Modalità di MMDVMHost
+Connessione al server DMR
+nessuna rete
+connessione in corso
+non usato · hotspot simplex (solo TS2
+Non usato
+Hotspot simplex – solo TS2
+nessun RSSI
+Tasso di errore sui bit – sotto l’1 % pulito, sopra il 3 % il vocoder fatica
+Vocoder e segnale
+BER live
+Ultime chiamate · BER (RF) / perdita (rete
+RSSI (RF
+Qualità vocale oggi
+RF
+Chiamata di rete – il BER si misura solo in RF
+In attesa di una chiamata RF
+Ancora nessuna chiamata
+Nessuna chiamata RF oggi
+nessuna chiamata RF oggi
+BER medio (RF
+BER max.
+Perdita media (rete
+Frame vocali (AMBE+2
+via RF / rete
+persi in rete
+BER RF
+Stato, avvio automatico e avvia · ferma · riavvia – solo ciò che questo hotspot consente (regole sudo del N8 Admin-Kit
+Avvio automatico attivo
+Programma (root, in sola lettura per il servizio), dati e password, servizi, sudo, «Aggiorna ora» e la porta del modem
+Porta del modem
+systemd
+Permessi corretti – tutto in ordine
+Restano alcuni problemi
+richiesto
+Aggiorna ora» viene eseguito come root tramite
+solo fast-forward, pacchetti, servizi e file ini, permessi e sudo, riavvio, controllo dell’interfaccia web – se non risponde, ritorno alla versione precedente
+Versioni
+L’hotspot non funziona senza di esso finché non lo riavvii
+1. Fast-forward a
+(si ferma se dei file sono stati modificati a mano
+2. Pacchetti Python, servizi e file ini, permessi e sudo (N8 Admin-Kit, come root
+3. Riavvio di MMDVMHost, DMRGateway e dell’interfaccia web
+4. Controllo dell’interfaccia web – se non risponde, ritorno alla versione precedente; la pagina si ricarica da sola
+L’interfaccia web si riavvia
+Ogni minuto come root: controlla davvero ogni servizio (interfaccia web, MQTT, modem, accesso al server DMR), riavvia i servizi malati dopo 3 minuti (al massimo 4× all’ora), rileva le interruzioni di Internet e poi riavvia i servizi di rete, e si segnala a un indirizzo heartbeat
+Nome del token
+Crea token
+Ancora nessun token
+nessuna rete attivata
+Reti
+Ascolto
+Ascolto (solo admin connessi
+Volume
+Volume di ascolto
+Livello della stazione che parla
+Silenzio su tutte le reti
+Attivo ora
+In onda · via DMR
+In onda · via FRN
+In onda · via Zello
+Reti online
+Stazioni oggi
+Bloccate oggi
+Inviato a
+Stanza / TG / canale
+Stazioni nella stanza
+in trasmissione
+in ricezione
+pronto
+sconosciuto
+non
+Ancora nessun superadmin – creane uno ora per usare il portale admin
+Crea superadmin
+Impostazioni salvate. FRN/DMR/Zello/vocoder richiedono un riavvio del bridge
+Accesso predefinito
+è ancora attivo – imposta una password personale in Admin → Utenti
+Attività per rete
+Soprattutto via
+Quando si parla
+Stato attuale
+Connesso da
+Online da
+Pacchetti
+Frame
+Versione del server
+Versione del protocollo
+Stato del canale
+Stato di trasmissione
+Fase di accesso
+Accesso OK
+Utenti online
+Ping / pong
+Eventi
+Registro eventi
+ID peer
+Time slot
+Canale
+Account
+Bridge
+Generale
+Instradamento
+Liste ID e avatar
+Backup e nuovo inizio
+Vocoder
+Area admin di N8 Crosslink
+Le modifiche hanno effetto subito, durante il funzionamento
+Titolo nella dashboard
+Nome del server / dominio
+Indirizzo web (bind
+Porta web
+0.0.0.0 = tutte le interfacce · serve un riavvio del servizio
+serve un riavvio del servizio
+Banner di avviso nella dashboard
+Menu link (lista JSON con name/url
+Conserva gli ultimi ascoltati (giorni
+Cerca aggiornamenti ogni ora esatta
+Repository GitHub per gli aggiornamenti
+Nominativo pronunciato all’inizio di un passaggio
+Una voce sintetica (espeak-ng) pronuncia il nominativo, poi segue l’audio – il passaggio è ritardato della durata dell’annuncio
+Annuncia verso FRN
+Annuncia verso DMR
+Annuncia verso Zello
+Testo dell’annuncio
+Segnaposto: {call} = nominativo, {name} = nome – p. es. "{call}" o "{call} {name}"
+Pronuncia i nominativi come
+Lettere (D O 1 T E S T
+Alfabeto NATO (Delta Oscar One
+Anche senza nominativo (annuncia il nome
+Al massimo ogni … minuti per stazione
+Velocità di parlato (parole/min
+Volume (picco dBFS
+Pausa dopo l’annuncio (ms
+Ascolta l’annuncio in anteprima – con i valori del modulo
+Riproduci annuncio
+Salva e riavvia
+FRN – FreeRadioNetwork
+Porta
+Server di backup
+Porta di backup
+E-mail (account FRN
+Password (FRN
+Nome / descrizione
+Banda / canale (BC

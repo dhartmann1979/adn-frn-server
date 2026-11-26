@@ -1,0 +1,180 @@
+Kontrollerad
+Starta om den (sudo systemctl restart hblink4-dash
+Välj en profil och ändra sedan valfri färg – eller bygg ett helt eget schema. Du ser resultatet direkt
+Titlar
+Vad sidhuvudet och webbläsarfliken visar
+Stor text bredvid logotypen
+Liten rad under titeln
+Webbläsarflikens titel
+Tom = instrumentpanelens titel
+Logotyp och webbläsarikon
+Ladda upp egna bilder eller gå tillbaka till N8schicht-logotypen när som helst
+Webbläsarikon (favicon
+Ladda upp bild
+N8-logotyp
+eller adressen till en bild (https://… eller /static/
+Tom = N8schicht-logotyp · PNG, JPEG, WebP, GIF, SVG · max. 1 MB
+Tom = samma som logotypen · PNG, JPEG, WebP, GIF, SVG, ICO · max. 1 MB
+Logotypstorlek (px
+Logotypens hörn (%
+0 = som ritad, 50 = rund
+Dina egna länkar i sidhuvudet, t.ex. till nätverkets webbplats, en chattgrupp eller en wiki
+Dina egna länkar i sidhuvudet: webbplats, chattgrupp, wiki, donationssida… Alla ser dem, även utan inloggning
+Rad med knappar under sidhuvudet
+En enda knapp bredvid statusmärkena (äldre alternativ
+Extra knapp i sidhuvudet
+(enda extra knapp
+Knapplänk
+Inga länkar än. Lägg till den första nedan
+Visa/dölj
+OpenBridge förbinder denna server med ett annat nätverk, t.ex. en FreeDMR-server
+Ny trunk
+Spara trunkar
+Bara talkgroups i denna lista passerar trunken (båda riktningarna); allt annat kastas. Ställs in i adminområdet → Mönster, länkar och trunkar →
+Expert: alla trunkar som JSON – eller klistra in en hblink.cfg-sektion
+Ta över i formuläret
+Här ser du alla trunkar som JSON. Du kan även klistra in OpenBridge-sektioner från en FreeDMR/HBlink3
+ignoreras. En sektion uppdaterar trunken med samma namn – eller den på samma port eller nätverks-ID; annars läggs en trunk till
+Rader som börjar med
+Ladda ett HBlink3-exempel
+Importera en konfiguration
+Flyttar du från en annan DMR-server? Ladda dess konfigurationsfil; HBlink4 visar vad den kan ta över. Inget ändras innan du klickar
+Fil
+Välj fil
+Välj rules.py
+Analysera
+Vad som tas över
+Konfigurationsfil
+hblink.cfg, freedmr.cfg, adn-server.yaml eller config.json – eller släpp den här
+HBlink3/FreeDMR: lägg till rules.py (konferensbryggor
+valfritt – dess talkgroups blir talkgroup-listor
+Läses bara, körs aldrig
+allt från en annan HBlink4: server, åtkomst, mönster, svartlista, länkar, trunkar
+listor med radio- och repeater-ID:n blir svartlisteposter
+Tas inte över: reporting, logger, MySQL, AllStar, proxyer, alias-nedladdningar – HBlink4 gör det själv eller behöver det inte. Du ser listan efter analysen
+APRS (karta, DAPRS, server
+APRS-server
+APRS-fliken i instrumentpanelen
+Server-ID
+Server-ID (din anropssignal
+Anropssignal med SSID, t.ex. DB0ABC-10. Inloggningsnamn på APRS-IS (passcode beräknas) och namn i paketvägen
+Av som standard. Slår på kartan, stationsdatabasen och gatewayen DMR → APRS. TCP-portarna och uplinken nedan är separata brytare
+En APRS-IS-kompatibel server i Python: APRS-appar, iGates och trackers ansluter till den som till vilken APRS-IS-server som helst
+Öppna APRS-IS-portarna (TCP
+APRSdroid, Xastir, YAAC, iGates och trackers ansluter hit. Öppna portarna i brandväggen
+Filterport
+Port för fullt flöde
+Max. klienter
+Dubblettfönster (s
+Samma paket igen inom denna tid kastas (APRS-IS-standard: 30 s
+Klienterna väljer vad de får med ett filter (r/lat/lon/km
+Allt som servern har, ofiltrerat. 0 = av
+Klienter
+Anslutna klienter
+Ingen APRS-app eller iGate ansluten just nu
+Uplink och downlink
+Anslut denna server till ett APRS-nätverk: positioner från DMR går upp, stationer därifrån kommer ner på kartan
+Anslutning till ett APRS-nätverk – APRS-IS, CB-APRS eller egna servrar: DMR-positioner går upp, stationer kommer ner på kartan
+APRS-IS (amatörradio, världen över
+CB-APRS (CB-radio, eu.cbaprs.net
+Manuellt – egna servrar, flera länkar, upp/ner separat
+APRS-IS-server
+CB-APRS-server
+euro.aprs2.net (Europa), rotate.aprs2.net (världen över) eller din egen Tier-2-server
+eu.cbaprs.net (Europa) eller us.cbaprs.net
+Passcode
+Tom = beräknas från inloggningen; -1 = endast mottagning
+Inloggning (CB-anropssignal
+Tom = server-ID:t
+Downlink-filter
+Vad som kommer ner: r/lat/lon/km = radie kring en punkt (standard: Tyskland). Tom = inget kommer ner
+Vad som kommer ner från CB-APRS. Tom = inget
+Skicka upp dem (uplink
+Bara så länge uplinken är ansluten och verifierad
+APRS-appar behöver den för att sända. Ge den bara till licensierade amatörer
+Passcode för en anropssignal
+Beräkna
+En rad per server: värd, port, inloggning, passcode (tom = beräknad), filter och riktning
+Uplink och downlink är avstängda – kartan visar bara DMR och egna klienter
+ingen uplink
+Allt (DMR, egna klienter och downlink
+Bara DMR och egna klienter
+Skickat upp
+Inkommande paket
+Stationer per källa
+DMR-positioner
+Starta om APRS-servern
+portar stängda
+DAPRS – GPS från radioapparater
+DAPRS-avkodning
+Avkoda GPS-positioner (DAPRS
+DMR-servern hittar GPS-positioner i radiotrafiken (DAPRS). Vad som händer med dem ställs in i APRS-fliken
+Slås på tillsammans med APRS (APRS-fliken → Server). Hittar positioner som radioapparater skickar via DMR och lämnar dem till instrumentpanelens APRS-server
+GPS i röstsamtal (inbäddad GPS LC
+Radioapparater med GPS som skickar sin position under ett samtal (Motorola, Hytera, AnyTone
+GPS-datasamtal (NMEA, LRRP
+Positionsrapporter skickade som datasamtal, t.ex. AnyTone/TYT ”Digital APRS” till 900999 eller Motorola LRRP
+Acceptera GPS-data skickade till
+DMR-ID:n/talkgroups som radioapparaterna skickar sina GPS-data till. all = valfri destination; t.ex. 900999, 5057
+Positioner från DMR
+DMR-positioner blir APRS-positioner
+Positioner som DMR-servern hittar (DAPRS) hamnar på kartan som CALL-SSID; anropssignalen kommer från ID-listan
+Vad som händer med DMR-radioapparaters GPS-positioner: anropssignal från ID-listan, SSID, symbol, kommentar, APRS-IS
+CALL-7 för en handapparat; 0 = inget SSID. Per ID nedan
+Symbol
+Kommentar
+Upp högst var (s
+Tabell och symbolkod: /[ person, /> bil, /k lastbil, /b cykel, /- hus, /r antenn
+Platshållare: {tg} talkgroup, {repeater} hotspotens/repeaterns anropssignal, {dmrid}, {slot}, {server}
+Per DMR-ID
+Egen anropssignal, SSID, symbol eller kommentar för enskilda ID:n, eller stäng av ett
+ID utan anropssignal
+Repeaterobjekt
+Repeatrar på kartan
+Hotspots på kartan
+Hotspot-positioner är ofta hemadresser – av som standard
+Som APRS-objekt på positionen de anger vid inloggning, med frekvens och color code
+Repeatersymbol
+Hotspot-symbol
+Objektkommentar
+Efter frekvens och color code
+Objektfyr var (min
+Skicka upp dessa objekt (uplink
+Skicka repeaterobjekt nu
+Stationer inloggade med gästlösenordet (FreeRadioID) visas bara på den lokala kartan
+APRS-kartan: vem som ser den, vad den visar och hur länge stationer ligger kvar
+Kartan synlig utan inloggning
+Oberoende av instrumentpanelen: kartan kan vara offentlig även om instrumentpanelen inte är det
+Stationer på kartan
+Visa stationer från de senaste (h
+Visa spår
+Linje med de senaste positionerna för rörliga stationer
+Visa råpaket
+Paketlogg under kartan och i stationsfönstret
+Kartans mittpunkt (lat, lon
+Var kartan öppnas, t.ex. 52.29, 8.92
+Zoom
+2 = världen, 6 = Tyskland, 10 = region
+Kartstil
+Automatisk – mörk karta för mörka färgprofiler, ljus karta för Daylight
+Mörk (OpenStreetMap, mörkad) – passar N8-designen
+Topografisk (OpenTopoMap
+Egen tile-server
+Egen tile-URL
+Högsta zoom för den egna tile-servern
+Längre in förstoras rutorna i stället för att saknas (OpenStreetMap 19, OpenTopoMap 17 – sätts automatiskt
+https://…/{z}/{x}/{y}.png – bara för ”Egen tile-server” (t.ex. med egen API-nyckel
+Per station. Den lokala kartan visar alltid den senaste positionen
+Spara stationer (dagar
+Spara spår (dagar
+Spara råpaket (dagar
+APRS-domäner
+Upp till tre domäner som öppnar kartan direkt, var och en med egen titel och logotyp och vid behov ett Let’s Encrypt-certifikat
+Domän 1
+Domän 2
+Domän 3
+Domän 1: HTTPS med Let’s Encrypt
+Domän 2: HTTPS med Let’s Encrypt
+Domän 3: HTTPS med Let’s Encrypt
+t.ex. map.example.org – öppnar kartan på /. Måste peka på denna server (DNS). Tom = av
+t.ex. aprs.example.org – öppnar kartan på /. Måste peka på denna server (DNS). Tom = av

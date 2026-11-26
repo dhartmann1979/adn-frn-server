@@ -1,0 +1,233 @@
+"Crosslink" of bv. 446.03125FM CTC131.8
+Stad – wijk / locator
+FRN-kamer
+Kamer (net
+Naam van de spreker als FRN-tekstbericht
+Tekstbericht alleen naar deze stations (privé
+Roepnamen gescheiden door komma’s, bv. DL1ABC, DB0XYZ – leeg = openbaar voor iedereen in de kamer. Privéberichten verschijnen nergens anders
+Einddetectie RX (ms
+FRN levert blokken van 200 ms – 240 ms is een goede waarde
+Zo lang geen spraakpakket = doorgang beëindigd (SvxLink: 1000
+Niveau FRN → brug (dB
+Niveau brug → FRN (dB
+System Manager (voor „wachtwoord aanvragen”
+Poort van de System Manager
+Standaard sysman.freeradionetwork.eu – bij een eigen FRN-netwerk diens System Manager
+Nog geen FRN-wachtwoord? Vul roepnaam, naam, e-mail, band/kanaal, land en stad in en vraag het aan – het wachtwoord komt per e-mail
+Watchdog: opnieuw openen na (s) zonder antwoord
+Watchdog: het netwerk volledig opnieuw opbouwen na … s offline
+Naast de normale herverbinding (standaard 120 s
+DMR – HomeBrew (HBlink4 / FreeDMR
+Server (HBlink4 / FreeDMR
+Wachtwoord (passphrase
+leeg laten = ongewijzigd · Met HBlink4-FreeRadioID: persoonlijk FreeRadioID-wachtwoord – met de passphrase van de server is de brug alleen gast en mag hij niet zenden op TG 262
+Peer-/repeater-ID
+7 of 9 cijfers, moet op de server toegestaan zijn
+Zendtalkgroup
+Ontvangsttalkgroup
+0 = alle groepsgesprekken op het time slot
+Opties (RPTO
+bv. TS2=262 – leeg = serverconfiguratie
+Color code
+RX-frequentie (Hz
+TX-frequentie (Hz
+Bron-ID voor uitzendingen naar DMR
+roepnaam → eigen DMR-ID, als die in de ID-database staat
+Talker alias (stationsnaam) in de spraakframes versturen
+Ook DMRA-pakketten versturen (niet voor HBlink4
+Einddetectie RX zonder terminator (ms
+Niveau DMR → brug (dB
+Niveau brug → DMR (dB
+Time-outtimer per doorgang (s
+Voorbuffer DMR/Zello-uitgang (ms
+Naam van de RX/TX-talkgroup
+Zello – Channel API
+WebSocket-server
+Zello: wss://zello.io/ws · Zello Work: wss://zellowork.io/ws/NETWORK
+Zello-gebruikersnaam
+Ontwikkelaarstoken
+Issuer + privésleutel (JWT
+geen (Zello Work
+Auth-token
+Issuer
+Privésleutel (PEM
+alleen voor „Issuer + privésleutel” – leeg laten = ongewijzigd
+Samplefrequentie bij verzenden
+16 kHz (aanbevolen
+Opus-bitrate (bit/s
+Pakketlengte (ms
+Naam van de spreker als tekstbericht in het kanaal
+Tekstsjabloon
+Plaatshouders: {name} {callsign} {source} {detail}
+Einddetectie zonder stop_stream (ms
+Niveau Zello → brug (dB
+Niveau brug → Zello (dB
+leeg laten = ongewijzigd
+ingesteld – leeg laten = ongewijzigd
+Welke bron gaat naar welk netwerk? Wijzigingen werken direct
+Vergrendeltijd na zenden (ms
+Voorkomt pingpong tussen de netwerken
+Planning
+Vocoder (AMBE+2
+N8schicht-vocoder (software
+USB-stick (AMBE3000
+AMBEserver (netwerk
+Test zonder vocoder
+AMBE+2 in software – fork van de DroidStar-codec, afgestemd op verstaanbaarheid. Geen extra hardware en geen qemu; draait als eigen proces (x86 en ARM
+ThumbDV, DVstick 30, DV3000 direct via USB/serieel. Beste kwaliteit, geen extra dienst nodig
+AMBE3000 op een andere computer achter AMBEserver (UDP 2460
+Alleen om de verbindingen te testen – DMR-audio is dan stil
+Bibliotheek (leeg = automatisch
+Standaard: /opt/n8crosslink/lib/libn8vocoder.so
+Geluidsinstellingen
+Niveau voor codering (dB
+Niveau na decodering (dB
+Vocoder testen
+Vocoder bouwen / bijwerken
+Voorbeeld (invoer → DMR → uitvoer
+WAV-bestand
+Eigen testzin (leeg = standaardzin
+Testen
+ID-lijsten
+DMR-ID’s
+Geregistreerd bij FreeRadioID
+Talkgroupnamen
+ID-lijsten bijwerken
+ID-lijsten nu bijwerken
+Avatars nu bijwerken
+ID-lijsten en avatars automatisch één keer per dag, direct met de knop
+Bronnen
+FreeRadioID: alle DMR-ID’s (CSV
+FreeRadioID: alle DMR-ID’s (JSON, terugval
+FreeRadioID: geregistreerde ID’s (JSON
+FreeRadioID: geregistreerde ID’s (CSV, terugval
+FreeRadioID: losse opzoeking van onbekende ID’s ({id}
+Terugvalbron RadioID.net (CSV
+Talkgroupnamen (JSON
+Alleen bij FreeRadioID geregistreerde ID’s opzoeken
+Avatar-URL DMR ({id}
+Avatar-URL Zello ({username}, optioneel
+FRN-/Zello-roepnaam → FreeRadioID-avatar
+De Zello Channel API levert geen profielfoto’s – voer hier een eigen bron in of upload hieronder afbeeldingen
+Zello-avatars (eigen afbeeldingen
+Afbeelding (PNG/JPEG/WebP/GIF
+Nog geen eigen afbeeldingen
+Updatedienst
+ingericht
+Updatedienst ontbreekt – eenmaal uitvoeren
+teruggezet naar
+Versleutelde back-up maken
+Handleiding
+Back-up downloaden
+Back-up herstellen
+Back-upbestand (.n8xbak
+BELANGRIJK – superadmin-wachtwoord = sleutel van de back-up
+De back-up is volledig versleuteld (AES-256-GCM, geen platte tekst). De sleutel is het
+superadmin-wachtwoord
+op het moment van de back-up. Zonder dit wachtwoord kan de back-up niet worden
+hersteld – zelfs niet door de ontwikkelaar. Bewaar het superadmin-wachtwoord in de
+wachtwoordkluis
+(bv. samen met de bestandsnaam van de back-up
+Bevat alles: instellingen incl. inloggegevens (FRN, DMR, Zello), gebruikers, laatst gehoord, statistieken, gebeurtenissen, ID-lijsten, talkgroups en avatars
+Superadmin-wachtwoord (uw huidige wachtwoord
+Superadmin-wachtwoord op het moment van de back-up
+Superadmin-wachtwoord ter bevestiging
+Opnieuw beginnen
+Wat terugzetten
+Laatst gehoord, statistieken en gebeurtenissen verwijderen
+Alle instellingen naar standaard (gebruikers en geschiedenis blijven
+Alles – zoals vers geïnstalleerd (aanmelden daarna n8schicht / n8schicht
+Maak bij voorkeur eerst een back-up. Een volledige verwijdering gaat op de server met
+(zie de documentatie „Verwijderen”
+Configuratie exporteren
+Importeren
+Nieuwe gebruiker / wachtwoord wijzigen
+Wachtwoord (min. 8 tekens
+u
+Autostart uit
+Brug herstarten
+Server herstarten
+Rechten controleren en herstellen
+sudo niet ingericht – voer eenmaal sudo /opt/n8crosslink/update.sh uit
+Even geduld
+Dezelfde kleurenmotor als HBlink4-FreeRadioID, adn-frn-server en N8-HotSpot: kies een profiel en wijzig dan elke kleur – de hele pagina toont het meteen, het wordt pas met „Opslaan” bewaard
+Weergave opslaan
+Weergave opgeslagen
+Eigen waarden wissen
+Server en HTTPS
+HTTPS
+Toegang
+GitHub niet bereikbaar
+Status van HTTPS, toegang en de DMR-server, plus herstartknoppen. Update, diensten, rechten en keep-alive zijn de volgende items in het menu
+Elke minuut als root: controleert het dashboard, de DMR-server (UDP-poort, koppeling met het dashboard) en APRS (server en uplink) echt, herstart zieke diensten na 3 minuten (hoogstens 4× per uur), merkt internetstoringen op en herstart daarna de netwerkdiensten, en meldt zich bij een heartbeat-adres (Uptime Kuma „push”, Healthchecks.io …). Een hier gestopte dienst blijft gestopt
+Instellen
+Beheergedeelte
+Netwerkinfo
+Verbinden
+Onbekend
+Live-gegevens
+Klik om geluidsmeldingen in te schakelen
+Live-gegevens: browser verbonden met het dashboard, realtime updates – klik om te herladen
+DMR-server: het dashboard is verbonden met de DMR-server
+Verbinden met de dashboardserver
+Wachten op verbindingsstatus
+Offline – klik om opnieuw te verbinden
+DMR-server offline
+APRS uit
+Mededeling
+Verbergen tot de volgende versie
+Op de server installeren
+Klik voor gedetailleerde informatie
+Gesprekken vandaag
+Verkeer vandaag
+Actieve streams
+Vandaag doorgestuurd
+Verbindingen
+Repeaters
+Hotspots
+Apps
+Netwerk inkomend
+Netwerk uitgaand
+Recente gebeurtenissen
+Nog geen gebeurtenissen
+Sprekers
+Meest actief
+Laatste gesprek
+Laatste verkeer
+Spraakgesprek
+Groepsgesprek
+Individueel (privé)gesprek
+Privé- (individuele) gesprekken
+Datagesprek (niet doorgestuurd
+Radio-ID
+Bestemming
+Locatie onbekend
+Detail
+Actief sinds
+Software en pakketnaam die het station bij het aanmelden meldt
+Onbekend apparaattype
+TG’s geleverd door de repeater via RPTO
+TS1-TG’s
+TS2-TG’s
+Bron aangemeld via FreeRadioID
+Aanmelding geverifieerd door FreeRadioID.net – volledige toegang
+Aangemeld met de standaard-passphrase – zenden beperkt tot gast-talkgroups
+Talker Alias
+DMR Talker Alias
+Stationsinfo tonen
+alleen admins
+Alleen zichtbaar voor admins
+verborgen
+niet verbonden
+keep-alive
+actief in het afgelopen uur
+herstart
+Volledig scherm
+Kaart openen
+De kaart op een eigen pagina openen
+Kaart
+APRS-kaart
+Dashboard
+Overzicht
+Nu vernieuwen
+Talkgroupstatistieken

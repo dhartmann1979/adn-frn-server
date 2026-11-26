@@ -1,0 +1,233 @@
+"Crosslink" o p. ej. 446.03125FM CTC131.8
+Ciudad – barrio / locator
+Sala FRN
+Sala (net
+Nombre de quien habla como mensaje de texto FRN
+Mensaje de texto solo a estas estaciones (privado
+Indicativos separados por comas, p. ej. DL1ABC, DB0XYZ – vacío = público para todos en la sala. Los mensajes privados no aparecen en ningún otro sitio
+Detección de fin RX (ms
+FRN entrega bloques de 200 ms – 240 ms es un buen valor
+Ningún paquete de voz durante este tiempo = pasada terminada (SvxLink: 1000
+Nivel FRN → puente (dB
+Nivel puente → FRN (dB
+System Manager (para «solicitar contraseña»
+Puerto del System Manager
+Por defecto sysman.freeradionetwork.eu – con una red FRN propia, su System Manager
+¿Aún sin contraseña FRN? Rellene indicativo, nombre, correo, banda/canal, país y ciudad y solicítela – la contraseña llega por correo
+Watchdog: reabrir tras (s) sin respuesta
+Watchdog: reconstruir la red por completo tras … s sin conexión
+Además de la reconexión normal (por defecto 120 s
+DMR – HomeBrew (HBlink4 / FreeDMR
+Servidor (HBlink4 / FreeDMR
+Contraseña (frase de paso
+dejar vacío = sin cambios · Con HBlink4-FreeRadioID: contraseña personal de FreeRadioID – con la frase de paso del servidor, el puente es solo invitado y no puede emitir en el TG 262
+ID de par/repetidor
+7 o 9 cifras, debe estar permitido en el servidor
+Talkgroup de emisión
+Talkgroup de recepción
+0 = todas las llamadas de grupo en el time slot
+Opciones (RPTO
+p. ej. TS2=262 – vacío = configuración del servidor
+Color code
+Frecuencia RX (Hz
+Frecuencia TX (Hz
+ID de origen para las emisiones hacia DMR
+indicativo → ID DMR propio, si está en la base de datos de ID
+Enviar el talker alias (nombre de la estación) en las tramas de voz
+Enviar también paquetes DMRA (no para HBlink4
+Detección de fin RX sin terminador (ms
+Nivel DMR → puente (dB
+Nivel puente → DMR (dB
+Temporizador de tiempo límite por pasada (s
+Prebúfer de salida DMR/Zello (ms
+Nombre del talkgroup RX/TX
+Zello – Channel API
+Servidor WebSocket
+Zello: wss://zello.io/ws · Zello Work: wss://zellowork.io/ws/NETWORK
+Nombre de usuario de Zello
+Token de desarrollador
+Issuer + clave privada (JWT
+ninguno (Zello Work
+Token de autenticación
+Issuer
+Clave privada (PEM
+solo para «Issuer + clave privada» – dejar vacío = sin cambios
+Frecuencia de muestreo al enviar
+16 kHz (recomendado
+Tasa de bits Opus (bit/s
+Longitud del paquete (ms
+Nombre de quien habla como mensaje de texto en el canal
+Plantilla de texto
+Marcadores: {name} {callsign} {source} {detail}
+Detección de fin sin stop_stream (ms
+Nivel Zello → puente (dB
+Nivel puente → Zello (dB
+dejar vacío = sin cambios
+establecido – dejar vacío = sin cambios
+¿Qué fuente va a qué red? Los cambios se aplican al instante
+Tiempo de bloqueo tras emitir (ms
+Evita el ping-pong entre las redes
+Horario
+Vocoder (AMBE+2
+Vocoder N8schicht (software
+Lápiz USB (AMBE3000
+AMBEserver (red
+Prueba sin vocoder
+AMBE+2 en software – bifurcación del códec DroidStar, ajustado para la inteligibilidad. Sin hardware adicional y sin qemu; funciona como proceso propio (x86 y ARM
+ThumbDV, DVstick 30, DV3000 directamente por USB/serie. La mejor calidad, sin servicio adicional
+AMBE3000 en otro ordenador detrás de AMBEserver (UDP 2460
+Solo para probar las conexiones – el audio DMR queda entonces en silencio
+Biblioteca (vacío = automático
+Por defecto: /opt/n8crosslink/lib/libn8vocoder.so
+Ajustes de sonido
+Nivel antes de codificar (dB
+Nivel tras decodificar (dB
+Probar vocoder
+Compilar / actualizar vocoder
+Vista previa (entrada → DMR → salida
+Archivo WAV
+Frase de prueba propia (vacío = frase por defecto
+Probar
+Listas de ID
+ID DMR
+Registrados en FreeRadioID
+Nombres de talkgroups
+Actualizar listas de ID
+Actualizar listas de ID ahora
+Actualizar avatares ahora
+Listas de ID y avatares automáticamente una vez al día, al instante con el botón
+Fuentes
+FreeRadioID: todos los ID DMR (CSV
+FreeRadioID: todos los ID DMR (JSON, alternativa
+FreeRadioID: ID registrados (JSON
+FreeRadioID: ID registrados (CSV, alternativa
+FreeRadioID: consulta individual de ID desconocidos ({id}
+Fuente alternativa RadioID.net (CSV
+Nombres de talkgroups (JSON
+Consultar solo los ID registrados en FreeRadioID
+URL de avatar DMR ({id}
+URL de avatar Zello ({username}, opcional
+Indicativo FRN/Zello → avatar de FreeRadioID
+La Channel API de Zello no entrega fotos de perfil – indique aquí una fuente propia o suba imágenes abajo
+Avatares de Zello (imágenes propias
+Imagen (PNG/JPEG/WebP/GIF
+Aún no hay imágenes propias
+Servicio de actualización
+configurado
+Falta el servicio de actualización – ejecutar una vez
+revertido a
+Crear copia de seguridad cifrada
+Guía
+Descargar copia de seguridad
+Restaurar copia de seguridad
+Archivo de copia (.n8xbak
+IMPORTANTE – contraseña del superadmin = clave de la copia
+La copia está totalmente cifrada (AES-256-GCM, sin texto plano). La clave es la
+contraseña del superadmin
+en el momento de la copia. Sin esta contraseña la copia no se puede
+restaurar – ni siquiera el desarrollador. Guarde la contraseña del superadmin en el
+gestor de contraseñas
+(p. ej. junto con el nombre del archivo de copia
+Contiene todo: ajustes con credenciales (FRN, DMR, Zello), usuarios, últimos escuchados, estadísticas, eventos, listas de ID, talkgroups y avatares
+Contraseña del superadmin (su contraseña actual
+Contraseña del superadmin en el momento de la copia
+Contraseña del superadmin para confirmar
+Empezar de nuevo
+Qué restablecer
+Borrar últimos escuchados, estadísticas y eventos
+Todos los ajustes por defecto (los usuarios y el historial se mantienen
+Todo – como recién instalado (después inicio de sesión n8schicht / n8schicht
+Mejor cree primero una copia de seguridad. Una desinstalación completa se hace en el servidor con
+(vea la documentación «Desinstalación»
+Exportar configuración
+Importar
+Nuevo usuario / cambiar contraseña
+Contraseña (mín. 8 caracteres
+usted
+Inicio automático desactivado
+Reiniciar puente
+Reiniciar servidor
+Comprobar y corregir permisos
+sudo no configurado – ejecute una vez sudo /opt/n8crosslink/update.sh
+Espere, por favor
+El mismo motor de colores que HBlink4-FreeRadioID, adn-frn-server y N8-HotSpot: elija un perfil y cambie cualquier color – toda la página lo muestra al instante, solo se guarda con «Guardar»
+Guardar apariencia
+Apariencia guardada
+Borrar valores propios
+Servidor y HTTPS
+HTTPS
+Acceso
+GitHub inaccesible
+Estado de HTTPS, del acceso y del servidor DMR, más botones de reinicio. Actualización, servicios, permisos y keep-alive son las siguientes entradas del menú
+Cada minuto como root: comprueba de verdad el panel, el servidor DMR (puerto UDP, enlace con el panel) y APRS (servidor y uplink), reinicia los servicios enfermos tras 3 minutos (como máximo 4× por hora), detecta cortes de Internet y después reinicia los servicios de red, e informa a una dirección heartbeat (Uptime Kuma «push», Healthchecks.io …). Un servicio detenido aquí sigue detenido
+Configuración
+Área de administración
+Información de red
+Conectando
+Desconocido
+Datos en vivo
+Haga clic para activar las notificaciones de sonido
+Datos en vivo: navegador conectado al panel con actualizaciones en tiempo real – haga clic para recargar
+Servidor DMR: el panel está conectado al servidor DMR
+Conectando con el servidor del panel
+Esperando el estado de la conexión
+Sin conexión – haga clic para reconectar
+Servidor DMR sin conexión
+APRS desactivado
+Aviso
+Ocultar hasta la próxima versión
+Instalar en el servidor
+Haga clic para obtener información detallada
+Llamadas hoy
+Tráfico hoy
+Flujos activos
+Retransmitidos hoy
+Conexiones
+Repetidores
+Hotspots
+Apps
+Red entrante
+Red saliente
+Eventos recientes
+Aún no hay eventos
+Hablantes
+Más activos
+Última llamada
+Último tráfico
+Llamada de voz
+Llamada de grupo
+Llamada individual (privada
+Llamadas privadas (individuales
+Llamada de datos (no reenviada
+ID de radio
+Destino
+Ubicación desconocida
+Detalle
+En marcha desde
+Software y nombre del paquete que la estación indica al conectarse
+Tipo de dispositivo desconocido
+TG proporcionados por el repetidor vía RPTO
+TG de TS1
+TG de TS2
+Origen conectado mediante FreeRadioID
+Acceso verificado por FreeRadioID.net – acceso completo
+Conectado con la frase de paso por defecto – emisión limitada a los talkgroups de invitado
+Talker Alias
+Talker Alias DMR
+Mostrar información de la estación
+solo admins
+Visible solo para admins
+oculto
+no conectado
+keep-alive
+activo en la última hora
+reinicio
+Pantalla completa
+Abrir el mapa
+Abrir el mapa en su propia página
+Mapa
+Mapa APRS
+Panel
+Resumen
+Actualizar ahora
+Estadísticas de talkgroups

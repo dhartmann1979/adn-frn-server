@@ -1,0 +1,126 @@
+bv. aprs2.example.org – opent de kaart op /. Moet naar deze server wijzen (DNS). Leeg = uit
+Titel 1
+Titel 2
+Titel 3
+Ondertitel 1
+Ondertitel 2
+Ondertitel 3
+Logo 1
+Logo 2
+Logo 3
+Leeg = APRS-kaart · domein
+Leeg = N8schicht-APRS-logo
+Leeg = de titel
+Leeg = de ondertitel (Weergave → Ondertitel
+Komt in het certificaat van het dashboard (Instellingen → HTTPS en web moet aan staan
+Geen eigen domein. De kaart staat altijd op
+Status van HTTPS, toegang en de DMR-server, de geïnstalleerde versie en updates, plus herstartknoppen
+Serversoftware
+DMR-server (HBlink4
+Verbonden systemen
+Geen systemen verbonden
+TX MHz
+Netwerk uitgaand
+Netwerk inkomend
+Onbekend apparaat
+OpenBridge
+Repeater
+App
+Uitgaande link
+geen verkeer
+Gemiste keep-alive-pings
+FRID
+Alle talkgroups toegestaan (geen configuratie
+Alle talkgroups geweigerd (lege configuratie
+Stations met een positie van een DMR-portofoon
+Live-verbinding met de server
+Verbinding met het APRS-netwerk
+De stationslijst tonen of verbergen
+Roepnaam, DMR-ID of commentaar
+stations
+Ruwe pakketten
+Spoor
+Snelheid
+Koers
+Hoogte
+Pad
+Positie
+Afstand
+Via
+Hotspot
+Soort GPS-rapport
+Back-up maken en downloaden
+Back-up opnieuw downloaden
+Opgeslagen back-ups
+Status vernieuwen
+Volledige back-ups bevatten alle inloggegevens. Dit gedeelte is voorbehouden aan de superadmin
+Maak een back-up van uw HBlink4-installatie en verhuis die naar een andere HBlink4-server. Inbegrepen zijn programmacode, configuraties, gebruikers, inloggegevens, databases, APRS-gegevens en uw eigen bestanden
+Het archief bevat vertrouwelijke gegevens en is niet versleuteld. Bewaar het veilig. Python-omgevingen worden op het doel opnieuw opgebouwd. Besturingssysteem, firewall en DNS maken geen deel uit van de back-up
+Back-up wordt gemaakt. Houd dit venster open
+Automatische back-up vóór herstel
+Versleutelde AutoBackup downloaden
+Lokale back-up verwijderd
+Lokale back-up verwijderen
+Verwijderen wist alleen het lokale back-upbestand. Kopieën op SFTP of Google Drive blijven
+Herstellen vervangt deze HBlink4-installatie. Eerst wordt een back-up van de huidige toestand gemaakt. Als er iets misgaat, komt de vorige toestand terug. Daarna meldt u zich aan met het gebruikersaccount van de bronserver
+De doelserver heeft Linux met systemd en Python 3.9 of nieuwer nodig. Bij een andere Python-versie worden code en opgeslagen pakketversies op compatibiliteit gecontroleerd voordat de diensten stoppen. Beide diensten worden tijdens het herstel onderbroken; het installeren van de Python-pakketten kan enkele minuten duren
+De diensthelper ontbreekt. Voer eenmaal uit in de HBlink4-map op de doelserver
+Vernieuw daarna dit gedeelte
+Voor versleutelde AutoBackups: aparte herstelsleutel (.agekey
+Bestand uploaden en controleren
+Archief uploaden en volledig controleren
+Kies eerst een back-upbestand
+Het bestand is groter dan 2 GiB
+Controlesommen, bestandspaden en databases zijn geldig. Er is nog niets hersteld
+Uw huidige superadmin-wachtwoord
+Huidig superadmin-wachtwoord
+De gecontroleerde back-up herstellen
+Herstel gestart. Beide diensten herstarten. Herlaad de pagina als het klaar is en meld u aan met het account van de bronserver. Als er iets misgaat, start de vorige toestand weer; de melding verschijnt hier na het aanmelden
+Draag de herstelsleutel alleen over via HTTPS of een lokale SSH-tunnel
+AutoBackup
+AutoBackup voorbereiden
+AutoBackup inschakelen
+AutoBackup opgeslagen
+AutoBackup-instellingen opslaan
+AutoBackup draait op de achtergrond. Vernieuw de status als hij klaar is
+Volledige back-ups volgens planning maken, versleutelen en naar SFTP of Google Drive sturen. De planning draait in de dashboarddienst, ook zonder geopende browser. AutoBackup-inloggegevens worden versleuteld opgeslagen; de herstelsleutel blijft buiten de programmagegevens
+Dagelijks
+Wekelijks
+Dagelijkse back-ups bewaren
+Wekelijkse back-ups bewaren
+Doel actief
+Doel verwijderen
+SFTP-doel
+Google Drive
+Opgeslagen doel testen
+Schrijven, lezen en verwijderen werkten
+Opgeslagen – leeg laten om te behouden
+Lege wachtwoord-/tokenvelden behouden de opgeslagen waarden. Oude back-ups worden pas opgeruimd na een geslaagde upload en inhoudscontrole; handmatige back-ups blijven
+Controleer eerst de hostsleutel bij de serverbeheerder. SSH-sleutelbestanden moeten leesbaar zijn voor de dienstgebruiker van het dashboard
+Eigen Google OAuth-client-ID
+OAuth-clientgeheim
+OAuth-token-JSON met refresh_token
+Op een computer met browser
+Voer hier de token-JSON in
+Zonder map-ID wordt de doelmap automatisch aangemaakt
+De doelen gebruiken een eigen submap
+voor deze server
+Nu een versleutelde back-up uitvoeren
+Herstelsleutel downloaden
+Superadmin-wachtwoord voor het exporteren van de sleutel
+Sleutel gedownload. Bewaar hem buiten deze server
+De sleutel is geëxporteerd
+Exporteer eerst de sleutel
+Exporteer de sleutel alleen via HTTPS of een lokale SSH-tunnel
+Draag de sleutel alleen over via HTTPS of een lokale SSH-tunnel
+Exporteren mislukt
+Gebruik HTTPS of een lokale SSH-tunnel voor inloggegevens en het exporteren van de sleutel
+Sla inloggegevens alleen op via HTTPS of een lokale SSH-tunnel
+Opgeslagen doelen ontgrendelen
+Oorspronkelijke herstelsleutel
+Exporteer na het ontgrendelen de sleutel van deze server en schakel de planning weer in
+Doelen ontgrendeld. Exporteer de sleutel van deze server en schakel de planning weer in
+Of opnieuw instellen: typ RESET
+Doelen en planning terugzetten
+Bestaande back-upbestanden blijven
+Terugzetten alleen via HTTPS of een lokale SSH-tunnel

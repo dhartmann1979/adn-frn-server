@@ -1,0 +1,219 @@
+Server en gegevens
+Java nu bijwerken
+Java-FRN-server
+Elke minuut als root: controleert elke dienst echt (dashboard, Java-FRN-server draait en neemt stations aan), herstart zieke diensten na 3 minuten (hoogstens 4× per uur), merkt internetstoringen op en herstart daarna de netwerkdiensten, en meldt zich bij een heartbeat-adres
+Keep-Alive
+met de hand gestopt – Keep-Alive wacht
+Keep-Alive aan
+Wordt elke minuut aangeroepen zolang alles in orde is (Uptime Kuma „Push”, Healthchecks.io …) – waarschuwt u als de aanroepen uitblijven
+Keep-Alive-logboek
+Keep-Alive opgeslagen
+Keep-Alive 1 uur gepauzeerd
+Keep-Alive weer actief
+Openbaar FRN-foutenlogboek
+Kijk bij problemen altijd eerst hier: de FRN-SystemManager van freeradionetwork.de schrijft daar elke geweigerde aanmelding van servers en clients (verkeerd FRN-wachtwoord, meervoudige verbinding, poort niet bereikbaar …) – de reden die de FRN-server zelf niet noemt. Getoond worden vermeldingen over dit serveradres, de roepnaam van de beheerder en hier geweigerde stations. Nieuwe vermeldingen verschijnen ook hieronder bij de gebeurtenissen
+Volledig foutenlogboek openen ↗
+niet bereikbaar
+vermeldingen over deze server
+niets over deze server
+sinds
+Wie
+Geen vermeldingen over deze server in de laatste vermeldingen van het logboek
+Roepnamen
+andere stations in het logboek
+laden
+De reden staat in het openbare FRN-foutenlogboek
+Logboeken → FRN-foutenlogboek
+volledig logboek openen ↗
+Geweigerd door de SystemManager? De reden staat in het openbare FRN-foutenlogboek van freeradionetwork.de (Help → Foutenlogboek
+FRN-foutenlogboek
+openen ↗
+Verkeerd FRN-wachtwoord – vraag een wachtwoord aan bij de SystemManager (📧 FRN-wachtwoord aanvragen) en voer precies het toegewezen wachtwoord in met hetzelfde e-mailadres en dezelfde roepnaam/naam
+Meervoudige verbinding: er is al een verbinding met dezelfde gegevens actief – draait er een tweede instantie (oude server, tweede server of een back-upserver met hetzelfde account)? Elke FRN-server heeft een eigen account nodig
+De SystemManager kan de server op dit adres en deze poort niet vanaf internet bereiken – controleer firewall en port forwarding (TCP) en het serveradres
+Toegang geblokkeerd – vraag het de beheerder van het FRN-netwerk
+Account onbekend bij de SystemManager – vraag een wachtwoord aan of controleer de spelling van e-mail, roepnaam en naam
+Protocolversie geweigerd – werk de FRN-server/client bij
+E-mailadres geweigerd – gebruik precies het adres van het FRN-wachtwoord
+Status, autostart bij het opstarten en starten, stoppen, herstarten – alleen de diensten die voor dit dashboard zijn vrijgegeven
+Controleert de dienstgebruiker, de rechten van programma en gegevens, systemd-units en de sudo-regels
+repareert wat fout is en controleert opnieuw. Console
+mislukt
+Autostart bij het opstarten
+fouten
+controleren
+controleren en herstellen
+De rechten zijn in orde
+Niet alles kon worden hersteld
+Nog geen update vanuit het dashboard
+Uitschakelen
+Stations op deze server kunnen de verbinding verliezen
+Het dashboard is daarna weg – start het opnieuw in de console: sudo systemctl start frnadn
+FRN-wachtwoord aanvragen
+Wachtwoord aanvragen
+FRN-wachtwoord aangevraagd
+E-mail (het wachtwoord wordt daarheen gestuurd
+Band / kanaal
+Land
+Stad - wijk
+Elke FRN-server heeft een eigen FRN-account nodig – hetzelfde e-mailadres en wachtwoord op twee servers worden geweigerd („dezelfde gegevens zijn al online op een andere server”
+Voer daarna bovenaan onder SystemManager e-mail en wachtwoord in en sla op. Gebruik voor een tweede server een andere naam (bv. „Server Test”) – roepnaam en naam samen moeten nieuw zijn
+De SystemManager mailt een wachtwoord voor een nieuw FRN-account
+Grootte
+Back-up gedownload
+Back-up verwijderd
+Herstel gestart
+Back-up hersteld
+Back-up
+Herstellen
+Back-up maken
+Nu herstellen
+Controleren
+Alles in één versleuteld bestand (.frnbak): instellingen, gebruikers, kamers, toegangslijsten, FRN-accounts, statistieken, chat, clientlogo’s, huisstijl en de configuratie van de FRN-server. Kies een wachtwoord – zonder dit kan de back-up niet worden geopend, bewaar het in uw wachtwoordkluis. De laatste back-ups blijven op de server
+Wachtwoord voor de back-up (min. 10 tekens
+Herhalen
+Nog geen back-ups
+Vervangt database, huisstijl en FRN-configuratie door de back-up. Het dashboard herstart, past de back-up toe en herstart daarna de FRN-server – verbonden stations maken vanzelf opnieuw verbinding. De huidige toestand wordt bewaard in before-restore-… in de gegevensmap. Daarna meldt u zich aan met de accounts uit de back-up
+Back-upbestand (.frnbak
+Wachtwoord van de back-up
+Typ RESTORE om te bevestigen
+Laatste herstel
+Laatste herstel mislukt
+Kamers
+FRN-accounts
+Back-up gemaakt
+De wachtwoorden verschillen
+Deze back-up verwijderen
+Deze back-up nu herstellen
+Het dashboard herstart en vervangt alle gegevens door de back-up; ook de FRN-server herstart
+Herstellen – het dashboard herstart
+Uploaden mislukt
+Verkeerd wachtwoord of beschadigd bestand
+Dit is geen back-up van adn-frn-server (.frnbak
+Upload eerst het back-upbestand
+Typ RESTORE om te bevestigen
+Het back-upwachtwoord moet minstens 10 tekens hebben
+Back-ups bevatten alle toegangsgegevens – alleen superadmin
+Intrekken
+Dit token intrekken
+De dienst verliest direct de toegang
+Token ingetrokken
+Laatst gebruikt
+Token
+Kopieer het token nu – het wordt maar één keer getoond
+API-token
+API-token ingetrokken
+Lijsten
+FRN-server
+Chat
+Nu online
+Doorgangen vandaag
+Zendtijd vandaag
+Gehoorde stations
+Piek online
+Kamer
+Band
+Meer tonen
+Laatste
+van freeradionetwork.de
+minder
+nu
+online
+Gedempt
+Geblokkeerd
+Beheerder
+Nog geen superadmin
+Voltooi de begeleide installatie op de server
+of maak er een aan met
+Serverinstellingen of ACL’s opgeslagen
+Herstart de FRN-server om de wijzigingen toe te passen (verbonden stations maken vanzelf opnieuw verbinding
+binnengekomen
+vertrokken
+Topstations
+Activiteit per kamer
+Stations online
+maximum, elke 5 minuten gemeten
+Wanneer er gepraat wordt
+Aandeel
+Meest actieve stations
+Meestal in
+Komen en gaan
+aan- en afmeldingen, live
+op zendtijd
+zendtijd, laatste 30 dagen
+Dagtotalen
+Ma
+Di
+Wo
+Do
+Vr
+Za
+Zo
+Zoeken: roepnaam, naam, stad of land
+Laatst gezien
+Gesproken (30 d
+Doorgangen (30 d
+Stad
+Clienttype
+Sinds
+Aanmeldingen
+Crosslink
+Gateway
+Gateway (radio
+Alleen pc
+Alleen pc
+Pc / app
+Duitsland
+Oostenrijk
+Zwitserland
+Nederland
+België
+Polen
+Verenigd Koninkrijk
+Verenigde Staten
+Kamerchat
+Chatberichten
+Tekstberichten geschreven in de kamers
+FRN-kamers
+Serverlijsten
+Toegangslijsten van de server
+Admins
+Thema
+Sessies en logboek
+Wijzigingslogboek
+Actieve sessies
+Gebeurtenissen (live
+Configuratie
+Titel, openbare weergave en wat bezoekers zien
+Openbare weergave
+Aan: iedereen ziet kamers en statistieken zonder aan te melden
+Verborgen kamers openbaar tonen
+Tabblad Stations
+Met e-mail en adres – alleen zichtbaar voor admins
+Aanmelding geldig voor (uren
+Registratie bij sysman.freeradionetwork.de of zelfstandig
+Zelfstandig (zonder SystemManager
+Aan: de server draait op zichzelf, wachtwoorden komen uit de eigen lijst (FRN-accounts). Uit: geregistreerd bij de SystemManager
+Eigen wachtwoordlijst gebruiken (zelfstandig
+Uit: in zelfstandige modus wordt elk FRN-wachtwoord geaccepteerd
+Alleen voor zelfstandig, bv. een server voor het thuisnetwerk
+zelfstandig
+Geregistreerd bij de SystemManager staat de server in het FRN-systeem en controleert hij daar de aanmeldingen. De SystemManager test of adres en poort vanaf internet bereikbaar zijn – stel eerst port forwarding in
+SystemManager
+SystemManager (sysman_server_addr
+sysman.freeradionetwork.de = alternatief FRN-systeem (DE
+Adres, poort en time-outs – geschreven naar server.properties
+Serveradres (server_addr
+Hostnaam of publiek IP van deze server, bv. frn.die-n8schicht.de – de SystemManager controleert of hij bereikbaar is
+Poort (server_port
+TCP-poort voor de FRN-clients; open hem in router en firewall
+Back-upserver (backup_server_addr
+Poort van de back-upserver
+Naar de clients gestuurd: waarheen als deze server uitvalt
+Client-time-out (client_sotimeout, ms
+Een client die zo lang niets stuurt, wordt losgekoppeld
+Spraak-time-out (client_txtimeout, ms
+Zo lang geen spraak beëindigt een uitzending; 0 = uit
+Standaard 180
+Standaardkamer (default_net
+Clients die om een niet-bestaande kamer vragen, komen hier terecht

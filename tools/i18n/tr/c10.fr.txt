@@ -1,0 +1,75 @@
+En attente de la prochaine émission
+pas encore de passage aujourd’hui
+Aujourd’hui par heure
+Pas de connexion FRN
+Réception (une station parle
+Émission vers les autres réseaux
+Source → (FRN : coupe-bas, médiums, aigus) → AGC d’entrée → répartition → AGC de sortie par réseau → limiteur → réseau
+Vers DMR suit en plus le renforcement médiums/aigus avant l’encodeur (🎛️ Vocodeur → Avant l’encodeur). Les modifications prennent effet immédiatement, sans redémarrage
+Le niveau sur lequel chaque source est régulée avant d’être répartie. −20 dBFS est une bonne valeur
+Niveau vers chaque réseau. Pour AMBE et Zello −18 dBFS ; le limiteur maintient les crêtes sous le plafond
+Gain maximal (dB
+Le maximum dont l’AGC remonte les stations faibles (15 dB
+Atténuation maximale (dB
+Le maximum dont elle baisse les stations fortes (20 dB
+Vitesse à laquelle elle baisse sur les passages trop forts – rapide : 5–15 ms
+Temps de retour (ms
+Vitesse à laquelle elle remonte ensuite – 200–500 ms sonne naturel, plus court « pompe »
+En dessous, c’est une pause/du bruit : le gain reste figé, le bruit n’est pas remonté (−50 dBFS
+Aucune crête ne passe au-dessus – rien ne sature (−1 dBFS
+Supprime grondements, ronflements et vent du son FRN (GSM) – 100–150 Hz
+Le GSM sonne sourd – la présence rend les voix plus intelligibles, pour Zello et AMBE (3 dB
+FRN : renforcer les aigus (dB, à partir de 3 kHz
+Un peu plus de brillance pour le son FRN (2 dB). Trop rend le bruit audible
+En cas de problème, regardez ici en premier : le journal public des erreurs de freeradionetwork.de indique la raison des connexions refusées (mauvais mot de passe FRN, connexion multiple, port injoignable …) que le serveur FRN lui-même ne donne pas. Sont affichées les entrées concernant votre indicatif et vos serveurs FRN ; N8 Crosslink y regarde de lui-même après chaque refus et écrit la raison dans le journal des événements
+Interroge le tableau de bord du serveur FRN (ADN FRN Server 2.21 ou plus récent) pour savoir qui est maître et qui est secours. Le maître est toujours en priorité 1 : après une panne, le pont passe au secours, et dès que le maître fonctionne à nouveau (3 vérifications à une minute d’intervalle), il revient au maître entre deux passages. Sans détection, « Serveur » passe avant « Serveur de secours »
+Liste du serveur FRN – « 🔄 » la relit. S’il manque un salon (p. ex. masqué), choisissez « ✏️ Autre salon … »
+Lire les salons du serveur FRN
+Autre salon
+0 = n’importe quel port libre · fixe p. ex. pour les règles de pare-feu (tous les ports : 🔌 Ports
+Qui peut se connecter à l’espace admin. Les superadmins peuvent en plus restaurer des sauvegardes, tout réinitialiser et gérer d’autres superadmins
+signifie : à ouvrir dans le pare-feu/routeur s’il doit être joignable de l’extérieur
+l’autre côté doit être joignable. Tout est enregistré avec un seul bouton ; ce qui nécessite un redémarrage s’affiche ensuite en haut
+0.0.0.0 = toutes les interfaces (IPv4) · :: = toutes (IPv4 et IPv6) · 127.0.0.1 = cet ordinateur uniquement (alors seulement via le domaine
+Interface web et données en direct (http://IP:port). En dessous de 1024 (p. ex. 80) fonctionne sans root – nginx a alors besoin d’autres ports. Redémarrage du service
+http:// des domaines et contrôle Let’s Encrypt. Let’s Encrypt vient toujours sur le port 80 – un autre port uniquement avec une redirection dans le routeur (extérieur 80 → intérieur ce port
+https:// des domaines (par défaut 443 ; sinon https://domaine:port). Appliqué immédiatement à tous les domaines
+vers le serveur de secours, s’il est renseigné
+connexion/mot de passe auprès du SystemManager (par défaut 10025
+Port source du pont · 0 = quelconque (par défaut) · fixe pour les règles de pare-feu ou le NAT
+uniquement en mode AMBEserver (127.0.0.1, par défaut 2460) – pas utilisé actuellement
+WebSocket wss://zello.io/ws – le port figure dans l’adresse (💬 Zello
+Vos propres domaines pour cette interface web avec un certificat gratuit de
+nginx accepte le domaine sur le port 80/443 et redirige vers N8 Crosslink (127.0.0.1:) ; certbot obtient le certificat et le renouvelle automatiquement avant son expiration. Prérequis : le domaine pointe vers ce serveur par DNS et les ports 80 (Let’s Encrypt y vérifie toujours – sinon redirection dans le routeur) et 443 sont joignables depuis Internet
+Domaines et HTTPS ne sont pas encore activés – exécutez une fois sudo /opt/n8crosslink/update.sh
+nginx écoute sur
+et redirige vers 127.0.0.1: – à modifier sous
+Pour les avis sur l’expiration du certificat
+Certificat de test (Let’s Encrypt staging, pour essayer sans limites
+sudo n’est pas encore configuré – une fois dans la console : sudo /opt/n8crosslink/install.sh --fix-perms
+Hors ligne depuis
+Paramètres : {call} = indicatif, {name} = nom – p. ex. « {call} » ou « {call} {name} »
+Port du serveur FRN
+Port du serveur DMR
+Interface web
+Tous les ports du N8 Hotspot au même endroit. Le hotspot n’a besoin d’aucune redirection de port dans le routeur : il se connecte uniquement vers l’extérieur (serveur DMR) ; l’interface web est destinée au réseau domestique
+défini dans le service systemd (N8HS_PORT
+Serveur et mot de passe sous Exploitation → Réglages → Réseau DMR
+Connexions entre les services du hotspot – ne rien ouvrir
+Données en direct de MMDVMHost et DMRGateway vers l’interface web (127.0.0.1
+Déclencheur de mise à jour (« Mettre à jour maintenant »
+Démo – pas de vérification réelle
+DMRGateway (serveur DMR
+Personne dans ce salon
+Le test d’écho perroquet est activé
+ID à 7 chiffres de radioid.net / FreeRadioID.net
+MMDVMHost et DMRGateway s’arrêtent pendant l’étalonnage
+Le hotspot redémarre ensuite avec le nouveau décalage
+avec la prochaine mise à jour de la liste des ID
+Aucun utilisateur entendu pour l’instant
+Serveur DMR : le tableau de bord n’est pas connecté au serveur DMR
+Connexions vérifiées par FreeRadioID.net / connexions invité avec la phrase secrète par défaut
+Pas encore d’appels de groupe sur cette période
+noms envoyés par les radios
+Aucun Talker Alias reçu sur cette période
+Vous utilisez l’identifiant d’usine. Choisissez votre propre nom d’utilisateur et mot de passe – l’identifiant d’usine cessera alors de fonctionner

@@ -1,0 +1,234 @@
+El máster y el respaldo usan la misma cuenta FRN
+El SystemManager solo deja en línea a uno de ellos – el otro recibe «credenciales incorrectas» y su servidor FRN se detiene. Solicite una contraseña FRN propia para el respaldo e introdúzcala allí en SystemManager
+Máster y respaldo
+Segundo servidor FRN con la misma configuración – sincronización cada hora en punto y con botón
+Rol de este servidor
+Máster: las salas, listas y cuentas se editan aquí. Respaldo: las toma del máster
+Servidor único
+Panel del socio
+En el máster el respaldo, en el respaldo el máster, p. ej. https://frn-backup.example.org
+Clave de sincronización
+Cifra cada transferencia entre los dos servidores – la misma en ambos (al menos 24 caracteres); «🎲 Nueva clave» crea una
+cifrado con la clave de sincronización
+La respuesta del socio no está cifrada con la clave de sincronización (dirección o clave incorrecta
+La respuesta del socio no corresponde a esta solicitud
+Sincronizar cada hora en punto
+El respaldo obtiene la configuración del máster cada hora en punto – la diferencia es como máximo de una hora
+Se envía a los clientes: adónde ir si este servidor está caído. Vacío con Máster y respaldo = el socio
+Transferencia
+Socio
+Última sincronización
+Próxima sincronización
+Última obtención por el respaldo
+Los clientes cambian a
+sin cambios
+adoptado
+Servidor FRN reiniciado
+reinicio pendiente – estaciones conectadas
+FRN detenido
+mantenimiento – las estaciones están en el respaldo
+Introduzca el socio y la clave de sincronización y guarde
+Elija abajo el rol de este servidor: el máster entrega su configuración, el respaldo la toma cada hora en punto. La conmutación en sí la hace FRN: los clientes van a la dirección de respaldo cuando este servidor desaparece
+Sincronizar ahora
+Pasar al respaldo
+Recuperar del respaldo
+Cada servidor necesita su propia cuenta FRN
+Contraseña FRN Máster
+Contraseña FRN Backup
+Nueva clave
+Sincronizando
+Sincronización: sin cambios
+Sincronización: configuración adoptada
+Error de sincronización
+Crear una nueva clave de sincronización
+La clave se guarda aquí. Introduzca la misma clave en el otro servidor – hasta entonces la sincronización no funciona
+Nueva clave de sincronización
+Cópiela e introdúzcala en el otro servidor en Máster y respaldo
+Hecho
+Primero se sincroniza la configuración con el respaldo. Después el servidor FRN de aquí se detiene – las estaciones cambian solas al respaldo (dirección de respaldo FRN). El panel sigue funcionando
+El servidor FRN de aquí vuelve a arrancar. Después el respaldo reinicia su servidor FRN para que sus estaciones vuelvan aquí
+Pasar
+Recuperar
+Pasando
+Recuperando
+Pasado al respaldo
+Recuperado
+Configuración sincronizada con el respaldo
+El servidor FRN del respaldo está en marcha
+Servidor FRN de aquí detenido – las estaciones cambian al respaldo
+Servidor FRN de aquí iniciado
+El respaldo devuelve sus estaciones
+allí no hay ningún servidor FRN en marcha
+no está en marcha tras 30 s
+Esta cuenta es para el otro servidor: introduzca allí el correo y la contraseña en SystemManager
+Solicitar contraseña FRN – Máster
+Solicitar contraseña FRN – Backup
+Establezca primero el rol (Máster o respaldo)
+Solo el máster pasa al respaldo
+El servidor FRN del respaldo no está en marcha – no se ha conmutado nada
+Clave de sincronización: al menos 24 caracteres
+No hay clave de sincronización
+El socio aún no conoce Máster y respaldo – actualícelo a la misma versión
+El máster no envió salas – no se adoptó nada (protección contra un máster vacío
+Use https:// para el socio – la sincronización transporta las cuentas FRN (http solo dentro de la LAN
+Portal
+Noticias
+Página del portal
+Últimas noticias
+Todas las noticias
+Leer más
+Fijada
+actualizada
+Aún no hay noticias
+Noticias anteriores
+Conectar
+Abrir el panel en vivo
+No hay salas
+No hay enlaces configurados
+ℹ️ Info
+Importante
+Tecnología
+Red y salas
+Solo los admins escriben y publican noticias – aparecen en la página del portal. Los borradores solo son visibles aquí
+Abrir la página del portal ↗
+Nueva noticia
+Editar noticia
+Publicar
+Despublicar
+Publicada
+Despublicada
+Borrador
+publicadas
+borradores
+Categoría
+Fecha
+Entradilla
+Texto
+(breve resumen en la tarjeta, opcional
+Fijar arriba
+Guardar como borrador
+Guardada como borrador
+Guardar y publicar
+Eliminar la noticia
+Eliminada
+Aún no hay noticias – «＋ Nueva noticia» escribe la primera
+Dominio propio: 🌐 Red, puertos y dominios → 🔒 Dominios y HTTPS
+Página pública con las noticias de los operadores – en /portal y en su propio dominio
+Dominio del portal
+Dominio del portal
+Autores
+El portal puede tener su propio dominio (p. ej. news.example.org) con un certificado Let’s Encrypt – muestra directamente la página del portal
+Aún no hay dominio propio – el portal está en /portal del panel
+Solo los admins (rol Admin o Superadmin) escriben, editan, publican y eliminan noticias. Los usuarios y visitantes solo leen. Cada cambio queda en el 📜 registro
+Noticias publicadas como feed
+Página del portal activada
+Título del portal
+Subtítulo
+Texto de bienvenida
+Mostrar salas y estaciones en línea
+Mostrar las cifras de hoy
+Noticias por página
+Página pública con las noticias de los operadores en /portal (y en el dominio del portal
+Vacío = el título del panel
+p. ej. «Noticias del servidor FRN Auf der NachtSchicht»
+Se muestra encima de las noticias. Formato como en las noticias: **negrita**, *cursiva*, [enlace](https://…), listas con -
+Recuadro lateral con las salas, las estaciones en línea y quién está en el aire (solo si el panel es público
+Pasadas, tiempo de emisión y estaciones de hoy
+Introduzca un título
+Esta noticia no existe (ya
+La página del portal está desactivada
+Correo
+Escribir
+Bandeja de entrada
+Borradores
+Enviados
+Correo no deseado
+Papelera
+Elija un mensaje
+No se encontró nada
+No hay mensajes
+mensajes
+seleccionados
+leído
+no leído
+Spam
+No es spam
+Responder
+Responder a todos
+Reenviar
+Cargar imágenes
+a
+El
+Mensaje reenviado
+Nuevo mensaje
+Para
+Asunto
+Adjuntar
+Enviar
+Programa de correo
+Usuario: su dirección · contraseña: su contraseña del panel
+Adjuntos de más de 20 MB
+Introduzca un destinatario
+Buzón inaccesible
+Sin buzón
+Mensaje no encontrado
+Nada seleccionado
+Correo
+Servidor de correo
+Buzones
+DMARC y BIMI
+Plantillas DNS
+Dominios de correo
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (spam, comprobación DKIM, SPF/DMARC) en esta máquina. Cada usuario del panel tiene un buzón con la misma contraseña
+Configurado
+Cola
+en espera
+Última aplicación
+Estado comprobado
+aún no
+Comprobar estado
+Instalar servidor de correo
+Reinstalar / reparar
+Desactivar
+Relé, TLS y límites
+El correo saliente pasa por el servidor de su proveedor (smarthost) – siempre cifrado. Los programas de correo solo se conectan con TLS
+Programas de correo
+Entrante (IMAP
+Saliente (SMTP
+o
+Autenticación
+contraseña normal
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – el nombre de usuario es la dirección de correo (o el nombre de usuario del panel), la contraseña la del panel
+Seguridad
+Servidor de correo activado
+Relé (smarthost
+Puerto del relé
+Cifrado del relé
+Usuario del relé
+Contraseña del relé
+SPF del relé
+Puerto 25: cifrado obligatorio
+Tamaño del buzón (MB
+Mensaje más grande (MB
+Postmaster
+Puntuación de spam → carpeta Correo no deseado
+Puntuación de spam → rechazar
+Postfix + Dovecot + Rspamd en esta máquina: cada usuario del panel recibe un buzón con la misma contraseña
+Todo el correo saliente pasa por este servidor de su proveedor, p. ej. smtp.provider.de – vacío = entrega directa
+587 = STARTTLS, 465 = TLS desde el principio
+Siempre cifrado – nunca en texto plano
+Para la plantilla DNS, p. ej. include:_spf.provider.de – su proveedor lo indica
+Activado: otros servidores de correo deben usar TLS (STARTTLS) para entregar – los pocos sin TLS se rechazan. Los programas de correo siempre necesitan TLS
+Usuario del panel que recibe postmaster@, abuse@ y los informes DMARC – vacío = el superadmin
+STARTTLS (puerto 587
+TLS / SMTPS (puerto 465
+Cada usuario del panel tiene automáticamente un buzón – el nombre de usuario es la dirección, la contraseña la del panel. Los usuarios nuevos, las contraseñas nuevas y los usuarios bloqueados o eliminados llegan solos al servidor de correo
+bloqueado
+espera el inicio de sesión
+Sin buzón
+Aún no hay dominio de correo
+DKIM, DMARC y MTA-STS
+Claves DKIM
+clave lista (RSA 2048
+se crea en el próximo «Aplicar»
+El servidor firma cada correo saliente (DKIM), comprueba SPF, DKIM y DMARC del correo entrante e indica a los demás cómo tratar el correo falsificado. Los registros DNS se le preparan en 🧾 Plantillas DNS

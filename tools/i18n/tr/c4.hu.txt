@@ -1,0 +1,215 @@
+DKIM-szelektor
+DMARC-irányelv
+DMARC-illesztés
+DMARC-jelentések ide:
+BIMI-logó
+BIMI-tanúsítvány (VMC/CMC
+MTA-STS
+Mit tesznek a címzettek a megbukott levelekkel – a BIMI quarantine vagy reject értéket igényel
+none – csak jelentések
+quarantine – a spambe
+reject
+relaxed (az aldomainek is számítanak
+strict
+Üres = dmarc@<fő domain>
+Logó a levelei mellett a Gmailben, Apple Mailben, Yahoo-ban … (DMARC quarantine/reject szükséges
+Egy VMC vagy CMC opcionális https://-címe – a Gmail és az Apple csak ezzel mutatja a logót
+Közli a többi szerverrel, hogy csak titkosítva kézbesítsenek Önnek
+testing – csak jelentés
+enforce
+Az Ön logója a levelei mellett a Gmailben, Yahoo-ban, Apple Mailben … DMARC quarantine vagy reject szükséges; a Gmail és az Apple VMC/CMC-tanúsítványt is kér. A logónak SVG Tiny PS formátumúnak kell lennie – a szerver ellenőrzi, és a /.well-known/bimi/ alatt szolgálja ki
+automatikusan a címből készítve
+saját logó
+Betűk
+Szín
+Logó készítése
+SVG feltöltése
+Alapértelmezés
+BIMI-logó elkészült
+BIMI-logó mentve
+DNS ellenőrzése most
+Összes másolása
+Zónafájl
+Típus
+Érték
+Cél
+opcionális
+beállítva
+eltér
+hiányzik
+A levelezőszerver címe
+A levelezőszerver IPv6-címe
+A domain levelei erre a szerverre érkeznek
+DKIM: az aláírás nyilvános kulcsa
+DMARC: irányelv és jelentések
+BIMI: logó a levelei mellett (DMARC quarantine/reject szükséges
+MTA-STS: csak titkosított kézbesítés
+TLS-RPT: jelentések TLS-problémákról
+A levelezőprogramok maguktól megtalálják az IMAP-ot
+A levelezőprogramok maguktól megtalálják az SMTP-t
+Nincs titkosítatlan IMAP
+SMTP STARTTLS-sel
+Fordított DNS a tárhelyszolgáltatónál – nagyon fontos a spamszűrők ellen
+SPF: ki küldhet a domain nevében (ez a szerver és a továbbító
+SPF: ki küldhet a domain nevében (ez a szerver
+fő domain
+a tanúsítványban
+Levelezési domain hozzáadása
+Sorrend
+Legyen fő domain
+Érvénytelen domain
+Már szerepel
+Levelezőszerver kikapcsolása
+Levelezőszerver telepítése
+Telepítés
+Folyamatban – ez néhány percig tarthat
+Témakép
+Kép kiválasztása
+Kép eltávolítása
+Képleírás
+(képernyőolvasóknak
+Csak JPEG, PNG vagy WebP
+A kép nem olvasható
+JPEG, PNG vagy WebP – a böngészőben kicsinyítve (max. 1600 px széles); a kártya és a cikk tetején jelenik meg, 16:9
+Témakép: csak JPEG, PNG vagy WebP
+Témakép: legfeljebb 1,5 MB
+Témakép: a fájl nem az, aminek mondja magát
+Témakép: sérült fájl
+DNS-re vár
+Levelezési domainek automatikus hozzáadása
+A 🔒 Domainek és HTTPS alatti minden domain levelezési domain is lesz (news.example.org → example.org); a mail.<domain> magától rákerül a Let’s Encrypt tanúsítványra, amint a DNS-e erre a szerverre mutat
+Teljesen automatikus: a 🔒 Domainek és HTTPS alatti új domainek levelezési domainek lesznek, a mail.<domain> rákerül a Let’s Encrypt tanúsítványra, amint a DNS-e erre a szerverre mutat (30 percenként ellenőrizve, újraindítás nélkül), és a levelezőszerver magától átveszi
+Adja hozzá itt a levelezési domaint (vagy hagyja automatikusan hozzáadni) – a tanúsítvány magától bővül, amint a DNS rendben van
+Be: a többi levelezőszervernek TLS-t (STARTTLS) kell használnia a kézbesítéshez – a kevés TLS nélküli elutasításra kerül, a tesztelőeszközök, mint az MXToolbox, is (530 Must issue a STARTTLS command first). Az RFC 3207 nyilvános MX esetén nem javasolja. A levelezőprogramoknak mindig TLS kell
+Élő vezérlőpult
+Portál (hírek
+Minden domain vagy aldomain azt mutatja, amit a 🔒 Domainek és HTTPS → „Megjeleníti” alatt választ: az élő vezérlőpultot vagy a portáloldalt – tetszőleges számú domain, mind Let’s Encrypttel
+Az első domain a fő domain (felhasználó@fő-domain); minden további domain álnév ugyanazokhoz a postafiókokhoz. Minden domain a mail.<domain> nevet a vezérlőpult Let’s Encrypt tanúsítványára teszi – a levelezőszerver csak TLS-t használ
+DNS: mail.<domain> (A/AAAA) → ez a szerver; MX → mail.<domain>
+Domainek és HTTPS: a vezérlőpultnak van domainje és a HTTPS be van kapcsolva
+Adja hozzá itt a levelezési domaint – a tanúsítvány bővül
+Levelezőszerver: ⚙️ Telepítés, továbbító, ✅ Alkalmaz
+DNS-sablonok: SPF, DKIM, DMARC, BIMI … a DNS-szolgáltatónál, PTR a tárhelyszolgáltatónál
+Portok: 25, 465, 587, 993 nyitva a tűzfalon és a routeren
+Módosítás után a vezérlőpult újraindul és bővíti a tanúsítványt (a mail.<domain> DNS-ének erre a szerverre kell mutatnia, a 80-as port elérhető). Ezután 📮 Levelezőszerver → ✅ Alkalmaz
+Levelezőszerver <code>
+A levelezőprogramok az SRV-rekordok révén maguktól megtalálják a beállításokat (🧾 DNS-sablonok). A titkosítatlan IMAP (143) ki van kapcsolva
+Csak TLS 1.2+: IMAPS 993, SMTPS 465, submission 587 (STARTTLS kötelező), bejelentkezés csak TLS után
+Kimenő: DKIM-aláírás minden domainhez, továbbító csak titkosítva, ellenőrzött tanúsítvánnyal
+A felhasználók csak a saját címükkel (vagy álneveikkel) küldhetnek
+Jelszavak: a Dovecot csak SHA512-CRYPT hasht kap; a webmail saját master-hozzáférést használ, soha nem a felhasználó jelszavát
+bejelentkezésre vár”: a levelezőszerver előtti felhasználóknak még nincs levelezési jelszava – a következő vezérlőpult-bejelentkezéskor készül el (vagy amikor egy admin új jelszót állít be
+Az Ön beállításaiból készülnek: MX, A/AAAA, SPF, DKIM (a nyilvános kulcs az „Alkalmaz” után jelenik meg), DMARC, BIMI, MTA-STS, TLS-RPT és SRV-rekordok a levelezőprogramokhoz. A „DNS ellenőrzése” megkérdezi a DNS-t, mi van most beállítva
+DMR-szerver
+Tétlen
+Itt hallott
+RF (helyi
+Hálózat
+Hálózat
+RF / Hálózat
+RF arány
+DMR-hálózat
+Modem
+csatlakozva
+Legaktívabb talkgroupok
+Aktivitás
+Hívások (30 n
+Élő napló
+A gyári n8schicht / n8schicht bejelentkezés még aktív
+Hardver és adatok
+A hálózatán bárki módosíthatná a hotspotját. Kérjük, állítson be saját jelszót
+Módosítás most
+Az MMDVMHost és a DMRGateway újraindítás után használja őket
+Talkgroup-lista
+Az N8schicht talkgroup-listája
+Saját nevek
+Keresés: szám vagy név, pl. 262 vagy Bayern
+Nevek
+Nevek a github.com/dhartmann1979/n8schicht-ről, plusz a sajátjai
+az N8-Hotspottal szállított példány
+Hívójel, DMR ID és helyszín
+Az Ön hívójele, pl. DL1ABC
+Hotspot ID
+Hotspot utótag
+Két számjegy, amely egyedivé teszi a hotspot ID-t (DMR ID + utótag, pl. 262123401). Üres = csak DMR ID
+Helyszín
+Város vagy lokátor, a szervernek megjelenítve
+Szélesség
+Hosszúság
+Antennamagasság (m
+Teljesítmény (W
+Panel, port, frekvenciák és szintek
+Modempanel
+Soros port
+Port sebessége
+Kitölti a portot, a sebességet és a simplex/duplex módot
+Modem keresése
+Keresés
+MMDVM_HS_Hat a GPIO-csatlakozón (simplex
+MMDVM_HS_Dual_Hat a GPIO-csatlakozón (duplex
+ZUMspot / HS hat USB-n (simplex
+MMDVM átjátszópanel USB-n (duplex
+Egyéb / saját értékek
+RX-frekvencia (MHz
+TX-frekvencia (MHz
+Simplexnél ugyanaz, mint az RX
+RX-eltolás (Hz
+TX-eltolás (Hz
+A kalibrálásból
+RX-szint (%
+TX-szint (%
+RF-teljesítmény (%
+RX invertálás
+TX invertálás
+PTT invertálás
+TX-késleltetés (ms
+DMR-késleltetés (ms
+DMR mód
+Color code, time slotok, tartási idők
+Color code
+Duplex (két time slot
+Simplex hotspotoknál ki (csak TS2
+Time slotok
+Time slot 1
+Time slot 2
+Csak duplex módban használatos
+Hívástartás (s
+TX-tartás (s
+RF-mód tartása (s
+Hálózati mód tartása (s
+Csak a saját ID-m adhat
+Talker alias küldése
+Hívójel morzében 10 percenként
+Csatlakozás DMR-szerverhez
+Szerver, jelszó és beállítások
+Szerver
+Kitölti a nevet, a címet és a portot
+Másik szerver (HomeBrew
+Szervercím
+Hosztnév / IP
+Szerverport (UDP
+Az N8schichtnél: az Ön FreeRadioID.net jelszava (teljes hozzáférés) vagy a vendégjelszó
+Opcionális, pl. TS1=262;TS2=26500
+Jitterpuffer (ms
+Időkorlát (s
+Cím, nyilvános nézet, ID-lista
+Ki = csak a bejelentkezett felhasználók látják a vezérlőpultot
+Munkamenet hossza (óra
+Hívások megőrzése (nap
+DMR ID-lista
+Hívójelek és nevek a vezérlőpulthoz és az MMDVMHosthoz (DMRIds.dat
+Napi ID-lista-frissítés
+csak radioid.net
+Regisztrált FreeRadioID ID-k betöltése
+Naponta az ID-listával: FRID-jelvény, a csak FreeRadioID-s ID-k nevei
+Avatarok, profilok és regisztrált ID-k
+Avatarok megjelenítése
+A FreeRadioID-tagok profilképei; egy állomás meghallásakor letöltve, az adatbázisban gyorsítótárazva
+Profilok lekérdezése
+Név, hely és megjegyzések az állomásnézetben (élőben a FreeRadioID API-ból
+Regisztrált ID-k
+Regisztrálva a FreeRadioID.net-en
+Regisztrált ID-k (FRID-jelvény) és avatarok, az ID-listával betöltve
+Gyorsítótárazott avatarok
+Gyorsítótárazva
+Talkgroup-lista URL-je

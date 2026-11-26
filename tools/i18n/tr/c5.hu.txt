@@ -1,0 +1,243 @@
+JSON a talkgroup_ids.json formátumában
+Saját talkgroup-nevek
+Soronként egy: 26500 = N8schicht Ortsrunde. Felülírja a listát, vagy hozzáadja a hiányzó talkgroupokat
+Kb. 1400 talkgroup neve (github.com/dhartmann1979/n8schicht), naponta frissítve az ID-listával
+Szakértő
+További sorok az ini-fájlokhoz
+További sorok az MMDVM-Host.ini-hez
+További sorok a DMRGateway.ini-hez
+[Szakasz], majd Kulcs=Érték sorok; ezek lecserélik vagy kiegészítik az értékeket
+Visszavonás
+Beállítások
+Mód
+Kalibrálás
+Frekvenciakalibrálás
+Megkeresi a modem eltolását az MMDVMCal BER-tesztjével
+Kezdőfrekvencia (MHz
+Nyomja meg az Indítást
+Nyomja meg:
+Programozzon be egy
+simplex csatornát
+a rádiójába ezen:
+Adjon néhány másodpercig a rádiójával (beszélni nem kell). A BER jobbra megjelenik
+Mozgassa a frekvenciát ezzel:
+amíg a BER a legalacsonyabb (ideálisan 1 % alatt). Minden lépés után adjon újra
+Adjon a rádiójával – a BER itt jelenik meg
+BER most
+Eltolás
+Eltolás mentése
+Eltolás mentése (RX és TX
+Mentett eltolások
+További tesztek
+Tapasztalt felhasználóknak: löket, RSSI és tesztminták (a modem ad
+Löket +
+Löket −
+Teljesítmény +
+Teljesítmény −
+DMR-löket (D
+TX be/ki (szóköz
+Átvétel
+Az adminok mindent módosítanak, a megtekintők csak a vezérlőpultot látják (akkor is, ha privát
+Új jelszó (min. 8
+gyári jelszó
+Színséma
+Válasszon előbeállítást, és módosítson tetszés szerint bármely színt. Az előnézet élő – a „Mentés” előtt semmi sem tárolódik. Ugyanaz a témamotor fut a HBlink4-FreeRadioID-ben és az FRN-vezérlőpulton, így egy színkód mindenhol ugyanúgy néz ki
+Alapértelmezés
+Másolja a sémát egy másik N8-vezérlőpultra (HBlink4-FreeRadioID → Megjelenés, FRN → Téma), vagy illesszen be onnan egyet
+Exportálás / importálás
+Gomb szövege
+Link
+Megnyitás új lapon
+Új lap
+Oldalikon
+Az oldal faviconjának lekérése
+Oldalikonok frissítése most
+Mindenkinek megjelenik a fejlécben. Az „oldalikon” beállítással a hotspot egyszer lekéri a hivatkozott oldal faviconját, eltárolja az adatbázisában és megjeleníti a menüben (az emoji a tartalék, pl. offline állapotban
+Panel
+CPU-hőmérséklet
+SD-kártya
+MQTT élő adatok
+MQTT-bróker (mosquitto
+N8-Hotspot webes felület
+Tárolt hívások
+ID-k
+Frissítve
+Nincs Linux-konzol a modem UART-ján
+Jogosultságok
+Mit tehet a webes felület: megnyitja a modem portjait (keresés, kalibrálás), frissítés után újraindítja a szolgáltatásokat, frissíti a saját mappáját
+A webes felület a dialout csoport tagja (modemkeresés, kalibrálás
+sudo szabály a szolgáltatások újraindításához (/etc/sudoers.d/n8hotspot
+A /opt/n8hotspot programmappa írható (Frissítés most
+A Python-környezet írható (új csomagok frissítés után
+Minden rendben
+megvan
+dialout csoport, 660-as mód
+Frissítési beállítások
+Frissítések keresése
+Minden egész órában megkérdezi a GitHubot (bejelentkezés nélkül, a hotspotról semmilyen adat nem kerül elküldésre
+Ellenőrzés gyakorisága (óra
+Automatikus telepítés
+A választott órában magától telepíti az új verziót – csak ha senki sem ad és nem fut kalibrálás
+Automatikus frissítések órája
+MMDVMHost és DMRGateway újraindítása
+Frissítés után az ini-fájlok újra kiíródnak, és mindkét rádiós szolgáltatás újraindul; a webes felület mindig újraindul
+Ág
+A telepített verzió dátuma
+Rendszernapló megjelenítése
+Konfigurációs fájlok
+A beállításokból generálva. További sorok: Beállítások → Szakértő
+Mappa
+Ez a telepítés nem git checkout – frissítsen ezzel: <code>sudo /opt/n8hotspot/scripts/update.sh</code>
+Indítsa újra kézzel az N8-Hotspotot: sudo systemctl restart n8hotspot
+1. Pontosan ennek letöltése:
+(csak fast-forward, helyi módosítások nélkül
+2. Python-csomagok, ha a requirements.txt megváltozott
+3. Ini-fájlok újra, MMDVMHost és DMRGateway újraindítása
+3. Ini-fájlok újra
+4. A webes felület újraindítása – az oldal magától újratöltődik
+Vétel rádióról (RF
+Adás a rádiók felé (a hálózatról
+Az MMDVMHost módja
+Kapcsolat a DMR-szerverrel
+nincs hálózat
+csatlakozás
+nem használt · simplex hotspot (csak TS2
+Nem használt
+Simplex hotspot – csak TS2
+nincs RSSI
+Bithibaarány – 1 % alatt tiszta, 3 % felett a vokóder küszködik
+Vokóder és jel
+BER élőben
+Utolsó hívások · BER (RF) / veszteség (hálózat
+RSSI (RF
+Mai hangminőség
+RF
+Hálózati hívás – a BER csak RF-en mérhető
+Várakozás RF-hívásra
+Még nincsenek hívások
+Ma nem volt RF-hívás
+ma nem volt RF-hívás
+Átlagos BER (RF
+max. BER
+Átlagos veszteség (hálózat
+Hangkeretek (AMBE+2
+RF-en / hálózaton át
+elveszett a hálózaton
+RF BER
+Állapot, automatikus indítás és indítás · leállítás · újraindítás – csak amit ez a hotspot megenged (az N8 Admin-Kit sudo szabályai
+Automatikus indítás be
+Program (root, a szolgáltatás számára csak olvasható), adatok és jelszavak, szolgáltatások, sudo, „Frissítés most” és a modemport
+Modemport
+systemd
+Jogosultságok javítva – minden rendben
+Néhány probléma megmaradt
+kérve
+Frissítés most” rootként fut ezen keresztül:
+csak fast-forward, csomagok, szolgáltatások és ini-fájlok, jogosultságok és sudo, újraindítás, a webes felület ellenőrzése – ha nem válaszol, vissza az előző verzióra
+Verziók
+A hotspot nélküle nem működik, amíg újra el nem indítja
+1. Fast-forward erre:
+(leáll, ha fájlokat kézzel módosítottak
+2. Python-csomagok, szolgáltatások és ini-fájlok, jogosultságok és sudo (N8 Admin-Kit, rootként
+3. MMDVMHost, DMRGateway és a webes felület újraindítása
+4. A webes felület ellenőrzése – ha nem válaszol, vissza az előző verzióra; az oldal magától újratöltődik
+A webes felület újraindul
+Percenként rootként: valóban ellenőriz minden szolgáltatást (webes felület, MQTT, modem, bejelentkezés a DMR-szerverre), 3 perc után újraindítja a hibásakat (óránként legfeljebb 4×), észleli az internetkimaradásokat és utána újraindítja a hálózati szolgáltatásokat, és jelentést küld egy heartbeat-címre
+Token neve
+Token létrehozása
+Még nincs token
+nincs engedélyezett hálózat
+Hálózatok
+Belehallgatás
+Belehallgatás (csak bejelentkezett adminok
+Hangerő
+Belehallgatás hangereje
+A beszélő állomás szintje
+Csend minden hálózaton
+Most aktív
+Adásban · DMR-en át
+Adásban · FRN-en át
+Adásban · Zellón át
+Online hálózatok
+Mai állomások
+Ma letiltva
+Elküldve ide:
+Szoba / TG / csatorna
+Állomások a szobában
+ad
+vesz
+kész
+ismeretlen
+nem
+Még nincs superadmin – hozzon létre egyet most az admin portál használatához
+Superadmin létrehozása
+Beállítások mentve. Az FRN/DMR/Zello/vokóder a híd újraindítását igényli
+Alapértelmezett bejelentkezés
+még aktív – állítson be saját jelszót az Admin → Felhasználók alatt
+Aktivitás hálózatonként
+Leginkább ezen át:
+Mikor beszélnek
+Jelenlegi állapot
+Csatlakozva ekkor óta
+Online ekkor óta
+Csomagok
+Keretek
+Szerververzió
+Protokollverzió
+Csatorna állapota
+Adási állapot
+Bejelentkezési fázis
+Hozzáférés OK
+Online felhasználók
+Ping / pong
+Események
+Eseménynapló
+Peer ID
+Time slot
+Csatorna
+Fiók
+Híd
+Általános
+Útválasztás
+ID-listák és avatarok
+Mentés és újrakezdés
+Vokóder
+Az N8 Crosslink admin területe
+A módosítások azonnal, működés közben érvényesek
+Cím a vezérlőpulton
+Szervernév / domain
+Webcím (bind
+Webport
+0.0.0.0 = minden interfész · a szolgáltatás újraindítása szükséges
+a szolgáltatás újraindítása szükséges
+Értesítősáv a vezérlőpulton
+Linkmenü (JSON-lista name/url mezőkkel
+Utoljára hallottak megőrzése (nap
+Frissítések keresése minden egész órában
+GitHub-tároló a frissítésekhez
+Kimondott hívójel az adás elején
+Egy gépi hang (espeak-ng) kimondja a hívójelet, majd jön a hang – az adás a bejelentés hosszával késik
+Bejelentés az FRN felé
+Bejelentés a DMR felé
+Bejelentés a Zello felé
+Bejelentés szövege
+Helyőrzők: {call} = hívójel, {name} = név – pl. "{call}" vagy "{call} {name}"
+Hívójelek kiejtése
+Betűk (D O 1 T E S T
+NATO-ábécé (Delta Oscar One
+Hívójel nélkül is (a név bejelentése
+Legfeljebb … percenként állomásonként
+Beszédsebesség (szó/perc
+Hangerő (dBFS csúcs
+Szünet a bejelentés után (ms
+A bejelentés előnézete – az űrlap értékeivel
+Bejelentés lejátszása
+Mentés és újraindítás
+FRN – FreeRadioNetwork
+Port
+Tartalékszerver
+Tartalékport
+E-mail (FRN-fiók
+Jelszó (FRN
+Név / leírás
+Sáv / csatorna (BC

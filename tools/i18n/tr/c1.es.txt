@@ -1,0 +1,219 @@
+Servidor y datos
+Actualizar Java ahora
+Servidor FRN Java
+Cada minuto como root: comprueba de verdad cada servicio (panel, servidor FRN Java en marcha y aceptando estaciones), reinicia los servicios enfermos tras 3 minutos (como máximo 4× por hora), detecta cortes de Internet y después reinicia los servicios de red, e informa a una dirección heartbeat
+Keep-Alive
+detenido a mano – el Keep-Alive espera
+Keep-Alive activado
+Se llama cada minuto mientras todo va bien (Uptime Kuma «Push», Healthchecks.io …) – le avisa cuando las llamadas se detienen
+Registro del Keep-Alive
+Keep-Alive guardado
+Keep-Alive en pausa durante 1 hora
+Keep-Alive activo de nuevo
+Registro público de errores FRN
+Ante problemas, mire siempre primero aquí: el SystemManager FRN de freeradionetwork.de anota allí cada acceso rechazado de servidores y clientes (contraseña FRN incorrecta, conexión múltiple, puerto inaccesible …) – el motivo que el propio servidor FRN no indica. Se muestran las entradas sobre la dirección de este servidor, el indicativo del operador y las estaciones rechazadas aquí. Las nuevas entradas aparecen también abajo en los eventos
+Abrir el registro de errores completo ↗
+inaccesible
+entradas sobre este servidor
+nada sobre este servidor
+desde
+Quién
+No hay entradas sobre este servidor en las últimas entradas del registro
+Indicativos
+otras estaciones en el registro
+cargando
+El motivo está en el registro público de errores FRN
+Registros → Registro de errores FRN
+abrir el registro completo ↗
+¿Rechazado por el SystemManager? El motivo está en el registro público de errores FRN de freeradionetwork.de (Ayuda → Registro de errores
+Registro de errores FRN
+abrir ↗
+Contraseña FRN incorrecta – solicite una contraseña al SystemManager (📧 Solicitar contraseña FRN) e introduzca exactamente la contraseña asignada con el mismo correo y el mismo indicativo/nombre
+Conexión múltiple: ya hay una conexión activa con las mismas credenciales – ¿hay una segunda instancia en marcha (servidor antiguo, segundo servidor o un servidor de respaldo con la misma cuenta)? Cada servidor FRN necesita su propia cuenta
+El SystemManager no puede alcanzar el servidor en esta dirección y puerto desde Internet – compruebe el cortafuegos, la redirección de puertos (TCP) y la dirección del servidor
+Acceso bloqueado – consulte al operador de la red FRN
+Cuenta desconocida para el SystemManager – solicite una contraseña o compruebe la ortografía del correo, el indicativo y el nombre
+Versión de protocolo rechazada – actualice el servidor/cliente FRN
+Dirección de correo rechazada – use exactamente la dirección de la contraseña FRN
+Estado, inicio automático al arrancar e iniciar, detener, reiniciar – solo los servicios habilitados para este panel
+Comprueba el usuario del servicio, los permisos de programa y datos, las unidades systemd y las reglas sudo
+repara lo que esté mal y vuelve a comprobar. Consola
+fallido
+Inicio automático al arrancar
+errores
+comprobando
+comprobando y corrigiendo
+Los permisos están en orden
+No se pudo corregir todo
+Aún no hay actualizaciones desde el panel
+Desactivar
+Las estaciones de este servidor pueden perder la conexión
+Después el panel deja de estar disponible – vuelva a iniciarlo en la consola: sudo systemctl start frnadn
+Solicitar contraseña FRN
+Solicitar contraseña
+Contraseña FRN solicitada
+Correo (la contraseña se envía allí
+Banda / canal
+País
+Ciudad - barrio
+Cada servidor FRN necesita su propia cuenta FRN – el mismo correo y contraseña en dos servidores se rechazan («las mismas credenciales ya están en línea en otro servidor»
+Después introduzca arriba en SystemManager el correo y la contraseña y guarde. Para un segundo servidor use otro nombre (p. ej. «Server Test») – indicativo y nombre juntos deben ser nuevos
+El SystemManager envía por correo una contraseña para una nueva cuenta FRN
+Tamaño
+Copia de seguridad descargada
+Copia de seguridad eliminada
+Restauración iniciada
+Copia de seguridad restaurada
+Copia de seguridad
+Restaurar
+Crear copia de seguridad
+Restaurar ahora
+Comprobar
+Todo en un único archivo cifrado (.frnbak): ajustes, usuarios, salas, listas de acceso, cuentas FRN, estadísticas, chat, logotipos de clientes, imagen de marca y la configuración del servidor FRN. Elija una contraseña – sin ella la copia no se puede abrir, guárdela en su gestor de contraseñas. Las últimas copias permanecen en el servidor
+Contraseña de la copia (mín. 10 caracteres
+Repetir
+Aún no hay copias de seguridad
+Sustituye la base de datos, la imagen de marca y la configuración FRN por la copia. El panel se reinicia, aplica la copia y después reinicia el servidor FRN – las estaciones conectadas se reconectan solas. El estado actual se conserva en before-restore-… en el directorio de datos. Después inicie sesión con las cuentas de la copia
+Archivo de copia (.frnbak
+Contraseña de la copia
+Escriba RESTORE para confirmar
+Última restauración
+La última restauración falló
+Salas
+Cuentas FRN
+Copia de seguridad creada
+Las contraseñas no coinciden
+Eliminar esta copia
+Restaurar esta copia ahora
+El panel se reinicia y sustituye todos los datos por la copia; el servidor FRN también se reinicia
+Restaurando – el panel se reinicia
+Error al subir
+Contraseña incorrecta o archivo dañado
+Esto no es una copia de adn-frn-server (.frnbak
+Suba primero el archivo de copia
+Escriba RESTORE para confirmar
+La contraseña de la copia necesita al menos 10 caracteres
+Las copias contienen todos los datos de acceso – solo superadmin
+Revocar
+Revocar este token
+El servicio pierde el acceso al instante
+Token revocado
+Último uso
+Token
+Copie el token ahora – solo se muestra una vez
+Token de API
+Token de API revocado
+Listas
+Servidor FRN
+Chat
+En línea ahora
+Pasadas hoy
+Tiempo de emisión hoy
+Estaciones escuchadas
+Pico en línea
+Sala
+Banda
+Mostrar más
+Último
+de freeradionetwork.de
+menos
+ahora
+en línea
+Silenciado
+Bloqueado
+Operador
+Aún no hay superadmin
+Termine la instalación guiada en el servidor
+o cree uno con
+Ajustes del servidor o ACL guardados
+Reinicie el servidor FRN para aplicar los cambios (las estaciones conectadas se reconectan solas
+entró
+salió
+Estaciones más activas
+Actividad por sala
+Estaciones en línea
+máximo, medido cada 5 minutos
+Cuándo se habla
+Proporción
+Estaciones más activas
+Sobre todo en
+Llegadas y salidas
+entradas y salidas, en vivo
+por tiempo de emisión
+tiempo de emisión, últimos 30 días
+Totales diarios
+Lun
+Mar
+Mié
+Jue
+Vie
+Sáb
+Dom
+Buscar: indicativo, nombre, ciudad o país
+Visto por última vez
+Hablado (30 d
+Pasadas (30 d
+Ciudad
+Tipo de cliente
+Desde
+Accesos
+Crosslink
+Pasarela
+Pasarela (radio
+Solo PC
+Solo PC
+PC / app
+Alemania
+Austria
+Suiza
+Países Bajos
+Bélgica
+Polonia
+Reino Unido
+Estados Unidos
+Chat de la sala
+Mensajes de chat
+Mensajes de texto escritos en las salas
+Salas FRN
+Listas del servidor
+Listas de acceso del servidor
+Admins
+Tema
+Sesiones y registro
+Registro de cambios
+Sesiones activas
+Eventos (en vivo
+Configuración
+Título, vista pública y lo que ven los visitantes
+Vista pública
+Activado: todos ven las salas y las estadísticas sin iniciar sesión
+Mostrar públicamente las salas ocultas
+Pestaña Estaciones
+Con correo y dirección – solo visible para admins
+Inicio de sesión válido durante (horas
+Registro en sysman.freeradionetwork.de o autónomo
+Autónomo (sin SystemManager
+Activado: el servidor funciona por sí solo, las contraseñas vienen de la lista propia (cuentas FRN). Desactivado: registrado en el SystemManager
+Usar la lista de contraseñas propia (autónomo
+Desactivado: en modo autónomo se acepta cualquier contraseña FRN
+Solo para modo autónomo, p. ej. un servidor para la red doméstica
+autónomo
+Registrado en el SystemManager, el servidor figura en el sistema FRN y comprueba allí los accesos. El SystemManager verifica que la dirección y el puerto sean accesibles desde Internet – configure primero la redirección de puertos
+SystemManager
+SystemManager (sysman_server_addr
+sysman.freeradionetwork.de = sistema FRN alternativo (DE
+Dirección, puerto y tiempos de espera – escritos en server.properties
+Dirección del servidor (server_addr
+Nombre de host o IP pública de este servidor, p. ej. frn.die-n8schicht.de – el SystemManager comprueba que sea accesible
+Puerto (server_port
+Puerto TCP para los clientes FRN; ábralo en el router y el cortafuegos
+Servidor de respaldo (backup_server_addr
+Puerto del servidor de respaldo
+Se envía a los clientes: adónde ir si este servidor está caído
+Tiempo de espera del cliente (client_sotimeout, ms
+Un cliente que no envía nada durante este tiempo se desconecta
+Tiempo de espera de voz (client_txtimeout, ms
+Sin voz durante este tiempo termina una emisión; 0 = desactivado
+Por defecto 180
+Sala por defecto (default_net
+Los clientes que piden una sala que no existe llegan aquí

@@ -1,0 +1,180 @@
+Ellenőrizve
+Indítsa újra (sudo systemctl restart hblink4-dash
+Válasszon profilt, majd módosítson tetszés szerint bármely színt – vagy építsen teljesen saját sémát. Az eredményt azonnal látja
+Címek
+Mit mutat a fejléc és a böngészőfül
+Nagy szöveg a logó mellett
+Kis sor a cím alatt
+A böngészőfül címe
+Üres = a vezérlőpult címe
+Logó és böngészőikon
+Töltsön fel saját képeket, vagy bármikor térjen vissza az N8schicht logóhoz
+Böngészőikon (favicon
+Kép feltöltése
+N8 logó
+vagy egy kép címe (https://… vagy /static/
+Üres = N8schicht logó · PNG, JPEG, WebP, GIF, SVG · max. 1 MB
+Üres = ugyanaz, mint a logó · PNG, JPEG, WebP, GIF, SVG, ICO · max. 1 MB
+Logóméret (px
+Logó sarkai (%
+0 = ahogy rajzolták, 50 = kerek
+Saját linkek a fejlécben, pl. a hálózat weboldalára, egy csevegőcsoportba vagy egy wikire
+Saját linkek a fejlécben: weboldal, csevegőcsoport, wiki, adományoldal… Mindenki látja, bejelentkezés nélkül is
+Gombsor a fejléc alatt
+Egyetlen gomb az állapotjelvények mellett (régebbi lehetőség
+Extra gomb a fejlécben
+(egyetlen extra gomb
+Gomb linkje
+Még nincsenek linkek. Adja hozzá lent az elsőt
+Megjelenítés/elrejtés
+Az OpenBridge összeköti ezt a szervert egy másik hálózattal, pl. egy FreeDMR-szerverrel
+Új trunk
+Trunkök mentése
+Csak a listán szereplő talkgroupok haladnak át a trunkön (mindkét irányban); minden más eldobásra kerül. Beállítás: admin terület → Minták, linkek és trunkök →
+Szakértő: minden trunk JSON-ként – vagy illesszen be egy hblink.cfg szakaszt
+Átvétel az űrlapba
+Itt minden trunkot JSON-ként lát. OpenBridge-szakaszokat is beilleszthet egy FreeDMR/HBlink3-ból
+figyelmen kívül maradnak. Egy szakasz az azonos nevű trunkot frissíti – vagy az azonos porton vagy hálózati ID-n lévőt; különben új trunkot ad hozzá
+Az ezzel kezdődő sorok:
+HBlink3-példa betöltése
+Konfiguráció importálása
+Másik DMR-szerverről költözik? Töltse be annak konfigurációs fájlját; a HBlink4 megmutatja, mit tud átvenni. Semmi sem változik, amíg nem kattint
+Fájl
+Fájl kiválasztása
+rules.py kiválasztása
+Elemzés
+Mi kerül átvételre
+Konfigurációs fájl
+hblink.cfg, freedmr.cfg, adn-server.yaml vagy config.json – vagy húzza ide
+HBlink3/FreeDMR: adja hozzá a rules.py-t (konferenciahidak
+opcionális – a talkgroupjai talkgroup-listák lesznek
+Csak beolvasva, soha nem futtatva
+minden egy másik HBlink4-ből: szerver, hozzáférés, minták, tiltólista, linkek, trunkök
+a rádió- és átjátszó-ID-k listái tiltólista-bejegyzések lesznek
+Nem kerül átvételre: reporting, logger, MySQL, AllStar, proxyk, alias-letöltések – a HBlink4 ezeket maga végzi, vagy nincs rájuk szüksége. A listát az elemzés után látja
+APRS (térkép, DAPRS, szerver
+APRS-szerver
+APRS fül a vezérlőpulton
+Szerver ID
+Szerver ID (az Ön hívójele
+Hívójel SSID-vel, pl. DB0ABC-10. Bejelentkezési név az APRS-IS-en (a passcode kiszámítva) és név a csomagútvonalban
+Alapértelmezésben ki. Bekapcsolja a térképet, az állomás-adatbázist és a DMR → APRS átjárót. A lenti TCP-portok és az uplink külön kapcsolók
+APRS-IS-kompatibilis szerver Pythonban: az APRS-appok, iGate-ek és trackerek úgy csatlakoznak hozzá, mint bármely APRS-IS-szerverhez
+APRS-IS-portok megnyitása (TCP
+Az APRSdroid, Xastir, YAAC, iGate-ek és trackerek ide csatlakoznak. Nyissa meg a portokat a tűzfalon
+Szűrőport
+Teljes feed port
+Max. kliensek
+Duplikátumablak (s
+Ugyanaz a csomag ezen az időn belül újra eldobásra kerül (APRS-IS szabvány: 30 s
+A kliensek szűrővel választják ki, mit kapnak (r/lat/lon/km
+Minden, ami a szervernek van, szűretlenül. 0 = ki
+Kliensek
+Csatlakozott kliensek
+Jelenleg nincs csatlakozott APRS-app vagy iGate
+Uplink és downlink
+Kösse ezt a szervert egy APRS-hálózathoz: a DMR-pozíciók felmennek, az onnan jövő állomások lejönnek a térképre
+Kapcsolat egy APRS-hálózathoz – APRS-IS, CB-APRS vagy saját szerverek: a DMR-pozíciók felmennek, az állomások lejönnek a térképre
+APRS-IS (rádióamatőr, világszerte
+CB-APRS (CB-rádió, eu.cbaprs.net
+Kézi – saját szerverek, több link, fel/le külön
+APRS-IS-szerver
+CB-APRS-szerver
+euro.aprs2.net (Európa), rotate.aprs2.net (világszerte) vagy saját Tier-2 szerver
+eu.cbaprs.net (Európa) vagy us.cbaprs.net
+Passcode
+Üres = a bejelentkezésből számítva; -1 = csak vétel
+Bejelentkezés (CB-hívójel
+Üres = a szerver ID
+Downlink-szűrő
+Mi jön le: r/lat/lon/km = sugár egy pont körül (alapértelmezés: Németország). Üres = semmi sem jön le
+Mi jön le a CB-APRS-ről. Üres = semmi
+Felküldés (uplink
+Csak amíg az uplink csatlakozva és ellenőrizve van
+Az APRS-appoknak küldéshez kell. Csak engedéllyel rendelkező rádióamatőröknek adja meg
+Passcode egy hívójelhez
+Számítás
+Szerverenként egy sor: hoszt, port, bejelentkezés, passcode (üres = számított), szűrő és irány
+Az uplink és a downlink ki van kapcsolva – a térkép csak a DMR-t és a saját klienseket mutatja
+nincs uplink
+Minden (DMR, saját kliensek és downlink
+Csak DMR és saját kliensek
+Felküldve
+Beérkezett csomagok
+Állomások forrás szerint
+DMR-pozíciók
+APRS-szerver újraindítása
+portok zárva
+DAPRS – GPS a rádiókból
+DAPRS-dekódolás
+GPS-pozíciók dekódolása (DAPRS
+A DMR-szerver GPS-pozíciókat talál a rádióforgalomban (DAPRS). Hogy mi történik velük, az APRS fülön állítható be
+Az APRS-sel együtt kapcsol be (APRS fül → Szerver). Megtalálja a rádiók által DMR-en küldött pozíciókat, és átadja őket a vezérlőpult APRS-szerverének
+GPS hanghívásokban (beágyazott GPS LC
+GPS-es rádiók, amelyek hívás közben küldik a pozíciójukat (Motorola, Hytera, AnyTone
+GPS-adathívások (NMEA, LRRP
+Adathívásként küldött pozíciójelentések, pl. AnyTone/TYT „Digital APRS” a 900999-re vagy Motorola LRRP
+Az ide küldött GPS-adatok elfogadása:
+DMR ID-k/talkgroupok, amelyekre a rádiók a GPS-adataikat küldik. all = bármely cél; pl. 900999, 5057
+Pozíciók a DMR-ből
+A DMR-pozíciók APRS-pozíciókká válnak
+A DMR-szerver által talált pozíciók (DAPRS) HÍVÓJEL-SSID formában kerülnek a térképre; a hívójel az ID-listából jön
+Mi történik a DMR-rádiók GPS-pozícióival: hívójel az ID-listából, SSID, szimbólum, megjegyzés, APRS-IS
+CALL-7 kézi rádióhoz; 0 = nincs SSID. ID-nként lent
+Szimbólum
+Megjegyzés
+Felküldés legfeljebb ennyi (s) időnként
+Táblázat és szimbólumkód: /[ személy, /> autó, /k teherautó, /b kerékpár, /- ház, /r antenna
+Helyőrzők: {tg} talkgroup, {repeater} hotspot/átjátszó hívójele, {dmrid}, {slot}, {server}
+DMR ID-nként
+Saját hívójel, SSID, szimbólum vagy megjegyzés egyes ID-khez, vagy egy ID kikapcsolása
+ID hívójel nélkül
+Átjátszó-objektumok
+Átjátszók a térképen
+Hotspotok a térképen
+A hotspotok pozíciói gyakran lakcímek – alapértelmezésben ki
+APRS-objektumként a bejelentkezéskor jelzett pozíción, frekvenciával és color code-dal
+Átjátszó szimbóluma
+Hotspot szimbóluma
+Objektum megjegyzése
+A frekvencia és a color code után
+Objektum-jeladás ennyi percenként (min
+Ezen objektumok felküldése (uplink
+Átjátszó-objektumok küldése most
+A vendégjelszóval (FreeRadioID) bejelentkezett állomások csak a helyi térképen jelennek meg
+Az APRS-térkép: ki látja, mit mutat, és meddig maradnak rajta az állomások
+A térkép bejelentkezés nélkül látható
+A vezérlőpulttól független: a térkép lehet nyilvános akkor is, ha a vezérlőpult nem az
+Állomások a térképen
+Az utolsó ennyi (h) óra állomásainak megjelenítése
+Nyomvonalak megjelenítése
+A mozgó állomások utolsó pozícióinak vonala
+Nyers csomagok megjelenítése
+Csomagnapló a térkép alatt és az állomásablakban
+A térkép középpontja (lat, lon
+Hol nyílik a térkép, pl. 52.29, 8.92
+Nagyítás
+2 = világ, 6 = Németország, 10 = régió
+Térképstílus
+Automatikus – sötét térkép sötét színprofilokhoz, világos térkép a Daylighthoz
+Sötét (OpenStreetMap, sötétítve) – illik az N8 dizájnhoz
+Topográfiai (OpenTopoMap
+Saját csempeszerver
+Saját csempe-URL
+A saját csempeszerver legnagyobb nagyítása
+Ezen túl a csempék nagyítva jelennek meg ahelyett, hogy hiányoznának (OpenStreetMap 19, OpenTopoMap 17 – automatikusan beállítva
+https://…/{z}/{x}/{y}.png – csak a „Saját csempeszerver”-hez (pl. saját API-kulccsal
+Állomásonként. A helyi térkép mindig a legújabb pozíciót mutatja
+Állomások megőrzése (nap
+Nyomvonalak megőrzése (nap
+Nyers csomagok megőrzése (nap
+APRS-domainek
+Legfeljebb három domain, amely közvetlenül a térképet nyitja meg, mindegyik saját címmel és logóval, és igény szerint Let’s Encrypt tanúsítvánnyal
+1. domain
+2. domain
+3. domain
+1. domain: HTTPS Let’s Encrypttel
+2. domain: HTTPS Let’s Encrypttel
+3. domain: HTTPS Let’s Encrypttel
+pl. map.example.org – a térképet a / címen nyitja meg. Erre a szerverre kell mutatnia (DNS). Üres = ki
+pl. aprs.example.org – a térképet a / címen nyitja meg. Erre a szerverre kell mutatnia (DNS). Üres = ki

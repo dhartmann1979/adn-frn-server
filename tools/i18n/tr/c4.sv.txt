@@ -1,0 +1,215 @@
+DKIM-selektor
+DMARC-policy
+DMARC-anpassning
+DMARC-rapporter till
+BIMI-logotyp
+BIMI-certifikat (VMC/CMC
+MTA-STS
+Vad mottagare gör med e-post som inte klarar kontrollen – BIMI kräver quarantine eller reject
+none – bara rapporter
+quarantine – till skräppost
+reject
+relaxed (underdomäner räknas
+strict
+Tom = dmarc@<huvuddomän>
+Logotyp bredvid din e-post i Gmail, Apple Mail, Yahoo … (kräver DMARC quarantine/reject
+Valfri https://-adress till ett VMC eller CMC – Gmail och Apple visar logotypen bara med ett sådant
+Säger åt andra servrar att bara leverera till dig krypterat
+testing – bara rapport
+enforce
+Din logotyp bredvid din e-post i Gmail, Yahoo, Apple Mail … Kräver DMARC quarantine eller reject; Gmail och Apple vill även ha ett VMC/CMC-certifikat. Logotypen måste vara SVG Tiny PS – servern kontrollerar den och levererar den under /.well-known/bimi/
+skapas automatiskt från titeln
+egen logotyp
+Bokstäver
+Färg
+Skapa logotyp
+Ladda upp SVG
+Standard
+BIMI-logotyp skapad
+BIMI-logotyp sparad
+Kontrollera DNS nu
+Kopiera allt
+Zonfil
+Typ
+Värde
+Syfte
+valfritt
+satt
+avviker
+saknas
+E-postserverns adress
+E-postserverns IPv6-adress
+E-post till domänen går till denna server
+DKIM: signaturens publika nyckel
+DMARC: policy och rapporter
+BIMI: logotyp bredvid din e-post (kräver DMARC quarantine/reject
+MTA-STS: leverera bara krypterat
+TLS-RPT: rapporter om TLS-problem
+E-postprogram hittar IMAP av sig själva
+E-postprogram hittar SMTP av sig själva
+Ingen okrypterad IMAP
+SMTP med STARTTLS
+Omvänd DNS hos webbhotellet – mycket viktigt mot skräppostfilter
+SPF: vem som får skicka för domänen (denna server och reläet
+SPF: vem som får skicka för domänen (denna server
+huvuddomän
+i certifikatet
+Lägg till e-postdomän
+Ordning
+Gör till huvuddomän
+Ingen giltig domän
+Finns redan
+Stäng av e-postservern
+Installera e-postservern
+Installera
+Pågår – detta kan ta några minuter
+Ämnesbild
+Välj bild
+Ta bort bild
+Bildbeskrivning
+(för skärmläsare
+Endast JPEG, PNG eller WebP
+Bilden kan inte läsas
+JPEG, PNG eller WebP – förminskas i webbläsaren (max. 1600 px bred); visas överst på kortet och i artikeln, 16:9
+Ämnesbild: endast JPEG, PNG eller WebP
+Ämnesbild: högst 1,5 MB
+Ämnesbild: filen är inte vad den utger sig för att vara
+Ämnesbild: skadad fil
+väntar på DNS
+Lägg till e-postdomäner automatiskt
+Varje domän under 🔒 Domäner och HTTPS blir också en e-postdomän (news.example.org → example.org); mail.<domän> läggs till i Let’s Encrypt-certifikatet av sig själv så snart dess DNS pekar på denna server
+Helt automatiskt: nya domäner under 🔒 Domäner och HTTPS blir e-postdomäner, mail.<domän> läggs till i Let’s Encrypt-certifikatet så snart dess DNS pekar på denna server (kontrolleras var 30:e minut, utan omstart), och e-postservern tar över det av sig själv
+Lägg till e-postdomänen här (eller låt den läggas till automatiskt) – certifikatet utökas av sig själv så snart DNS stämmer
+På: andra e-postservrar måste använda TLS (STARTTLS) för att leverera – de få utan TLS nekas, även testverktyg som MXToolbox (530 Must issue a STARTTLS command first). RFC 3207 avråder från det för en publik MX. E-postprogram behöver alltid TLS
+Live-instrumentpanel
+Portal (nyheter
+Varje domän eller underdomän visar det du väljer under 🔒 Domäner och HTTPS → ”Visar”: live-instrumentpanelen eller portalsidan – valfritt antal domäner, alla med Let’s Encrypt
+Den första domänen är huvuddomänen (användare@huvuddomän); varje ytterligare domän är ett alias för samma brevlådor. Varje domän lägger till mail.<domän> i instrumentpanelens Let’s Encrypt-certifikat – e-postservern använder bara TLS
+DNS: mail.<domän> (A/AAAA) → denna server; MX → mail.<domän>
+Domäner och HTTPS: instrumentpanelen har sin domän och HTTPS är på
+Lägg till e-postdomänen här – certifikatet utökas
+E-postserver: ⚙️ Installera, relä, ✅ Tillämpa
+DNS-mallar: SPF, DKIM, DMARC, BIMI … hos DNS-leverantören, PTR hos webbhotellet
+Portar: 25, 465, 587, 993 öppna i brandvägg och router
+Efter en ändring startas instrumentpanelen om och utökar certifikatet (DNS för mail.<domän> måste peka på denna server, port 80 nåbar). Sedan 📮 E-postserver → ✅ Tillämpa
+E-postserver <code>
+E-postprogram hittar inställningarna av sig själva via SRV-posterna (🧾 DNS-mallar). Okrypterad IMAP (143) är avstängd
+Endast TLS 1.2+: IMAPS 993, SMTPS 465, submission 587 (STARTTLS krävs), inloggning först efter TLS
+Utgående: DKIM-signatur för varje domän, relä bara krypterat med kontrollerat certifikat
+Användare skickar bara med sin egen adress (eller sina alias
+Lösenord: Dovecot får bara en SHA512-CRYPT-hash; webbmailen använder en egen master-åtkomst, aldrig användarens lösenord
+väntar på inloggning”: användare från före e-postservern har inget e-postlösenord än – det skapas vid deras nästa inloggning i instrumentpanelen (eller när en administratör sätter ett nytt lösenord
+Skapas från dina inställningar: MX, A/AAAA, SPF, DKIM (den publika nyckeln visas efter ”Tillämpa”), DMARC, BIMI, MTA-STS, TLS-RPT och SRV-poster för e-postprogram. ”Kontrollera DNS” frågar DNS vad som är satt just nu
+DMR-server
+Vilande
+Hört här
+RF (lokalt
+Nät
+Nätverk
+RF / Nätverk
+RF-andel
+DMR-nätverk
+Modem
+ansluten
+Mest aktiva talkgroups
+Aktivitet
+Samtal (30 d
+Live-logg
+Fabriksinloggningen n8schicht / n8schicht är fortfarande aktiv
+Hårdvara och data
+Vem som helst i ditt nätverk kan ändra din hotspot. Ange ett eget lösenord
+Ändra nu
+MMDVMHost och DMRGateway använder dem efter en omstart
+Talkgroup-lista
+N8schichts talkgroup-lista
+Egna namn
+Sök: nummer eller namn, t.ex. 262 eller Bayern
+Namn
+Namn från github.com/dhartmann1979/n8schicht, plus dina egna
+kopia som följer med N8-Hotspot
+Anropssignal, DMR-ID och plats
+Din anropssignal, t.ex. DL1ABC
+Hotspot-ID
+Hotspot-suffix
+Två siffror som gör hotspot-ID:t unikt (DMR-ID + suffix, t.ex. 262123401). Tom = bara DMR-ID
+Plats
+Stad eller lokator, visas för servern
+Latitud
+Longitud
+Antennhöjd (m
+Effekt (W
+Kort, port, frekvenser och nivåer
+Modemkort
+Seriell port
+Porthastighet
+Fyller i port, hastighet och simplex/duplex
+Hitta modemet
+Sök
+MMDVM_HS_Hat på GPIO-kontakten (simplex
+MMDVM_HS_Dual_Hat på GPIO-kontakten (duplex
+ZUMspot / HS hat via USB (simplex
+MMDVM-repeaterkort via USB (duplex
+Annat / egna värden
+RX-frekvens (MHz
+TX-frekvens (MHz
+Samma som RX vid simplex
+RX-offset (Hz
+TX-offset (Hz
+Från kalibreringen
+RX-nivå (%
+TX-nivå (%
+RF-effekt (%
+RX-invertering
+TX-invertering
+PTT-invertering
+TX-fördröjning (ms
+DMR-fördröjning (ms
+DMR-läge
+Color code, time slots, hålltider
+Color code
+Duplex (två time slots
+Av för simplex-hotspots (bara TS2
+Time slots
+Time slot 1
+Time slot 2
+Används bara i duplexläge
+Samtalshållning (s
+TX-hållning (s
+RF-lägeshållning (s
+Nätverkslägeshållning (s
+Bara mitt eget ID får sända
+Skicka talker alias
+Anropssignal i morse var 10:e minut
+Anslut till en DMR-server
+Server, lösenord och alternativ
+Server
+Fyller i namn, adress och port
+Annan server (HomeBrew
+Serveradress
+Värdnamn / IP
+Serverport (UDP
+Hos N8schicht: ditt FreeRadioID.net-lösenord (full åtkomst) eller gästlösenordet
+Valfritt, t.ex. TS1=262;TS2=26500
+Jitterbuffert (ms
+Tidsgräns (s
+Titel, offentlig vy, ID-lista
+Av = bara inloggade användare ser instrumentpanelen
+Sessionslängd (timmar
+Spara samtal i (dagar
+DMR-ID-lista
+Anropssignaler och namn för instrumentpanelen och MMDVMHost (DMRIds.dat
+Daglig uppdatering av ID-listan
+endast radioid.net
+Ladda registrerade FreeRadioID-ID:n
+Dagligen med ID-listan: FRID-märke, namn på ID:n som bara finns hos FreeRadioID
+Avatarer, profiler och registrerade ID:n
+Visa avatarer
+Profilbilder för FreeRadioID-medlemmar; hämtas när en station hörs, cachas i databasen
+Slå upp profiler
+Namn, ort och kommentarer i stationsvyn (live från FreeRadioID-API:t
+Registrerade ID:n
+Registrerade på FreeRadioID.net
+Registrerade ID:n (FRID-märke) och avatarer, laddade med ID-listan
+Cachade avatarer
+Cachat
+URL för talkgroup-listan

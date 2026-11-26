@@ -1,0 +1,219 @@
+Server och data
+Uppgradera Java nu
+Java-FRN-server
+Varje minut som root: kontrollerar verkligen varje tjänst (instrumentpanel, Java-FRN-servern körs och tar emot stationer), startar om sjuka tjänster efter 3 minuter (högst 4× per timme), upptäcker internetavbrott och startar sedan om nätverkstjänsterna, och rapporterar till en heartbeat-adress
+Keep-Alive
+stoppad för hand – Keep-Alive väntar
+Keep-Alive på
+Anropas varje minut så länge allt är i ordning (Uptime Kuma ”Push”, Healthchecks.io …) – larmar dig när anropen upphör
+Keep-Alive-logg
+Keep-Alive sparad
+Keep-Alive pausad i 1 timme
+Keep-Alive aktiv igen
+Offentlig FRN-fellogg
+Vid problem, titta alltid här först: FRN SystemManager på freeradionetwork.de skriver dit varje nekad inloggning av servrar och klienter (fel FRN-lösenord, dubbel anslutning, port inte nåbar …) – orsaken som FRN-servern själv inte anger. Visas gör poster om denna serveradress, operatörens anropssignal och stationer som nekats här. Nya poster visas även nedan bland händelserna
+Öppna hela felloggen ↗
+inte nåbar
+poster om denna server
+inget om denna server
+sedan
+Vem
+Inga poster om denna server bland loggens senaste poster
+Anropssignaler
+andra stationer i loggen
+laddar
+Orsaken finns i den offentliga FRN-felloggen
+Loggar → FRN-fellogg
+öppna hela loggen ↗
+Nekad av SystemManager? Orsaken finns i den offentliga FRN-felloggen på freeradionetwork.de (Hjälp → Fellogg
+FRN-fellogg
+öppna ↗
+Fel FRN-lösenord – begär ett lösenord från SystemManager (📧 Begär FRN-lösenord) och ange exakt det tilldelade lösenordet med samma e-post och samma anropssignal/namn
+Dubbel anslutning: en anslutning med samma inloggningsuppgifter är redan aktiv – körs en andra instans (gammal server, andra server eller en reservserver med samma konto)? Varje FRN-server behöver ett eget konto
+SystemManager kan inte nå servern på denna adress och port från internet – kontrollera brandvägg och portvidarebefordran (TCP) samt serveradressen
+Åtkomst blockerad – kontakta operatören av FRN-nätet
+Kontot är okänt för SystemManager – begär ett lösenord eller kontrollera stavningen av e-post, anropssignal och namn
+Protokollversion nekad – uppdatera FRN-servern/klienten
+E-postadress nekad – använd exakt adressen för FRN-lösenordet
+Status, autostart vid uppstart och starta, stoppa, starta om – bara tjänsterna som är frisläppta för denna instrumentpanel
+Kontrollerar tjänsteanvändaren, behörigheter för program och data, systemd-enheter och sudo-reglerna
+reparerar det som är fel och kontrollerar igen. Konsol
+misslyckades
+Autostart vid uppstart
+fel
+kontrollerar
+kontrollerar och åtgärdar
+Behörigheterna är i ordning
+Allt kunde inte åtgärdas
+Ingen uppdatering från instrumentpanelen än
+Inaktivera
+Stationer på denna server kan tappa anslutningen
+Instrumentpanelen är borta efteråt – starta den igen i konsolen: sudo systemctl start frnadn
+Begär FRN-lösenord
+Begär lösenord
+FRN-lösenord begärt
+E-post (lösenordet skickas dit
+Band / kanal
+Land
+Stad - stadsdel
+Varje FRN-server behöver ett eget FRN-konto – samma e-post och lösenord på två servrar nekas (”samma inloggningsuppgifter är redan online på en annan server”
+Ange sedan e-post och lösenord ovan under SystemManager och spara. För en andra server, använd ett annat namn (t.ex. ”Server Test”) – anropssignal och namn tillsammans måste vara nya
+SystemManager e-postar ett lösenord för ett nytt FRN-konto
+Storlek
+Säkerhetskopia nedladdad
+Säkerhetskopia borttagen
+Återställning startad
+Säkerhetskopia återställd
+Säkerhetskopia
+Återställ
+Skapa säkerhetskopia
+Återställ nu
+Kontrollera
+Allt i en krypterad fil (.frnbak): inställningar, användare, rum, åtkomstlistor, FRN-konton, statistik, chatt, klientlogotyper, varumärke och FRN-serverns konfiguration. Välj ett lösenord – utan det kan säkerhetskopian inte öppnas, förvara det i din lösenordshanterare. De senaste säkerhetskopiorna ligger kvar på servern
+Lösenord för säkerhetskopian (minst 10 tecken
+Upprepa
+Inga säkerhetskopior än
+Ersätter databas, varumärke och FRN-konfiguration med säkerhetskopian. Instrumentpanelen startas om, tillämpar säkerhetskopian och startar sedan om FRN-servern – anslutna stationer ansluter igen av sig själva. Det aktuella läget sparas i before-restore-… i datakatalogen. Efteråt loggar du in med kontona från säkerhetskopian
+Säkerhetskopiefil (.frnbak
+Säkerhetskopians lösenord
+Skriv RESTORE för att bekräfta
+Senaste återställning
+Senaste återställningen misslyckades
+Rum
+FRN-konton
+Säkerhetskopia skapad
+Lösenorden skiljer sig åt
+Ta bort denna säkerhetskopia
+Återställ denna säkerhetskopia nu
+Instrumentpanelen startas om och ersätter all data med säkerhetskopian; FRN-servern startas också om
+Återställer – instrumentpanelen startas om
+Uppladdningen misslyckades
+Fel lösenord eller skadad fil
+Detta är ingen säkerhetskopia av adn-frn-server (.frnbak
+Ladda först upp säkerhetskopiefilen
+Skriv RESTORE för att bekräfta
+Säkerhetskopians lösenord måste ha minst 10 tecken
+Säkerhetskopior innehåller alla åtkomstuppgifter – endast superadmin
+Återkalla
+Återkalla denna token
+Tjänsten förlorar åtkomsten direkt
+Token återkallad
+Senast använd
+Token
+Kopiera token nu – den visas bara en gång
+API-token
+API-token återkallad
+Listor
+FRN-server
+Chatt
+Online nu
+Sändningar idag
+Sändningstid idag
+Hörda stationer
+Topp online
+Rum
+Band
+Visa mer
+Senaste
+från freeradionetwork.de
+mindre
+nu
+online
+Tystad
+Blockerad
+Operatör
+Ingen superadmin än
+Slutför den guidade installationen på servern
+eller skapa en med
+Serverinställningar eller ACL:er sparade
+Starta om FRN-servern för att tillämpa ändringarna (anslutna stationer ansluter igen av sig själva
+anslöt
+lämnade
+Mest aktiva stationer
+Aktivitet per rum
+Stationer online
+maximum, mätt var 5:e minut
+När det pratas
+Andel
+Mest aktiva stationer
+Mest i
+Ankomster och avfärder
+in- och utloggningar, live
+efter sändningstid
+sändningstid, senaste 30 dagarna
+Dagliga summor
+Mån
+Tis
+Ons
+Tor
+Fre
+Lör
+Sön
+Sök: anropssignal, namn, stad eller land
+Senast sedd
+Pratat (30 d
+Sändningar (30 d
+Stad
+Klienttyp
+Sedan
+Inloggningar
+Crosslink
+Gateway
+Gateway (radio
+Endast PC
+Endast PC
+PC / app
+Tyskland
+Österrike
+Schweiz
+Nederländerna
+Belgien
+Polen
+Storbritannien
+USA
+Rumschatt
+Chattmeddelanden
+Textmeddelanden skrivna i rummen
+FRN-rum
+Serverlistor
+Serverns åtkomstlistor
+Administratörer
+Tema
+Sessioner och logg
+Ändringslogg
+Aktiva sessioner
+Händelser (live
+Konfiguration
+Titel, offentlig vy och vad besökare ser
+Offentlig vy
+På: alla ser rum och statistik utan att logga in
+Visa dolda rum offentligt
+Fliken Stationer
+Med e-post och adress – syns bara för administratörer
+Inloggning giltig i (timmar
+Registrering på sysman.freeradionetwork.de eller fristående
+Fristående (utan SystemManager
+På: servern körs på egen hand, lösenorden kommer från den egna listan (FRN-konton). Av: registrerad hos SystemManager
+Använd egen lösenordslista (fristående
+Av: varje FRN-lösenord accepteras i fristående läge
+Endast för fristående, t.ex. en server för hemnätverket
+fristående
+Registrerad hos SystemManager listas servern i FRN-systemet och kontrollerar inloggningarna där. SystemManager testar att adress och port är nåbara från internet – konfigurera portvidarebefordran först
+SystemManager
+SystemManager (sysman_server_addr
+sysman.freeradionetwork.de = alternativt FRN-system (DE
+Adress, port och tidsgränser – skrivs till server.properties
+Serveradress (server_addr
+Värdnamn eller publik IP för denna server, t.ex. frn.die-n8schicht.de – SystemManager kontrollerar att den är nåbar
+Port (server_port
+TCP-port för FRN-klienterna; öppna den i router och brandvägg
+Reservserver (backup_server_addr
+Reservserverns port
+Skickas till klienterna: vart de ska gå om denna server är nere
+Klienttidsgräns (client_sotimeout, ms
+En klient som inte skickar något så länge kopplas från
+Taltidsgräns (client_txtimeout, ms
+Ingen röst så länge avslutar en sändning; 0 = av
+Standard 180
+Standardrum (default_net
+Klienter som ber om ett rum som inte finns hamnar här

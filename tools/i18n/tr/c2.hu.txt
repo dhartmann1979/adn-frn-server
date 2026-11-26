@@ -1,0 +1,214 @@
+Tulajdonos e-mail-címe (server_owner
+Szervertulajdonos (minden szobában OWNER jogot kap
+Csak egy cím; üres = a fenti FRN-fiók e-mail-címe. OWNER jog minden szobában
+FRN-fiók e-mail-címe (sysman_auth_emailaddr
+FRN-fiók jelszava (sysman_auth_password
+Az FRN-felhasználói fiókja e-mail-címe a SystemManagernél
+Ennek az FRN-fióknak a jelszava (ahogy a SystemManager elküldte
+Elküldve a SystemManagernek és megjelenik a vezérlőpulton
+Megjelenik a vezérlőpulton
+HTTPS és web
+HTTPS bekapcsolása Let’s Encrypttel
+Automatikus HTTPS-tanúsítványok a Let’s Encrypttel (nyilvános DNS és 80/443-as portok szükségesek
+Nyilvános domain
+Példa: dashboard.example.org. Ne írjon be http://-t vagy elérési utat
+Tanúsítvány e-mail-címe
+Let’s Encrypt lejárati és fontos tanúsítvány-értesítések
+Teszttanúsítványok használata (staging
+Csak teszteléshez; a böngészők nem bíznak a staging tanúsítványokban
+HTTPS-port
+Nyilvános HTTPS-port. Szabványosan 443
+HTTP-challenge / átirányítási port
+A HTTP-01 challenge és a HTTP → HTTPS átirányítás nyilvános TCP-portja
+Egy erre a szerverre mutató nyilvános DNS-név és bejövő 80-as és 443-as TCP-port szükséges. Mentés, majd indítsa újra az frnadn-t
+Adatbázis
+Meddig maradnak meg az adások és bejelentkezések
+Egyes adások megőrzése (nap
+Bejelentkezések megőrzése (nap
+Chatüzenetek megőrzése (nap
+A napi összesítők örökre megmaradnak, kicsik
+Módosítások elvetése
+nincs mentve
+profilból
+beépített
+üres
+Új szoba
+Név (net00
+Emoji a név előtt
+A szoba nyitva (_enable
+Ki: a szerver nem kínálja ezt a szobát
+Rejtett a vezérlőpulton
+Csak a vezérlőpultra való bejelentkezés után (az FRN-kliensek továbbra is látják
+Szobatulajdonosok (_owner
+E-mailek vesszővel elválasztva; NETOWNER jog ebben a szobában. Üres = szervertulajdonos
+Engedélyezett crosslinkek (_acl_cl
+Engedélyezett átjárók (_acl_gw
+Üres = mind, none = nincs crosslink, vagy e-mailek
+Üres = mind, none = nincs átjáró, vagy e-mailek
+Üzenet az elutasított crosslinkeknek/átjáróknak (_acl_info
+Max. adás (_tot, s
+Némítás feloldása ennyi után (_unmute, perc
+0 = némítva a feloldásig
+Nincs hang a némított csak-PC kliensek felé
+Nincs hang a némított crosslinkek felé
+Nincs hang a némított átjárók felé
+Beszédszünet (_speechpause, ms
+Beszédszünet üzenete
+Csak-PC klienseknek küldve; a {callsign} behelyettesítődik
+Papagáj / visszhangteszt
+Papagáj be/ki (_parrot_startstop_enable
+A papagáj szöveges üzenettel be- és kikapcsolható
+Telegram-bot (_tgbot_params
+min. adás ms;min. szünet ms;bot token;csatorna ID – pl. 6000;30000;123:ABC;-100123
+Információs üzenet (_show_infomessage
+Beszédengedély szükséges
+Adhat
+Feljebb
+Lejjebb
+Sorrend a vezérlőpulton; az FRN-kliensek név szerint rendezve látják a szobákat. ⭐ = alapértelmezett szoba, 🦜 = net00, a teszt/papagáj szoba
+Hozzáférési lista
+Csak a hozzáférési listán szereplők engedélyezése
+Hozzáférési üzenet
+Ki látja a hozzáférési lista információs üzenetét
+Mindenki
+csak a hozzáférési lista által érintett kliensek
+Tiltási minta (_bl_regexp
+Reguláris kifejezés a névre, e-mailre és városra
+Üzenet a letiltott klienseknek (_bl_info
+LAN-cím engedélyezése (allowLANAddr
+Hozzáférési beállítások mentése
+Bejegyzés hozzáadása
+Hozzáadás a listához
+Nincs bejegyzés ebben a listában
+Online állomás másolása
+Csatlakozott állomás kiválasztása
+A listák SQLite-ban tárolódnak, és az FRN-szerver XML-formátumában íródnak ki. A meglévő XML-bejegyzések automatikusan importálódnak. A módosítások az FRN-szerver újraindítása után lépnek életbe; az eredeti XML-fájlokról csere előtt mentés készül
+Az FRN-tulajdonosok és -adminok az FRN-kliensben továbbra is módosíthatják ezeket a listákat. A vezérlőpult megjelenítés vagy szerkesztés előtt importálja a módosításokat az XML-fájlokból
+Új FRN-fiók
+Még nincs fiók
+E-mail (az FRN-kliens bejelentkezése
+FRN-jelszó
+FRN-kliensazonosító
+A szerver jelszólistája ehhez:
+mód (acl/FRNPasswd.xml
+ezen a szerveren
+A szerver regisztrálva van a SystemManagernél: a bejelentkezéseket ott ellenőrzik, ez a lista nincs használatban
+A szervernek magának kell a jelszó az FRNPasswd.xml-ben (a fájl csak a szolgáltatás számára olvasható
+Új felhasználó
+Jelszó (min. 10
+Új jelszó (min. 10
+Csak adminok
+Superadmin: minden, az adminok is. Adminok: minden, kivéve a többi admint. Felhasználók: látják a vezérlőpultot akkor is, ha privát, és a rejtett szobákat
+superadmin
+Bejelentkezett felhasználók
+Mi
+Honnan
+Vége
+telepítés / parancssor
+Gép
+Hoszt
+Terhelés
+Memória
+Lemez
+Újraindítás
+Leállítás
+Szolgáltatás
+Fut ekkor óta
+FRN-szerver újraindítása
+Vezérlőpult újraindítása
+frn-server napló
+frnadn napló
+Java FRN-szerver, készítette:
+Telepítve: ismeretlen
+Telepített verzió
+frissítés érhető el
+Tároló
+Adatok (SQLite
+Statisztikai gyorsítótár
+Az FRN-szerver server.log fájlja
+server.properties megjelenítése
+Fel
+Le
+Régi server.properties importálása
+server.properties importálása
+Válassza ki a régi server.properties fájlt
+Opcionális: beállítások importálása az előző FRN-telepítésből ebbe az új telepítésbe. Csak a támogatott tulajdonságok és szobadefiníciók kerülnek át. A régi adatbázis, a Java JAR, az ACL-listák és a jelszó-XML-fájlok nem másolódnak át
+Színprofil
+Válasszon színprofilt, majd módosítson tetszés szerint bármely színt – vagy építsen teljesen saját sémát. Az egész oldal azonnal mutatja; csak ezután marad meg:
+Ugyanaz a színmotor, mint a HBlink4-FreeRadioID-ben és az N8-HotSpotban
+Saját színek
+Kattintson egy színre a módosításához; a ↺ ismét a profilból veszi
+Vissza a profil színéhez
+Kiemelés
+Kiemelés 2
+Háttér
+Az oldal színe minden mögött
+Gombok, számok, aktív fülek
+A gombok és a cím második színe
+Ragyogás bal fent
+Ragyogás jobb fent
+Ragyogás lent
+Kártyaárnyalat
+Az üvegkártyákba kevert szín
+Kártyafényerő
+Mennyire emelkednek ki az üvegkártyák
+Üvegelmosás
+Háttérragyogás
+0 = sima háttér
+Lekerekítés
+Kártyák és gombok sarkai
+Ki = gyorsabb régi telefonokon
+Olvasható (kontraszt 18.3 : 1
+N8 alapértelmezés
+Logó és oldalikon
+Vezérlőpult logója
+Jelenlegi vezérlőpult-logó
+Alapértelmezett logó használata
+Oldalikon / favicon
+Jelenlegi oldalikon
+Alapértelmezett oldalikon használata
+PNG-kép, legfeljebb 2 MB. A fejlécben és a bejelentkezési ablakban jelenik meg
+PNG vagy ICO, legfeljebb 2 MB. A böngészőfülekben és könyvjelzőkben használatos
+Színek, logó és ikon mentése
+Üres = automatikusan illeszkedik a háttérhez
+Klienslogók
+Az állomások avatarként azt a szoftvert vagy hálózatot mutatják, ahonnan jönnek – a sávból, a leírásból és a klienstípusból (crosslink, átjáró, PC) felismerve. A beépített képek egyszerű jelvények. Mindegyiket lecserélheti saját képre (PNG, JPEG, WebP, GIF, ICO vagy egyszerű SVG, max. 512 KB) – például egy hivatalos logóra, ha használhatja
+Ikon
+Linkmenü
+Linkmenü megjelenítése
+Menügomb szövege
+Gomb legördülő menüvel
+Gombsor a fejléc alatt
+(sorrend = sorrend a menüben
+Név, pl. Weboldal
+Megnyitás új böngészőfülön
+új fül
+Link hozzáadása
+Linkek mentése
+Oldalikonok mentése és frissítése
+A weboldal gyorsítótárazott faviconjának megjelenítése
+oldalikon
+Egyszerű HTML
+Saját linkek a fejlécben: weboldal, csevegőcsoport, wiki, adományoldal … Mindenki látja, bejelentkezés nélkül is
+Weboldal
+E-mail
+Cím
+Beállítások másolása innen:
+Nem rögzíti
+(átvált arra a fülre) és
+Ismeretlen tulajdonos: a szerver tulajdonosának e-mail-címe (server_owner – Beállítások → Üzemeltető, üres = az FRN-fiók) nem ismert FRN-fiók a SystemManagernél – adja meg egy létező FRN-fiók e-mail-címét
+Az elutasított bejelentkezések oka (hibás FRN-jelszó, ismeretlen tulajdonos, többszörös kapcsolat …) – a háttérben is ellenőrizve: közvetlenül az FRN-szerver problémája után, majd 2 percenként; az új okok az eseményeknél jelennek meg
+ismeretlen – szinkronizáljon, vagy nyissa meg egyszer a partnert
+önálló (SystemManager nélkül
+jelszó beállítva
+nincs jelszó
+nincs megadva FRN-fiók
+FRN-fiókok a SystemManagernél
+a szinkronizálás sosem érinti, minden szerver megtartja a sajátját
+Fiók mentése
+FRN-fiók mentve – indítsa újra az FRN-szervert a bejelentkezéshez
+Nincs módosítás
+Az itteni FRN-szerver leállítva és zárolva
+magától elindul, amint saját FRN-fiókot ment a SystemManager alatt
+A tartalék maga állítja le és zárolja FRN-szerverét (a következő szinkronizáláskor vagy állapot-ellenőrzéskor) – a master online marad
+Zárolva: ez a tartalék ugyanazt az FRN-fiókot használja, mint a master. Előbb adjon meg saját FRN-fiókot a SystemManager alatt (📧 FRN-jelszó Backup

@@ -1,0 +1,215 @@
+Aktivitás időben
+Honnan jönnek a hívások
+Helyi (átjátszók és hotspotok
+Időszak
+Mérték
+óránként
+Az adásidő OpenBridge-en át érkezett hányada
+Aktív TG-k
+DMR ID / hívójel
+Talker Alias (a rádió küldi
+OpenBridge-trunkök
+Trunkök
+Trunk
+Forgalom a trunkön
+Legaktívabb talkgroupok a trunkön
+Talkgroupok a trunkön
+Legutóbbi hívások a trunkön
+Fogadott / küldött
+Fogadott
+Fogadott (fent
+Küldött (lent
+Távoli vég
+Protokoll
+Hálózati ID
+Helyi port
+nincs talkgroup-szűrő
+nincs szűrő
+Még nincs trunk
+Működő / beállított OpenBridge-trunkök · mai hívások fogadva (⬇) és küldve (⬆) a trunkökön
+minden talkgroup ezen a trunkön megy TS2-n, kivéve a helyieket (1–79, 4000, 5000, 9990–9999
+OpenBridge-trunkök FreeDMR keep-alive-okkal, protokollverzióval és talkgroupokkal
+Nem található talkgroup
+Szám vagy név, pl. 262 vagy Bayern
+Aktív
+Aktív (30 nap
+Minden TG
+Önnek engedélyezett
+Vendégeknek nem
+Gyorsindítás
+Szerver és port
+FreeRadioID-jelszó
+Szervercím hotspotokhoz
+Port (UDP
+Használja a DMR ID-ját és a
+személyes FreeRadioID.net-jelszavát
+az Ön FreeRadioID-jelszava
+az Ön DMR ID-ja
+Teljes hozzáférést kap a szerver minden talkgroupjához
+Még nincs jelszava? Regisztrálja ID-ját itt:
+vendéghozzáféréshez
+a FreeRadioID-jelszavával, vagy használja ezt:
+FreeRadioID-jelszó nélkül vendégként csatlakozik: mindent hall, de csak
+a vendég-talkgroupokon adhat
+Vendég
+Vendéghozzáférés
+A vendégek adhatnak ezeken:
+Time slot 1 · TS1
+Time slot 2 · TS2
+Az eszköze maga választhatja ki a talkgroupjait a
+mezővel, pl.
+Kész beállítások
+Pi-Star / WPSD: adja hozzá ezt a sort ehhez:
+a DMR-konfigurációban
+A sysop megjegyzése
+Csatlakozás: szerver, port, jelszó, talkgroupok és kész beállítások
+Konfiguráció fül
+Beállítás fül
+Portálhozzáférés (API-tokenek
+Még nincsenek tokenek
+Visszavonja ezt a tokent? A szolgáltatás azonnal elveszíti a hozzáférést
+API-tokennel nem
+Terület
+Csak superadmin
+Jelszó (min. 8
+Böngésző
+IP-címek
+Fiókok
+Szakasz
+Beállítások (opcionális
+Speciális beállítások
+Minden aktuális bejelentkezés. A „Visszavonás” befejez egyet – az az eszköz azonnal kijelentkezik
+Bejelentkezések, sikertelen kísérletek és minden változás az admin területen, időponttal, személlyel és IP-címmel
+Az adminok látják az IP-címeket, és kezelik a felhasználókat és a beállításokat. Csak a superadmin (beállítva itt:
+hozhat létre adminokat
+Az ablak mögötti teljes vezérlőpult már mutatja a módosításait. Még nincs mentve? Zárja be az ablakot, és minden visszaáll
+Egyes módosítások a vezérlőpult újraindítása után lépnek életbe
+Újraindítás után lép életbe
+Azonnal életbe lép. HTTPS és portok a vezérlőpult újraindítása után
+E szakasz értékeinek újbóli átvétele a konfigurációs fájlból
+Alapértékek a fájlból
+Minden érték az adatbázisban van (
+Csak a superadmin és az indítási címek maradnak a konfigurációs fájlokban
+Beállítások módosítása
+Bejelentkezés nélkül látható
+igen (bárki megtekintheti
+nincs beállítva —
+Így fut:
+kézzel (run_all.sh
+systemctl sudón át
+ajánlott
+Hozzáférés a vezérlőpulthoz
+Nyilvános vezérlőpult
+„Bejelentkezve maradok” (nap
+Ki láthatja a vezérlőpultot, és meddig tart egy bejelentkezés
+Ki = bejelentkezés nélkül semmi sem látható. Az IP-címek és portok mindig csak adminoknak láthatók
+Átjátszók és hotspotok hozzáférése
+Jelszó és talkgroupok átjátszókhoz és hotspotokhoz
+Passphrase (alapértelmezett
+Közös jelszó a saját minta nélküli átjátszóknak/hotspotoknak. Bekapcsolt FreeRadioID-bejelentkezésnél ez a vendégjelszó
+Talkgroupok TS1
+Talkgroupok TS2
+Vesszővel elválasztva, all = minden talkgroup, none = nincs talkgroup
+Az eszköz által kért TG-k elfogadása (RPTO
+Be = az eszköz saját talkgroup-listája nyer; ki = csak a fenti listák
+FreeRadioID-bejelentkezés
+FreeRadioID biztonságos bejelentkezés
+Személyes bejelentkezések a FreeRadioID.net-en át és a vendéghozzáférés
+A bejelentkezéseket a személyes FreeRadioID.net-jelszóval ellenőrzik; a fenti passphrase lesz a vendégbejelentkezés
+Vendég TX-talkgroupok
+A vendégek csak itt adhatnak; all = nincs korlátozás, none = a vendégek nem adhatnak
+API-időkorlát (s
+FreeRadioID ID-k
+FreeRadioID-adatok
+FreeRadioID ID-lista betöltése
+A FreeRadioID-nál regisztrált ID-k képei, az adatbázisban gyorsítótárazva
+Avatarok, profilok és az FRID-jelvény a FreeRadioID.net-ről
+A regisztrált ID-k FRID-jelvényt kapnak az Utoljára hallott listában
+Név és hely az állomás részletes nézetében
+Hívójel-adatbázis
+Honnan jönnek a DMR ID-k hívójelei és nevei
+Országok
+all, vagy vesszővel elválasztva pontosan úgy, ahogy a lista írja (Germany, Austria
+Napi frissítés ekkor:
+FreeRadioID.net (radioid.net + FreeRadioID
+Talkgroupok és statisztika
+Talkgroup-statisztika és talkgroup-nevek
+Talkgroup-statisztika rögzítése
+Minden csoporthívás (talkgroup, időtartam, rádió ID) az adatbázisba kerül a diagramokhoz
+SQLite, legfeljebb 90 nap
+Ki = csak a bejelentkezett felhasználók látják a talkgroup- és OpenBridge-statisztikát
+Kb. 1400 talkgroup neve (github.com/dhartmann1979/n8schicht), naponta frissítve a hívójel-adatbázissal
+Közleménysáv megjelenítése
+Sáv a vezérlőpult fölött hírekhez és karbantartási értesítésekhez
+A Konfiguráció fül megjelenítése
+A Konfiguráció fül elmondja az új felhasználóknak, hogyan csatlakoztassák a hotspotjukat
+Megjelenik a Konfiguráció fülön
+A fül végén jelenik meg: szabályok, kapcsolat, linkek
+Alapértelmezett jelszó megjelenítése
+FreeRadioID-bejelentkezésnél ez a vendégjelszó. Ki = „kérdezze a sysopot”
+Megjegyzés a felhasználóknak
+DMR-master / szerver
+DMR-master
+A DMR-szerver portja és időzítései
+DMR-port (UDP
+Figyelési cím
+Üres = minden cím (IPv4 és IPv6
+Ping-időkorlát (s
+Kihagyott pingek a bontás előtt
+Stream vége terminátor nélkül (s
+Talkgroup-tartási idő (s
+Meddig marad egy slot lefoglalva az utolsó talkgroupnak
+Ide csatlakoznak az átjátszók és hotspotok (HomeBrew szabvány 62031
+Mentéskor elküldve a DMR-szervernek. A port, a linkek és a trunkök a DMR-szerver újraindítása után változnak
+Ennél rövidebb újracsatlakozások naplózása (s
+0 = minden újracsatlakozás naplózása
+Hívások továbbadása trunkök között
+Be: az egyik trunkön érkező hívás minden más, a talkgroupot vivő trunkön is kimegy. A hurkokat a visszhangvédelem és a FreeDMR hop-számláló állítja meg
+Eszközfelismerés
+Hogyan sorolódnak az állomások átjátszókba, hotspotokba, appokba és hálózatokba: a szoftverük által bejelentkezéskor jelzett csomagnév alapján
+Automatikus felismerés
+Az automatikus felismerés mindet felismeri
+Akkor ellenőrzött, ha a csomagnév nem árul el semmit
+Hotspotok – a csomagnév tartalmazza
+Hotspotok – a szoftver tartalmazza
+Appok – a csomagnév tartalmazza
+Appok – a szoftver tartalmazza
+Átjátszók – a csomagnév tartalmazza
+Hálózatok – a csomagnév tartalmazza
+Hálózatok – a szoftver tartalmazza
+Telefonos/PC-s appok rádiós hardver nélkül. Vesszővel elválasztva, a kis- és nagybetű nem számít. A csatlakozott állomások mentés után azonnal újra besorolódnak
+Ezeknek az állomásoknak a szoftvere olyan nevet jelez, amelyet a HBlink4 még nem ismer (a kártyán látható). Az adminok besorolhatják
+Minták, tiltólista és linkek (JSON
+Állomásonkénti szabályok, letiltott ID-k és linkek más szerverekhez – tapasztalt sysopoknak
+Átjátszóminták
+Saját szabályok ID-nként, ID-tartományonként vagy hívójelenként: passphrase, talkgroupok, freeradioid be/ki. Lásd config/config_advanced_sample.json
+Tiltólista
+Letiltott ID-k, ID-tartományok vagy hívójelek, mindegyik indoklással
+Kimenő linkek más szerverekhez
+linkek más szerverekhez
+Trunkök más hálózatokhoz, mint a FreeDMR
+HTTPS Let’s Encrypttel
+Titkosított hozzáférés ingyenes Let’s Encrypt tanúsítvánnyal
+Domainek
+E-mail a Let’s Encrypt számára
+Teszttanúsítványok (staging
+HTTP-port (challenge + átirányítás
+Sima webport
+HTTPS-re irányít, ha a HTTPS be van kapcsolva
+Szükséges a certbot, az ide mutató domain és a nyitott 80/443-as portok
+Érvényes eddig:
+Ez az oldal HTTPS-en
+HTTPS ki
+Let’s Encrypt (automatikus
+Adminok értesítése frissítésekről
+A bejelentkezett adminok értesítést kapnak, ha a GitHubon újabb verzió van
+GitHub-tároló
+tulajdonos/név
+Ki nyomhatja meg a „Frissítés most” gombot
+Minden admin
+Senki (kézi frissítés
+Újraindítás frissítés után
+Óránként egyszer megkérdezi a GitHubot, van-e újabb verzió. Semmi sem települ automatikusan
+Mindig újra kéri a jelszót. Csak a szerveren beállított git remote-ból húz le
+Telepített verzió · HBlink4 4.8.0 alapon
+Legújabb ott

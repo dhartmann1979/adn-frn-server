@@ -1,0 +1,215 @@
+Actividad a lo largo del tiempo
+De dónde vienen las llamadas
+Local (repetidores y hotspots
+Periodo
+Medida
+por hora
+Proporción del tiempo de emisión que llegó por OpenBridge
+TG activos
+ID DMR / indicativo
+Talker Alias (enviado por la radio
+Troncales OpenBridge
+Troncales
+Troncal
+Tráfico en la troncal
+Talkgroups más activos en la troncal
+Talkgroups en la troncal
+Últimas llamadas en la troncal
+Recibidas / enviadas
+Recibidas
+Recibidas (arriba
+Enviadas (abajo
+Extremo remoto
+Protocolo
+ID de red
+Puerto local
+sin filtro de talkgroups
+sin filtro
+Aún no hay troncal
+Troncales OpenBridge activas / configuradas · llamadas de hoy recibidas (⬇) y enviadas (⬆) por las troncales
+cada talkgroup pasa por esta troncal en TS2, salvo los locales (1–79, 4000, 5000, 9990–9999
+Troncales OpenBridge con keep-alives de FreeDMR, versión de protocolo y talkgroups
+No se encontró ningún talkgroup
+Número o nombre, p. ej. 262 o Bayern
+Activos
+Activos (30 días
+Todos los TG
+permitidos para usted
+No para invitados
+Inicio rápido
+Servidor y puerto
+Contraseña de FreeRadioID
+Dirección del servidor para hotspots
+Puerto (UDP
+Use su ID DMR y su
+contraseña personal de FreeRadioID.net
+su contraseña de FreeRadioID
+su ID DMR
+Obtiene acceso completo a todos los talkgroups de este servidor
+¿Aún sin contraseña? Registre su ID en
+para el acceso de invitado
+con su contraseña de FreeRadioID, o use
+Sin contraseña de FreeRadioID se conecta como invitado: lo oye todo, pero solo puede
+emitir en los talkgroups de invitado
+Invitado
+Acceso de invitado
+Los invitados pueden emitir en
+Time slot 1 · TS1
+Time slot 2 · TS2
+Su dispositivo puede elegir sus propios talkgroups con el
+campo, p. ej.
+Ajustes listos para usar
+Pi-Star / WPSD: añada esta línea a
+en la configuración DMR
+Nota del sysop
+Cómo conectarse: servidor, puerto, contraseña, talkgroups y ajustes listos para usar
+Pestaña Configuración
+Pestaña Configuración
+Acceso al portal (tokens de API
+Aún no hay tokens
+¿Revocar este token? El servicio pierde el acceso al instante
+No con un token de API
+Área
+Solo superadmin
+Contraseña (mín. 8
+Navegador
+Direcciones IP
+Cuentas
+Sección
+Opciones (opcional
+Opciones avanzadas
+Todos los accesos actuales. Termine uno con «Revocar» – ese dispositivo se desconecta al instante
+Accesos, intentos fallidos y cada cambio en el área de administración, con hora, persona y dirección IP
+Los admins ven las direcciones IP y gestionan usuarios y ajustes. Solo el superadmin (definido en
+puede crear admins
+Todo el panel detrás de esta ventana ya muestra sus cambios. ¿Aún sin guardar? Cierre la ventana y todo vuelve atrás
+Algunos cambios se aplican tras reiniciar el panel
+Se aplica tras un reinicio
+Se aplica al instante. HTTPS y puertos tras reiniciar el panel
+Volver a tomar los valores de esta sección del archivo de configuración
+Valores por defecto del archivo
+Todos los valores están en la base de datos (
+Solo el superadmin y las direcciones de arranque quedan en los archivos de configuración
+Cambiar ajustes
+Visible sin iniciar sesión
+sí (cualquiera puede verlo
+no establecido —
+Se ejecuta como
+manualmente (run_all.sh
+systemctl mediante sudo
+recomendado
+Acceso al panel
+Panel público
+«Mantener la sesión iniciada» (días
+Quién puede ver el panel y cuánto dura un inicio de sesión
+Desactivado = no se ve nada sin iniciar sesión. Las direcciones IP y los puertos son siempre solo para admins
+Acceso de repetidores y hotspots
+Contraseña y talkgroups para repetidores y hotspots
+Frase de paso (por defecto
+Contraseña compartida para repetidores/hotspots sin patrón propio. Con el acceso FreeRadioID activado, es la contraseña de invitado
+Talkgroups TS1
+Talkgroups TS2
+Separados por comas, all = todos los talkgroups, none = ningún talkgroup
+Confiar en los TG solicitados por el dispositivo (RPTO
+Activado = gana la lista de talkgroups del propio dispositivo; desactivado = solo las listas de arriba
+Acceso FreeRadioID
+Acceso seguro FreeRadioID
+Accesos personales mediante FreeRadioID.net y el acceso de invitado
+Los accesos se comprueban con la contraseña personal de FreeRadioID.net; la frase de paso de arriba pasa a ser el acceso de invitado
+Talkgroups TX para invitados
+Los invitados solo pueden emitir aquí; all = sin restricción, none = los invitados no pueden emitir
+Tiempo de espera de la API (s
+ID de FreeRadioID
+Datos de FreeRadioID
+Cargar la lista de ID de FreeRadioID
+Imágenes de los ID registrados en FreeRadioID, guardadas en caché en la base de datos
+Avatares, perfiles y la insignia FRID de FreeRadioID.net
+Los ID registrados reciben la insignia FRID en Últimos escuchados
+Nombre y lugar en la vista de detalle de la estación
+Base de datos de indicativos
+De dónde vienen los indicativos y nombres de los ID DMR
+Países
+all, o separados por comas exactamente como los escribe la lista (Germany, Austria
+Actualización diaria a las
+FreeRadioID.net (radioid.net + FreeRadioID
+Talkgroups y estadísticas
+Estadísticas y nombres de talkgroups
+Registrar estadísticas de talkgroups
+Cada llamada de grupo (talkgroup, duración, ID de radio) se guarda en la base de datos para los gráficos
+SQLite, como máximo 90 días
+Desactivado = solo los usuarios conectados ven las estadísticas de talkgroups y de OpenBridge
+Nombres de unos 1400 talkgroups (github.com/dhartmann1979/n8schicht), actualizados a diario con la base de datos de indicativos
+Mostrar el banner de avisos
+Un banner sobre el panel para noticias y avisos de mantenimiento
+Mostrar la pestaña Configuración
+La pestaña Configuración explica a los nuevos usuarios cómo conectar su hotspot
+Se muestra en la pestaña Configuración
+Se muestra al final de la pestaña: normas, contacto, enlaces
+Mostrar la contraseña por defecto
+Con el acceso FreeRadioID es la contraseña de invitado. Desactivado = «pregunte al sysop»
+Nota para los usuarios
+Máster DMR / servidor
+Máster DMR
+Puerto y tiempos del servidor DMR
+Puerto DMR (UDP
+Dirección de escucha
+Vacío = todas las direcciones (IPv4 e IPv6
+Tiempo de espera de ping (s
+Pings perdidos antes de desconectar
+Fin de flujo sin terminador (s
+Tiempo de retención del talkgroup (s
+Cuánto tiempo queda reservado un slot para el último talkgroup
+Los repetidores y hotspots se conectan aquí (estándar HomeBrew 62031
+Se envía al servidor DMR al guardar. Puerto, enlaces y troncales cambian tras reiniciar el servidor DMR
+Registrar reconexiones más cortas que (s
+0 = registrar cada reconexión
+Pasar llamadas entre troncales
+Activado: una llamada que entra por una troncal sale también por todas las demás troncales que llevan el talkgroup. Los bucles se detienen con la protección contra eco y el contador de saltos de FreeDMR
+Detección de dispositivos
+Cómo se clasifican las estaciones en repetidores, hotspots, apps y redes: por el nombre de paquete que su software indica al conectarse
+Detección automática
+La detección automática los reconoce todos
+Se comprueba cuando el nombre de paquete no dice nada
+Hotspots – el nombre de paquete contiene
+Hotspots – el software contiene
+Apps – el nombre de paquete contiene
+Apps – el software contiene
+Repetidores – el nombre de paquete contiene
+Redes – el nombre de paquete contiene
+Redes – el software contiene
+Apps de teléfono/PC sin hardware de radio. Separados por comas, mayúsculas/minúsculas no importan. Las estaciones conectadas se vuelven a clasificar justo después de guardar
+El software de estas estaciones indica un nombre que HBlink4 aún no conoce (se muestra en la tarjeta). Los admins pueden clasificarlo
+Patrones, lista negra y enlaces (JSON
+Reglas por estación, ID bloqueados y enlaces a otros servidores – para sysops con experiencia
+Patrones de repetidores
+Reglas propias por ID, rango de ID o indicativo: frase de paso, talkgroups, freeradioid on/off. Vea config/config_advanced_sample.json
+Lista negra
+ID, rangos de ID o indicativos bloqueados, cada uno con un motivo
+Enlaces salientes a otros servidores
+enlaces a otros servidores
+Troncales a otras redes como FreeDMR
+HTTPS con Let’s Encrypt
+Acceso cifrado con un certificado gratuito de Let’s Encrypt
+Dominios
+Correo para Let’s Encrypt
+Certificados de prueba (staging
+Puerto HTTP (challenge + redirección
+Puerto web simple
+Redirige a HTTPS cuando HTTPS está activado
+Necesita certbot, el dominio apuntando aquí y los puertos 80/443 abiertos
+Válido hasta
+Esta página por HTTPS
+HTTPS desactivado
+Let’s Encrypt (automático
+Avisar a los admins de las actualizaciones
+Los admins conectados reciben un aviso cuando GitHub tiene una versión más nueva
+Repositorio de GitHub
+propietario/nombre
+Quién puede pulsar «Actualizar ahora»
+Todos los admins
+Nadie (actualización a mano
+Reiniciar tras la actualización
+Pregunta a GitHub una vez por hora si existe una versión más nueva. No se instala nada automáticamente
+Siempre vuelve a pedir la contraseña. Solo descarga del remoto git configurado en el servidor
+Versión instalada · basada en HBlink4 4.8.0
+Más reciente allí

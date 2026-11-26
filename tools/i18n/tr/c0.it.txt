@@ -1,0 +1,332 @@
+Aggiornamento disponibile
+Novità
+Aggiorna ora
+Dettagli
+Più tardi
+Nascondi fino a domani
+Installata
+Su GitHub
+Ultimo controllo
+Controllo automatico
+ogni ora esatta
+aggiornato
+Ultimo aggiornamento
+riuscito
+annullato
+Controlla ora
+Controllo in corso
+Installa ora l’aggiornamento
+Registro aggiornamenti
+Controllato ogni ora esatta. Gli aggiornamenti vengono installati solo quando premi il pulsante. Il servizio si riavvia poi; se l’interfaccia web non risponde, la versione precedente viene ripristinata automaticamente
+Download e applicazione dell’aggiornamento
+Annulla
+Il servizio si riavvia (circa un minuto). Se poi l’interfaccia web non risponde, la versione precedente viene ripristinata automaticamente
+La tua password (conferma
+Riavvio del servizio
+Controllo dell’interfaccia web
+Chiudi
+Aggiornamento installato. Ricaricamento della pagina
+Aggiornamento installato
+L’aggiornamento è stato annullato – è di nuovo in esecuzione la versione precedente
+Non aggiornato – la versione precedente continua a funzionare invariata
+Elimina questa voce
+Elimina quelle mostrate
+Elimina tutto
+Elimina le voci mostrate con i relativi registri
+Eliminare tutte le voci con i relativi registri? L’operazione non può essere annullata
+Elimina questa voce con il suo registro
+Dettagli nel registro aggiornamenti (Sistema → Aggiornamento
+file modificati a mano – aggiornamento interrotto
+Il servizio non risponde ancora. Ricarica tra qualche minuto o consulta il registro aggiornamenti
+Lingua / Language
+sempre
+spento
+mai
+Menu
+Esercizio
+Utenti e accesso
+Aspetto
+Rete e domini
+Sistema
+Aggiornamento
+Servizi
+Permessi e sudo
+Keep-alive
+in esecuzione
+fermo
+Errore
+avvio
+arresto
+ricaricamento
+Avvio automatico
+avvio automatico attivo
+Riavvia
+Ferma
+Avvia
+Ferma il servizio
+Stato, avvio automatico al boot e avvia · ferma · riavvia – solo ciò che questo sistema consente. Un servizio fermato qui non viene riavviato dal keep-alive
+Non ancora configurato – eseguire una volta nella console
+Disattivare l’avvio automatico? Dopo un riavvio il servizio non si avvia da solo
+non controllato
+tutto a posto
+Console
+controlli OK
+Controlla di nuovo
+Correggi
+Correzione in corso
+Controlla l’utente del servizio, il programma (root, in sola lettura per il servizio), dati e password, servizi systemd, «Aggiorna ora», keep-alive e le regole sudo. Correggi ripara ciò che non va e controlla di nuovo
+Utente del servizio
+Programma
+Dati
+Hardware
+Cartella sorgente
+Vocoder USB
+Domini e HTTPS
+non configurato
+in pausa
+non in esecuzione
+attivo
+Internet
+raggiungibile
+non raggiungibile da
+Ultimo controllo
+proprio ora
+Heartbeat
+sano
+nessun riavvio
+fermato a mano – il keep-alive attende
+riavviato
+Da configurare una volta nella console
+Rete, porte e domini
+Utenti
+Sessioni
+Registro
+Utente
+Ruolo
+Ultimo accesso
+Modifica
+disattivato
+Nome visualizzato
+Nominativo
+Nome utente
+Password (min. {n}
+Nuova password (facoltativa
+Aggiungi utente
+Elimina
+Eliminare davvero
+Utente creato
+Utente eliminato
+solo superadmin
+Superadmin
+Admin
+Lettore
+Autore
+Redattore
+Chi può accedere. Gli admin vedono indirizzi IP e porte e modificano le impostazioni; gli utenti vedono solo la dashboard
+Tutti gli accessi attuali. «Esci» ne termina uno subito
+Nessuna sessione attiva
+Ultima attività
+Scade
+Esci
+Sessione terminata
+questa sessione
+Accessi, tentativi falliti e ogni modifica nell’area admin – con ora, persona e indirizzo IP
+Ora
+Evento
+Porte
+in entrata
+in uscita
+Salva porte
+Tutte le porte in un unico posto. In entrata: aprire nel firewall e nel router se deve essere raggiungibile dall’esterno. In uscita: l’altro lato deve essere raggiungibile
+Riavvia il servizio
+Il servizio si riavvia – ricarica poi la pagina
+Dominio
+Certificato
+nessun certificato
+certificato di prova
+valido
+scaduto
+solo HTTP
+fino al
+Rinnova
+Ottieni certificato
+Rimuovi
+Ancora nessun dominio
+DNS: nessun record trovato
+Aggiungi dominio
+E-mail per Let’s Encrypt
+Certificato di prova (Let’s Encrypt staging
+Aggiungi dominio e ottieni certificato
+Richiesta del certificato
+In corso – può richiedere fino a un minuto
+I certificati vengono rinnovati automaticamente
+Il rinnovo automatico non è configurato
+Mostra
+Domini propri con un certificato gratuito di Let’s Encrypt
+Rimuovere {d}? Inoltro e certificato vengono eliminati
+Crash
+Crash
+Watchdog
+Memoria esaurita
+Terminato
+Timeout
+Blocco
+Componente andato in crash
+Thread andato in crash
+Processo ausiliario andato in crash
+Riavvio da keep-alive
+nuovo
+tutto letto
+tutti
+Ultimi 7 giorni
+Nessun crash registrato
+Segna tutto come letto
+Nessun registro disponibile
+Monitoraggio crash
+Ogni crash, blocco e riavvio di emergenza di ogni servizio viene registrato qui – con la parte dell’applicazione in cui è avvenuto e il registro completo (journal, stack Python). Il servizio viene riavviato automaticamente. I nuovi rilevamenti compaiono come avviso dopo l’accesso finché non vengono segnati come letti
+Questi servizi sono monitorati. Dopo ogni arresto imprevisto systemd registra il rilevamento e riavvia il servizio; se resta fermo, lo riavvia il keep-alive
+Il monitoraggio crash non è ancora configurato. Il prossimo aggiornamento lo configura – oppure una volta nella console
+1 nuovo crash
+n} nuovi crash
+altro
+Mostra tutti i crash
+Segna come letto
+Dalla tua ultima visita un servizio è andato in crash o si è bloccato. È stato riavviato automaticamente. Il rilevamento indica la parte dell’applicazione e contiene il registro completo
+L’interfaccia web viene arrestata
+L’interfaccia web si riavvia – un momento
+Keep-alive attivo
+Riavvia i servizi di rete dopo un’interruzione di Internet
+Indirizzo heartbeat
+Heartbeat in caso di errori (facoltativo
+Riprendi
+Pausa 1 h (manutenzione
+Salva
+Registro keep-alive
+Ogni minuto come root: controlla davvero ogni servizio (interfaccia web e connessioni dei protocolli), riavvia i servizi malati dopo alcuni minuti (al massimo 4× all’ora), rileva le interruzioni di Internet e poi riavvia i servizi di rete, e si segnala a un indirizzo heartbeat (Uptime Kuma «push», Healthchecks.io …). Un servizio fermato a mano resta fermo
+Messaggio
+Ancora nessun aggiornamento tramite l’interfaccia web
+Ricarica
+Accedi
+Password
+Mostra password
+Ripeti password
+Il blocco maiuscole è attivo
+Resta connesso
+Crea
+Connessione cifrata
+Connessione non cifrata (HTTP
+Inserisci nome utente e password
+La password è troppo corta
+Le password non coincidono
+Accesso non riuscito
+Il mio account
+Cambia password
+Lingua
+Troppi tentativi falliti – attendi 15 minuti
+Accesso
+Webmail
+Resta connesso (30 giorni
+Accedi per gestire il server FRN
+Questa dashboard è privata. Effettua l’accesso
+Accedi per modificare le impostazioni
+Questo hotspot è privato. Effettua l’accesso
+Accedi per vedere gli indirizzi IP e l’area admin
+Effettua l’accesso per vedere la dashboard
+Nome utente o password errati
+Troppi accessi falliti. Riprova tra 15 minuti
+Troppe password errate. Riprova tra 15 minuti
+Troppe richieste – attendi un momento
+Troppi tentativi falliti. Attendi 15 minuti
+Uscita
+Link
+Impostazioni
+Aggiornamenti
+Registri
+Registro modifiche
+Live
+Dati live
+Statistiche
+Statistiche
+Ultimi ascoltati
+Ultimi ascoltati
+In onda
+Oggi
+24 h
+7 giorni
+30 giorni
+90 giorni
+1 anno
+Durata
+Tempo di trasmissione
+Chiamate
+Passaggi
+Stazione
+Stazioni
+Nome
+Stato
+Online
+Offline
+Silenzio
+Notifiche
+Caricamento
+Caricamento link
+Ancora nulla ascoltato
+nessuno
+sì
+no
+attivo
+Sì
+No
+OK
+Indietro
+Aggiorna
+Riavvia ora
+Carica
+Scarica
+Cerca
+Filtro
+Tutti
+Totale
+Versione
+Tempo di attività
+Password attuale
+Nuova password
+Ripeti nuova password
+Creato
+Aggiungi
+Salvato
+Impostazioni salvate
+Avviso
+Info
+Talkgroup
+Talkgroup
+Slot
+Sorgente
+Destinazione
+Direzione
+secondi
+minuti
+ore
+giorni
+fa
+Chiaro
+Scuro
+Automatico
+Colori
+Colori
+Logo
+Titolo
+Anteprima
+Ripristina
+Applica
+Copia
+Copiato
+Mostra
+Nascondi
+Altro
+Meno
+Mostra tutto
+Mostra meno
+Descrizione
+Attivato
+Disattivato

@@ -1,0 +1,233 @@
+"Crosslink" vagy pl. 446.03125FM CTC131.8
+Város – városrész / lokátor
+FRN-szoba
+Szoba (net
+A beszélő neve FRN-szövegüzenetként
+Szöveges üzenet csak ezeknek az állomásoknak (privát
+Vesszővel elválasztott hívójelek, pl. DL1ABC, DB0XYZ – üres = nyilvános a szoba minden tagjának. A privát üzenetek sehol máshol nem jelennek meg
+RX végérzékelés (ms
+Az FRN 200 ms-os blokkokat küld – 240 ms jó érték
+Ennyi ideig nincs hangcsomag = az adás véget ért (SvxLink: 1000
+Szint FRN → híd (dB
+Szint híd → FRN (dB
+System Manager (a „jelszó igényléséhez”
+System Manager port
+Alapértelmezés sysman.freeradionetwork.eu – saját FRN-hálózatnál annak System Managere
+Még nincs FRN-jelszava? Adja meg a hívójelet, nevet, e-mailt, sávot/csatornát, országot és várost, és igényelje – a jelszó e-mailben érkezik
+Watchdog: újranyitás ennyi (s) válasz nélkül után
+Watchdog: a hálózat teljes újraépítése … s offline után
+A normál újracsatlakozás mellett (alapértelmezés 120 s
+DMR – HomeBrew (HBlink4 / FreeDMR
+Szerver (HBlink4 / FreeDMR
+Jelszó (passphrase
+üresen hagyva = változatlan · HBlink4-FreeRadioID esetén: személyes FreeRadioID-jelszó – a szerver passphrase-ével a híd csak vendég, és nem adhat a TG 262-n
+Peer/átjátszó ID
+7 vagy 9 számjegy, a szerveren engedélyezettnek kell lennie
+Adási talkgroup
+Vételi talkgroup
+0 = minden csoporthívás a time sloton
+Beállítások (RPTO
+pl. TS2=262 – üres = szerverkonfiguráció
+Color code
+RX-frekvencia (Hz
+TX-frekvencia (Hz
+Forrás ID a DMR felé irányuló adásokhoz
+hívójel → saját DMR ID, ha szerepel az ID-adatbázisban
+Talker alias (állomásnév) küldése a hangkeretekben
+DMRA-csomagok küldése is (nem HBlink4-hez
+RX végérzékelés terminátor nélkül (ms
+Szint DMR → híd (dB
+Szint híd → DMR (dB
+Időkorlát-időzítő adásonként (s
+Előpuffer DMR/Zello kimenet (ms
+RX/TX talkgroup neve
+Zello – Channel API
+WebSocket-szerver
+Zello: wss://zello.io/ws · Zello Work: wss://zellowork.io/ws/NETWORK
+Zello-felhasználónév
+Fejlesztői token
+Issuer + privát kulcs (JWT
+nincs (Zello Work
+Hitelesítési token
+Issuer
+Privát kulcs (PEM
+csak az „Issuer + privát kulcs” esetén – üresen hagyva = változatlan
+Mintavételi frekvencia küldéshez
+16 kHz (ajánlott
+Opus bitráta (bit/s
+Csomaghossz (ms
+A beszélő neve szöveges üzenetként a csatornába
+Szövegsablon
+Helyőrzők: {name} {callsign} {source} {detail}
+Végérzékelés stop_stream nélkül (ms
+Szint Zello → híd (dB
+Szint híd → Zello (dB
+üresen hagyva = változatlan
+beállítva – üresen hagyva = változatlan
+Melyik forrás melyik hálózatba megy? A módosítások azonnal érvényesek
+Zárolási idő adás után (ms
+Megakadályozza a pingpongot a hálózatok között
+Ütemezés
+Vokóder (AMBE+2
+N8schicht vokóder (szoftver
+USB-kulcs (AMBE3000
+AMBEserver (hálózat
+Teszt vokóder nélkül
+AMBE+2 szoftverben – a DroidStar kodek forkja, érthetőségre hangolva. Nincs szükség extra hardverre és qemura; saját folyamatként fut (x86 és ARM
+ThumbDV, DVstick 30, DV3000 közvetlenül USB-n/soros porton. A legjobb minőség, nincs szükség extra szolgáltatásra
+AMBE3000 egy másik gépen AMBEserver mögött (UDP 2460
+Csak a kapcsolatok teszteléséhez – a DMR-hang ilyenkor néma
+Könyvtár (üres = automatikus
+Alapértelmezés: /opt/n8crosslink/lib/libn8vocoder.so
+Hangbeállítások
+Szint kódolás előtt (dB
+Szint dekódolás után (dB
+Vokóder tesztelése
+Vokóder fordítása / frissítése
+Előnézet (bemenet → DMR → kimenet
+WAV-fájl
+Saját tesztmondat (üres = alapértelmezett mondat
+Teszt
+ID-listák
+DMR ID-k
+Regisztrálva a FreeRadioID-nál
+Talkgroup-nevek
+ID-listák frissítése
+ID-listák frissítése most
+Avatarok frissítése most
+ID-listák és avatarok automatikusan naponta egyszer, a gombbal azonnal
+Források
+FreeRadioID: minden DMR ID (CSV
+FreeRadioID: minden DMR ID (JSON, tartalék
+FreeRadioID: regisztrált ID-k (JSON
+FreeRadioID: regisztrált ID-k (CSV, tartalék
+FreeRadioID: ismeretlen ID-k egyenkénti lekérdezése ({id}
+Tartalékforrás RadioID.net (CSV
+Talkgroup-nevek (JSON
+Csak a FreeRadioID-nál regisztrált ID-k lekérdezése
+Avatar URL DMR ({id}
+Avatar URL Zello ({username}, opcionális
+FRN/Zello hívójel → FreeRadioID-avatar
+A Zello Channel API nem ad profilképeket – adjon meg itt saját forrást, vagy töltsön fel képeket lent
+Zello-avatarok (saját képek
+Kép (PNG/JPEG/WebP/GIF
+Még nincsenek saját képek
+Frissítési szolgáltatás
+beállítva
+Hiányzik a frissítési szolgáltatás – egyszer futtassa
+visszaállítva erre:
+Titkosított biztonsági mentés készítése
+Útmutató
+Biztonsági mentés letöltése
+Biztonsági mentés visszaállítása
+Biztonsági mentés fájlja (.n8xbak
+FONTOS – a superadmin jelszava = a mentés kulcsa
+A mentés teljesen titkosított (AES-256-GCM, nincs nyílt szöveg). A kulcs a
+superadmin jelszava
+a mentés időpontjában. E jelszó nélkül a mentés nem
+állítható vissza – még a fejlesztő sem tudja. Tartsa a superadmin jelszavát a
+jelszókezelőben
+(pl. a mentésfájl nevével együtt
+Mindent tartalmaz: beállítások hitelesítő adatokkal (FRN, DMR, Zello), felhasználók, utoljára hallottak, statisztika, események, ID-listák, talkgroupok és avatarok
+Superadmin jelszó (jelenlegi jelszava
+Superadmin jelszó a mentés időpontjában
+Superadmin jelszó a megerősítéshez
+Újrakezdés
+Mit kell visszaállítani
+Utoljára hallottak, statisztika és események törlése
+Minden beállítás alapértékre (a felhasználók és az előzmények maradnak
+Minden – mint frissen telepítve (utána bejelentkezés: n8schicht / n8schicht
+Legjobb előbb biztonsági mentést készíteni. A teljes eltávolítás a szerveren ezzel történik:
+(lásd a dokumentáció „Eltávolítás” részét
+Konfiguráció exportálása
+Importálás
+Új felhasználó / jelszó módosítása
+Jelszó (min. 8 karakter
+Ön
+Automatikus indítás ki
+Híd újraindítása
+Szerver újraindítása
+Jogosultságok ellenőrzése és javítása
+A sudo nincs beállítva – futtassa egyszer: sudo /opt/n8crosslink/update.sh
+Kérjük, várjon
+Ugyanaz a színmotor, mint a HBlink4-FreeRadioID-ben, az adn-frn-serverben és az N8-HotSpotban: válasszon profilt, majd módosítson bármely színt – az egész oldal azonnal mutatja, csak a „Mentés”-sel tárolódik
+Megjelenés mentése
+Megjelenés mentve
+Saját értékek törlése
+Szerver és HTTPS
+HTTPS
+Hozzáférés
+A GitHub nem érhető el
+A HTTPS, a hozzáférés és a DMR-szerver állapota, valamint újraindító gombok. A frissítés, a szolgáltatások, a jogosultságok és a keep-alive a menü következő elemei
+Percenként rootként: valóban ellenőrzi a vezérlőpultot, a DMR-szervert (UDP-port, kapcsolat a vezérlőpulttal) és az APRS-t (szerver és uplink), 3 perc után újraindítja a hibás szolgáltatásokat (óránként legfeljebb 4×), észleli az internetkimaradásokat és utána újraindítja a hálózati szolgáltatásokat, és jelentést küld egy heartbeat-címre (Uptime Kuma „push”, Healthchecks.io …). Az itt leállított szolgáltatás leállítva marad
+Beállítás
+Admin terület
+Hálózati infó
+Csatlakozás
+Ismeretlen
+Élő adatok
+Kattintson a hangértesítések bekapcsolásához
+Élő adatok: a böngésző csatlakozik a vezérlőpulthoz, valós idejű frissítések – kattintson az újratöltéshez
+DMR-szerver: a vezérlőpult csatlakozik a DMR-szerverhez
+Csatlakozás a vezérlőpult szerveréhez
+Várakozás a kapcsolat állapotára
+Offline – kattintson az újracsatlakozáshoz
+DMR-szerver offline
+APRS ki
+Közlemény
+Elrejtés a következő verzióig
+Telepítés a szerverre
+Kattintson a részletes információkért
+Mai hívások
+Mai forgalom
+Aktív streamek
+Ma továbbítva
+Kapcsolatok
+Átjátszók
+Hotspotok
+Appok
+Bejövő hálózat
+Kimenő hálózat
+Legutóbbi események
+Még nincsenek események
+Beszélők
+Legaktívabbak
+Utolsó hívás
+Utolsó forgalom
+Hanghívás
+Csoporthívás
+Egyéni (privát) hívás
+Privát (egyéni) hívások
+Adathívás (nincs továbbítva
+Rádió ID
+Cél
+Ismeretlen helyszín
+Részlet
+Fut ekkor óta
+A szoftver és a csomagnév, amelyet az állomás bejelentkezéskor jelez
+Ismeretlen eszköztípus
+Az átjátszó által RPTO-n át megadott TG-k
+TS1 TG-k
+TS2 TG-k
+A forrás FreeRadioID-n keresztül jelentkezett be
+A bejelentkezést a FreeRadioID.net igazolta – teljes hozzáférés
+Az alapértelmezett passphrase-szel bejelentkezve – adás csak a vendég-talkgroupokon
+Talker Alias
+DMR Talker Alias
+Állomásinfó megjelenítése
+csak adminok
+Csak adminok számára látható
+rejtett
+nincs csatlakozva
+keep-alive
+aktív az elmúlt órában
+újraindítás
+Teljes képernyő
+Térkép megnyitása
+A térkép megnyitása külön oldalon
+Térkép
+APRS-térkép
+Vezérlőpult
+Áttekintés
+Frissítés most
+Talkgroup-statisztika

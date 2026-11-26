@@ -1,0 +1,243 @@
+JSON in het formaat van talkgroup_ids.json
+Eigen talkgroupnamen
+Eén per regel: 26500 = N8schicht Ortsrunde. Overschrijft de lijst of voegt ontbrekende talkgroups toe
+Namen van ca. 1400 talkgroups (github.com/dhartmann1979/n8schicht), dagelijks bijgewerkt met de ID-lijst
+Expert
+Extra regels voor de ini-bestanden
+Extra regels voor MMDVM-Host.ini
+Extra regels voor DMRGateway.ini
+[Sectie] gevolgd door regels Sleutel=Waarde; ze vervangen of vullen waarden aan
+Ongedaan maken
+Opties
+Modus
+Kalibratie
+Frequentiekalibratie
+Vindt de offset van uw modem met de BER-test van MMDVMCal
+Startfrequentie (MHz
+Druk op Start
+Druk op
+Programmeer een
+simplexkanaal
+in uw portofoon op
+Zend een paar seconden met uw portofoon (praten is niet nodig). De BER verschijnt rechts
+Verschuif de frequentie met
+tot de BER het laagst is (bij voorkeur onder 1 %). Zend na elke stap opnieuw
+Zend met uw portofoon – de BER verschijnt hier
+BER nu
+Offset
+Offset opslaan
+Offset opslaan (RX en TX
+Opgeslagen offsets
+Meer tests
+Voor ervaren gebruikers: deviatie, RSSI en testpatronen (het modem zendt
+Deviatie +
+Deviatie −
+Vermogen +
+Vermogen −
+DMR-deviatie (D
+TX aan/uit (spatie
+Overnemen
+Admins wijzigen alles, kijkers zien alleen het dashboard (ook als het privé is
+Nieuw wachtwoord (min. 8
+fabriekswachtwoord
+Kleurenschema
+Kies een voorinstelling en wijzig elke kleur naar wens. Het voorbeeld is live – niets wordt opgeslagen vóór „Opslaan”. Dezelfde thema-engine draait in HBlink4-FreeRadioID en het FRN-dashboard, dus één kleurcode ziet er overal hetzelfde uit
+Standaard
+Kopieer het schema naar een ander N8-dashboard (HBlink4-FreeRadioID → Weergave, FRN → Thema) of plak er een vandaar
+Exporteren / importeren
+Knoptekst
+Link
+Openen in een nieuw tabblad
+Nieuw tabblad
+Site-icoon
+De favicon van de pagina ophalen
+Site-iconen nu vernieuwen
+Voor iedereen in de kop getoond. Met „site-icoon” haalt de hotspot één keer de favicon van de gelinkte pagina op, bewaart die in zijn database en toont hem in het menu (de emoji is de terugval, bv. offline
+Board
+CPU-temperatuur
+SD-kaart
+MQTT-livegegevens
+MQTT-broker (mosquitto
+Webinterface van N8-Hotspot
+Opgeslagen gesprekken
+ID’s
+Bijgewerkt
+Geen Linux-console op de modem-UART
+Rechten
+Wat de webinterface mag doen: de modempoorten openen (zoeken, kalibratie), de diensten na een update herstarten, zijn eigen map bijwerken
+Webinterface zit in de groep dialout (modem zoeken, kalibratie
+sudo-regel voor herstart van diensten (/etc/sudoers.d/n8hotspot
+Programmamap /opt/n8hotspot is beschrijfbaar (Nu bijwerken
+Python-omgeving is beschrijfbaar (nieuwe pakketten na een update
+Alles in orde
+aanwezig
+groep dialout, modus 660
+Update-instellingen
+Op updates controleren
+Vraagt GitHub elk heel uur (geen aanmelding, er worden geen gegevens over uw hotspot verstuurd
+Controleren elke (uren
+Automatisch installeren
+Installeert zelf een nieuwe versie tijdens het gekozen uur – alleen als niemand zendt en er geen kalibratie loopt
+Uur voor automatische updates
+MMDVMHost en DMRGateway herstarten
+Na een update worden de ini-bestanden opnieuw geschreven en herstarten beide radiodiensten; de webinterface herstart altijd
+Branch
+Datum van de geïnstalleerde versie
+Systeemjournal tonen
+Configuratiebestanden
+Gegenereerd uit de instellingen. Extra regels: Instellingen → Expert
+Map
+Deze installatie is geen git-checkout – bijwerken met <code>sudo /opt/n8hotspot/scripts/update.sh</code>
+Herstart N8-Hotspot met de hand: sudo systemctl restart n8hotspot
+1. Precies downloaden
+(alleen fast-forward, geen lokale wijzigingen
+2. Python-pakketten als requirements.txt veranderd is
+3. ini-bestanden opnieuw, MMDVMHost en DMRGateway herstarten
+3. ini-bestanden opnieuw
+4. De webinterface herstarten – de pagina herlaadt vanzelf
+Ontvangen van een portofoon (RF
+Zenden naar de portofoons (vanuit het netwerk
+Modus van MMDVMHost
+Verbinding met de DMR-server
+geen netwerk
+verbinden
+niet gebruikt · simplex-hotspot (alleen TS2
+Niet gebruikt
+Simplex-hotspot – alleen TS2
+geen RSSI
+Bitfoutpercentage – onder 1 % schoon, boven 3 % heeft de vocoder het moeilijk
+Vocoder en signaal
+BER live
+Laatste gesprekken · BER (RF) / verlies (netwerk
+RSSI (RF
+Spraakkwaliteit vandaag
+RF
+Netwerkgesprek – BER wordt alleen op RF gemeten
+Wachten op een RF-gesprek
+Nog geen gesprekken
+Vandaag geen RF-gesprek
+vandaag geen RF-gesprek
+Ø BER (RF
+max. BER
+Ø verlies (netwerk
+Spraakframes (AMBE+2
+via RF / netwerk
+verloren in het netwerk
+RF-BER
+Status, autostart en starten · stoppen · herstarten – alleen wat deze hotspot toestaat (sudo-regels van de N8 Admin-Kit
+Autostart aan
+Programma (root, alleen-lezen voor de dienst), gegevens en wachtwoorden, diensten, sudo, „Nu bijwerken” en de modempoort
+Modempoort
+systemd
+Rechten hersteld – alles in orde
+Er blijven enkele problemen
+aangevraagd
+Nu bijwerken” draait als root via
+alleen fast-forward, pakketten, diensten en ini-bestanden, rechten en sudo, herstart, controle van de webinterface – als die niet antwoordt, terug naar de vorige versie
+Versies
+De hotspot werkt niet zonder deze dienst tot u hem weer start
+1. Fast-forward naar
+(stopt als bestanden met de hand gewijzigd zijn
+2. Python-pakketten, diensten en ini-bestanden, rechten en sudo (N8 Admin-Kit, als root
+3. MMDVMHost, DMRGateway en de webinterface herstarten
+4. Controle van de webinterface – als die niet antwoordt, terug naar de vorige versie; de pagina herlaadt vanzelf
+Webinterface herstart
+Elke minuut als root: controleert elke dienst echt (webinterface, MQTT, modem, aanmelding bij de DMR-server), herstart zieke diensten na 3 minuten (hoogstens 4× per uur), merkt internetstoringen op en herstart daarna de netwerkdiensten, en meldt zich bij een heartbeat-adres
+Tokennaam
+Token maken
+Nog geen token
+geen netwerken ingeschakeld
+Netwerken
+Meeluisteren
+Meeluisteren (alleen aangemelde admins
+Volume
+Volume meeluisteren
+Niveau van het sprekende station
+Rustig op alle netwerken
+Nu actief
+In de lucht · via DMR
+In de lucht · via FRN
+In de lucht · via Zello
+Netwerken online
+Stations vandaag
+Vandaag geblokkeerd
+Verzonden naar
+Kamer / TG / kanaal
+Stations in de kamer
+zendt
+ontvangt
+gereed
+onbekend
+niet
+Nog geen superadmin – maak er nu een aan om het beheerportaal te gebruiken
+Superadmin aanmaken
+Instellingen opgeslagen. FRN/DMR/Zello/vocoder vereisen een herstart van de brug
+Standaardaanmelding
+is nog actief – stel een eigen wachtwoord in onder Admin → Gebruikers
+Activiteit per netwerk
+Meestal via
+Wanneer mensen praten
+Huidige toestand
+Verbonden sinds
+Online sinds
+Pakketten
+Frames
+Serverversie
+Protocolversie
+Kanaalstatus
+Zendstatus
+Aanmeldfase
+Toegang OK
+Gebruikers online
+Ping / pong
+Gebeurtenissen
+Gebeurtenissenlogboek
+Peer-ID
+Time slot
+Kanaal
+Account
+Brug
+Algemeen
+Routering
+ID-lijsten en avatars
+Back-up en opnieuw beginnen
+Vocoder
+Beheergedeelte van N8 Crosslink
+Wijzigingen werken direct, tijdens het draaien
+Titel in het dashboard
+Servernaam / domein
+Webadres (bind
+Webpoort
+0.0.0.0 = alle interfaces · herstart van de dienst nodig
+herstart van de dienst nodig
+Meldingsbanner in het dashboard
+Linkmenu (JSON-lijst met name/url
+Laatst gehoord bewaren (dagen
+Elk heel uur op updates controleren
+GitHub-repository voor updates
+Uitgesproken roepnaam aan het begin van een doorgang
+Een computerstem (espeak-ng) zegt de roepnaam, daarna volgt de audio – de doorgang wordt vertraagd met de lengte van de aankondiging
+Aankondigen naar FRN
+Aankondigen naar DMR
+Aankondigen naar Zello
+Aankondigingstekst
+Plaatshouders: {call} = roepnaam, {name} = naam – bv. "{call}" of "{call} {name}"
+Roepnamen uitspreken als
+Letters (D O 1 T E S T
+NAVO-alfabet (Delta Oscar One
+Ook zonder roepnaam (de naam aankondigen
+Hoogstens elke … minuten per station
+Spreektempo (woorden/min
+Volume (dBFS piek
+Pauze na de aankondiging (ms
+Aankondiging beluisteren – met de waarden uit het formulier
+Aankondiging afspelen
+Opslaan en herstarten
+FRN – FreeRadioNetwork
+Poort
+Back-upserver
+Back-uppoort
+E-mail (FRN-account
+Wachtwoord (FRN
+Naam / beschrijving
+Band / kanaal (BC

@@ -1,0 +1,233 @@
+"Crosslink" eller t.ex. 446.03125FM CTC131.8
+Stad – stadsdel / lokator
+FRN-rum
+Rum (net
+Talarens namn som FRN-textmeddelande
+Textmeddelande bara till dessa stationer (privat
+Anropssignaler separerade med komma, t.ex. DL1ABC, DB0XYZ – tom = offentligt för alla i rummet. Privata meddelanden dyker inte upp någon annanstans
+Slutdetektering RX (ms
+FRN levererar block på 200 ms – 240 ms är ett bra värde
+Inget röstpaket så länge = sändningen slut (SvxLink: 1000
+Nivå FRN → brygga (dB
+Nivå brygga → FRN (dB
+System Manager (för ”begär lösenord”
+System Manager-port
+Standard sysman.freeradionetwork.eu – med ett eget FRN-nät dess System Manager
+Inget FRN-lösenord än? Fyll i anropssignal, namn, e-post, band/kanal, land och stad och begär det – lösenordet kommer via e-post
+Watchdog: öppna igen efter (s) utan svar
+Watchdog: bygg upp nätverket helt efter … s offline
+Utöver den normala återanslutningen (standard 120 s
+DMR – HomeBrew (HBlink4 / FreeDMR
+Server (HBlink4 / FreeDMR
+Lösenord (lösenfras
+lämna tomt = oförändrat · Med HBlink4-FreeRadioID: personligt FreeRadioID-lösenord – med serverns lösenfras är bryggan bara gäst och får inte sända på TG 262
+Peer-/repeater-ID
+7 eller 9 siffror, måste vara tillåtet på servern
+Sändtalkgroup
+Mottagningstalkgroup
+0 = alla gruppsamtal på time sloten
+Alternativ (RPTO
+t.ex. TS2=262 – tom = serverns konfiguration
+Color code
+RX-frekvens (Hz
+TX-frekvens (Hz
+Käll-ID för sändningar in i DMR
+anropssignal → eget DMR-ID, om det finns i ID-databasen
+Skicka talker alias (stationsnamn) i röstramarna
+Skicka även DMRA-paket (inte för HBlink4
+Slutdetektering RX utan terminator (ms
+Nivå DMR → brygga (dB
+Nivå brygga → DMR (dB
+Tidsgränstimer per sändning (s
+Förbuffert DMR/Zello-utgång (ms
+Namn på RX/TX-talkgroup
+Zello – Channel API
+WebSocket-server
+Zello: wss://zello.io/ws · Zello Work: wss://zellowork.io/ws/NETWORK
+Zello-användarnamn
+Utvecklartoken
+Issuer + privat nyckel (JWT
+ingen (Zello Work
+Autentiseringstoken
+Issuer
+Privat nyckel (PEM
+bara för ”Issuer + privat nyckel” – lämna tomt = oförändrat
+Samplingsfrekvens vid sändning
+16 kHz (rekommenderas
+Opus-bithastighet (bit/s
+Paketlängd (ms
+Talarens namn som textmeddelande i kanalen
+Textmall
+Platshållare: {name} {callsign} {source} {detail}
+Slutdetektering utan stop_stream (ms
+Nivå Zello → brygga (dB
+Nivå brygga → Zello (dB
+lämna tomt = oförändrat
+satt – lämna tomt = oförändrat
+Vilken källa går till vilket nätverk? Ändringar gäller direkt
+Spärrtid efter sändning (ms
+Förhindrar pingpong mellan nätverken
+Schema
+Vocoder (AMBE+2
+N8schicht-vocoder (mjukvara
+USB-sticka (AMBE3000
+AMBEserver (nätverk
+Test utan vocoder
+AMBE+2 i mjukvara – en fork av DroidStar-codecen, optimerad för förståelighet. Ingen extra hårdvara och ingen qemu; körs som egen process (x86 och ARM
+ThumbDV, DVstick 30, DV3000 direkt via USB/seriell. Bästa kvalitet, ingen extra tjänst behövs
+AMBE3000 på en annan dator bakom AMBEserver (UDP 2460
+Bara för att testa anslutningarna – DMR-ljudet är då tyst
+Bibliotek (tom = automatiskt
+Standard: /opt/n8crosslink/lib/libn8vocoder.so
+Ljudinställningar
+Nivå före kodning (dB
+Nivå efter avkodning (dB
+Testa vocoder
+Bygg / uppdatera vocoder
+Förhandsvisning (in → DMR → ut
+WAV-fil
+Egen testmening (tom = standardmening
+Testa
+ID-listor
+DMR-ID:n
+Registrerade hos FreeRadioID
+Talkgroup-namn
+Uppdatera ID-listor
+Uppdatera ID-listor nu
+Uppdatera avatarer nu
+ID-listor och avatarer automatiskt en gång om dagen, direkt med knappen
+Källor
+FreeRadioID: alla DMR-ID:n (CSV
+FreeRadioID: alla DMR-ID:n (JSON, reserv
+FreeRadioID: registrerade ID:n (JSON
+FreeRadioID: registrerade ID:n (CSV, reserv
+FreeRadioID: enskild uppslagning av okända ID:n ({id}
+Reservkälla RadioID.net (CSV
+Talkgroup-namn (JSON
+Slå bara upp ID:n registrerade hos FreeRadioID
+Avatar-URL DMR ({id}
+Avatar-URL Zello ({username}, valfritt
+FRN-/Zello-anropssignal → FreeRadioID-avatar
+Zello Channel API levererar inga profilbilder – ange en egen källa här eller ladda upp bilder nedan
+Zello-avatarer (egna bilder
+Bild (PNG/JPEG/WebP/GIF
+Inga egna bilder än
+Uppdateringstjänst
+konfigurerad
+Uppdateringstjänsten saknas – kör en gång
+återställd till
+Skapa krypterad säkerhetskopia
+Guide
+Ladda ner säkerhetskopia
+Återställ säkerhetskopia
+Säkerhetskopiefil (.n8xbak
+VIKTIGT – superadmin-lösenord = nyckel till säkerhetskopian
+Säkerhetskopian är helt krypterad (AES-256-GCM, ingen klartext). Nyckeln är
+superadmin-lösenordet
+vid tidpunkten för säkerhetskopian. Utan detta lösenord kan säkerhetskopian inte
+återställas – inte ens av utvecklaren. Förvara superadmin-lösenordet i
+lösenordshanteraren
+(t.ex. tillsammans med säkerhetskopians filnamn
+Innehåller allt: inställningar inkl. inloggningsuppgifter (FRN, DMR, Zello), användare, senast hörda, statistik, händelser, ID-listor, talkgroups och avatarer
+Superadmin-lösenord (ditt nuvarande lösenord
+Superadmin-lösenord vid tidpunkten för säkerhetskopian
+Superadmin-lösenord för att bekräfta
+Börja om
+Vad som ska återställas
+Ta bort senast hörda, statistik och händelser
+Alla inställningar till standard (användare och historik finns kvar
+Allt – som nyinstallerat (inloggning sedan n8schicht / n8schicht
+Skapa helst en säkerhetskopia först. En fullständig avinstallation görs på servern med
+(se dokumentationen ”Avinstallation”
+Exportera konfiguration
+Importera
+Ny användare / byt lösenord
+Lösenord (minst 8 tecken
+du
+Autostart av
+Starta om bryggan
+Starta om servern
+Kontrollera och åtgärda behörigheter
+sudo inte konfigurerat – kör sudo /opt/n8crosslink/update.sh en gång
+Vänta
+Samma färgmotor som HBlink4-FreeRadioID, adn-frn-server och N8-HotSpot: välj en profil och ändra sedan valfri färg – hela sidan visar det direkt, det sparas bara med ”Spara”
+Spara utseende
+Utseende sparat
+Rensa egna värden
+Server och HTTPS
+HTTPS
+Åtkomst
+GitHub kan inte nås
+Status för HTTPS, åtkomst och DMR-servern samt omstartsknappar. Uppdatering, tjänster, behörigheter och keep-alive är menyns nästa poster
+Varje minut som root: kontrollerar verkligen instrumentpanelen, DMR-servern (UDP-port, länk till instrumentpanelen) och APRS (server och uplink), startar om sjuka tjänster efter 3 minuter (högst 4× per timme), upptäcker internetavbrott och startar sedan om nätverkstjänsterna, och rapporterar till en heartbeat-adress (Uptime Kuma ”push”, Healthchecks.io …). En tjänst som stoppas här förblir stoppad
+Konfiguration
+Adminområde
+Nätverksinfo
+Ansluter
+Okänd
+Livedata
+Klicka för att aktivera ljudaviseringar
+Livedata: webbläsaren är ansluten till instrumentpanelen med uppdateringar i realtid – klicka för att ladda om
+DMR-server: instrumentpanelen är ansluten till DMR-servern
+Ansluter till instrumentpanelens server
+Väntar på anslutningsstatus
+Offline – klicka för att återansluta
+DMR-servern offline
+APRS av
+Meddelande
+Dölj till nästa version
+Installera på servern
+Klicka för detaljerad information
+Samtal idag
+Trafik idag
+Aktiva strömmar
+Vidarebefordrat idag
+Anslutningar
+Repeatrar
+Hotspots
+Appar
+Inkommande nätverk
+Utgående nätverk
+Senaste händelser
+Inga händelser än
+Talare
+Mest aktiva
+Senaste samtal
+Senaste trafik
+Röstsamtal
+Gruppsamtal
+Enskilt (privat) samtal
+Privata (enskilda) samtal
+Datasamtal (vidarebefordras inte
+Radio-ID
+Destination
+Okänd plats
+Detalj
+Uppe sedan
+Programvara och paketnamn som stationen anger vid inloggning
+Okänd enhetstyp
+TG:er som repeatern levererar via RPTO
+TS1-TG:er
+TS2-TG:er
+Källan inloggad via FreeRadioID
+Inloggning verifierad av FreeRadioID.net – full åtkomst
+Inloggad med standardlösenfrasen – sändning begränsad till gästtalkgroups
+Talker Alias
+DMR Talker Alias
+Visa stationsinfo
+endast administratörer
+Synligt bara för administratörer
+dold
+inte ansluten
+keep-alive
+aktiv den senaste timmen
+omstart
+Helskärm
+Öppna kartan
+Öppna kartan på en egen sida
+Karta
+APRS-karta
+Instrumentpanel
+Översikt
+Uppdatera nu
+Talkgroup-statistik

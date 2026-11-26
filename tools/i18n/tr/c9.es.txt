@@ -1,0 +1,126 @@
+p. ej. aprs2.example.org – abre el mapa en /. Debe apuntar a este servidor (DNS). Vacío = desactivado
+Título 1
+Título 2
+Título 3
+Subtítulo 1
+Subtítulo 2
+Subtítulo 3
+Logotipo 1
+Logotipo 2
+Logotipo 3
+Vacío = mapa APRS · dominio
+Vacío = logotipo APRS de N8schicht
+Vacío = el título
+Vacío = el subtítulo (Apariencia → Subtítulo
+Se añade al certificado del panel (Ajustes → HTTPS y web debe estar activado
+Sin dominio propio. El mapa está siempre en
+Estado de HTTPS, del acceso y del servidor DMR, la versión instalada y las actualizaciones, más botones de reinicio
+Software del servidor
+Servidor DMR (HBlink4
+Sistemas conectados
+No hay sistemas conectados
+TX MHz
+Red saliente
+Red entrante
+Dispositivo desconocido
+OpenBridge
+Repetidor
+App
+Enlace saliente
+sin tráfico
+Pings keep-alive perdidos
+FRID
+Todos los talkgroups permitidos (sin configuración
+Todos los talkgroups denegados (configuración vacía
+Estaciones con una posición de una radio DMR
+Conexión en vivo con el servidor
+Conexión a la red APRS
+Mostrar u ocultar la lista de estaciones
+Indicativo, ID DMR o comentario
+estaciones
+Paquetes en bruto
+Traza
+Velocidad
+Rumbo
+Altitud
+Ruta
+Posición
+Distancia
+Vía
+Hotspot
+Tipo de informe GPS
+Crear y descargar copia de seguridad
+Descargar de nuevo la copia
+Copias de seguridad guardadas
+Actualizar estado
+Las copias completas contienen todas las credenciales. Esta área está reservada al superadmin
+Haga una copia de seguridad de su instalación de HBlink4 y trasládela a otro servidor HBlink4. Se incluyen código del programa, configuraciones, usuarios, credenciales, bases de datos, datos APRS y sus propios archivos
+El archivo contiene datos confidenciales y no está cifrado. Guárdelo en un lugar seguro. Los entornos de Python se reconstruyen en el destino. El sistema operativo, el cortafuegos y el DNS no forman parte de la copia
+Creando la copia de seguridad. Mantenga abierta esta ventana
+Copia automática antes de restaurar
+Descargar AutoBackup cifrado
+Copia local eliminada
+Eliminar copia local
+Eliminar solo borra el archivo de copia local. Las copias en SFTP o Google Drive se mantienen
+Restaurar sustituye esta instalación de HBlink4. Primero se crea una copia del estado actual. Si algo falla, vuelve el estado anterior. Después inicie sesión con la cuenta de usuario del servidor de origen
+El servidor de destino necesita Linux con systemd y Python 3.9 o más reciente. Con otra versión de Python, se comprueba la compatibilidad del código y de las versiones de paquetes guardadas antes de detener los servicios. Ambos servicios se interrumpen durante la restauración; instalar los paquetes de Python puede tardar varios minutos
+Falta el asistente del servicio. Ejecute una vez en la carpeta de HBlink4 del servidor de destino
+Después actualice esta área
+Para AutoBackups cifrados: clave de recuperación aparte (.agekey
+Subir y comprobar el archivo
+Subiendo y comprobando por completo el archivo
+Elija primero un archivo de copia
+El archivo supera los 2 GiB
+Sumas de comprobación, rutas de archivos y bases de datos son válidas. Aún no se ha restaurado nada
+Su contraseña actual de superadmin
+Contraseña actual de superadmin
+Restaurar la copia comprobada
+Restauración iniciada. Ambos servicios se reinician. Recargue la página cuando termine e inicie sesión con la cuenta del servidor de origen. Si algo falla, vuelve a arrancar el estado anterior; el mensaje aparece aquí tras iniciar sesión
+Transfiera la clave de recuperación solo por HTTPS o un túnel SSH local
+AutoBackup
+Preparar AutoBackup
+Activar AutoBackup
+AutoBackup guardado
+Guardar ajustes de AutoBackup
+AutoBackup se ejecuta en segundo plano. Actualice el estado cuando termine
+Crear copias completas según un horario, cifrarlas y enviarlas a SFTP o Google Drive. El horario funciona en el servicio del panel, también sin navegador abierto. Las credenciales de AutoBackup se guardan cifradas; la clave de recuperación queda fuera de los datos del programa
+Diario
+Semanal
+Copias diarias a conservar
+Copias semanales a conservar
+Destino activo
+Quitar destino
+Destino SFTP
+Google Drive
+Probar el destino guardado
+La escritura, la lectura y el borrado funcionaron
+Guardado – dejar vacío para conservar
+Los campos de contraseña/token vacíos conservan los valores guardados. Las copias antiguas solo se limpian tras una subida y una comprobación de contenido correctas; las copias manuales se mantienen
+Compruebe primero la clave del host con el operador del servidor. Los archivos de clave SSH deben poder ser leídos por el usuario del servicio del panel
+ID de cliente de Google OAuth propio
+Secreto de cliente OAuth
+JSON del token OAuth con refresh_token
+En un ordenador con navegador
+Introduzca aquí el JSON del token
+Sin ID de carpeta, la carpeta de destino se crea automáticamente
+Los destinos usan su propia subcarpeta
+para este servidor
+Ejecutar ahora una copia cifrada
+Descargar la clave de recuperación
+Contraseña de superadmin para exportar la clave
+Clave descargada. Guárdela fuera de este servidor
+La clave se ha exportado
+Exporte primero la clave
+Exporte la clave solo por HTTPS o un túnel SSH local
+Transfiera la clave solo por HTTPS o un túnel SSH local
+Error al exportar
+Use HTTPS o un túnel SSH local para las credenciales y la exportación de la clave
+Guarde las credenciales solo por HTTPS o un túnel SSH local
+Desbloquear los destinos guardados
+Clave de recuperación original
+Tras desbloquear, exporte la clave de este servidor y vuelva a activar el horario
+Destinos desbloqueados. Exporte la clave de este servidor y vuelva a activar el horario
+O configurar de nuevo: escriba RESET
+Restablecer destinos y horario
+Los archivos de copia existentes se mantienen
+Restablecer solo por HTTPS o un túnel SSH local

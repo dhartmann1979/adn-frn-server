@@ -1,0 +1,75 @@
+Väntar på nästa sändning
+ingen sändning idag än
+Idag per timme
+Ingen FRN-anslutning
+Mottagning (en station pratar
+Sänder till de andra nätverken
+Källa → (FRN: lågskärning, mellanregister, diskant) → AGC in → fördelning → AGC ut per nätverk → limiter → nätverk
+Mot DMR följer dessutom höjningen av mellanregister/diskant före kodaren (🎛️ Vocoder → Före kodaren). Ändringar gäller direkt, utan omstart
+Nivån som varje källa regleras till innan den fördelas. −20 dBFS är ett bra värde
+Nivå in i varje nätverk. För AMBE och Zello −18 dBFS; limitern håller topparna under taket
+Högsta förstärkning (dB
+Så mycket höjer AGC svaga stationer som mest (15 dB
+Högsta sänkning (dB
+Så mycket sänker den starka stationer som mest (20 dB
+Hur snabbt den sänker vid för starka partier – snabbt: 5–15 ms
+Återgångstid (ms
+Hur snabbt den höjer igen efteråt – 200–500 ms låter naturligt, kortare ”pumpar”
+Under detta räknas det som paus/brus: förstärkningen står still, brus dras inte upp (−50 dBFS
+Ingen topp går över – inget överstyr (−1 dBFS
+Tar bort mullrande, brum och vind ur FRN-ljudet (GSM) – 100–150 Hz
+GSM låter dovt – närvaron gör rösterna tydligare, för Zello och AMBE (3 dB
+FRN: höj diskanten (dB, från 3 kHz
+Lite mer briljans i FRN-ljudet (2 dB). För mycket gör bruset hörbart
+Vid problem, titta här först: den offentliga felloggen på freeradionetwork.de anger orsaken till nekade inloggningar (fel FRN-lösenord, dubbel anslutning, port inte nåbar …) som FRN-servern själv inte anger. Visas gör poster om din anropssignal och dina FRN-servrar; N8 Crosslink tittar själv efter varje nekande och skriver orsaken i händelseloggen
+Frågar FRN-serverns instrumentpanel (ADN FRN Server 2.21 eller nyare) vilken som är master och vilken som är reserv. Mastern har alltid prioritet 1: efter ett avbrott går bryggan till reserven, och så snart mastern körs igen (3 kontroller med en minuts mellanrum) tillbaka till mastern mellan två sändningar. Utan identifiering kommer ”Server” före ”Reservserver”
+Lista från FRN-servern – ”🔄” läser den igen. Saknas ett rum (t.ex. dolt), välj ”✏️ Annat rum …”
+Läs rummen från FRN-servern
+Annat rum
+0 = valfri ledig port · fast t.ex. för brandväggsregler (alla portar: 🔌 Portar
+Vem som får logga in i adminområdet. Superadmins får dessutom återställa säkerhetskopior, nollställa allt och hantera andra superadmins
+betyder: öppna i brandvägg/router om den ska nås utifrån
+motsidan måste vara nåbar. Allt sparas med en knapp; det som kräver omstart visas sedan överst
+0.0.0.0 = alla gränssnitt (IPv4) · :: = alla (IPv4 och IPv6) · 127.0.0.1 = bara denna dator (då bara via domänen
+Webbgränssnitt och livedata (http://IP:port). Under 1024 (t.ex. 80) fungerar utan root – nginx behöver då andra portar. Omstart av tjänsten
+http:// för domänerna och Let’s Encrypt-kontrollen. Let’s Encrypt kommer alltid till port 80 – en annan port bara med vidarebefordran i routern (utanför 80 → innanför denna port
+https:// för domänerna (standard 443; annars https://domän:port). Tillämpas direkt på alla domäner
+till reservservern, om angiven
+inloggning/lösenord hos SystemManager (standard 10025
+Bryggans källport · 0 = valfri (standard) · fast för brandväggsregler eller NAT
+bara i läget AMBEserver (127.0.0.1, standard 2460) – används inte just nu
+WebSocket wss://zello.io/ws – porten står i adressen (💬 Zello
+Egna domäner för detta webbgränssnitt med ett gratis certifikat från
+nginx tar emot domänen på port 80/443 och vidarebefordrar till N8 Crosslink (127.0.0.1:); certbot hämtar certifikatet och förnyar det automatiskt i god tid före utgång. Förutsättning: domänen pekar på denna server via DNS och portarna 80 (Let’s Encrypt kontrollerar alltid där – annars vidarebefordran i routern) och 443 är nåbara från internet
+Domäner och HTTPS är inte aktiverade än – kör sudo /opt/n8crosslink/update.sh en gång
+nginx lyssnar på
+och vidarebefordrar till 127.0.0.1: – ändra under
+För meddelanden om certifikatets utgång
+Testcertifikat (Let’s Encrypt staging, för att prova utan gränser
+sudo är inte konfigurerat än – en gång i konsolen: sudo /opt/n8crosslink/install.sh --fix-perms
+Offline sedan
+Platshållare: {call} = anropssignal, {name} = namn – t.ex. ”{call}” eller ”{call} {name}”
+FRN-serverns port
+DMR-serverns port
+Webbgränssnitt
+Alla portar för N8 Hotspot på ett ställe. Hotspoten behöver ingen portvidarebefordran i routern: den ansluter bara utåt (DMR-server); webbgränssnittet är för hemnätverket
+anges i systemd-tjänsten (N8HS_PORT
+Server och lösenord under Drift → Inställningar → DMR-nätverk
+Anslutningar mellan tjänsterna på hotspoten – öppna ingenting
+Livedata från MMDVMHost och DMRGateway till webbgränssnittet (127.0.0.1
+Uppdateringsutlösare (”Uppdatera nu”
+Demo – ingen verklig kontroll
+DMRGateway (DMR-server
+Ingen i detta rum
+Papegojans ekotest är på
+7-siffrigt ID från radioid.net / FreeRadioID.net
+MMDVMHost och DMRGateway stoppas medan kalibreringen körs
+Hotspoten startar sedan igen med den nya offseten
+med nästa uppdatering av ID-listan
+Inga användare hörda än
+DMR-server: instrumentpanelen är inte ansluten till DMR-servern
+Inloggningar verifierade av FreeRadioID.net / gästinloggningar med standardlösenfrasen
+Inga gruppsamtal under denna period än
+namn skickade av radioapparaterna
+Inget Talker Alias mottaget under denna period
+Du använder fabriksinloggningen. Välj ett eget användarnamn och lösenord – fabriksinloggningen slutar sedan fungera

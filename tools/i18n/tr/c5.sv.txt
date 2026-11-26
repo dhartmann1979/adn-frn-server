@@ -1,0 +1,243 @@
+JSON i formatet för talkgroup_ids.json
+Egna talkgroup-namn
+En per rad: 26500 = N8schicht Ortsrunde. Ersätter listan eller lägger till saknade talkgroups
+Namn på cirka 1400 talkgroups (github.com/dhartmann1979/n8schicht), uppdateras dagligen med ID-listan
+Expert
+Extra rader för ini-filerna
+Extra rader för MMDVM-Host.ini
+Extra rader för DMRGateway.ini
+[Sektion] följt av rader Nyckel=Värde; de ersätter eller lägger till värden
+Ångra
+Alternativ
+Läge
+Kalibrering
+Frekvenskalibrering
+Hittar ditt modems offset med BER-testet i MMDVMCal
+Startfrekvens (MHz
+Tryck på Starta
+Tryck på
+Programmera en
+simplexkanal
+i din radio på
+Sänd med din radio i några sekunder (du behöver inte prata). BER visas till höger
+Flytta frekvensen med
+tills BER är lägst (helst under 1 %). Sänd igen efter varje steg
+Sänd med din radio – BER visas här
+BER nu
+Offset
+Spara offset
+Spara offset (RX och TX
+Sparade offsets
+Fler tester
+För erfarna användare: deviation, RSSI och testmönster (modemet sänder
+Deviation +
+Deviation −
+Effekt +
+Effekt −
+DMR-deviation (D
+TX på/av (mellanslag
+Ta över
+Administratörer ändrar allt, läsare ser bara instrumentpanelen (även när den är privat
+Nytt lösenord (minst 8
+fabrikslösenord
+Färgschema
+Välj en förinställning och ändra valfri färg. Förhandsvisningen är live – inget sparas före ”Spara”. Samma temamotor körs i HBlink4-FreeRadioID och FRN-instrumentpanelen, så en färgkod ser likadan ut överallt
+Standard
+Kopiera schemat till en annan N8-instrumentpanel (HBlink4-FreeRadioID → Utseende, FRN → Tema) eller klistra in ett därifrån
+Exportera / importera
+Knapptext
+Länk
+Öppna i ny flik
+Ny flik
+Webbplatsikon
+Hämta sidans favicon
+Uppdatera webbplatsikoner nu
+Visas i sidhuvudet för alla. Med ”webbplatsikon” hämtar hotspoten den länkade sidans favicon en gång, sparar den i sin databas och visar den i menyn (emojin är reserv, t.ex. offline
+Kort
+CPU-temperatur
+SD-kort
+MQTT-livedata
+MQTT-broker (mosquitto
+N8-Hotspots webbgränssnitt
+Lagrade samtal
+ID:n
+Uppdaterad
+Ingen Linux-konsol på modemets UART
+Behörigheter
+Vad webbgränssnittet får göra: öppna modemportarna (sökning, kalibrering), starta om tjänsterna efter en uppdatering, uppdatera sin egen mapp
+Webbgränssnittet är med i gruppen dialout (modemsökning, kalibrering
+sudo-regel för omstart av tjänster (/etc/sudoers.d/n8hotspot
+Programmappen /opt/n8hotspot är skrivbar (Uppdatera nu
+Python-miljön är skrivbar (nya paket efter en uppdatering
+Allt i ordning
+finns
+grupp dialout, läge 660
+Uppdateringsinställningar
+Sök efter uppdateringar
+Frågar GitHub varje hel timme (ingen inloggning, inga data om din hotspot skickas
+Kontrollera var (timmar
+Installera automatiskt
+Installerar en ny version av sig själv under den valda timmen – bara när ingen sänder och ingen kalibrering körs
+Timme för automatiska uppdateringar
+Starta om MMDVMHost och DMRGateway
+Efter en uppdatering skrivs ini-filerna om och båda radiotjänsterna startas om; webbgränssnittet startas alltid om
+Gren
+Datum för installerad version
+Visa systemjournal
+Konfigurationsfiler
+Genererade från inställningarna. Extra rader: Inställningar → Expert
+Mapp
+Denna installation är ingen git-utcheckning – uppdatera med <code>sudo /opt/n8hotspot/scripts/update.sh</code>
+Starta om N8-Hotspot för hand: sudo systemctl restart n8hotspot
+1. Ladda ner exakt
+(endast fast-forward, inga lokala ändringar
+2. Python-paket om requirements.txt ändrats
+3. ini-filer igen, starta om MMDVMHost och DMRGateway
+3. ini-filer igen
+4. Starta om webbgränssnittet – sidan laddas om av sig själv
+Tar emot från en radio (RF
+Sänder till radiorna (från nätverket
+MMDVMHosts läge
+Anslutning till DMR-servern
+inget nätverk
+ansluter
+används inte · simplex-hotspot (bara TS2
+Används inte
+Simplex-hotspot – bara TS2
+ingen RSSI
+Bitfelsfrekvens – under 1 % rent, över 3 % har vocodern det svårt
+Vocoder och signal
+BER live
+Senaste samtal · BER (RF) / förlust (nätverk
+RSSI (RF
+Röstkvalitet idag
+RF
+Nätverkssamtal – BER mäts bara på RF
+Väntar på ett RF-samtal
+Inga samtal än
+Inget RF-samtal idag
+inget RF-samtal idag
+Ø BER (RF
+max. BER
+Ø förlust (nätverk
+Röstramar (AMBE+2
+via RF / nätverk
+förlorade i nätverket
+RF-BER
+Status, autostart och starta · stoppa · starta om – bara det som denna hotspot tillåter (sudo-regler i N8 Admin-Kit
+Autostart på
+Program (root, skrivskyddat för tjänsten), data och lösenord, tjänster, sudo, ”Uppdatera nu” och modemporten
+Modemport
+systemd
+Behörigheter åtgärdade – allt i ordning
+Vissa problem kvarstår
+begärd
+Uppdatera nu” körs som root via
+endast fast-forward, paket, tjänster och ini-filer, behörigheter och sudo, omstart, kontroll av webbgränssnittet – om det inte svarar, tillbaka till den tidigare versionen
+Versioner
+Hotspoten fungerar inte utan den förrän du startar den igen
+1. Fast-forward till
+(stoppar om filer ändrats för hand
+2. Python-paket, tjänster och ini-filer, behörigheter och sudo (N8 Admin-Kit, som root
+3. Starta om MMDVMHost, DMRGateway och webbgränssnittet
+4. Kontroll av webbgränssnittet – om det inte svarar, tillbaka till den tidigare versionen; sidan laddas om av sig själv
+Webbgränssnittet startas om
+Varje minut som root: kontrollerar verkligen varje tjänst (webbgränssnitt, MQTT, modem, inloggning på DMR-servern), startar om sjuka tjänster efter 3 minuter (högst 4× per timme), upptäcker internetavbrott och startar sedan om nätverkstjänsterna, och rapporterar till en heartbeat-adress
+Tokennamn
+Skapa token
+Ingen token än
+inga nätverk aktiverade
+Nätverk
+Medlyssning
+Medlyssning (bara inloggade administratörer
+Volym
+Medlyssningsvolym
+Nivå för den talande stationen
+Tyst på alla nätverk
+Aktiv nu
+I sändning · via DMR
+I sändning · via FRN
+I sändning · via Zello
+Nätverk online
+Stationer idag
+Blockerade idag
+Skickat till
+Rum / TG / kanal
+Stationer i rummet
+sänder
+tar emot
+redo
+okänd
+inte
+Ingen superadmin än – skapa en nu för att använda adminportalen
+Skapa superadmin
+Inställningar sparade. FRN/DMR/Zello/vocoder kräver omstart av bryggan
+Standardinloggning
+är fortfarande aktiv – ange ett eget lösenord under Admin → Användare
+Aktivitet per nätverk
+Mest via
+När folk pratar
+Aktuellt läge
+Ansluten sedan
+Online sedan
+Paket
+Ramar
+Serverversion
+Protokollversion
+Kanalstatus
+Sändstatus
+Inloggningsfas
+Åtkomst OK
+Användare online
+Ping / pong
+Händelser
+Händelselogg
+Peer-ID
+Time slot
+Kanal
+Konto
+Brygga
+Allmänt
+Routning
+ID-listor och avatarer
+Säkerhetskopiera och börja om
+Vocoder
+Adminområde för N8 Crosslink
+Ändringar gäller direkt, under drift
+Titel i instrumentpanelen
+Servernamn / domän
+Webbadress (bind
+Webbport
+0.0.0.0 = alla gränssnitt · omstart av tjänsten krävs
+omstart av tjänsten krävs
+Meddelandebanner i instrumentpanelen
+Länkmeny (JSON-lista med name/url
+Spara senast hörda (dagar
+Sök efter uppdateringar varje hel timme
+GitHub-arkiv för uppdateringar
+Uppläst anropssignal i början av en sändning
+En datorröst (espeak-ng) säger anropssignalen, sedan följer ljudet – sändningen fördröjs med meddelandets längd
+Meddela till FRN
+Meddela till DMR
+Meddela till Zello
+Meddelandetext
+Platshållare: {call} = anropssignal, {name} = namn – t.ex. "{call}" eller "{call} {name}"
+Uttala anropssignaler som
+Bokstäver (D O 1 T E S T
+Natoalfabetet (Delta Oscar One
+Även utan anropssignal (meddela namnet
+Högst var … minut per station
+Talhastighet (ord/min
+Volym (dBFS topp
+Paus efter meddelandet (ms
+Förhandslyssna på meddelandet – med värdena från formuläret
+Spela upp meddelandet
+Spara och starta om
+FRN – FreeRadioNetwork
+Port
+Reservserver
+Reservport
+E-post (FRN-konto
+Lösenord (FRN
+Namn / beskrivning
+Band / kanal (BC

@@ -1,0 +1,219 @@
+Server e dati
+Aggiorna Java ora
+Server FRN Java
+Ogni minuto come root: controlla davvero ogni servizio (dashboard, server FRN Java in esecuzione che accetta stazioni), riavvia i servizi malati dopo 3 minuti (al massimo 4× all’ora), rileva le interruzioni di Internet e poi riavvia i servizi di rete, e si segnala a un indirizzo heartbeat
+Keep-Alive
+fermato a mano – il Keep-Alive attende
+Keep-Alive attivo
+Chiamato ogni minuto finché tutto va bene (Uptime Kuma «Push», Healthchecks.io …) – ti avvisa quando le chiamate si interrompono
+Registro Keep-Alive
+Keep-Alive salvato
+Keep-Alive in pausa per 1 ora
+Keep-Alive di nuovo attivo
+Registro pubblico degli errori FRN
+In caso di problemi guarda sempre prima qui: il SystemManager FRN di freeradionetwork.de vi registra ogni accesso rifiutato di server e client (password FRN errata, connessione multipla, porta non raggiungibile …) – il motivo che il server FRN stesso non indica. Sono mostrate le voci relative all’indirizzo di questo server, al nominativo del gestore e alle stazioni rifiutate qui. Le nuove voci compaiono anche sotto negli eventi
+Apri il registro errori completo ↗
+non raggiungibile
+voci su questo server
+nulla su questo server
+da
+Chi
+Nessuna voce su questo server nelle ultime voci del registro
+Nominativi
+altre stazioni nel registro
+caricamento
+Il motivo è nel registro pubblico degli errori FRN
+Registri → Registro errori FRN
+apri il registro completo ↗
+Rifiutato dal SystemManager? Il motivo è nel registro pubblico degli errori FRN di freeradionetwork.de (Aiuto → Registro errori
+Registro errori FRN
+apri ↗
+Password FRN errata – richiedi una password al SystemManager (📧 Richiedi password FRN) e inserisci esattamente la password assegnata con la stessa e-mail e lo stesso nominativo/nome
+Connessione multipla: è già attiva una connessione con le stesse credenziali – è in esecuzione una seconda istanza (vecchio server, secondo server o un server di backup con lo stesso account)? Ogni server FRN ha bisogno del proprio account
+Il SystemManager non riesce a raggiungere il server a questo indirizzo e porta da Internet – controlla firewall, inoltro porte (TCP) e indirizzo del server
+Accesso bloccato – contatta il gestore della rete FRN
+Account sconosciuto al SystemManager – richiedi una password o controlla l’ortografia di e-mail, nominativo e nome
+Versione del protocollo rifiutata – aggiorna il server/client FRN
+Indirizzo e-mail rifiutato – usa esattamente l’indirizzo della password FRN
+Stato, avvio automatico al boot e avvia, ferma, riavvia – solo i servizi abilitati per questa dashboard
+Controlla l’utente del servizio, i permessi di programma e dati, le unità systemd e le regole sudo
+ripara ciò che non va e controlla di nuovo. Console
+non riuscito
+Avvio automatico al boot
+errori
+controllo
+controllo e correzione
+I permessi sono a posto
+Non è stato possibile correggere tutto
+Ancora nessun aggiornamento dalla dashboard
+Disattiva
+Le stazioni su questo server possono perdere la connessione
+Dopo la dashboard non è più disponibile – riavviala nella console: sudo systemctl start frnadn
+Richiedi password FRN
+Richiedi password
+Password FRN richiesta
+E-mail (la password viene inviata lì
+Banda / canale
+Paese
+Città - quartiere
+Ogni server FRN ha bisogno del proprio account FRN – la stessa e-mail e la stessa password su due server vengono rifiutate («le stesse credenziali sono già online su un altro server»
+Poi inserisci e-mail e password sopra in SystemManager e salva. Per un secondo server usa un altro nome (p. es. «Server Test») – nominativo e nome insieme devono essere nuovi
+Il SystemManager invia per e-mail una password per un nuovo account FRN
+Dimensione
+Backup scaricato
+Backup eliminato
+Ripristino avviato
+Backup ripristinato
+Backup
+Ripristina
+Crea backup
+Ripristina ora
+Controlla
+Tutto in un unico file cifrato (.frnbak): impostazioni, utenti, stanze, liste di accesso, account FRN, statistiche, chat, loghi dei client, branding e configurazione del server FRN. Scegli una password – senza di essa il backup non può essere aperto, conservala nel tuo gestore di password. Gli ultimi backup restano sul server
+Password per il backup (min. 10 caratteri
+Ripeti
+Ancora nessun backup
+Sostituisce database, branding e configurazione FRN con il backup. La dashboard si riavvia, applica il backup e poi riavvia il server FRN – le stazioni connesse si riconnettono da sole. Lo stato attuale viene conservato in before-restore-… nella cartella dati. Dopo accedi con gli account del backup
+File di backup (.frnbak
+Password del backup
+Digita RESTORE per confermare
+Ultimo ripristino
+L’ultimo ripristino non è riuscito
+Stanze
+Account FRN
+Backup creato
+Le password non coincidono
+Elimina questo backup
+Ripristina ora questo backup
+La dashboard si riavvia e sostituisce tutti i dati con il backup; si riavvia anche il server FRN
+Ripristino in corso – la dashboard si riavvia
+Caricamento non riuscito
+Password errata o file danneggiato
+Questo non è un backup di adn-frn-server (.frnbak
+Carica prima il file di backup
+Digita RESTORE per confermare
+La password del backup deve avere almeno 10 caratteri
+I backup contengono tutti i dati di accesso – solo superadmin
+Revoca
+Revoca questo token
+Il servizio perde subito l’accesso
+Token revocato
+Ultimo utilizzo
+Token
+Copia ora il token – viene mostrato una sola volta
+Token API
+Token API revocato
+Liste
+Server FRN
+Chat
+Online ora
+Passaggi oggi
+Tempo di trasmissione oggi
+Stazioni ascoltate
+Picco online
+Stanza
+Banda
+Mostra altro
+Ultimo
+da freeradionetwork.de
+meno
+ora
+online
+Silenziato
+Bloccato
+Gestore
+Ancora nessun superadmin
+Completa l’installazione guidata sul server
+oppure creane uno con
+Impostazioni del server o ACL salvate
+Riavvia il server FRN per applicare le modifiche (le stazioni connesse si riconnettono da sole
+entrato
+uscito
+Stazioni più attive
+Attività per stanza
+Stazioni online
+massimo, rilevato ogni 5 minuti
+Quando si parla
+Quota
+Stazioni più attive
+Soprattutto in
+Arrivi e partenze
+accessi e uscite, in diretta
+per tempo di trasmissione
+tempo di trasmissione, ultimi 30 giorni
+Totali giornalieri
+Lun
+Mar
+Mer
+Gio
+Ven
+Sab
+Dom
+Cerca: nominativo, nome, città o paese
+Ultima volta visto
+Parlato (30 g
+Passaggi (30 g
+Città
+Tipo di client
+Da
+Accessi
+Crosslink
+Gateway
+Gateway (radio
+Solo PC
+Solo PC
+PC / app
+Germania
+Austria
+Svizzera
+Paesi Bassi
+Belgio
+Polonia
+Regno Unito
+Stati Uniti
+Chat della stanza
+Messaggi di chat
+Messaggi di testo scritti nelle stanze
+Stanze FRN
+Liste del server
+Liste di accesso del server
+Admin
+Tema
+Sessioni e registro
+Registro modifiche
+Sessioni attive
+Eventi (live
+Configurazione
+Titolo, vista pubblica e ciò che vedono i visitatori
+Vista pubblica
+Attivo: tutti vedono stanze e statistiche senza accedere
+Mostra pubblicamente le stanze nascoste
+Scheda Stazioni
+Con e-mail e indirizzo – visibile solo agli admin
+Accesso valido per (ore
+Registrazione su sysman.freeradionetwork.de o autonomo
+Autonomo (senza SystemManager
+Attivo: il server funziona da solo, le password vengono dalla lista propria (account FRN). Disattivo: registrato presso il SystemManager
+Usa la lista password propria (autonomo
+Disattivo: in modalità autonoma ogni password FRN viene accettata
+Solo per modalità autonoma, p. es. un server per la rete di casa
+autonomo
+Registrato presso il SystemManager, il server compare nel sistema FRN e vi controlla gli accessi. Il SystemManager verifica che indirizzo e porta siano raggiungibili da Internet – configura prima l’inoltro porte
+SystemManager
+SystemManager (sysman_server_addr
+sysman.freeradionetwork.de = sistema FRN alternativo (DE
+Indirizzo, porta e timeout – scritti in server.properties
+Indirizzo del server (server_addr
+Nome host o IP pubblico di questo server, p. es. frn.die-n8schicht.de – il SystemManager verifica che sia raggiungibile
+Porta (server_port
+Porta TCP per i client FRN; aprila nel router e nel firewall
+Server di backup (backup_server_addr
+Porta del server di backup
+Inviato ai client: dove andare se questo server non è disponibile
+Timeout client (client_sotimeout, ms
+Un client che non invia nulla per questo tempo viene disconnesso
+Timeout voce (client_txtimeout, ms
+Senza voce per questo tempo una trasmissione termina; 0 = disattivato
+Predefinito 180
+Stanza predefinita (default_net
+I client che chiedono una stanza inesistente finiscono qui

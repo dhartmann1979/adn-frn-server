@@ -1,0 +1,234 @@
+Master e backup usano lo stesso account FRN
+Il SystemManager lascia online solo uno dei due – l’altro riceve «credenziali errate» e il suo server FRN si ferma. Richiedi una password FRN propria per il backup e inseriscila lì in SystemManager
+Master e backup
+Secondo server FRN con la stessa configurazione – sincronizzazione ogni ora esatta e tramite pulsante
+Ruolo di questo server
+Master: stanze, liste e account si modificano qui. Backup: li riprende dal master
+Server singolo
+Dashboard del partner
+Sul master il backup, sul backup il master, p. es. https://frn-backup.example.org
+Chiave di sincronizzazione
+Cifra ogni trasferimento tra i due server – la stessa su entrambi (almeno 24 caratteri); «🎲 Nuova chiave» ne crea una
+cifrato con la chiave di sincronizzazione
+La risposta del partner non è cifrata con la chiave di sincronizzazione (indirizzo o chiave errati
+La risposta del partner non appartiene a questa richiesta
+Sincronizza ogni ora esatta
+Il backup recupera la configurazione del master a ogni ora esatta – la differenza è al massimo di un’ora
+Inviato ai client: dove andare se questo server non è disponibile. Vuoto con Master e backup = il partner
+Trasferimento
+Partner
+Ultima sincronizzazione
+Prossima sincronizzazione
+Ultimo recupero da parte del backup
+I client passano a
+invariato
+ripreso
+Server FRN riavviato
+riavvio in sospeso – stazioni connesse
+FRN fermo
+manutenzione – le stazioni sono sul backup
+Inserisci il partner e la chiave di sincronizzazione, poi salva
+Scegli qui sotto il ruolo di questo server: il master fornisce la sua configurazione, il backup la riprende ogni ora esatta. Il passaggio vero e proprio lo fa FRN: i client vanno all’indirizzo di backup quando questo server scompare
+Sincronizza ora
+Passa al backup
+Riprendi dal backup
+Ogni server ha bisogno del proprio account FRN
+Password FRN Master
+Password FRN Backup
+Nuova chiave
+Sincronizzazione in corso
+Sincronizzazione: invariato
+Sincronizzazione: configurazione ripresa
+Sincronizzazione non riuscita
+Crea una nuova chiave di sincronizzazione
+La chiave è salvata qui. Inserisci la stessa chiave sull’altro server – fino ad allora la sincronizzazione non funziona
+Nuova chiave di sincronizzazione
+Copiala e inseriscila sull’altro server in Master e backup
+Fatto
+La configurazione viene prima sincronizzata sul backup. Poi il server FRN qui si ferma – le stazioni passano da sole al backup (indirizzo di backup FRN). La dashboard continua a funzionare
+Il server FRN qui riparte. Poi il backup riavvia il suo server FRN, così le sue stazioni tornano qui
+Passa
+Riprendi
+Passaggio in corso
+Ripresa in corso
+Passato al backup
+Ripreso
+Configurazione sincronizzata sul backup
+Il server FRN sul backup è in esecuzione
+Server FRN qui fermato – le stazioni passano al backup
+Server FRN qui avviato
+Il backup rimanda indietro le sue stazioni
+lì non è in esecuzione nessun server FRN
+non in esecuzione dopo 30 s
+Questo account è per l’altro server: inserisci e-mail e password lì in SystemManager
+Richiedi password FRN – Master
+Richiedi password FRN – Backup
+Imposta prima il ruolo (Master o Backup)
+Solo il master passa al backup
+Il server FRN sul backup non è in esecuzione – nessun passaggio
+Chiave di sincronizzazione: almeno 24 caratteri
+Nessuna chiave di sincronizzazione impostata
+Il partner non conosce ancora Master e backup – aggiornalo alla stessa versione
+Il master non ha inviato stanze – nulla ripreso (protezione contro un master vuoto
+Usa https:// per il partner – la sincronizzazione trasporta gli account FRN (http solo nella LAN
+Portale
+Notizie
+Pagina del portale
+Ultime notizie
+Tutte le notizie
+Leggi di più
+In evidenza
+aggiornata
+Ancora nessuna notizia
+Notizie precedenti
+Collegati
+Apri la dashboard live
+Nessuna stanza
+Nessun link configurato
+ℹ️ Info
+Importante
+Tecnica
+Rete e stanze
+Solo gli admin scrivono e pubblicano notizie – compaiono sulla pagina del portale. Le bozze sono visibili solo qui
+Apri la pagina del portale ↗
+Nuova notizia
+Modifica notizia
+Pubblica
+Ritira
+Pubblicata
+Ritirata
+Bozza
+pubblicate
+bozze
+Categoria
+Data
+Anteprima
+Testo
+(breve riassunto sulla scheda, facoltativo
+Fissa in alto
+Salva come bozza
+Salvata come bozza
+Salva e pubblica
+Elimina la notizia
+Eliminata
+Ancora nessuna notizia – «＋ Nuova notizia» scrive la prima
+Dominio proprio: 🌐 Rete, porte e domini → 🔒 Domini e HTTPS
+Pagina pubblica con le notizie dei gestori – su /portal e su un dominio proprio
+Dominio del portale
+Dominio del portale
+Autori
+Il portale può avere un proprio dominio (p. es. news.example.org) con un certificato Let’s Encrypt – mostra direttamente la pagina del portale
+Ancora nessun dominio proprio – il portale si trova su /portal della dashboard
+Solo gli admin (ruolo Admin o Superadmin) scrivono, modificano, pubblicano ed eliminano notizie. Utenti e visitatori leggono soltanto. Ogni modifica è nel 📜 registro
+Notizie pubblicate come feed
+Pagina del portale attiva
+Titolo del portale
+Sottotitolo
+Testo di benvenuto
+Mostra stanze e stazioni online
+Mostra i numeri di oggi
+Notizie per pagina
+Pagina pubblica con le notizie dei gestori su /portal (e sul dominio del portale
+Vuoto = il titolo della dashboard
+p. es. «Notizie dal server FRN Auf der NachtSchicht»
+Mostrato sopra le notizie. Formattazione come nelle notizie: **grassetto**, *corsivo*, [link](https://…), elenchi con -
+Riquadro laterale con le stanze, le stazioni online e chi è in onda (solo se la dashboard è pubblica
+Passaggi, tempo di trasmissione e stazioni di oggi
+Inserisci un titolo
+Questa notizia non esiste (più
+La pagina del portale è disattivata
+Posta
+Scrivi
+Posta in arrivo
+Bozze
+Inviati
+Indesiderata
+Cestino
+Scegli un messaggio
+Nulla trovato
+Nessun messaggio
+messaggi
+selezionati
+letto
+non letto
+Spam
+Non spam
+Rispondi
+Rispondi a tutti
+Inoltra
+Carica immagini
+a
+Il
+Messaggio inoltrato
+Nuovo messaggio
+A
+Oggetto
+Allega
+Invia
+Programma di posta
+Utente: il tuo indirizzo · password: la password della dashboard
+Allegati più grandi di 20 MB
+Inserisci un destinatario
+Casella di posta non raggiungibile
+Nessuna casella di posta
+Messaggio non trovato
+Nulla selezionato
+E-mail
+Server di posta
+Caselle di posta
+DMARC e BIMI
+Modelli DNS
+Domini di posta
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (spam, controllo DKIM, SPF/DMARC) su questa macchina. Ogni utente della dashboard ha una casella di posta con la stessa password
+Configurato
+Coda
+in attesa
+Ultima applicazione
+Stato controllato
+non ancora
+Controlla stato
+Installa server di posta
+Reinstalla / ripara
+Disattiva
+Relay, TLS e limiti
+La posta in uscita passa dal server del tuo provider (smarthost) – sempre cifrata. I programmi di posta si collegano solo con TLS
+Programmi di posta
+In entrata (IMAP
+In uscita (SMTP
+oppure
+Autenticazione
+password normale
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – il nome utente è l’indirizzo e-mail (o il nome utente della dashboard), la password quella della dashboard
+Sicurezza
+Server di posta attivo
+Relay (smarthost
+Porta del relay
+Cifratura del relay
+Utente del relay
+Password del relay
+SPF del relay
+Porta 25: cifratura obbligatoria
+Dimensione casella (MB
+Messaggio più grande (MB
+Postmaster
+Punteggio spam → cartella Indesiderata
+Punteggio spam → rifiuta
+Postfix + Dovecot + Rspamd su questa macchina: ogni utente della dashboard riceve una casella di posta con la stessa password
+Tutta la posta in uscita passa da questo server del tuo provider, p. es. smtp.provider.de – vuoto = consegna diretta
+587 = STARTTLS, 465 = TLS fin dall’inizio
+Sempre cifrato – mai in chiaro
+Per il modello DNS, p. es. include:_spf.provider.de – lo indica il tuo provider
+Attivo: gli altri server di posta devono usare TLS (STARTTLS) per consegnare – i pochi senza TLS vengono rifiutati. I programmi di posta hanno sempre bisogno di TLS
+Utente della dashboard che riceve postmaster@, abuse@ e i rapporti DMARC – vuoto = il superadmin
+STARTTLS (porta 587
+TLS / SMTPS (porta 465
+Ogni utente della dashboard ha automaticamente una casella di posta – il nome utente è l’indirizzo, la password quella della dashboard. Nuovi utenti, nuove password, utenti bloccati o eliminati arrivano da soli al server di posta
+bloccato
+attende l’accesso
+Senza casella di posta
+Ancora nessun dominio di posta
+DKIM, DMARC e MTA-STS
+Chiavi DKIM
+chiave pronta (RSA 2048
+creata al prossimo «Applica»
+Il server firma ogni messaggio in uscita (DKIM), controlla SPF, DKIM e DMARC della posta in entrata e indica agli altri come trattare la posta falsificata. I record DNS vengono preparati per te in 🧾 Modelli DNS

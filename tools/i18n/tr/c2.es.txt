@@ -1,0 +1,214 @@
+Correo del propietario (server_owner
+Propietario del servidor (recibe derechos OWNER en cada sala
+Solo una dirección; vacío = el correo de la cuenta FRN de arriba. Derechos OWNER en cada sala
+Correo de la cuenta FRN (sysman_auth_emailaddr
+Contraseña de la cuenta FRN (sysman_auth_password
+Correo de su cuenta de usuario FRN en el SystemManager
+La contraseña de esta cuenta FRN (tal como la envió el SystemManager
+Se envía al SystemManager y se muestra en el panel
+Se muestra en el panel
+HTTPS y web
+Activar HTTPS con Let’s Encrypt
+Certificados HTTPS automáticos con Let’s Encrypt (requiere DNS público y los puertos 80/443
+Dominio público
+Ejemplo: dashboard.example.org. No introduzca http:// ni una ruta
+Correo del certificado
+Caducidad de Let’s Encrypt y avisos importantes del certificado
+Usar certificados de prueba (staging
+Solo para pruebas; los navegadores no confían en los certificados staging
+Puerto HTTPS
+Puerto HTTPS público. El estándar es 443
+Puerto del challenge HTTP / redirección
+Puerto TCP público usado por el challenge HTTP-01 y la redirección HTTP → HTTPS
+Requiere un nombre DNS público que apunte a este servidor y los puertos TCP entrantes 80 y 443. Guarde y después reinicie frnadn
+Base de datos
+Cuánto tiempo se guardan las pasadas y los accesos
+Guardar pasadas individuales (días
+Guardar accesos (días
+Guardar mensajes de chat (días
+Los totales diarios se guardan para siempre, son pequeños
+Descartar cambios
+sin guardar
+del perfil
+integrado
+vacío
+Nueva sala
+Nombre (net00
+Emoji delante del nombre
+La sala está abierta (_enable
+Desactivado: el servidor no ofrece esta sala
+Oculta en el panel
+Solo tras iniciar sesión en el panel (los clientes FRN la siguen viendo
+Propietarios de la sala (_owner
+Correos separados por comas; derechos NETOWNER en esta sala. Vacío = propietario del servidor
+Crosslinks permitidos (_acl_cl
+Pasarelas permitidas (_acl_gw
+Vacío = todos, none = ningún crosslink, o correos
+Vacío = todas, none = ninguna pasarela, o correos
+Mensaje para crosslinks/pasarelas rechazados (_acl_info
+Emisión máx. (_tot, s
+Quitar silencio tras (_unmute, min
+0 = silenciado hasta quitar el silencio
+Sin voz hacia clientes solo PC silenciados
+Sin voz hacia crosslinks silenciados
+Sin voz hacia pasarelas silenciadas
+Pausa de habla (_speechpause, ms
+Mensaje de pausa de habla
+Se envía a clientes solo PC; {callsign} se sustituye
+Loro / prueba de eco
+Inicio/parada del loro (_parrot_startstop_enable
+El loro se puede activar y desactivar con un mensaje de texto
+Bot de Telegram (_tgbot_params
+emisión mín. ms;reposo mín. ms;token del bot;ID del canal – p. ej. 6000;30000;123:ABC;-100123
+Mensaje informativo (_show_infomessage
+Exigir permiso para hablar
+Puede emitir
+Subir
+Bajar
+Orden en el panel; los clientes FRN ven las salas ordenadas por nombre. ⭐ = sala por defecto, 🦜 = net00, la sala de prueba/loro
+Lista de acceso
+Permitir solo las entradas de la lista de acceso
+Mensaje de acceso
+Quién ve el mensaje informativo de la lista de acceso
+Todos
+solo los clientes afectados por la lista de acceso
+Patrón de bloqueo (_bl_regexp
+Expresión regular sobre nombre, correo y ciudad
+Mensaje para clientes bloqueados (_bl_info
+Permitir una dirección LAN (allowLANAddr
+Guardar ajustes de acceso
+Añadir entrada
+Añadir a la lista
+No hay entradas en esta lista
+Copiar una estación en línea
+Seleccionar una estación conectada
+Las listas se guardan en SQLite y se escriben en el formato XML del servidor FRN. Las entradas XML existentes se importan automáticamente. Los cambios se aplican tras reiniciar el servidor FRN; los archivos XML originales se respaldan antes de sustituirlos
+Los propietarios y admins FRN pueden seguir cambiando estas listas en el cliente FRN. El panel importa los cambios de los archivos XML antes de mostrarlos o editarlos
+Nueva cuenta FRN
+Aún no hay cuentas
+Correo (acceso del cliente FRN
+Contraseña FRN
+ID del cliente FRN
+La lista de contraseñas del servidor para
+modo (acl/FRNPasswd.xml
+en este servidor
+El servidor está registrado en el SystemManager: los accesos se comprueban allí, esta lista no se usa
+El propio servidor necesita la contraseña en FRNPasswd.xml (archivo legible solo por el servicio
+Nuevo usuario
+Contraseña (mín. 10
+Nueva contraseña (mín. 10
+Solo admins
+Superadmin: todo, también los admins. Admins: todo excepto otros admins. Usuarios: ven el panel también cuando es privado, y las salas ocultas
+superadmin
+Usuarios conectados
+Qué
+Desde
+Fin
+instalación / línea de comandos
+Máquina
+Host
+Carga
+Memoria
+Disco
+Reiniciar
+Apagar
+Servicio
+En marcha desde
+Reiniciar el servidor FRN
+Reiniciar el panel
+Journal frn-server
+Journal frnadn
+Servidor FRN Java de
+Instalado: desconocido
+Versión instalada
+actualización disponible
+Repositorio
+Datos (SQLite
+Caché de estadísticas
+server.log del servidor FRN
+Mostrar server.properties
+Arriba
+Abajo
+Importar server.properties antiguo
+Importar server.properties
+Seleccione el archivo server.properties antiguo
+Opcional: importar ajustes de la instalación FRN anterior en esta nueva instalación. Solo se transfieren las propiedades compatibles y las definiciones de salas. La base de datos antigua, el JAR de Java, las listas ACL y los archivos XML de contraseñas no se copian
+Perfil de colores
+Elija un perfil de colores y después cambie el color que quiera – o cree un esquema completamente propio. Toda la página lo muestra al instante; solo se conserva después de
+El mismo motor de colores que HBlink4-FreeRadioID y N8-HotSpot
+Colores propios
+Haga clic en un color para cambiarlo; ↺ lo vuelve a tomar del perfil
+Volver al color del perfil
+Acento
+Acento 2
+Fondo
+Color de la página detrás de todo
+Botones, números, pestañas activas
+Segundo color de los botones y del título
+Resplandor arriba a la izquierda
+Resplandor arriba a la derecha
+Resplandor abajo
+Tinte de las tarjetas
+Color mezclado en las tarjetas de cristal
+Brillo de las tarjetas
+Cuánto destacan las tarjetas de cristal
+Desenfoque del cristal
+Resplandor de fondo
+0 = fondo plano
+Redondeo
+Esquinas de tarjetas y botones
+Desactivado = más rápido en teléfonos antiguos
+Legible (contraste 18.3 : 1
+Estándar N8
+Logotipo e icono del sitio
+Logotipo del panel
+Logotipo actual del panel
+Usar el logotipo por defecto
+Icono del sitio / favicon
+Icono actual del sitio
+Usar el icono por defecto
+Imagen PNG, hasta 2 MB. Se muestra en la cabecera y en el diálogo de inicio de sesión
+PNG o ICO, hasta 2 MB. Se usa en las pestañas y marcadores del navegador
+Guardar colores, logotipo e icono
+Vacío = se adapta automáticamente al fondo
+Logotipos de clientes
+Las estaciones muestran como avatar el software o la red de la que proceden – detectado por la banda, la descripción y el tipo de cliente (crosslink, pasarela, PC). Las imágenes integradas son simples insignias. Puede sustituir cada una por una imagen propia (PNG, JPEG, WebP, GIF, ICO o SVG simple, máx. 512 KB) – por ejemplo un logotipo oficial, si puede usarlo
+Icono
+Menú de enlaces
+Mostrar el menú de enlaces
+Texto del botón del menú
+Botón con menú desplegable
+Fila de botones bajo la cabecera
+(orden = orden en el menú
+Nombre, p. ej. Sitio web
+Abrir en una nueva pestaña del navegador
+nueva pestaña
+Añadir enlace
+Guardar enlaces
+Guardar y actualizar iconos de sitios
+Mostrar el favicon en caché de este sitio
+icono del sitio
+HTML simple
+Sus propios enlaces en la cabecera: sitio web, grupo de chat, wiki, página de donaciones … Todos los ven, también sin iniciar sesión
+Sitio web
+Correo
+Dirección
+Copiar ajustes de
+No registrar
+(cambia a esa pestaña) y
+Propietario desconocido: el correo del propietario del servidor (server_owner – Ajustes → Operador, vacío = la cuenta FRN) no es una cuenta FRN conocida en el SystemManager – introduzca el correo de una cuenta FRN existente
+El motivo de los accesos rechazados (contraseña FRN incorrecta, propietario desconocido, conexión múltiple …) – también comprobado en segundo plano: justo después de un problema del servidor FRN y luego cada 2 minutos; los nuevos motivos aparecen en los eventos
+desconocido – sincronice o abra el socio una vez
+autónomo (sin SystemManager
+contraseña establecida
+sin contraseña
+ninguna cuenta FRN introducida
+Cuentas FRN en el SystemManager
+la sincronización nunca las toca, cada servidor conserva la suya
+Guardar cuenta
+Cuenta FRN guardada – reinicie el servidor FRN para iniciar sesión con ella
+Sin cambios
+Servidor FRN aquí detenido y bloqueado
+se inicia solo en cuanto se guarde una cuenta FRN propia en SystemManager
+El respaldo detiene y bloquea por sí mismo su servidor FRN (en la próxima sincronización o comprobación de estado) – el máster sigue en línea
+Bloqueado: este respaldo usa la misma cuenta FRN que el máster. Introduzca primero una cuenta FRN propia en SystemManager (📧 Contraseña FRN Backup

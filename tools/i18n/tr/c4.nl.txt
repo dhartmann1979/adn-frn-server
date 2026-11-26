@@ -1,0 +1,215 @@
+DKIM-selector
+DMARC-beleid
+DMARC-uitlijning
+DMARC-rapporten naar
+BIMI-logo
+BIMI-certificaat (VMC/CMC
+MTA-STS
+Wat ontvangers doen met mail die niet slaagt – BIMI vereist quarantine of reject
+none – alleen rapporten
+quarantine – naar spam
+reject
+relaxed (subdomeinen tellen mee
+strict
+Leeg = dmarc@<hoofddomein>
+Logo naast uw mails in Gmail, Apple Mail, Yahoo … (vereist DMARC quarantine/reject
+Optioneel https://-adres van een VMC of CMC – Gmail en Apple tonen het logo alleen daarmee
+Vertelt andere servers om alleen versleuteld bij u af te leveren
+testing – alleen rapporteren
+enforce
+Uw logo naast uw mails in Gmail, Yahoo, Apple Mail … Vereist DMARC quarantine of reject; Gmail en Apple willen ook een VMC/CMC-certificaat. Het logo moet SVG Tiny PS zijn – de server controleert het en levert het onder /.well-known/bimi/
+automatisch gemaakt uit de titel
+eigen logo
+Letters
+Kleur
+Logo maken
+SVG uploaden
+Standaard
+BIMI-logo gemaakt
+BIMI-logo opgeslagen
+DNS nu controleren
+Alles kopiëren
+Zonebestand
+Type
+Waarde
+Doel
+optioneel
+ingesteld
+wijkt af
+ontbreekt
+Adres van de mailserver
+IPv6-adres van de mailserver
+Mail voor het domein gaat naar deze server
+DKIM: de publieke sleutel van de handtekening
+DMARC: beleid en rapporten
+BIMI: logo naast uw mails (vereist DMARC quarantine/reject
+MTA-STS: alleen versleuteld afleveren
+TLS-RPT: rapporten over TLS-problemen
+Mailprogramma’s vinden IMAP vanzelf
+Mailprogramma’s vinden SMTP vanzelf
+Geen onversleutelde IMAP
+SMTP met STARTTLS
+Reverse DNS bij de hostingprovider – heel belangrijk tegen spamfilters
+SPF: wie namens het domein mag versturen (deze server en de relay
+SPF: wie namens het domein mag versturen (deze server
+hoofddomein
+in het certificaat
+Maildomein toevoegen
+Volgorde
+Hoofddomein maken
+Geen geldig domein
+Bestaat al
+De mailserver uitschakelen
+De mailserver installeren
+Installeren
+Bezig – dit kan enkele minuten duren
+Themafoto
+Afbeelding kiezen
+Afbeelding verwijderen
+Beschrijving van de afbeelding
+(voor schermlezers
+Alleen JPEG, PNG of WebP
+De afbeelding kan niet worden gelezen
+JPEG, PNG of WebP – in de browser verkleind (max. 1600 px breed); getoond bovenaan de kaart en het artikel, 16:9
+Themafoto: alleen JPEG, PNG of WebP
+Themafoto: hoogstens 1,5 MB
+Themafoto: het bestand is niet wat het beweert te zijn
+Themafoto: beschadigd bestand
+wacht op DNS
+Maildomeinen automatisch toevoegen
+Elk domein onder 🔒 Domeinen en HTTPS wordt ook een maildomein (news.example.org → example.org); mail.<domein> komt vanzelf op het Let’s Encrypt-certificaat zodra de DNS naar deze server wijst
+Volledig automatisch: nieuwe domeinen onder 🔒 Domeinen en HTTPS worden maildomeinen, mail.<domein> komt op het Let’s Encrypt-certificaat zodra de DNS naar deze server wijst (elke 30 minuten gecontroleerd, zonder herstart), en de mailserver neemt het vanzelf over
+Voeg het maildomein hier toe (of laat het automatisch toevoegen) – het certificaat wordt vanzelf uitgebreid zodra de DNS klopt
+Aan: andere mailservers moeten TLS (STARTTLS) gebruiken om af te leveren – de weinige zonder TLS worden geweigerd, testtools zoals MXToolbox ook (530 Must issue a STARTTLS command first). RFC 3207 raadt dit af voor een openbare MX. Mailprogramma’s hebben altijd TLS nodig
+Live-dashboard
+Portaal (nieuws
+Elk domein of subdomein toont wat u kiest onder 🔒 Domeinen en HTTPS → „Toont”: het live-dashboard of de portaalpagina – willekeurig veel domeinen, allemaal met Let’s Encrypt
+Het eerste domein is het hoofddomein (gebruiker@hoofddomein); elk volgend domein is een alias voor dezelfde postvakken. Elk domein zet mail.<domein> op het Let’s Encrypt-certificaat van het dashboard – de mailserver gebruikt alleen TLS
+DNS: mail.<domein> (A/AAAA) → deze server; MX → mail.<domein>
+Domeinen en HTTPS: het dashboard heeft zijn domein en HTTPS staat aan
+Voeg het maildomein hier toe – het certificaat wordt uitgebreid
+Mailserver: ⚙️ Installeren, relay, ✅ Toepassen
+DNS-sjablonen: SPF, DKIM, DMARC, BIMI … bij de DNS-provider, PTR bij de hostingprovider
+Poorten: 25, 465, 587, 993 open in firewall en router
+Na een wijziging herstart het dashboard en breidt het het certificaat uit (DNS van mail.<domein> moet naar deze server wijzen, poort 80 bereikbaar). Daarna 📮 Mailserver → ✅ Toepassen
+Mailserver <code>
+Mailprogramma’s vinden de instellingen vanzelf via de SRV-records (🧾 DNS-sjablonen). Onversleutelde IMAP (143) staat uit
+Alleen TLS 1.2+: IMAPS 993, SMTPS 465, submission 587 (STARTTLS vereist), aanmelden pas na TLS
+Uitgaand: DKIM-handtekening voor elk domein, relay alleen versleuteld met gecontroleerd certificaat
+Gebruikers versturen alleen met hun eigen adres (of hun aliassen
+Wachtwoorden: Dovecot krijgt alleen een SHA512-CRYPT-hash; de webmail gebruikt een eigen mastertoegang, nooit het wachtwoord van de gebruiker
+wacht op aanmelding”: gebruikers van vóór de mailserver hebben nog geen mailwachtwoord – het wordt gemaakt bij hun volgende aanmelding op het dashboard (of als een admin een nieuw wachtwoord instelt
+Gemaakt uit uw instellingen: MX, A/AAAA, SPF, DKIM (de publieke sleutel verschijnt na „Toepassen”), DMARC, BIMI, MTA-STS, TLS-RPT en SRV-records voor mailprogramma’s. „DNS controleren” vraagt de DNS wat er nu is ingesteld
+DMR-server
+Inactief
+Hier gehoord
+RF (lokaal
+Net
+Netwerk
+RF / Netwerk
+RF-aandeel
+DMR-netwerk
+Modem
+verbonden
+Top-talkgroups
+Activiteit
+Gesprekken (30 d
+Live-logboek
+De fabrieksaanmelding n8schicht / n8schicht is nog actief
+Hardware en gegevens
+Iedereen in uw netwerk zou uw hotspot kunnen wijzigen. Stel een eigen wachtwoord in
+Nu wijzigen
+MMDVMHost en DMRGateway gebruiken ze na een herstart
+Talkgrouplijst
+Talkgrouplijst van de N8schicht
+Eigen namen
+Zoeken: nummer of naam, bv. 262 of Bayern
+Namen
+Namen van github.com/dhartmann1979/n8schicht, plus uw eigen
+kopie meegeleverd met N8-Hotspot
+Roepnaam, DMR-ID en locatie
+Uw roepnaam, bv. DL1ABC
+Hotspot-ID
+Hotspot-achtervoegsel
+Twee cijfers die het hotspot-ID uniek maken (DMR-ID + achtervoegsel, bv. 262123401). Leeg = alleen DMR-ID
+Locatie
+Stad of locator, getoond aan de server
+Breedtegraad
+Lengtegraad
+Antennehoogte (m
+Vermogen (W
+Board, poort, frequenties en niveaus
+Modemboard
+Seriële poort
+Poortsnelheid
+Vult poort, snelheid en simplex/duplex in
+Het modem zoeken
+Zoeken
+MMDVM_HS_Hat op de GPIO-header (simplex
+MMDVM_HS_Dual_Hat op de GPIO-header (duplex
+ZUMspot / HS hat via USB (simplex
+MMDVM-repeaterboard via USB (duplex
+Overig / eigen waarden
+RX-frequentie (MHz
+TX-frequentie (MHz
+Gelijk aan RX bij simplex
+RX-offset (Hz
+TX-offset (Hz
+Uit de kalibratie
+RX-niveau (%
+TX-niveau (%
+RF-vermogen (%
+RX inverteren
+TX inverteren
+PTT inverteren
+TX-vertraging (ms
+DMR-vertraging (ms
+DMR-modus
+Color code, time slots, hangtijden
+Color code
+Duplex (twee time slots
+Uit voor simplex-hotspots (alleen TS2
+Time slots
+Time slot 1
+Time slot 2
+Alleen gebruikt in duplexmodus
+Gesprekshangtijd (s
+TX-hangtijd (s
+Hangtijd RF-modus (s
+Hangtijd netwerkmodus (s
+Alleen mijn eigen ID mag zenden
+Talker alias versturen
+Roepnaam in morse elke 10 minuten
+Verbinden met een DMR-server
+Server, wachtwoord en opties
+Server
+Vult naam, adres en poort in
+Andere server (HomeBrew
+Serveradres
+Hostnaam / IP
+Serverpoort (UDP
+Bij de N8schicht: uw FreeRadioID.net-wachtwoord (volledige toegang) of het gastwachtwoord
+Optioneel, bv. TS1=262;TS2=26500
+Jitterbuffer (ms
+Time-out (s
+Titel, openbare weergave, ID-lijst
+Uit = alleen aangemelde gebruikers zien het dashboard
+Sessieduur (uren
+Gesprekken bewaren (dagen
+DMR-ID-lijst
+Roepnamen en namen voor het dashboard en MMDVMHost (DMRIds.dat
+Dagelijkse update van de ID-lijst
+alleen radioid.net
+Geregistreerde FreeRadioID-ID’s laden
+Dagelijks met de ID-lijst: FRID-badge, namen van ID’s die alleen bij FreeRadioID staan
+Avatars, profielen en geregistreerde ID’s
+Avatars tonen
+Profielfoto’s van FreeRadioID-leden; opgehaald als een station gehoord wordt, gecachet in de database
+Profielen opzoeken
+Naam, plaats en opmerkingen in de stationsweergave (live uit de FreeRadioID-API
+Geregistreerde ID’s
+Geregistreerd bij FreeRadioID.net
+Geregistreerde ID’s (FRID-badge) en avatars, geladen met de ID-lijst
+Gecachete avatars
+Gecachet
+URL van de talkgrouplijst

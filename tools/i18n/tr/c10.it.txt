@@ -1,0 +1,75 @@
+In attesa della prossima trasmissione
+oggi ancora nessun passaggio
+Oggi per ora
+Nessuna connessione FRN
+Ricezione (una stazione sta parlando
+Trasmissione verso le altre reti
+Sorgente → (FRN: taglio bassi, medi, alti) → AGC in ingresso → distribuzione → AGC in uscita per rete → limiter → rete
+Verso DMR segue inoltre l’esaltazione di medi/alti prima dell’encoder (🎛️ Vocoder → Prima dell’encoder). Le modifiche hanno effetto subito, senza riavvio
+Il livello a cui ogni sorgente viene regolata prima di essere distribuita. −20 dBFS è un buon valore
+Livello verso ogni rete. Per AMBE e Zello −18 dBFS; il limiter mantiene i picchi sotto il tetto
+Guadagno massimo (dB
+Di quanto l’AGC alza al massimo le stazioni deboli (15 dB
+Attenuazione massima (dB
+Di quanto abbassa al massimo le stazioni forti (20 dB
+Quanto velocemente riduce nei passaggi troppo forti – veloce: 5–15 ms
+Tempo di rilascio (ms
+Quanto velocemente rialza poi – 200–500 ms suona naturale, più breve «pompa»
+Sotto questo valore conta come pausa/rumore: il guadagno resta fermo, il rumore non viene alzato (−50 dBFS
+Nessun picco va oltre – niente satura (−1 dBFS
+Rimuove rimbombo, ronzio e vento dall’audio FRN (GSM) – 100–150 Hz
+Il GSM suona cupo – la presenza rende le voci più comprensibili, per Zello e AMBE (3 dB
+FRN: esalta gli alti (dB, da 3 kHz
+Un po’ più di brillantezza per l’audio FRN (2 dB). Troppa rende udibile il rumore
+In caso di problemi guarda prima qui: il registro pubblico degli errori di freeradionetwork.de indica il motivo degli accessi rifiutati (password FRN errata, connessione multipla, porta non raggiungibile …) che il server FRN stesso non comunica. Sono mostrate le voci relative al tuo nominativo e ai tuoi server FRN; N8 Crosslink vi guarda da solo dopo ogni rifiuto e scrive il motivo nel registro eventi
+Chiede alla dashboard del server FRN (ADN FRN Server 2.21 o più recente) chi è master e chi è backup. Il master ha sempre priorità 1: dopo un guasto il bridge passa al backup e, appena il master torna a funzionare (3 controlli a un minuto di distanza), torna al master tra due passaggi. Senza rilevamento «Server» viene prima di «Server di backup»
+Lista dal server FRN – «🔄» la rilegge. Se manca una stanza (p. es. nascosta), scegli «✏️ Altra stanza …»
+Leggi le stanze dal server FRN
+Altra stanza
+0 = qualsiasi porta libera · fissa p. es. per regole firewall (tutte le porte: 🔌 Porte
+Chi può accedere all’area admin. I superadmin possono inoltre ripristinare backup, reimpostare tutto e gestire altri superadmin
+significa: aprirla nel firewall/router se deve essere raggiungibile dall’esterno
+l’altro lato deve essere raggiungibile. Tutto viene salvato con un solo pulsante; ciò che richiede un riavvio compare poi in alto
+0.0.0.0 = tutte le interfacce (IPv4) · :: = tutte (IPv4 e IPv6) · 127.0.0.1 = solo questo computer (allora solo tramite il dominio
+Interfaccia web e dati live (http://IP:porta). Sotto 1024 (p. es. 80) funziona senza root – nginx ha allora bisogno di altre porte. Riavvio del servizio
+http:// dei domini e verifica Let’s Encrypt. Let’s Encrypt arriva sempre sulla porta 80 – un’altra porta solo con inoltro nel router (esterno 80 → interno questa porta
+https:// dei domini (predefinito 443; altrimenti https://dominio:porta). Applicato subito a tutti i domini
+verso il server di backup, se indicato
+accesso/password presso il SystemManager (predefinito 10025
+Porta sorgente del bridge · 0 = qualsiasi (predefinito) · fissa per regole firewall o NAT
+solo modalità AMBEserver (127.0.0.1, predefinito 2460) – attualmente non in uso
+WebSocket wss://zello.io/ws – la porta è nell’indirizzo (💬 Zello
+Domini propri per questa interfaccia web con un certificato gratuito di
+nginx accetta il dominio sulla porta 80/443 e inoltra a N8 Crosslink (127.0.0.1:); certbot ottiene il certificato e lo rinnova automaticamente prima della scadenza. Requisito: il dominio punta a questo server tramite DNS e le porte 80 (Let’s Encrypt controlla sempre lì – altrimenti inoltro nel router) e 443 sono raggiungibili da Internet
+Domini e HTTPS non sono ancora abilitati – esegui una volta sudo /opt/n8crosslink/update.sh
+nginx ascolta su
+e inoltra a 127.0.0.1: – modifica in
+Per gli avvisi sulla scadenza del certificato
+Certificato di prova (Let’s Encrypt staging, per provare senza limiti
+sudo non è ancora configurato – una volta nella console: sudo /opt/n8crosslink/install.sh --fix-perms
+Offline da
+Segnaposto: {call} = nominativo, {name} = nome – p. es. «{call}» o «{call} {name}»
+Porta del server FRN
+Porta del server DMR
+Interfaccia web
+Tutte le porte di N8 Hotspot in un unico posto. L’hotspot non ha bisogno di inoltro porte nel router: si collega solo verso l’esterno (server DMR); l’interfaccia web è per la rete di casa
+impostata nel servizio systemd (N8HS_PORT
+Server e password in Esercizio → Impostazioni → Rete DMR
+Connessioni tra i servizi dell’hotspot – non aprire nulla
+Dati live da MMDVMHost e DMRGateway all’interfaccia web (127.0.0.1
+Avvio aggiornamento («Aggiorna ora»
+Demo – nessun controllo reale
+DMRGateway (server DMR
+Nessuno in questa stanza
+Il test eco pappagallo è attivo
+ID di 7 cifre da radioid.net / FreeRadioID.net
+MMDVMHost e DMRGateway si fermano durante la calibrazione
+L’hotspot riparte poi con il nuovo offset
+con il prossimo aggiornamento della lista ID
+Ancora nessun utente ascoltato
+Server DMR: la dashboard non è connessa al server DMR
+Accessi verificati da FreeRadioID.net / accessi ospite con la passphrase predefinita
+Ancora nessuna chiamata di gruppo in questo periodo
+nomi inviati dalle radio
+Nessun Talker Alias ricevuto in questo periodo
+Stai usando l’accesso di fabbrica. Scegli nome utente e password personali – l’accesso di fabbrica poi non funzionerà più

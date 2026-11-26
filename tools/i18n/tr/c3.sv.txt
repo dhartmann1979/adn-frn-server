@@ -1,0 +1,234 @@
+Master och reserv använder samma FRN-konto
+SystemManager släpper bara in en av dem online – den andra får ”fel inloggningsuppgifter” och dess FRN-server stoppas. Begär ett eget FRN-lösenord för reserven och ange det där under SystemManager
+Master och reserv
+Andra FRN-server med samma konfiguration – synkronisering varje hel timme och med knapp
+Denna servers roll
+Master: rum, listor och konton redigeras här. Reserv: tar över dem från mastern
+Enskild server
+Partnerns instrumentpanel
+På mastern reserven, på reserven mastern, t.ex. https://frn-backup.example.org
+Synkroniseringsnyckel
+Krypterar varje överföring mellan de två servrarna – samma på båda (minst 24 tecken); ”🎲 Ny nyckel” skapar en
+krypterad med synkroniseringsnyckeln
+Partnerns svar är inte krypterat med synkroniseringsnyckeln (fel adress eller nyckel
+Partnerns svar hör inte till denna förfrågan
+Synkronisera varje hel timme
+Reserven hämtar masterns konfiguration varje hel timme – skillnaden är högst en timme
+Skickas till klienterna: vart de ska gå om denna server är nere. Tom med Master och reserv = partnern
+Överföring
+Partner
+Senaste synkronisering
+Nästa synkronisering
+Senaste hämtning av reserven
+Klienterna växlar till
+oförändrad
+övertagen
+FRN-servern omstartad
+omstart väntar – stationer anslutna
+FRN stoppad
+underhåll – stationerna är på reserven
+Ange partnern och synkroniseringsnyckeln och spara sedan
+Välj denna servers roll nedan: mastern ger sin konfiguration, reserven tar över den varje hel timme. Själva växlingen sköts av FRN: klienterna går till reservadressen när denna server försvinner
+Synkronisera nu
+Lämna över till reserven
+Ta tillbaka från reserven
+Varje server behöver ett eget FRN-konto
+FRN-lösenord Master
+FRN-lösenord Backup
+Ny nyckel
+Synkroniserar
+Synkronisering: oförändrad
+Synkronisering: konfiguration övertagen
+Synkroniseringen misslyckades
+Skapa en ny synkroniseringsnyckel
+Nyckeln sparas här. Ange samma nyckel på den andra servern – till dess fungerar inte synkroniseringen
+Ny synkroniseringsnyckel
+Kopiera den och ange den på den andra servern under Master och reserv
+Klart
+Konfigurationen synkroniseras först till reserven. Sedan stoppas FRN-servern här – stationerna växlar av sig själva till reserven (FRN-reservadress). Instrumentpanelen fortsätter att köras
+FRN-servern här startar igen. Sedan startar reserven om sin FRN-server så att dess stationer kommer tillbaka hit
+Lämna över
+Ta tillbaka
+Lämnar över
+Tar tillbaka
+Överlämnad till reserven
+Tillbakatagen
+Konfigurationen synkroniserad till reserven
+FRN-servern på reserven körs
+FRN-servern här stoppad – stationerna växlar till reserven
+FRN-servern här startad
+Reserven skickar tillbaka sina stationer
+ingen FRN-server körs där
+körs inte efter 30 s
+Detta konto är för den andra servern: ange e-post och lösenord där under SystemManager
+Begär FRN-lösenord – Master
+Begär FRN-lösenord – Backup
+Ställ in rollen (Master eller reserv) först
+Bara mastern lämnar över till reserven
+FRN-servern på reserven körs inte – inget växlades
+Synkroniseringsnyckel: minst 24 tecken
+Ingen synkroniseringsnyckel satt
+Partnern känner inte till Master och reserv än – uppdatera den till samma version
+Mastern skickade inga rum – inget övertogs (skydd mot en tom master
+Använd https:// för partnern – synkroniseringen överför FRN-kontona (http bara inom LAN
+Portal
+Nyheter
+Portalsida
+Senaste nyheterna
+Alla nyheter
+Läs mer
+Fäst
+uppdaterad
+Inga nyheter än
+Äldre nyheter
+Anslut
+Öppna live-instrumentpanelen
+Inga rum
+Inga länkar konfigurerade
+ℹ️ Info
+Viktigt
+Teknik
+Nät och rum
+Bara administratörer skriver och publicerar nyheter – de visas på portalsidan. Utkast syns bara här
+Öppna portalsidan ↗
+Ny nyhet
+Redigera nyhet
+Publicera
+Avpublicera
+Publicerad
+Avpublicerad
+Utkast
+publicerade
+utkast
+Kategori
+Datum
+Ingress
+Text
+(kort sammanfattning på kortet, valfritt
+Fäst överst
+Spara som utkast
+Sparad som utkast
+Spara och publicera
+Ta bort nyheten
+Borttagen
+Inga nyheter än – ”＋ Ny nyhet” skriver den första
+Egen domän: 🌐 Nätverk, portar och domäner → 🔒 Domäner och HTTPS
+Offentlig sida med operatörernas nyheter – på /portal och på en egen domän
+Portalens domän
+Portaldomän
+Författare
+Portalen kan ha en egen domän (t.ex. news.example.org) med ett Let’s Encrypt-certifikat – den visar portalsidan direkt
+Ingen egen domän än – portalen finns på /portal i instrumentpanelen
+Bara administratörer (roll Admin eller Superadmin) skriver, redigerar, publicerar och tar bort nyheter. Användare och besökare läser bara. Varje ändring finns i 📜 loggen
+Publicerade nyheter som flöde
+Portalsida på
+Portalens titel
+Underrubrik
+Välkomsttext
+Visa rum och stationer online
+Visa dagens siffror
+Nyheter per sida
+Offentlig sida med operatörernas nyheter på /portal (och på portaldomänen
+Tom = instrumentpanelens titel
+t.ex. ”Nyheter från FRN-servern Auf der NachtSchicht”
+Visas ovanför nyheterna. Formatering som i nyheterna: **fet**, *kursiv*, [länk](https://…), listor med -
+Sidoruta med rummen, stationer online och vem som sänder (bara när instrumentpanelen är offentlig
+Dagens sändningar, sändningstid och stationer
+Ange en titel
+Denna nyhet finns inte (längre
+Portalsidan är avstängd
+E-post
+Skriv
+Inkorg
+Utkast
+Skickat
+Skräppost
+Papperskorg
+Välj ett meddelande
+Inget hittades
+Inga meddelanden
+meddelanden
+markerade
+läst
+oläst
+Skräppost
+Inte skräppost
+Svara
+Svara alla
+Vidarebefordra
+Ladda bilder
+till
+Den
+Vidarebefordrat meddelande
+Nytt meddelande
+Till
+Ämne
+Bifoga
+Skicka
+E-postprogram
+Användare: din adress · lösenord: ditt lösenord till instrumentpanelen
+Bilagor större än 20 MB
+Ange en mottagare
+Brevlådan kan inte nås
+Ingen brevlåda
+Meddelandet hittades inte
+Inget markerat
+E-post
+E-postserver
+Brevlådor
+DMARC och BIMI
+DNS-mallar
+E-postdomäner
+Postfix (SMTP) · Dovecot (IMAP) · Rspamd (skräppost, DKIM-, SPF/DMARC-kontroll) på denna maskin. Varje användare av instrumentpanelen har en brevlåda med samma lösenord
+Konfigurerad
+Kö
+väntar
+Senast tillämpad
+Status kontrollerad
+inte än
+Kontrollera status
+Installera e-postserver
+Installera igen / reparera
+Stäng av
+Relä, TLS och gränser
+Utgående e-post går via din leverantörs server (smarthost) – alltid krypterat. E-postprogram ansluter bara med TLS
+E-postprogram
+Inkommande (IMAP
+Utgående (SMTP
+eller
+Autentisering
+normalt lösenord
+Thunderbird, Outlook, Apple Mail, K-9/FairEmail … – användarnamnet är e-postadressen (eller användarnamnet i instrumentpanelen), lösenordet är instrumentpanelens lösenord
+Säkerhet
+E-postserver på
+Relä (smarthost
+Reläport
+Reläkryptering
+Reläanvändare
+Relälösenord
+Reläns SPF
+Port 25: kryptering krävs
+Brevlådans storlek (MB
+Största meddelande (MB
+Postmaster
+Skräppostpoäng → mappen Skräppost
+Skräppostpoäng → neka
+Postfix + Dovecot + Rspamd på denna maskin: varje användare av instrumentpanelen får en brevlåda med samma lösenord
+All utgående e-post går via denna server hos din leverantör, t.ex. smtp.provider.de – tom = leverera direkt
+587 = STARTTLS, 465 = TLS från början
+Alltid krypterat – aldrig klartext
+För DNS-mallen, t.ex. include:_spf.provider.de – din leverantör anger det
+På: andra e-postservrar måste använda TLS (STARTTLS) för att leverera – de få utan TLS nekas. E-postprogram behöver alltid TLS
+Användare av instrumentpanelen som får postmaster@, abuse@ och DMARC-rapporterna – tom = superadmin
+STARTTLS (port 587
+TLS / SMTPS (port 465
+Varje användare av instrumentpanelen har automatiskt en brevlåda – användarnamnet är adressen, lösenordet instrumentpanelens lösenord. Nya användare, nya lösenord, låsta eller borttagna användare når e-postservern av sig själva
+låst
+väntar på inloggning
+Utan brevlåda
+Ingen e-postdomän än
+DKIM, DMARC och MTA-STS
+DKIM-nycklar
+nyckel klar (RSA 2048
+skapas vid nästa ”Tillämpa”
+Servern signerar varje utgående e-post (DKIM), kontrollerar SPF, DKIM och DMARC för inkommande e-post och talar om för andra hur förfalskad e-post ska hanteras. DNS-posterna görs i ordning åt dig under 🧾 DNS-mallar

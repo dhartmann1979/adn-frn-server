@@ -1,0 +1,214 @@
+E-mail du propriétaire (server_owner
+Propriétaire du serveur (reçoit les droits OWNER dans chaque salon
+Une seule adresse ; vide = l’e-mail du compte FRN ci-dessus. Droits OWNER dans chaque salon
+E-mail du compte FRN (sysman_auth_emailaddr
+Mot de passe du compte FRN (sysman_auth_password
+E-mail de votre compte utilisateur FRN auprès du SystemManager
+Le mot de passe de ce compte FRN (tel qu’envoyé par le SystemManager
+Envoyé au SystemManager et affiché sur le tableau de bord
+Affiché sur le tableau de bord
+HTTPS et web
+Activer HTTPS avec Let’s Encrypt
+Certificats HTTPS automatiques avec Let’s Encrypt (nécessite un DNS public et les ports 80/443
+Domaine public
+Exemple : dashboard.example.org. Ne saisissez ni http:// ni chemin
+E-mail du certificat
+Expiration Let’s Encrypt et avis importants sur le certificat
+Utiliser des certificats de test (staging
+Pour les tests uniquement ; les navigateurs ne font pas confiance aux certificats staging
+Port HTTPS
+Port HTTPS public. La norme est 443
+Port du challenge HTTP / de redirection
+Port TCP public utilisé par le challenge HTTP-01 et la redirection HTTP → HTTPS
+Nécessite un nom DNS public pointant vers ce serveur et les ports TCP entrants 80 et 443. Enregistrez, puis redémarrez frnadn
+Base de données
+Durée de conservation des passages et connexions
+Conserver les passages individuels (jours
+Conserver les connexions (jours
+Conserver les messages de chat (jours
+Les totaux journaliers sont conservés indéfiniment, ils sont petits
+Annuler les modifications
+non enregistré
+du profil
+intégré
+vide
+Nouveau salon
+Nom (net00
+Emoji devant le nom
+Le salon est ouvert (_enable
+Désactivé : le serveur ne propose pas ce salon
+Masqué sur le tableau de bord
+Uniquement après connexion au tableau de bord (les clients FRN le voient toujours
+Propriétaires du salon (_owner
+E-mails séparés par des virgules ; droits NETOWNER dans ce salon. Vide = propriétaire du serveur
+Crosslinks autorisés (_acl_cl
+Passerelles autorisées (_acl_gw
+Vide = tous, none = aucun crosslink, ou des e-mails
+Vide = toutes, none = aucune passerelle, ou des e-mails
+Message pour les crosslinks/passerelles refusés (_acl_info
+Émission max. (_tot, s
+Rétablir le son après (_unmute, min
+0 = muet jusqu’à réactivation
+Pas de voix vers les clients PC muets
+Pas de voix vers les crosslinks muets
+Pas de voix vers les passerelles muettes
+Pause de parole (_speechpause, ms
+Message de pause de parole
+Envoyé aux clients PC uniquement ; {callsign} est remplacé
+Perroquet / test d’écho
+Marche/arrêt du perroquet (_parrot_startstop_enable
+Le perroquet peut être activé et désactivé par message texte
+Bot Telegram (_tgbot_params
+émission min. ms;repos min. ms;jeton du bot;ID du canal – p. ex. 6000;30000;123:ABC;-100123
+Message d’information (_show_infomessage
+Exiger l’autorisation de parole
+Peut émettre
+Monter
+Descendre
+Ordre sur le tableau de bord ; les clients FRN voient les salons triés par nom. ⭐ = salon par défaut, 🦜 = net00, le salon de test/perroquet
+Liste d’accès
+N’autoriser que les entrées de la liste d’accès
+Message d’accès
+Qui voit le message d’information de la liste d’accès
+Tout le monde
+uniquement les clients concernés par la liste d’accès
+Motif de blocage (_bl_regexp
+Expression régulière sur le nom, l’e-mail et la ville
+Message pour les clients bloqués (_bl_info
+Autoriser une adresse LAN (allowLANAddr
+Enregistrer les réglages d’accès
+Ajouter une entrée
+Ajouter à la liste
+Aucune entrée dans cette liste
+Copier une station en ligne
+Sélectionner une station connectée
+Les listes sont stockées dans SQLite et écrites au format XML du serveur FRN. Les entrées XML existantes sont importées automatiquement. Les modifications prennent effet après le redémarrage du serveur FRN ; les fichiers XML d’origine sont sauvegardés avant remplacement
+Les propriétaires et admins FRN peuvent toujours modifier ces listes dans le client FRN. Le tableau de bord importe les modifications des fichiers XML avant de les afficher ou de les modifier
+Nouveau compte FRN
+Pas encore de compte
+E-mail (identifiant du client FRN
+Mot de passe FRN
+ID du client FRN
+La liste de mots de passe du serveur pour
+mode (acl/FRNPasswd.xml
+sur ce serveur
+Le serveur est enregistré auprès du SystemManager : les connexions y sont vérifiées, cette liste n’est pas utilisée
+Le serveur a lui-même besoin du mot de passe dans FRNPasswd.xml (fichier lisible uniquement par le service
+Nouvel utilisateur
+Mot de passe (min. 10
+Nouveau mot de passe (min. 10
+Admins uniquement
+Superadmin : tout, y compris les admins. Admins : tout sauf les autres admins. Utilisateurs : voient le tableau de bord même privé, ainsi que les salons masqués
+superadmin
+Utilisateurs connectés
+Quoi
+De
+Fin
+installation / ligne de commande
+Machine
+Hôte
+Charge
+Mémoire
+Disque
+Redémarrer
+Éteindre
+Service
+En marche depuis
+Redémarrer le serveur FRN
+Redémarrer le tableau de bord
+Journal frn-server
+Journal frnadn
+Serveur FRN Java par
+Installé : inconnu
+Version installée
+mise à jour disponible
+Dépôt
+Données (SQLite
+Cache des statistiques
+server.log du serveur FRN
+Afficher server.properties
+Montant
+Descendant
+Importer un ancien server.properties
+Importer server.properties
+Sélectionnez l’ancien fichier server.properties
+Facultatif : importer les réglages de l’installation FRN précédente dans cette nouvelle installation. Seuls les paramètres pris en charge et les définitions de salons sont transférés. L’ancienne base de données, le JAR Java, les listes ACL et les fichiers XML de mots de passe ne sont pas copiés
+Profil de couleurs
+Choisissez un profil de couleurs, puis modifiez les couleurs à votre guise – ou créez un schéma entièrement personnel. Toute la page l’affiche immédiatement ; il n’est conservé qu’après
+Même moteur de couleurs que HBlink4-FreeRadioID et N8-HotSpot
+Couleurs personnelles
+Cliquez sur une couleur pour la modifier ; ↺ la reprend du profil
+Revenir à la couleur du profil
+Accent
+Accent 2
+Arrière-plan
+Couleur de la page derrière tout
+Boutons, chiffres, onglets actifs
+Deuxième couleur des boutons et du titre
+Halo en haut à gauche
+Halo en haut à droite
+Halo en bas
+Teinte des cartes
+Couleur mélangée aux cartes en verre
+Luminosité des cartes
+Intensité du relief des cartes en verre
+Flou du verre
+Halo d’arrière-plan
+0 = arrière-plan uni
+Arrondi
+Coins des cartes et des boutons
+Désactivé = plus rapide sur les vieux téléphones
+Lisible (contraste 18.3 : 1
+Standard N8
+Logo et icône du site
+Logo du tableau de bord
+Logo actuel du tableau de bord
+Utiliser le logo par défaut
+Icône du site / favicon
+Icône actuelle du site
+Utiliser l’icône par défaut
+Image PNG, jusqu’à 2 Mo. Affichée dans l’en-tête et la fenêtre de connexion
+PNG ou ICO, jusqu’à 2 Mo. Utilisée dans les onglets et les favoris du navigateur
+Enregistrer couleurs, logo et icône
+Vide = s’adapte automatiquement à l’arrière-plan
+Logos des clients
+Les stations affichent comme avatar le logiciel ou le réseau dont elles proviennent – détecté à partir de la bande, de la description et du type de client (crosslink, passerelle, PC). Les images intégrées sont de simples badges. Vous pouvez remplacer chacune par votre propre image (PNG, JPEG, WebP, GIF, ICO ou SVG simple, max. 512 Ko) – par exemple un logo officiel, si vous avez le droit de l’utiliser
+Icône
+Menu des liens
+Afficher le menu des liens
+Texte du bouton de menu
+Bouton avec menu déroulant
+Rangée de boutons sous l’en-tête
+(ordre = ordre dans le menu
+Nom, p. ex. Site web
+Ouvrir dans un nouvel onglet
+nouvel onglet
+Ajouter un lien
+Enregistrer les liens
+Enregistrer et actualiser les icônes de sites
+Afficher la favicon en cache de ce site
+icône du site
+HTML simple
+Vos propres liens dans l’en-tête : site web, groupe de discussion, wiki, page de dons … Tout le monde les voit, même sans connexion
+Site web
+E-mail
+Adresse
+Copier les réglages de
+Ne pas enregistrer
+(passe à cet onglet) et
+Propriétaire inconnu : l’e-mail du propriétaire du serveur (server_owner – Réglages → Exploitant, vide = le compte FRN) n’est pas un compte FRN connu du SystemManager – saisissez l’e-mail d’un compte FRN existant
+La raison des connexions refusées (mauvais mot de passe FRN, propriétaire inconnu, connexion multiple …) – également vérifiée en arrière-plan : juste après un problème du serveur FRN, puis toutes les 2 minutes ; les nouvelles raisons apparaissent dans les événements
+inconnu – synchronisez ou ouvrez le partenaire une fois
+autonome (sans SystemManager
+mot de passe défini
+aucun mot de passe
+aucun compte FRN saisi
+Comptes FRN auprès du SystemManager
+jamais modifié par la synchronisation, chaque serveur garde le sien
+Enregistrer le compte
+Compte FRN enregistré – redémarrez le serveur FRN pour vous connecter avec
+Aucune modification
+Serveur FRN ici arrêté et verrouillé
+il démarre de lui-même dès qu’un compte FRN propre est enregistré sous SystemManager
+Le serveur de secours arrête et verrouille lui-même son serveur FRN (à la prochaine synchronisation ou vérification d’état) – le maître reste en ligne
+Verrouillé : ce serveur de secours utilise le même compte FRN que le maître. Saisissez d’abord un compte FRN propre sous SystemManager (📧 Mot de passe FRN Backup

@@ -1,0 +1,180 @@
+Comprobado
+Reinícielo (sudo systemctl restart hblink4-dash
+Elija un perfil y después cambie el color que quiera – o cree un esquema completamente propio. Ve el resultado al instante
+Títulos
+Lo que muestran la cabecera y la pestaña del navegador
+Texto grande junto al logotipo
+Línea pequeña bajo el título
+Título de la pestaña del navegador
+Vacío = título del panel
+Logotipo e icono del navegador
+Suba sus propias imágenes o vuelva en cualquier momento al logotipo de N8schicht
+Icono del navegador (favicon
+Subir imagen
+Logotipo N8
+o dirección de una imagen (https://… o /static/
+Vacío = logotipo de N8schicht · PNG, JPEG, WebP, GIF, SVG · máx. 1 MB
+Vacío = igual que el logotipo · PNG, JPEG, WebP, GIF, SVG, ICO · máx. 1 MB
+Tamaño del logotipo (px
+Esquinas del logotipo (%
+0 = como está dibujado, 50 = redondo
+Sus propios enlaces en la cabecera, p. ej. al sitio web de la red, a un grupo de chat o a un wiki
+Sus propios enlaces en la cabecera: sitio web, grupo de chat, wiki, página de donaciones… Todos los ven, también sin iniciar sesión
+Fila de botones bajo la cabecera
+Un solo botón junto a las insignias de estado (opción antigua
+Botón adicional en la cabecera
+(único botón adicional
+Enlace del botón
+Aún no hay enlaces. Añada el primero abajo
+Mostrar/ocultar
+OpenBridge conecta este servidor con otra red, p. ej. un servidor FreeDMR
+Nueva troncal
+Guardar troncales
+Solo los talkgroups de esta lista pasan la troncal (en ambos sentidos); todo lo demás se descarta. Se configura en el área de administración → Patrones, enlaces y troncales →
+Experto: todas las troncales como JSON – o pegue una sección de hblink.cfg
+Pasar al formulario
+Aquí ve todas las troncales como JSON. También puede pegar secciones OpenBridge de un FreeDMR/HBlink3
+se ignoran. Una sección actualiza la troncal con el mismo nombre – o la del mismo puerto o ID de red; si no, añade una troncal
+Las líneas que empiezan por
+Cargar un ejemplo de HBlink3
+Importar una configuración
+¿Viene de otro servidor DMR? Cargue su archivo de configuración; HBlink4 muestra lo que puede adoptar. No cambia nada hasta que haga clic
+Archivo
+Elegir archivo
+Elegir rules.py
+Analizar
+Qué se adopta
+Archivo de configuración
+hblink.cfg, freedmr.cfg, adn-server.yaml o config.json – o suéltelo aquí
+HBlink3/FreeDMR: añada rules.py (puentes de conferencia
+opcional – sus talkgroups se convierten en listas de talkgroups
+Solo se lee, nunca se ejecuta
+todo de otro HBlink4: servidor, acceso, patrones, lista negra, enlaces, troncales
+las listas de ID de radios y repetidores se convierten en entradas de la lista negra
+No se adopta: reporting, logger, MySQL, AllStar, proxies, descargas de alias – HBlink4 lo hace por sí mismo o no lo necesita. Verá la lista tras el análisis
+APRS (mapa, DAPRS, servidor
+Servidor APRS
+Pestaña APRS del panel
+ID del servidor
+ID del servidor (su indicativo
+Indicativo con SSID, p. ej. DB0ABC-10. Nombre de acceso en APRS-IS (el passcode se calcula) y nombre en la ruta de los paquetes
+Desactivado por defecto. Activa el mapa, la base de datos de estaciones y la pasarela DMR → APRS. Los puertos TCP y el uplink de abajo son interruptores aparte
+Un servidor compatible con APRS-IS en Python: las apps APRS, iGates y trackers se conectan a él como a cualquier servidor APRS-IS
+Abrir los puertos APRS-IS (TCP
+APRSdroid, Xastir, YAAC, iGates y trackers se conectan aquí. Abra los puertos en el cortafuegos
+Puerto filtrado
+Puerto de flujo completo
+Clientes máx.
+Ventana de duplicados (s
+El mismo paquete recibido de nuevo en este tiempo se descarta (estándar APRS-IS: 30 s
+Los clientes eligen lo que reciben con un filtro (r/lat/lon/km
+Todo lo que tiene el servidor, sin filtrar. 0 = desactivado
+Clientes
+Clientes conectados
+Ninguna app APRS ni iGate conectada en este momento
+Uplink y downlink
+Conecte este servidor a una red APRS: las posiciones de DMR suben, las estaciones de allí bajan al mapa
+Conexión a una red APRS – APRS-IS, CB-APRS o servidores propios: las posiciones DMR suben, las estaciones bajan al mapa
+APRS-IS (radioaficionados, mundial
+CB-APRS (radio CB, eu.cbaprs.net
+Manual – servidores propios, varios enlaces, subida/bajada por separado
+Servidor APRS-IS
+Servidor CB-APRS
+euro.aprs2.net (Europa), rotate.aprs2.net (mundial) o su propio servidor Tier-2
+eu.cbaprs.net (Europa) o us.cbaprs.net
+Passcode
+Vacío = calculado a partir del acceso; -1 = solo recepción
+Acceso (indicativo CB
+Vacío = el ID del servidor
+Filtro de downlink
+Lo que baja: r/lat/lon/km = radio alrededor de un punto (por defecto: Alemania). Vacío = no baja nada
+Lo que baja de CB-APRS. Vacío = nada
+Subirlas (uplink
+Solo mientras el uplink esté conectado y verificado
+Las apps APRS lo necesitan para emitir. Déselo solo a radioaficionados con licencia
+Passcode para un indicativo
+Calcular
+Una línea por servidor: host, puerto, acceso, passcode (vacío = calculado), filtro y sentido
+Uplink y downlink están desactivados – el mapa solo muestra DMR y los clientes propios
+sin uplink
+Todo (DMR, clientes propios y downlink
+Solo DMR y clientes propios
+Subidos
+Paquetes recibidos
+Estaciones por origen
+Posiciones DMR
+Reiniciar el servidor APRS
+puertos cerrados
+DAPRS – GPS de las radios
+Decodificación DAPRS
+Decodificar posiciones GPS (DAPRS
+El servidor DMR encuentra posiciones GPS en el tráfico de radio (DAPRS). Qué ocurre con ellas se configura en la pestaña APRS
+Se activa junto con APRS (pestaña APRS → Servidor). Encuentra las posiciones que las radios envían por DMR y las entrega al servidor APRS del panel
+GPS en llamadas de voz (GPS LC incrustado
+Radios con GPS que envían su posición durante una llamada (Motorola, Hytera, AnyTone
+Llamadas de datos GPS (NMEA, LRRP
+Informes de posición enviados como llamada de datos, p. ej. AnyTone/TYT «Digital APRS» a 900999 o Motorola LRRP
+Aceptar datos GPS enviados a
+ID DMR/talkgroups a los que las radios envían sus datos GPS. all = cualquier destino; p. ej. 900999, 5057
+Posiciones desde DMR
+Las posiciones DMR se convierten en posiciones APRS
+Las posiciones que encuentra el servidor DMR (DAPRS) aparecen en el mapa como CALL-SSID; el indicativo procede de la lista de ID
+Qué ocurre con las posiciones GPS de las radios DMR: indicativo de la lista de ID, SSID, símbolo, comentario, APRS-IS
+CALL-7 para un portátil; 0 = sin SSID. Por ID abajo
+Símbolo
+Comentario
+Subir como máximo cada (s
+Tabla y código de símbolo: /[ persona, /> coche, /k camión, /b bici, /- casa, /r antena
+Marcadores: {tg} talkgroup, {repeater} indicativo del hotspot/repetidor, {dmrid}, {slot}, {server}
+Por ID DMR
+Indicativo, SSID, símbolo o comentario propios para ID individuales, o desactivar uno
+ID sin indicativo
+Objetos de repetidor
+Repetidores en el mapa
+Hotspots en el mapa
+Las posiciones de los hotspots suelen ser domicilios – desactivado por defecto
+Como objetos APRS en la posición que indican al conectarse, con frecuencia y color code
+Símbolo de repetidor
+Símbolo de hotspot
+Comentario del objeto
+Tras la frecuencia y el color code
+Baliza de objetos cada (min
+Subir estos objetos (uplink
+Enviar ahora los objetos de repetidor
+Las estaciones conectadas con la contraseña de invitado (FreeRadioID) solo aparecen en el mapa local
+El mapa APRS: quién lo ve, qué muestra y cuánto tiempo permanecen las estaciones
+Mapa visible sin iniciar sesión
+Independiente del panel: el mapa puede ser público aunque el panel no lo sea
+Estaciones en el mapa
+Mostrar estaciones de las últimas (h
+Mostrar trazas
+Línea de las últimas posiciones de las estaciones en movimiento
+Mostrar paquetes en bruto
+Registro de paquetes bajo el mapa y en la ventana de la estación
+Centro del mapa (lat, lon
+Dónde se abre el mapa, p. ej. 52.29, 8.92
+Zoom
+2 = mundo, 6 = Alemania, 10 = región
+Estilo del mapa
+Automático – mapa oscuro para perfiles de color oscuros, mapa claro para Daylight
+Oscuro (OpenStreetMap, oscurecido) – encaja con el diseño N8
+Topográfico (OpenTopoMap
+Servidor de teselas propio
+URL de teselas propia
+Zoom máximo del servidor de teselas propio
+Más allá, las teselas se amplían en lugar de faltar (OpenStreetMap 19, OpenTopoMap 17 – se ajusta automáticamente
+https://…/{z}/{x}/{y}.png – solo para «Servidor de teselas propio» (p. ej. con su propia clave de API
+Por estación. El mapa local muestra siempre la posición más reciente
+Guardar estaciones (días
+Guardar trazas (días
+Guardar paquetes en bruto (días
+Dominios APRS
+Hasta tres dominios que abren directamente el mapa, cada uno con su título y logotipo y, si se desea, un certificado Let’s Encrypt
+Dominio 1
+Dominio 2
+Dominio 3
+Dominio 1: HTTPS con Let’s Encrypt
+Dominio 2: HTTPS con Let’s Encrypt
+Dominio 3: HTTPS con Let’s Encrypt
+p. ej. map.example.org – abre el mapa en /. Debe apuntar a este servidor (DNS). Vacío = desactivado
+p. ej. aprs.example.org – abre el mapa en /. Debe apuntar a este servidor (DNS). Vacío = desactivado

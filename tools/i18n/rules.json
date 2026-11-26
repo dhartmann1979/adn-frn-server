@@ -1,0 +1,816 @@
+{
+ "kit": [
+  {
+   "to": "de",
+   "re": "^(\\d+) minutes? ago$",
+   "flags": "",
+   "rep": "vor $1 Min."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) seconds? ago$",
+   "flags": "",
+   "rep": "vor $1 s"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) hours? ago$",
+   "flags": "",
+   "rep": "vor $1 Std."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) days? ago$",
+   "flags": "",
+   "rep": "vor $1 Tagen"
+  },
+  {
+   "to": "de",
+   "re": "^rolled back to (.+)$",
+   "flags": "",
+   "rep": "zurückgesetzt auf $1"
+  },
+  {
+   "to": "de",
+   "re": "^noch (\\d+) Tage$",
+   "flags": "",
+   "rep": "$1 days left"
+  },
+  {
+   "to": "de",
+   "re": "^rollback failed \\(git reset\\)$",
+   "flags": "",
+   "rep": "Zurücksetzen fehlgeschlagen (git reset)"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) min ago$",
+   "flags": "",
+   "rep": "vor $1 Min."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) s ago$",
+   "flags": "",
+   "rep": "vor $1 s"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) h ago$",
+   "flags": "",
+   "rep": "vor $1 Std."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) d ago$",
+   "flags": "",
+   "rep": "vor $1 T."
+  }
+ ],
+ "adn": [
+  {
+   "to": "de",
+   "re": "^FRN account of this server \\((Master|Backup)\\)$",
+   "flags": "",
+   "rep": "FRN-Konto dieses Servers ($1)"
+  },
+  {
+   "to": "de",
+   "re": "^•+ \\(unchanged\\)$",
+   "flags": "",
+   "rep": "•••••••• (unverändert)"
+  },
+  {
+   "to": "de",
+   "re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+   "flags": "",
+   "rep": "(m, w) => `Dieses FRN-Konto verwendet schon der ${w === 'master' ? 'Master' : 'Backup'} – jeder Server braucht sein eigenes FRN-Konto (📧 FRN-Passwort ${w === 'master' ? 'Master' : 'Backup'}).`"
+  },
+  {
+   "to": "de",
+   "re": "^Removed by hand, not added again: (.+)$",
+   "flags": "",
+   "rep": "Von Hand entfernt, wird nicht wieder ergänzt: $1"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) waiting$",
+   "flags": "",
+   "rep": "$1 wartend"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) active( · .+)?$",
+   "flags": "",
+   "rep": "(m, n, r) => `${n} aktiv${r || ''}`"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) days$",
+   "flags": "",
+   "rep": "$1 Tage"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) mailboxes$",
+   "flags": "",
+   "rep": "$1 Postfächer"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) selected$",
+   "flags": "",
+   "rep": "$1 ausgewählt"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) messages$",
+   "flags": "",
+   "rep": "$1 Nachrichten"
+  },
+  {
+   "to": "de",
+   "re": "^Remove (.+)\\?$",
+   "flags": "",
+   "rep": "$1 entfernen?"
+  },
+  {
+   "to": "de",
+   "re": "^Mail server configured: (\\d+) domain\\(s\\), (\\d+) mailbox\\(es\\), Dovecot ([\\d.]+)\\.(.*)$",
+   "flags": "",
+   "rep": "Mailserver eingerichtet: $1 Domain(s), $2 Postfach/Postfächer, Dovecot $3.$4"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) published$",
+   "flags": "",
+   "rep": "$1 veröffentlicht"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) drafts$",
+   "flags": "",
+   "rep": "$1 Entwürfe"
+  },
+  {
+   "to": "de",
+   "re": "^Saved \\((\\d+)\\)$",
+   "flags": "",
+   "rep": "Gespeichert ($1)"
+  },
+  {
+   "to": "de",
+   "re": "^„(.+)“ is removed for good\\.?$",
+   "flags": "",
+   "rep": "„$1“ wird endgültig gelöscht."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) rooms$",
+   "flags": "",
+   "rep": "$1 Räume"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) accounts$",
+   "flags": "",
+   "rep": "$1 Konten"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) list entries$",
+   "flags": "",
+   "rep": "$1 Listeneinträge"
+  },
+  {
+   "to": "de",
+   "re": "^FRN: (\\d+) stations$",
+   "flags": "",
+   "rep": "FRN: $1 Stationen"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) stations$",
+   "flags": "",
+   "rep": "$1 Stationen"
+  },
+  {
+   "to": "de",
+   "re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+   "flags": "",
+   "rep": "Partner $1 nicht erreichbar ($2)."
+  },
+  {
+   "to": "de",
+   "re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+   "flags": "",
+   "rep": "Der Partner hat abgelehnt: $1 – der Schlüssel muss auf beiden Servern gleich sein."
+  },
+  {
+   "to": "de",
+   "re": "^Backup not reachable – nothing switched: (.+)$",
+   "flags": "",
+   "rep": "Backup nicht erreichbar – nichts umgeschaltet: $1"
+  },
+  {
+   "to": "de",
+   "re": "^Sync failed – nothing switched: (.*)$",
+   "flags": "",
+   "rep": "Abgleich fehlgeschlagen – nichts umgeschaltet: $1"
+  },
+  {
+   "to": "de",
+   "re": "^down since (.+)$",
+   "flags": "",
+   "rep": "weg seit $1"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)× restarted$",
+   "flags": "",
+   "rep": "$1× neu gestartet"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) min$",
+   "flags": "",
+   "rep": "$1 Min."
+  },
+  {
+   "to": "de",
+   "re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+   "flags": "",
+   "rep": "$1Angefordert – der SystemManager schickt das Passwort an $2. Auch im Spam-Ordner nachsehen."
+  },
+  {
+   "to": "de",
+   "re": "^(⚠️ )?There is already an FRN account with this callsign and name\\.",
+   "flags": "",
+   "rep": "$1Es gibt schon ein FRN-Konto mit diesem Rufzeichen und Namen. Das Passwort kam damals per E-Mail – für einen zweiten Server einen anderen Namen nehmen (z. B. „DO1ABC, Server Test“)."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+   "flags": "",
+   "rep": "$1 Stationen online · der FRN-Server übernimmt Änderungen nach einem Neustart · net00 ist immer der Test-/Papageienraum des Servers"
+  },
+  {
+   "to": "de",
+   "re": "^Show all (\\d+)$",
+   "flags": "",
+   "rep": "Alle $1 anzeigen"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) min ago$",
+   "flags": "",
+   "rep": "vor $1 Min."
+  },
+  {
+   "to": "de",
+   "re": "^in (.+) · (.+) · (\\d+) min ago$",
+   "flags": "",
+   "rep": "in $1 · $2 · vor $3 Min."
+  },
+  {
+   "to": "de",
+   "re": "^(.+) of (.+)$",
+   "flags": "",
+   "rep": "(m, a, b) => /^[\\d.,]+ ?[KMGT]?B$/.test(a) ? `${a} von ${b}` : m"
+  },
+  {
+   "to": "de",
+   "re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+   "flags": "",
+   "rep": "Port $1 · $2 Stationen · seit $3"
+  },
+  {
+   "to": "de",
+   "re": "^since (.+)$",
+   "flags": "",
+   "rep": "seit $1"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+   "flags": "",
+   "rep": "$1 · läuft $2 · $3 Browser"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) hits · (\\d+) computed$",
+   "flags": "",
+   "rep": "$1 Treffer · $2 berechnet"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) · no e-mail · (.+)$",
+   "flags": "",
+   "rep": "$1 · keine E-Mail · $2"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) – my account$",
+   "flags": "",
+   "rep": "$1 – mein Konto"
+  }
+ ],
+ "crosslink": [
+  {
+   "to": "en",
+   "re": "^(\\d+)–(\\d+) Uhr: (\\d+)$",
+   "flags": "",
+   "rep": "$1–$2 h: $3"
+  },
+  {
+   "to": "en",
+   "re": "^Stand (.+)$",
+   "flags": "",
+   "rep": "as of $1"
+  },
+  {
+   "to": "en",
+   "re": "^(.+) · Stand (.+)$",
+   "flags": "",
+   "rep": "$1 · as of $2"
+  },
+  {
+   "to": "en",
+   "re": "^Raum (.+) · (\\d+) Stationen$",
+   "flags": "",
+   "rep": "Room $1 · $2 stations"
+  },
+  {
+   "to": "en",
+   "re": "^Raum (.+)$",
+   "flags": "",
+   "rep": "Room $1"
+  },
+  {
+   "to": "en",
+   "re": "^Kanal (.+)$",
+   "flags": "",
+   "rep": "Channel $1"
+  },
+  {
+   "to": "en",
+   "re": "^FRN verbunden mit Raum „(.+)“ \\((.+)\\)$",
+   "flags": "",
+   "rep": "FRN connected to room \"$1\" ($2)"
+  },
+  {
+   "to": "en",
+   "re": "^Zello verbunden mit Kanal „(.+)“$",
+   "flags": "",
+   "rep": "Zello connected to channel \"$1\""
+  },
+  {
+   "to": "en",
+   "re": "^DMR verbunden mit (.+) als (\\d+) \\((.+)\\)$",
+   "flags": "",
+   "rep": "DMR connected to $1 as $2 ($3)"
+  },
+  {
+   "to": "en",
+   "re": "^(FRN|DMR|Zello) aktiv$",
+   "flags": "",
+   "rep": "$1 active"
+  },
+  {
+   "to": "en",
+   "re": "^⇣ (\\d+) empfangen · ⇡ (\\d+) gesendet$",
+   "flags": "",
+   "rep": "⇣ $1 received · ⇡ $2 sent"
+  },
+  {
+   "to": "en",
+   "re": "^(\\d+) Wiederverbindungen · (\\d+) Neuaufbauten$",
+   "flags": "",
+   "rep": "$1 reconnects · $2 rebuilds"
+  },
+  {
+   "to": "en",
+   "re": "^(\\d+)× neu geöffnet$",
+   "flags": "",
+   "rep": "reopened $1×"
+  },
+  {
+   "to": "en",
+   "re": "^vor (.+)$",
+   "flags": "",
+   "rep": "(m, a) => a === 'gerade eben' ? 'just now' : `${a} ago`"
+  },
+  {
+   "to": "en",
+   "re": "^· vor gerade eben$",
+   "flags": "",
+   "rep": "· just now"
+  },
+  {
+   "to": "en",
+   "re": "^Vocoder (.+): bereit$",
+   "flags": "",
+   "rep": "Vocoder $1: ready"
+  },
+  {
+   "to": "en",
+   "re": "^(.+) · aktiv$",
+   "flags": "",
+   "rep": "$1 · active"
+  },
+  {
+   "to": "en",
+   "re": "^Encode (\\d+) · Decode (\\d+) · Timeouts (\\d+) · Wiederholt (\\d+) · Neu geöffnet (\\d+)$",
+   "flags": "",
+   "rep": "Encode $1 · decode $2 · timeouts $3 · repeated $4 · reopened $5"
+  },
+  {
+   "to": "en",
+   "re": "^(\\d+) mit Bild \\((.+)\\) · (\\d+) ohne · zuletzt aktualisiert (.+)$",
+   "flags": "",
+   "rep": "(m, a, b, c, d) => `${a} with picture (${b}) · ${c} without · last updated ${d === 'noch nie' ? 'never' : d}`"
+  },
+  {
+   "to": "en",
+   "re": "^ID-Listen aktualisiert: ([\\d.,]+) DMR-IDs\\. (\\d+) bei FreeRadioID registriert\\. (\\d+) Talkgroups$",
+   "flags": "",
+   "rep": "ID lists updated: $1 DMR IDs. $2 registered at FreeRadioID. $3 talkgroups"
+  },
+  {
+   "to": "en",
+   "re": "^([\\d.,]+) DMR-IDs · (\\d+) FreeRadioID · (\\d+) Talkgroups · Stand (.+)$",
+   "flags": "",
+   "rep": "$1 DMR IDs · $2 FreeRadioID · $3 talkgroups · as of $4"
+  },
+  {
+   "to": "en",
+   "re": "^Update verfügbar: (.+)$",
+   "flags": "",
+   "rep": "Update available: $1"
+  },
+  {
+   "to": "en",
+   "re": "^Aktualisiert auf (.+)$",
+   "flags": "",
+   "rep": "Updated to $1"
+  },
+  {
+   "to": "de",
+   "re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+   "flags": "",
+   "rep": "(m, a) => `Gut lesbar (Kontrast ${a.replace('.', ',')} : 1)`"
+  },
+  {
+   "to": "de",
+   "re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+   "flags": "",
+   "rep": "(m, a) => `Schwer lesbar (Kontrast ${a.replace('.', ',')} : 1)`"
+  }
+ ],
+ "hotspot": [
+  {
+   "to": "de",
+   "re": "^→ TG (\\d+) · just now$",
+   "flags": "",
+   "rep": "→ TG $1 · gerade eben"
+  },
+  {
+   "to": "de",
+   "re": "^Show all ([\\d.,]+)$",
+   "flags": "",
+   "rep": "Alle $1 anzeigen"
+  },
+  {
+   "to": "de",
+   "re": "^\\((\\d+) without picture\\)$",
+   "flags": "",
+   "rep": "($1 ohne Bild)"
+  },
+  {
+   "to": "de",
+   "re": "^List of the N8schicht: ([\\d.,]+) names$",
+   "flags": "",
+   "rep": "Liste der N8schicht: $1 Namen"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) – my account$",
+   "flags": "",
+   "rep": "$1 – mein Konto"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) is starting$",
+   "flags": "",
+   "rep": "$1 startet"
+  },
+  {
+   "to": "de",
+   "re": "^Simplex · CC(\\d+)$",
+   "flags": "",
+   "rep": "Simplex · FC$1"
+  },
+  {
+   "to": "de",
+   "re": "^CC(\\d+)$",
+   "flags": "",
+   "rep": "FC$1"
+  },
+  {
+   "to": "de",
+   "re": "^Hotspot · DMR (Simplex|Duplex)$",
+   "flags": "",
+   "rep": "Hotspot · DMR $1"
+  },
+  {
+   "to": "de",
+   "re": "^today · (\\d+) RF \\/ (\\d+) network$",
+   "flags": "",
+   "rep": "heute · $1 Funk / $2 Netz"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) problem\\(s\\)$",
+   "flags": "",
+   "rep": "$1 Fehler"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) checks in order$",
+   "flags": "",
+   "rep": "$1 Prüfungen in Ordnung"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+   "flags": "",
+   "rep": "$1 · TS$2 · jetzt · $3 s"
+  },
+  {
+   "to": "de",
+   "re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+   "flags": "",
+   "rep": "$1 · TS$2 · letzter Funk-Durchgang · $3 s"
+  },
+  {
+   "to": "de",
+   "re": "^Stop (.+)\\?$",
+   "flags": "",
+   "rep": "$1 stoppen?"
+  },
+  {
+   "to": "de",
+   "re": "^down since (.+)$",
+   "flags": "",
+   "rep": "weg seit $1"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)× restarted(.*)$",
+   "flags": "",
+   "rep": "$1× neu gestartet$2"
+  },
+  {
+   "to": "de",
+   "re": "^failed · (.+)$",
+   "flags": "",
+   "rep": "fehlgeschlagen · $1"
+  },
+  {
+   "to": "de",
+   "re": "^Duplex · CC(\\d+)$",
+   "flags": "",
+   "rep": "Duplex · FC$1"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) min ago$",
+   "flags": "",
+   "rep": "vor $1 Min."
+  }
+ ],
+ "hblink": [
+  {
+   "to": "de",
+   "re": "^down since (.+)$",
+   "flags": "",
+   "rep": "weg seit $1"
+  },
+  {
+   "to": "de",
+   "re": "^last check (.+)$",
+   "flags": "",
+   "rep": "letzte Prüfung $1"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) missed$",
+   "flags": "",
+   "rep": "$1 verpasst"
+  },
+  {
+   "to": "de",
+   "re": "^All · TS(\\d)$",
+   "flags": "",
+   "rep": "Alle · TS$1"
+  },
+  {
+   "to": "de",
+   "re": "^no keep-alive$",
+   "flags": "",
+   "rep": "kein Keep-Alive"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)m ago$",
+   "flags": "",
+   "rep": "vor $1 Min."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)s ago$",
+   "flags": "",
+   "rep": "vor $1 s"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)h ago$",
+   "flags": "",
+   "rep": "vor $1 Std."
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+)d ago$",
+   "flags": "",
+   "rep": "vor $1 T."
+  },
+  {
+   "to": "de",
+   "re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+   "flags": "",
+   "rep": "$1 · $2 Sprecher"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) names? sent by the radios$",
+   "flags": "",
+   "rep": "$1 Namen von den Funkgeräten"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) verified$",
+   "flags": "",
+   "rep": "$1 bestätigt"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) other$",
+   "flags": "",
+   "rep": "$1 weitere"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) guests?$",
+   "flags": "",
+   "rep": "$1 Gäste"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) duplicates? dropped$",
+   "flags": "",
+   "rep": "$1 Duplikate verworfen"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) sent up$",
+   "flags": "",
+   "rep": "$1 hinaufgeschickt"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) new changes?$",
+   "flags": "",
+   "rep": "$1 neue Änderung(en)"
+  },
+  {
+   "to": "de",
+   "re": "^– (\\d+) new changes? on GitHub$",
+   "flags": "",
+   "rep": "– $1 neue Änderung(en) auf GitHub"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+   "flags": "",
+   "rep": "$1 Übersetzungsregel(n) aktiv – übersetzte TGs sind golden"
+  },
+  {
+   "to": "de",
+   "re": "^Version (\\S+) available$",
+   "flags": "",
+   "rep": "Version $1 verfügbar"
+  },
+  {
+   "to": "de",
+   "re": "^last hour · (\\d+) stored$",
+   "flags": "",
+   "rep": "letzte Stunde · $1 gespeichert"
+  },
+  {
+   "to": "de",
+   "re": "^Show all ([\\d.,]+)$",
+   "flags": "",
+   "rep": "Alle $1 anzeigen"
+  },
+  {
+   "to": "de",
+   "re": "^Show all ([\\d.,]+) names$",
+   "flags": "",
+   "rep": "Alle $1 Namen anzeigen"
+  },
+  {
+   "to": "de",
+   "re": "^Show all ([\\d.,]+) talkgroups$",
+   "flags": "",
+   "rep": "Alle $1 Talkgroups anzeigen"
+  },
+  {
+   "to": "de",
+   "re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+   "flags": "",
+   "rep": "Liste der N8schicht: $1 Namen, Stand $2"
+  },
+  {
+   "to": "de",
+   "re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+   "flags": "",
+   "rep": "Talker Alias (vom Funkgerät gesendet) · Datenbank: $1"
+  },
+  {
+   "to": "de",
+   "re": "^Talker Alias · database: (.+)$",
+   "flags": "",
+   "rep": "Talker Alias · Datenbank: $1"
+  },
+  {
+   "to": "de",
+   "re": "^up ([\\d:]+)(.*)$",
+   "flags": "",
+   "rep": "läuft $1$2"
+  },
+  {
+   "to": "de",
+   "re": "^· up ([\\d:]+)(.*)$",
+   "flags": "",
+   "rep": "· läuft $1$2"
+  },
+  {
+   "to": "de",
+   "re": "^admin · Superadmin$",
+   "flags": "",
+   "rep": "admin · Superadmin"
+  },
+  {
+   "to": "de",
+   "re": "^APRS (local|online|connecting) · (\\d+) stations$",
+   "flags": "",
+   "rep": "(m, a, n) => `APRS ${({ local: 'lokal', online: 'online', connecting: 'verbindet' })[a]} · ${n} Stationen`"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) stations?$",
+   "flags": "",
+   "rep": "$1 Stationen"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) calls?$",
+   "flags": "",
+   "rep": "$1 Gespräche"
+  },
+  {
+   "to": "de",
+   "re": "^(\\d+) talkgroups?$",
+   "flags": "",
+   "rep": "$1 Talkgroups"
+  },
+  {
+   "to": "en",
+   "re": "^AutoBackup vorbereiten: (.+)$",
+   "flags": "",
+   "rep": "Prepare AutoBackup: $1"
+  },
+  {
+   "to": "en",
+   "re": "^Backup-Datei \\(\\.tar\\.gz oder \\.tar\\.gz\\.age, maximal (.+)\\)$",
+   "flags": "",
+   "rep": "Backup file (.tar.gz or .tar.gz.age, at most $1)"
+  },
+  {
+   "to": "en",
+   "re": "^Backup erstellt \\((.+)\\)\\. Download wird gestartet\\.$",
+   "flags": "",
+   "rep": "Backup created ($1). Download starts."
+  }
+ ]
+}

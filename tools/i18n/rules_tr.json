@@ -1,0 +1,4586 @@
+{
+"fr": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "il y a $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "il y a $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "il y a $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "il y a $1 jours"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "restauré vers $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "encore $1 jours"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "échec de la restauration (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "il y a $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "il y a $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "il y a $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "il y a $1 j"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "il y a $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "il y a $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "il y a $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "il y a $1 j"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "hors ligne depuis $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "redémarré $1×$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "depuis $1"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Afficher les $1"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – mon compte"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 stations"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Mise à jour disponible : $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Mis à jour vers $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "Version $1 disponible"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Lisible (contraste $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Difficile à lire (contraste $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "Compte FRN de ce serveur ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (inchangé)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Ce compte FRN est déjà utilisé par le serveur $1 – chaque serveur a besoin de son propre compte FRN."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Retiré à la main, pas ajouté à nouveau : $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 en attente"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 actifs$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 jours"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 boîtes aux lettres"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 sélectionnés"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 messages"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "Retirer $1 ?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 publiées"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 brouillons"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Enregistré ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "« $1 » sera définitivement supprimé."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 salons"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 comptes"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 entrées de liste"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN : $1 stations"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "Partenaire $1 injoignable ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "Le partenaire a refusé : $1 – la clé doit être identique sur les deux serveurs."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "Secours injoignable – rien n’a basculé : $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Échec de la synchronisation – rien n’a basculé : $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 min"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Demandé – le SystemManager envoie le mot de passe à $2. Vérifiez aussi le dossier spam."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 stations en ligne · le serveur FRN applique les modifications après un redémarrage · net00 est toujours le salon de test/perroquet du serveur"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "dans $1 · $2 · il y a $3 min"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "port $1 · $2 stations · depuis $3"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · en marche depuis $2 · $3 navigateur(s)"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 trouvés · $2 calculés"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · pas d’e-mail · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · à l’instant"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 sans image)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "Liste de la N8schicht : $1 noms"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 démarre"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "aujourd’hui · $1 RF / $2 réseau"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 problème(s)"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 vérifications en ordre"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · maintenant · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · dernier appel RF · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "Arrêter $1 ?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "échec · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "dernière vérification $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 manqués"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Tous · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "pas de keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 orateur(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 nom(s) envoyé(s) par les radios"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 vérifiés"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 autres"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 invité(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 doublon(s) rejeté(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 envoyés en montée"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 nouvelle(s) modification(s)"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 nouvelle(s) modification(s) sur GitHub"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 règle(s) de traduction active(s) — les TG traduits sont affichés en or"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "dernière heure · $1 enregistrés"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Afficher les $1 noms"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Afficher les $1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "Liste de la N8schicht : $1 noms, mise à jour $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (envoyé par la radio) · base de données : $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · base de données : $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "en marche depuis $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· en marche depuis $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 stations"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 appels"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "Préparer l’AutoBackup : $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "Fichier de sauvegarde (.tar.gz ou .tar.gz.age, au plus $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Sauvegarde créée ($1). Le téléchargement commence."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2 h : $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "état au $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · état au $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "Salon $1 · $2 stations"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "Salon $1"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "Canal $1"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN connecté au salon « $1 » ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello connecté au canal « $1 »"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR connecté à $1 en tant que $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 actif"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 reçus · ⇡ $2 envoyés"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 reconnexions · $2 reconstructions"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "rouvert $1×"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "Vocodeur $1 : prêt"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · actif"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog : $1 est reconstruit (hors ligne depuis $2 s)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1 : échec de la connexion à $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN : maître et secours détectés – maître $1 (priorité 1), secours $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 reconnexions · $2 reconstructions (dernière : hors ligne depuis $3 s)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Indicatif $1 · serveur $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 salons du tableau de bord $2 (sans les salons masqués)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Qualité $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ Journal des erreurs injoignable ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "vers $1 (par défaut $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "vers $1 (HBlink4/FreeDMR, par défaut $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "vers $1 (HomeBrew, par défaut $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive : $1 – pas de réponse (depuis $2 min) – redémarré"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "watchdog systemd : plus de réponse – le processus était bloqué et a été arrêté (SIGABRT) – boucle d’événements figée pendant $1 s"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 sur $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Base d’indicatifs : $1 entrées + $2 FreeRadioID, mise à jour $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "il y a $1"
+}
+],
+"hu": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "$1 perce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "$1 másodperce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "$1 órája"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "$1 napja"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "visszaállítva erre: $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "még $1 nap"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "sikertelen visszaállítás (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "$1 perce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "$1 másodperce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "$1 órája"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "$1 napja"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "$1 perce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "$1 másodperce"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "$1 órája"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "$1 napja"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "nem elérhető ekkor óta: $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "$1× újraindítva$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "$1 óta"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Mind a(z) $1 megjelenítése"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – fiókom"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 állomás"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Frissítés érhető el: $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Frissítve erre: $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "A(z) $1 verzió elérhető"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Jól olvasható (kontraszt $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Nehezen olvasható (kontraszt $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "A szerver FRN-fiókja ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (változatlan)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Ezt az FRN-fiókot már használja a(z) $1 – minden szervernek saját FRN-fiók kell."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Kézzel eltávolítva, nem kerül újra hozzáadásra: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 várakozik"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 aktív$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 nap"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 postafiók"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 kijelölve"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 üzenet"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "Eltávolítja: $1?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 közzétéve"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 piszkozat"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Mentve ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "A(z) „$1” véglegesen törlődik."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 szoba"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 fiók"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 listabejegyzés"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN: $1 állomás"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "A(z) $1 partner nem érhető el ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "A partner elutasította: $1 – a kulcsnak mindkét szerveren azonosnak kell lennie."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "A tartalék nem érhető el – semmi sem váltott át: $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Sikertelen szinkronizálás – semmi sem váltott át: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 perc"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Igényelve – a SystemManager elküldi a jelszót ide: $2. Nézze meg a spam mappát is."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 online állomás · az FRN-szerver újraindítás után veszi át a módosításokat · a net00 mindig a szerver teszt-/papagájszobája"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "$1 · $2 · $3 perce"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "$1-es port · $2 állomás · $3 óta"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · fut: $2 · $3 böngésző"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 találat · $2 számított"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · nincs e-mail · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · épp most"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 kép nélkül)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "Az N8schicht listája: $1 név"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 indul"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "ma · $1 RF / $2 hálózat"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 probléma"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 ellenőrzés rendben"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · most · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · utolsó RF-hívás · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "Leállítja: $1?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "sikertelen · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "utolsó ellenőrzés: $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 kihagyva"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Mind · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "nincs keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 beszélő"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 név a rádióktól"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 ellenőrizve"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 egyéb"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 vendég"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 duplikátum eldobva"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 felküldve"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 új változás"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 új változás a GitHubon"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 fordítási szabály aktív — a fordított TG-k aranyszínűek"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "utolsó óra · $1 tárolva"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Mind a(z) $1 név megjelenítése"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Mind a(z) $1 talkgroup megjelenítése"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "Az N8schicht listája: $1 név, frissítve: $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (a rádió küldi) · adatbázis: $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · adatbázis: $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "fut: $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· fut: $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 állomás"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 hívás"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroup"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "AutoBackup előkészítése: $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "Mentésfájl (.tar.gz vagy .tar.gz.age, legfeljebb $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Mentés elkészült ($1). A letöltés elindul."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2 óra: $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "állapot: $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · állapot: $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "$1 szoba · $2 állomás"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "$1 szoba"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "$1 csatorna"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN csatlakozva a(z) „$1” szobához ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello csatlakozva a(z) „$1” csatornához"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR csatlakozva: $1, ID $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 aktív"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 fogadva · ⇡ $2 küldve"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 újracsatlakozás · $2 újraépítés"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "$1× újranyitva"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "$1 vokóder: kész"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · aktív"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog: a(z) $1 újraépül ($2 s óta offline)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1: sikertelen kapcsolódás ide: $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN: master és tartalék felismerve – master: $1 (1-es prioritás), tartalék: $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 újracsatlakozás · $2 újraépítés (utoljára: $3 s offline)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Hívójel: $1 · szerver: $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 szoba a(z) $2 vezérlőpultról (rejtett szobák nélkül)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Minőség $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ A hibanapló nem érhető el ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "ide: $1 (alapértelmezés $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "ide: $1 (HBlink4/FreeDMR, alapértelmezés $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "ide: $1 (HomeBrew, alapértelmezés $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive: $1 – nincs válasz ($2 perce) – újraindítva"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "systemd watchdog: nincs több válasz – a folyamat lefagyott és leállították (SIGABRT) – az eseményhurok $1 s-ig állt"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 / $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Hívójel-adatbázis: $1 bejegyzés + $2 FreeRadioID, frissítve: $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "$1 ezelőtt"
+}
+],
+"sv": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "för $1 min sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "för $1 s sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "för $1 h sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "för $1 dagar sedan"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "återställd till $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "$1 dagar kvar"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "återställningen misslyckades (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "för $1 min sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "för $1 s sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "för $1 h sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "för $1 d sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "för $1 min sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "för $1 s sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "för $1 h sedan"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "för $1 d sedan"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "nere sedan $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "omstartad $1×$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "sedan $1"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Visa alla $1"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – mitt konto"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 stationer"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Uppdatering tillgänglig: $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Uppdaterad till $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "Version $1 tillgänglig"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Läsbar (kontrast $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Svårläst (kontrast $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "Denna servers FRN-konto ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (oförändrat)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Detta FRN-konto används redan av $1 – varje server behöver ett eget FRN-konto."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Borttagen för hand, läggs inte till igen: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 väntar"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 aktiva$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 dagar"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 brevlådor"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 markerade"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 meddelanden"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "Ta bort $1?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 publicerade"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 utkast"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Sparat ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "”$1” tas bort för gott."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 rum"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 konton"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 listposter"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN: $1 stationer"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "Partnern $1 kan inte nås ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "Partnern nekade: $1 – nyckeln måste vara densamma på båda servrarna."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "Reserven kan inte nås – inget växlades: $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Synkroniseringen misslyckades – inget växlades: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 min"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Begärt – SystemManager e-postar lösenordet till $2. Titta även i skräppostmappen."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 stationer online · FRN-servern använder ändringar efter en omstart · net00 är alltid serverns test-/papegojrum"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "i $1 · $2 · för $3 min sedan"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "port $1 · $2 stationer · sedan $3"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · uppe $2 · $3 webbläsare"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 träffar · $2 beräknade"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · ingen e-post · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · just nu"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 utan bild)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "N8schichts lista: $1 namn"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 startar"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "idag · $1 RF / $2 nätverk"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 problem"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 kontroller i ordning"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · nu · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · senaste RF-samtal · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "Stoppa $1?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "misslyckades · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "senaste kontroll $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 missade"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Alla · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "ingen keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 talare"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 namn skickade av radioapparaterna"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 verifierade"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 andra"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 gäster"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 dubbletter kastade"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 skickade upp"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 nya ändringar"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 nya ändringar på GitHub"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 översättningsregler aktiva — översatta TG:er visas i guld"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "senaste timmen · $1 sparade"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Visa alla $1 namn"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Visa alla $1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "N8schichts lista: $1 namn, uppdaterad $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (skickat av radion) · databas: $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · databas: $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "uppe $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· uppe $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 stationer"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 samtal"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "Förbered AutoBackup: $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "Säkerhetskopiefil (.tar.gz eller .tar.gz.age, högst $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Säkerhetskopia skapad ($1). Nedladdningen startar."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2: $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "per $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · per $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "Rum $1 · $2 stationer"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "Rum $1"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "Kanal $1"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN ansluten till rummet ”$1” ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello ansluten till kanalen ”$1”"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR ansluten till $1 som $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 aktiv"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 mottagna · ⇡ $2 skickade"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 återanslutningar · $2 ombyggen"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "öppnad igen $1×"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "Vocoder $1: redo"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · aktiv"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog: $1 byggs upp igen (offline i $2 s)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1: anslutningen till $2 misslyckades ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN: master och reserv identifierade – master $1 (prioritet 1), reserv $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 återanslutningar · $2 ombyggen (senast: offline i $3 s)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Anropssignal $1 · server $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 rum från instrumentpanelen $2 (utan dolda rum)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Kvalitet $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ Felloggen kan inte nås ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "till $1 (standard $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "till $1 (HBlink4/FreeDMR, standard $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "till $1 (HomeBrew, standard $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive: $1 – inget svar (i $2 min) – omstartad"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "systemd-watchdog: inget svar längre – processen hängde sig och avslutades (SIGABRT) – händelseloopen stod still i $1 s"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 av $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Anropssignaldatabas: $1 poster + $2 FreeRadioID, uppdaterad $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "för $1 sedan"
+}
+],
+"nl": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "$1 min geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "$1 s geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "$1 u geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "$1 dagen geleden"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "teruggezet naar $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "nog $1 dagen"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "terugdraaien mislukt (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "$1 min geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "$1 s geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "$1 u geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "$1 d geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "$1 min geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "$1 s geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "$1 u geleden"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "$1 d geleden"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "offline sinds $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "$1× herstart$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "sinds $1"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Alle $1 tonen"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – mijn account"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 stations"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Update beschikbaar: $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Bijgewerkt naar $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "Versie $1 beschikbaar"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Goed leesbaar (contrast $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Slecht leesbaar (contrast $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "FRN-account van deze server ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (ongewijzigd)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Dit FRN-account wordt al gebruikt door de $1 – elke server heeft een eigen FRN-account nodig."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Met de hand verwijderd, wordt niet opnieuw toegevoegd: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 wachtend"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 actief$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 dagen"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 postvakken"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 geselecteerd"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 berichten"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "$1 verwijderen?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 gepubliceerd"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 concepten"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Opgeslagen ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "„$1” wordt definitief verwijderd."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 kamers"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 accounts"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 lijstvermeldingen"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN: $1 stations"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "Partner $1 niet bereikbaar ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "De partner weigerde: $1 – de sleutel moet op beide servers gelijk zijn."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "Back-up niet bereikbaar – niets overgeschakeld: $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Synchronisatie mislukt – niets overgeschakeld: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 min"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Aangevraagd – de SystemManager mailt het wachtwoord naar $2. Kijk ook in de spammap."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 stations online · de FRN-server neemt wijzigingen over na een herstart · net00 is altijd de test-/papegaaikamer van de server"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "in $1 · $2 · $3 min geleden"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "poort $1 · $2 stations · sinds $3"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · actief $2 · $3 browser(s)"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 treffers · $2 berekend"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · geen e-mail · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · zojuist"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 zonder afbeelding)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "Lijst van de N8schicht: $1 namen"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 start"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "vandaag · $1 RF / $2 netwerk"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 probleem/problemen"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 controles in orde"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · nu · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · laatste RF-gesprek · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "$1 stoppen?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "mislukt · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "laatste controle $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 gemist"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Alle · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "geen keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 spreker(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 naam/namen verstuurd door de portofoons"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 geverifieerd"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 overige"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 gast(en)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 duplicaat/duplicaten verworpen"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 omhoog verzonden"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 nieuwe wijziging(en)"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 nieuwe wijziging(en) op GitHub"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 vertaalregel(s) actief — vertaalde TG’s worden in goud getoond"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "laatste uur · $1 opgeslagen"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Alle $1 namen tonen"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Alle $1 talkgroups tonen"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "Lijst van de N8schicht: $1 namen, bijgewerkt $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (verstuurd door de portofoon) · database: $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · database: $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "actief $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· actief $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 stations"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 gesprekken"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "AutoBackup voorbereiden: $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "Back-upbestand (.tar.gz of .tar.gz.age, hoogstens $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Back-up gemaakt ($1). Download start."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2 u: $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "stand $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · stand $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "Kamer $1 · $2 stations"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "Kamer $1"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "Kanaal $1"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN verbonden met kamer „$1” ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello verbonden met kanaal „$1”"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR verbonden met $1 als $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 actief"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 ontvangen · ⇡ $2 verzonden"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 herverbindingen · $2 heropbouwen"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "$1× heropend"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "Vocoder $1: gereed"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · actief"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog: $1 wordt opnieuw opgebouwd ($2 s offline)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1: verbinding met $2 mislukt ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN: master en back-up herkend – master $1 (prioriteit 1), back-up $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 herverbindingen · $2 heropbouwen (laatst: $3 s offline)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Roepnaam $1 · server $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 kamers van het dashboard $2 (zonder verborgen kamers)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Kwaliteit $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ Foutenlogboek niet bereikbaar ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "naar $1 (standaard $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "naar $1 (HBlink4/FreeDMR, standaard $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "naar $1 (HomeBrew, standaard $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive: $1 – geen antwoord ($2 min) – herstart"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "systemd-watchdog: geen reactie meer – het proces hing en is beëindigd (SIGABRT) – event-loop stond $1 s stil"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 van $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Roepnamendatabase: $1 vermeldingen + $2 FreeRadioID, bijgewerkt $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "$1 geleden"
+}
+],
+"it": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "$1 min fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "$1 s fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "$1 h fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "$1 giorni fa"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "ripristinato a $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "ancora $1 giorni"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "ripristino non riuscito (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "$1 min fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "$1 s fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "$1 h fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "$1 g fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "$1 min fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "$1 s fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "$1 h fa"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "$1 g fa"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "non raggiungibile da $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "riavviato $1×$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "da $1"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Mostra tutti i $1"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – il mio account"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 stazioni"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Aggiornamento disponibile: $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Aggiornato a $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "Versione $1 disponibile"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Leggibile (contrasto $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Difficile da leggere (contrasto $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "Account FRN di questo server ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (invariato)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Questo account FRN è già usato dal $1 – ogni server ha bisogno del proprio account FRN."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Rimosso a mano, non viene aggiunto di nuovo: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 in attesa"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 attivi$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 giorni"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 caselle di posta"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 selezionati"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 messaggi"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "Rimuovere $1?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 pubblicate"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 bozze"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Salvato ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "«$1» viene eliminato definitivamente."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 stanze"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 account"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 voci di lista"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN: $1 stazioni"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "Partner $1 non raggiungibile ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "Il partner ha rifiutato: $1 – la chiave deve essere la stessa su entrambi i server."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "Backup non raggiungibile – nessun passaggio: $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Sincronizzazione non riuscita – nessun passaggio: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 min"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Richiesta inviata – il SystemManager invia la password a $2. Controlla anche la cartella spam."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 stazioni online · il server FRN applica le modifiche dopo un riavvio · net00 è sempre la stanza di test/pappagallo del server"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "in $1 · $2 · $3 min fa"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "porta $1 · $2 stazioni · da $3"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · attivo da $2 · $3 browser"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 trovati · $2 calcolati"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · nessuna e-mail · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · proprio ora"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 senza immagine)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "Lista della N8schicht: $1 nomi"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 si avvia"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "oggi · $1 RF / $2 rete"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 problema/i"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 controlli a posto"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · ora · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · ultima chiamata RF · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "Fermare $1?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "non riuscito · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "ultimo controllo $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 mancati"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Tutti · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "nessun keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 parlanti"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 nomi inviati dalle radio"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 verificati"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 altri"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 ospiti"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 duplicati scartati"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 inviati in salita"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 nuove modifiche"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 nuove modifiche su GitHub"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 regole di traduzione attive — i TG tradotti sono mostrati in oro"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "ultima ora · $1 salvati"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Mostra tutti i $1 nomi"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Mostra tutti i $1 talkgroup"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "Lista della N8schicht: $1 nomi, aggiornata $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (inviato dalla radio) · database: $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · database: $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "attivo da $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· attivo da $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 stazioni"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 chiamate"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroup"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "Prepara AutoBackup: $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "File di backup (.tar.gz o .tar.gz.age, al massimo $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Backup creato ($1). Il download inizia."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2: $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "aggiornato al $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · aggiornato al $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "Stanza $1 · $2 stazioni"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "Stanza $1"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "Canale $1"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN connesso alla stanza «$1» ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello connesso al canale «$1»"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR connesso a $1 come $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 attivo"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 ricevuti · ⇡ $2 inviati"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 riconnessioni · $2 ricostruzioni"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "riaperto $1×"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "Vocoder $1: pronto"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · attivo"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog: $1 viene ricostruito (offline da $2 s)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1: connessione a $2 non riuscita ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN: master e backup rilevati – master $1 (priorità 1), backup $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 riconnessioni · $2 ricostruzioni (ultima: offline da $3 s)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Nominativo $1 · server $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 stanze dalla dashboard $2 (senza stanze nascoste)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Qualità $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ Registro errori non raggiungibile ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "verso $1 (predefinito $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "verso $1 (HBlink4/FreeDMR, predefinito $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "verso $1 (HomeBrew, predefinito $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive: $1 – nessuna risposta (da $2 min) – riavviato"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "watchdog di systemd: nessuna risposta – il processo era bloccato ed è stato terminato (SIGABRT) – event loop fermo per $1 s"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 di $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Database nominativi: $1 voci + $2 FreeRadioID, aggiornato $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "$1 fa"
+}
+],
+"es": [
+{
+"repo": "kit",
+"re": "^(\\d+) minutes? ago$",
+"flags": "",
+"rep": "hace $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) seconds? ago$",
+"flags": "",
+"rep": "hace $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) hours? ago$",
+"flags": "",
+"rep": "hace $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days? ago$",
+"flags": "",
+"rep": "hace $1 días"
+},
+{
+"repo": "kit",
+"re": "^rolled back to (.+)$",
+"flags": "",
+"rep": "revertido a $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) days left$",
+"flags": "",
+"rep": "quedan $1 días"
+},
+{
+"repo": "kit",
+"re": "^rollback failed \\(git reset\\)$",
+"flags": "",
+"rep": "falló la reversión (git reset)"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) min ago$",
+"flags": "",
+"rep": "hace $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) s ago$",
+"flags": "",
+"rep": "hace $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) h ago$",
+"flags": "",
+"rep": "hace $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) d ago$",
+"flags": "",
+"rep": "hace $1 d"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)m ago$",
+"flags": "",
+"rep": "hace $1 min"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)s ago$",
+"flags": "",
+"rep": "hace $1 s"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)h ago$",
+"flags": "",
+"rep": "hace $1 h"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)d ago$",
+"flags": "",
+"rep": "hace $1 d"
+},
+{
+"repo": "kit",
+"re": "^down since (.+)$",
+"flags": "",
+"rep": "caído desde $1"
+},
+{
+"repo": "kit",
+"re": "^(\\d+)× restarted(.*)$",
+"flags": "",
+"rep": "reiniciado $1×$2"
+},
+{
+"repo": "kit",
+"re": "^since (.+)$",
+"flags": "",
+"rep": "desde $1"
+},
+{
+"repo": "kit",
+"re": "^Show all ([\\d.,]+)$",
+"flags": "",
+"rep": "Mostrar los $1"
+},
+{
+"repo": "kit",
+"re": "^(.+) – my account$",
+"flags": "",
+"rep": "$1 – mi cuenta"
+},
+{
+"repo": "kit",
+"re": "^(\\d+) stations?$",
+"flags": "",
+"rep": "$1 estaciones"
+},
+{
+"repo": "kit",
+"re": "^Update available: (.+)$",
+"flags": "",
+"rep": "Actualización disponible: $1"
+},
+{
+"repo": "kit",
+"re": "^Updated to (.+)$",
+"flags": "",
+"rep": "Actualizado a $1"
+},
+{
+"repo": "kit",
+"re": "^Version (\\S+) available$",
+"flags": "",
+"rep": "Versión $1 disponible"
+},
+{
+"repo": "kit",
+"re": "^Readable \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Legible (contraste $1 : 1)"
+},
+{
+"repo": "kit",
+"re": "^Hard to read \\(contrast ([\\d.]+) : 1\\)$",
+"flags": "",
+"rep": "Difícil de leer (contraste $1 : 1)"
+},
+{
+"repo": "adn",
+"re": "^FRN account of this server \\((Master|Backup)\\)$",
+"flags": "",
+"rep": "Cuenta FRN de este servidor ($1)"
+},
+{
+"repo": "adn",
+"re": "^•+ \\(unchanged\\)$",
+"flags": "",
+"rep": "•••••••• (sin cambios)"
+},
+{
+"repo": "adn",
+"re": "^This FRN account is already used by the (master|backup) – every server needs its own FRN account.*$",
+"flags": "",
+"rep": "Esta cuenta FRN ya la usa el $1 – cada servidor necesita su propia cuenta FRN."
+},
+{
+"repo": "adn",
+"re": "^Removed by hand, not added again: (.+)$",
+"flags": "",
+"rep": "Quitado a mano, no se vuelve a añadir: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) waiting$",
+"flags": "",
+"rep": "$1 en espera"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) active( · .+)?$",
+"flags": "",
+"rep": "$1 activos$2"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) days$",
+"flags": "",
+"rep": "$1 días"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) mailboxes$",
+"flags": "",
+"rep": "$1 buzones"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) selected$",
+"flags": "",
+"rep": "$1 seleccionados"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) messages$",
+"flags": "",
+"rep": "$1 mensajes"
+},
+{
+"repo": "adn",
+"re": "^Remove (.+)\\?$",
+"flags": "",
+"rep": "¿Quitar $1?"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) published$",
+"flags": "",
+"rep": "$1 publicadas"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) drafts$",
+"flags": "",
+"rep": "$1 borradores"
+},
+{
+"repo": "adn",
+"re": "^Saved \\((\\d+)\\)$",
+"flags": "",
+"rep": "Guardado ($1)"
+},
+{
+"repo": "adn",
+"re": "^„(.+)“ is removed for good\\.?$",
+"flags": "",
+"rep": "«$1» se eliminará definitivamente."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) rooms$",
+"flags": "",
+"rep": "$1 salas"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) accounts$",
+"flags": "",
+"rep": "$1 cuentas"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) list entries$",
+"flags": "",
+"rep": "$1 entradas de lista"
+},
+{
+"repo": "adn",
+"re": "^FRN: (\\d+) stations$",
+"flags": "",
+"rep": "FRN: $1 estaciones"
+},
+{
+"repo": "adn",
+"re": "^Partner (\\S+) not reachable \\((.*)\\)\\.?$",
+"flags": "",
+"rep": "Socio $1 inaccesible ($2)."
+},
+{
+"repo": "adn",
+"re": "^The partner refused: (.+?) – the key must be the same on both servers\\.?$",
+"flags": "",
+"rep": "El socio rechazó: $1 – la clave debe ser la misma en ambos servidores."
+},
+{
+"repo": "adn",
+"re": "^Backup not reachable – nothing switched: (.+)$",
+"flags": "",
+"rep": "Respaldo inaccesible – no se conmutó nada: $1"
+},
+{
+"repo": "adn",
+"re": "^Sync failed – nothing switched: (.*)$",
+"flags": "",
+"rep": "Error de sincronización – no se conmutó nada: $1"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) min$",
+"flags": "",
+"rep": "$1 min"
+},
+{
+"repo": "adn",
+"re": "^(✅ |⚠️ )?Requested – the SystemManager e-mails the password to (\\S+)\\. Also check the spam folder\\.?$",
+"flags": "",
+"rep": "$1Solicitado – el SystemManager envía la contraseña a $2. Revise también la carpeta de spam."
+},
+{
+"repo": "adn",
+"re": "^(\\d+) stations online · the FRN server uses changes after a restart · net00 is always the test\\/parrot room of the server$",
+"flags": "",
+"rep": "$1 estaciones en línea · el servidor FRN aplica los cambios tras un reinicio · net00 es siempre la sala de prueba/loro del servidor"
+},
+{
+"repo": "adn",
+"re": "^in (.+) · (.+) · (\\d+) min ago$",
+"flags": "",
+"rep": "en $1 · $2 · hace $3 min"
+},
+{
+"repo": "adn",
+"re": "^port (\\d+) · (\\d+) stations · since (.+)$",
+"flags": "",
+"rep": "puerto $1 · $2 estaciones · desde $3"
+},
+{
+"repo": "adn",
+"re": "^(.+) · up (\\S+) · (\\d+) browsers?$",
+"flags": "",
+"rep": "$1 · activo $2 · $3 navegador(es)"
+},
+{
+"repo": "adn",
+"re": "^(\\d+) hits · (\\d+) computed$",
+"flags": "",
+"rep": "$1 aciertos · $2 calculados"
+},
+{
+"repo": "adn",
+"re": "^(.+) · no e-mail · (.+)$",
+"flags": "",
+"rep": "$1 · sin correo · $2"
+},
+{
+"repo": "hotspot",
+"re": "^→ TG (\\d+) · just now$",
+"flags": "",
+"rep": "→ TG $1 · justo ahora"
+},
+{
+"repo": "hotspot",
+"re": "^\\((\\d+) without picture\\)$",
+"flags": "",
+"rep": "($1 sin imagen)"
+},
+{
+"repo": "hotspot",
+"re": "^List of the N8schicht: ([\\d.,]+) names$",
+"flags": "",
+"rep": "Lista de la N8schicht: $1 nombres"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) is starting$",
+"flags": "",
+"rep": "$1 se está iniciando"
+},
+{
+"repo": "hotspot",
+"re": "^today · (\\d+) RF \\/ (\\d+) network$",
+"flags": "",
+"rep": "hoy · $1 RF / $2 red"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) problem\\(s\\)$",
+"flags": "",
+"rep": "$1 problema(s)"
+},
+{
+"repo": "hotspot",
+"re": "^(\\d+) checks in order$",
+"flags": "",
+"rep": "$1 comprobaciones en orden"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · now · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · ahora · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^(.+) · TS(\\d) · last RF call · (\\d+) s$",
+"flags": "",
+"rep": "$1 · TS$2 · última llamada RF · $3 s"
+},
+{
+"repo": "hotspot",
+"re": "^Stop (.+)\\?$",
+"flags": "",
+"rep": "¿Detener $1?"
+},
+{
+"repo": "hotspot",
+"re": "^failed · (.+)$",
+"flags": "",
+"rep": "fallido · $1"
+},
+{
+"repo": "hblink",
+"re": "^last check (.+)$",
+"flags": "",
+"rep": "última comprobación $1"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) missed$",
+"flags": "",
+"rep": "$1 perdidos"
+},
+{
+"repo": "hblink",
+"re": "^All · TS(\\d)$",
+"flags": "",
+"rep": "Todos · TS$1"
+},
+{
+"repo": "hblink",
+"re": "^no keep-alive$",
+"flags": "",
+"rep": "sin keep-alive"
+},
+{
+"repo": "hblink",
+"re": "^([\\d.,]+ ?[mhs]+) · (\\d+) speakers?$",
+"flags": "",
+"rep": "$1 · $2 hablante(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) names? sent by the radios$",
+"flags": "",
+"rep": "$1 nombre(s) enviado(s) por las radios"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) verified$",
+"flags": "",
+"rep": "$1 verificados"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) other$",
+"flags": "",
+"rep": "$1 otros"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) guests?$",
+"flags": "",
+"rep": "$1 invitado(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) duplicates? dropped$",
+"flags": "",
+"rep": "$1 duplicado(s) descartado(s)"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) sent up$",
+"flags": "",
+"rep": "$1 subidos"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) new changes?$",
+"flags": "",
+"rep": "$1 cambio(s) nuevo(s)"
+},
+{
+"repo": "hblink",
+"re": "^– (\\d+) new changes? on GitHub$",
+"flags": "",
+"rep": "– $1 cambio(s) nuevo(s) en GitHub"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) translation rule\\(s\\) active — translated TGs are shown in gold$",
+"flags": "",
+"rep": "$1 regla(s) de traducción activa(s) — los TG traducidos se muestran en dorado"
+},
+{
+"repo": "hblink",
+"re": "^last hour · (\\d+) stored$",
+"flags": "",
+"rep": "última hora · $1 guardados"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) names$",
+"flags": "",
+"rep": "Mostrar los $1 nombres"
+},
+{
+"repo": "hblink",
+"re": "^Show all ([\\d.,]+) talkgroups$",
+"flags": "",
+"rep": "Mostrar los $1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^List of the N8schicht: ([\\d.,]+) names, updated (.+?)$",
+"flags": "",
+"rep": "Lista de la N8schicht: $1 nombres, actualizada $2"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias \\(sent by the radio\\) · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias (enviado por la radio) · base de datos: $1"
+},
+{
+"repo": "hblink",
+"re": "^Talker Alias · database: (.+)$",
+"flags": "",
+"rep": "Talker Alias · base de datos: $1"
+},
+{
+"repo": "hblink",
+"re": "^up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "activo $1$2"
+},
+{
+"repo": "hblink",
+"re": "^· up ([\\d:]+)(.*)$",
+"flags": "",
+"rep": "· activo $1$2"
+},
+{
+"repo": "hblink",
+"re": "^APRS (local|online|connecting) · (\\d+) stations$",
+"flags": "",
+"rep": "APRS $1 · $2 estaciones"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) calls?$",
+"flags": "",
+"rep": "$1 llamadas"
+},
+{
+"repo": "hblink",
+"re": "^(\\d+) talkgroups?$",
+"flags": "",
+"rep": "$1 talkgroups"
+},
+{
+"repo": "hblink",
+"re": "^Prepare AutoBackup: (.+)$",
+"flags": "",
+"rep": "Preparar AutoBackup: $1"
+},
+{
+"repo": "hblink",
+"re": "^Backup file \\(\\.tar\\.gz or \\.tar\\.gz\\.age, at most (.+)\\)$",
+"flags": "",
+"rep": "Archivo de copia (.tar.gz o .tar.gz.age, como máximo $1)"
+},
+{
+"repo": "hblink",
+"re": "^Backup created \\((.+)\\)\\. Download starts\\.$",
+"flags": "",
+"rep": "Copia creada ($1). Comienza la descarga."
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+)–(\\d+) h: (\\d+)$",
+"flags": "",
+"rep": "$1–$2 h: $3"
+},
+{
+"repo": "crosslink",
+"re": "^as of (.+)$",
+"flags": "",
+"rep": "a fecha de $1"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · as of (.+)$",
+"flags": "",
+"rep": "$1 · a fecha de $2"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+) · (\\d+) stations$",
+"flags": "",
+"rep": "Sala $1 · $2 estaciones"
+},
+{
+"repo": "crosslink",
+"re": "^Room (.+)$",
+"flags": "",
+"rep": "Sala $1"
+},
+{
+"repo": "crosslink",
+"re": "^Channel (.+)$",
+"flags": "",
+"rep": "Canal $1"
+},
+{
+"repo": "crosslink",
+"re": "^FRN connected to room \"(.+)\" \\((.+)\\)$",
+"flags": "",
+"rep": "FRN conectado a la sala «$1» ($2)"
+},
+{
+"repo": "crosslink",
+"re": "^Zello connected to channel \"(.+)\"$",
+"flags": "",
+"rep": "Zello conectado al canal «$1»"
+},
+{
+"repo": "crosslink",
+"re": "^DMR connected to (.+) as (\\d+) \\((.+)\\)$",
+"flags": "",
+"rep": "DMR conectado a $1 como $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello) active$",
+"flags": "",
+"rep": "$1 activo"
+},
+{
+"repo": "crosslink",
+"re": "^⇣ (\\d+) received · ⇡ (\\d+) sent$",
+"flags": "",
+"rep": "⇣ $1 recibidos · ⇡ $2 enviados"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds$",
+"flags": "",
+"rep": "$1 reconexiones · $2 reconstrucciones"
+},
+{
+"repo": "crosslink",
+"re": "^reopened (\\d+)×$",
+"flags": "",
+"rep": "reabierto $1×"
+},
+{
+"repo": "crosslink",
+"re": "^Vocoder (.+): ready$",
+"flags": "",
+"rep": "Vocoder $1: listo"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) · active$",
+"flags": "",
+"rep": "$1 · activo"
+},
+{
+"repo": "crosslink",
+"re": "^Watchdog: (FRN|DMR|Zello) is being rebuilt \\(offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "Watchdog: $1 se está reconstruyendo (sin conexión desde hace $2 s)"
+},
+{
+"repo": "crosslink",
+"re": "^(FRN|DMR|Zello): connection to (\\S+) failed \\((.*)\\)$",
+"flags": "",
+"rep": "$1: falló la conexión con $2 ($3)"
+},
+{
+"repo": "crosslink",
+"re": "^FRN: master & backup detected – master (\\S+) \\(priority 1\\), backup (\\S+)$",
+"flags": "",
+"rep": "FRN: máster y respaldo detectados – máster $1 (prioridad 1), respaldo $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) reconnects · (\\d+) rebuilds \\(last: offline for (\\d+) s\\)$",
+"flags": "",
+"rep": "$1 reconexiones · $2 reconstrucciones (última: sin conexión $3 s)"
+},
+{
+"repo": "crosslink",
+"re": "^Callsign (\\S+) · server (\\S+)$",
+"flags": "",
+"rep": "Indicativo $1 · servidor $2"
+},
+{
+"repo": "crosslink",
+"re": "^(\\d+) rooms from the dashboard (\\S+) \\(without hidden rooms\\)$",
+"flags": "",
+"rep": "$1 salas del panel $2 (sin salas ocultas)"
+},
+{
+"repo": "crosslink",
+"re": "^Quality ([\\d.,]+) %$",
+"flags": "",
+"rep": "Calidad $1 %"
+},
+{
+"repo": "crosslink",
+"re": "^⚠️ Error log not reachable \\((.+)\\)$",
+"flags": "",
+"rep": "⚠️ Registro de errores inaccesible ($1)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(default (\\d+)\\)$",
+"flags": "",
+"rep": "hacia $1 (por defecto $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HBlink4\\/FreeDMR, default (\\d+)\\)$",
+"flags": "",
+"rep": "hacia $1 (HBlink4/FreeDMR, por defecto $2)"
+},
+{
+"repo": "kit",
+"re": "^to (\\S+) \\(HomeBrew, default (\\d+)\\)$",
+"flags": "",
+"rep": "hacia $1 (HomeBrew, por defecto $2)"
+},
+{
+"repo": "kit",
+"re": "^Keep-Alive: (.+) – no answer \\(for (\\d+) min\\) – restarted$",
+"flags": "",
+"rep": "Keep-Alive: $1 – sin respuesta (desde hace $2 min) – reiniciado"
+},
+{
+"repo": "kit",
+"re": "^systemd watchdog: no response any more – the process hung and was ended \\(SIGABRT\\) – event loop stood still for (\\d+) s$",
+"flags": "",
+"rep": "watchdog de systemd: ya no responde – el proceso se colgó y se terminó (SIGABRT) – el bucle de eventos estuvo parado $1 s"
+},
+{
+"repo": "kit",
+"re": "^([\\d.,]+ ?[KMGT]?B) of ([\\d.,]+ ?[KMGT]?B)$",
+"flags": "",
+"rep": "$1 de $2"
+},
+{
+"repo": "hblink",
+"re": "^Callsign DB: ([\\d.,]+) entries \\+ ([\\d.,]+) FreeRadioID, updated (.+)$",
+"flags": "",
+"rep": "Base de indicativos: $1 entradas + $2 FreeRadioID, actualizada $3"
+},
+{
+"repo": "crosslink",
+"re": "^(.+) ago$",
+"flags": "",
+"rep": "hace $1"
+}
+]
+}

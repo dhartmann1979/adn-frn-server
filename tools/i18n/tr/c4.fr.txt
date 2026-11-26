@@ -1,0 +1,215 @@
+Sélecteur DKIM
+Politique DMARC
+Alignement DMARC
+Rapports DMARC à
+Logo BIMI
+Certificat BIMI (VMC/CMC
+MTA-STS
+Ce que font les destinataires des courriers qui échouent – BIMI exige quarantine ou reject
+none – rapports uniquement
+quarantine – dans les spams
+reject
+relaxed (les sous-domaines comptent
+strict
+Vide = dmarc@<domaine principal>
+Logo à côté de vos courriers dans Gmail, Apple Mail, Yahoo … (nécessite DMARC quarantine/reject
+Adresse https:// facultative d’un VMC ou CMC – Gmail et Apple n’affichent le logo qu’avec l’un d’eux
+Indique aux autres serveurs de ne vous livrer qu’en chiffré
+testing – rapport uniquement
+enforce
+Votre logo à côté de vos courriers dans Gmail, Yahoo, Apple Mail … Nécessite DMARC quarantine ou reject ; Gmail et Apple veulent aussi un certificat VMC/CMC. Le logo doit être au format SVG Tiny PS – le serveur le vérifie et le sert sous /.well-known/bimi/
+créé automatiquement à partir du titre
+logo personnel
+Lettres
+Couleur
+Créer le logo
+Téléverser un SVG
+Standard
+Logo BIMI créé
+Logo BIMI enregistré
+Vérifier le DNS maintenant
+Tout copier
+Fichier de zone
+Type
+Valeur
+Rôle
+facultatif
+défini
+différent
+manquant
+Adresse du serveur de messagerie
+Adresse IPv6 du serveur de messagerie
+Le courrier du domaine arrive sur ce serveur
+DKIM : la clé publique de la signature
+DMARC : politique et rapports
+BIMI : logo à côté de vos courriers (nécessite DMARC quarantine/reject
+MTA-STS : livrer uniquement en chiffré
+TLS-RPT : rapports sur les problèmes TLS
+Les logiciels de messagerie trouvent IMAP d’eux-mêmes
+Les logiciels de messagerie trouvent SMTP d’eux-mêmes
+Pas d’IMAP non chiffré
+SMTP avec STARTTLS
+DNS inverse chez l’hébergeur – très important face aux filtres anti-spam
+SPF : qui peut envoyer pour le domaine (ce serveur et le relais
+SPF : qui peut envoyer pour le domaine (ce serveur
+domaine principal
+dans le certificat
+Ajouter un domaine de messagerie
+Ordre
+Définir comme domaine principal
+Domaine non valide
+Déjà présent
+Désactiver le serveur de messagerie
+Installer le serveur de messagerie
+Installer
+En cours – cela peut prendre quelques minutes
+Image d’illustration
+Choisir une image
+Retirer l’image
+Description de l’image
+(pour les lecteurs d’écran
+JPEG, PNG ou WebP uniquement
+L’image ne peut pas être lue
+JPEG, PNG ou WebP – réduite dans le navigateur (max. 1600 px de large) ; affichée en haut de la carte et de l’article, 16:9
+Image d’illustration : JPEG, PNG ou WebP uniquement
+Image d’illustration : 1,5 Mo au maximum
+Image d’illustration : le fichier n’est pas ce qu’il prétend être
+Image d’illustration : fichier endommagé
+attend le DNS
+Ajouter automatiquement les domaines de messagerie
+Chaque domaine sous 🔒 Domaines et HTTPS devient aussi un domaine de messagerie (news.example.org → example.org) ; mail.<domaine> est ajouté de lui-même au certificat Let’s Encrypt dès que son DNS pointe vers ce serveur
+Entièrement automatique : les nouveaux domaines sous 🔒 Domaines et HTTPS deviennent des domaines de messagerie, mail.<domaine> est ajouté au certificat Let’s Encrypt dès que son DNS pointe vers ce serveur (vérifié toutes les 30 minutes, sans redémarrage), et le serveur de messagerie le reprend de lui-même
+Ajoutez ici le domaine de messagerie (ou laissez-le s’ajouter automatiquement) – le certificat est étendu de lui-même dès que le DNS est correct
+Activé : les autres serveurs de messagerie doivent utiliser TLS (STARTTLS) pour livrer – les rares sans TLS sont refusés, les outils de test comme MXToolbox aussi (530 Must issue a STARTTLS command first). La RFC 3207 le déconseille pour un MX public. Les logiciels de messagerie ont toujours besoin de TLS
+Tableau de bord en direct
+Portail (actualités
+Chaque domaine ou sous-domaine affiche ce que vous choisissez sous 🔒 Domaines et HTTPS → « Affiche » : le tableau de bord en direct ou la page du portail – autant de domaines que vous voulez, tous avec Let’s Encrypt
+Le premier domaine est le domaine principal (utilisateur@domaine-principal) ; chaque domaine supplémentaire est un alias pour les mêmes boîtes aux lettres. Chaque domaine ajoute mail.<domaine> au certificat Let’s Encrypt du tableau de bord – le serveur de messagerie utilise uniquement TLS
+DNS : mail.<domaine> (A/AAAA) → ce serveur ; MX → mail.<domaine>
+Domaines et HTTPS : le tableau de bord a son domaine et HTTPS est activé
+Ajoutez ici le domaine de messagerie – le certificat est étendu
+Serveur de messagerie : ⚙️ Installer, relais, ✅ Appliquer
+Modèles DNS : SPF, DKIM, DMARC, BIMI … chez le fournisseur DNS, PTR chez l’hébergeur
+Ports : 25, 465, 587, 993 ouverts dans le pare-feu et le routeur
+Après une modification, le tableau de bord redémarre et étend le certificat (le DNS de mail.<domaine> doit pointer vers ce serveur, port 80 joignable). Ensuite 📮 Serveur de messagerie → ✅ Appliquer
+Serveur de messagerie <code>
+Les logiciels de messagerie trouvent les réglages d’eux-mêmes grâce aux enregistrements SRV (🧾 Modèles DNS). L’IMAP non chiffré (143) est désactivé
+Uniquement TLS 1.2+ : IMAPS 993, SMTPS 465, submission 587 (STARTTLS obligatoire), connexion uniquement après TLS
+Sortant : signature DKIM pour chaque domaine, relais uniquement chiffré avec un certificat vérifié
+Les utilisateurs n’envoient qu’avec leur propre adresse (ou leurs alias
+Mots de passe : Dovecot ne reçoit qu’un hachage SHA512-CRYPT ; le webmail utilise son propre accès maître, jamais le mot de passe de l’utilisateur
+attend la connexion » : les utilisateurs antérieurs au serveur de messagerie n’ont pas encore de mot de passe mail – il est créé à leur prochaine connexion au tableau de bord (ou quand un admin définit un nouveau mot de passe
+Générés à partir de vos réglages : MX, A/AAAA, SPF, DKIM (la clé publique apparaît après « Appliquer »), DMARC, BIMI, MTA-STS, TLS-RPT et enregistrements SRV pour les logiciels de messagerie. « Vérifier le DNS » interroge le DNS sur ce qui est défini actuellement
+Serveur DMR
+Au repos
+Entendu ici
+RF (local
+Réseau
+Réseau
+RF / Réseau
+Part RF
+Réseau DMR
+Modem
+connecté
+Talkgroups les plus actifs
+Activité
+Appels (30 j
+Journal en direct
+L’identifiant d’usine n8schicht / n8schicht est toujours actif
+Matériel et données
+N’importe qui sur votre réseau pourrait modifier votre hotspot. Veuillez définir votre propre mot de passe
+Modifier maintenant
+MMDVMHost et DMRGateway les utilisent après un redémarrage
+Liste des talkgroups
+Liste des talkgroups de la N8schicht
+Noms personnels
+Recherche : numéro ou nom, p. ex. 262 ou Bayern
+Noms
+Noms de github.com/dhartmann1979/n8schicht, plus les vôtres
+copie fournie avec N8-Hotspot
+Indicatif, ID DMR et emplacement
+Votre indicatif, p. ex. DL1ABC
+ID du hotspot
+Suffixe du hotspot
+Deux chiffres qui rendent l’ID du hotspot unique (ID DMR + suffixe, p. ex. 262123401). Vide = ID DMR seul
+Emplacement
+Ville ou locator, affiché au serveur
+Latitude
+Longitude
+Hauteur d’antenne (m
+Puissance (W
+Carte, port, fréquences et niveaux
+Carte modem
+Port série
+Vitesse du port
+Remplit port, vitesse et simplex/duplex
+Trouver le modem
+Rechercher
+MMDVM_HS_Hat sur le connecteur GPIO (simplex
+MMDVM_HS_Dual_Hat sur le connecteur GPIO (duplex
+ZUMspot / HS hat via USB (simplex
+Carte relais MMDVM via USB (duplex
+Autre / valeurs personnelles
+Fréquence RX (MHz
+Fréquence TX (MHz
+Identique à RX en simplex
+Décalage RX (Hz
+Décalage TX (Hz
+D’après l’étalonnage
+Niveau RX (%
+Niveau TX (%
+Puissance RF (%
+Inversion RX
+Inversion TX
+Inversion PTT
+Délai TX (ms
+Délai DMR (ms
+Mode DMR
+Color code, time slots, temps de maintien
+Color code
+Duplex (deux time slots
+Désactivé pour les hotspots simplex (TS2 uniquement
+Time slots
+Time slot 1
+Time slot 2
+Utilisé uniquement en mode duplex
+Maintien d’appel (s
+Maintien TX (s
+Maintien du mode RF (s
+Maintien du mode réseau (s
+Seul mon propre ID peut émettre
+Envoyer le talker alias
+Indicatif en morse toutes les 10 minutes
+Se connecter à un serveur DMR
+Serveur, mot de passe et options
+Serveur
+Remplit nom, adresse et port
+Autre serveur (HomeBrew
+Adresse du serveur
+Nom d’hôte / IP
+Port du serveur (UDP
+Chez la N8schicht : votre mot de passe FreeRadioID.net (accès complet) ou le mot de passe invité
+Facultatif, p. ex. TS1=262;TS2=26500
+Tampon de gigue (ms
+Délai (s
+Titre, vue publique, liste des ID
+Désactivé = seuls les utilisateurs connectés voient le tableau de bord
+Durée de session (heures
+Conserver les appels pendant (jours
+Liste des ID DMR
+Indicatifs et noms pour le tableau de bord et MMDVMHost (DMRIds.dat
+Mise à jour quotidienne de la liste des ID
+radioid.net uniquement
+Charger les ID FreeRadioID enregistrés
+Chaque jour avec la liste des ID : badge FRID, noms des ID uniquement FreeRadioID
+Avatars, profils et ID enregistrés
+Afficher les avatars
+Photos de profil des membres FreeRadioID ; récupérées quand une station est entendue, mises en cache dans la base de données
+Consulter les profils
+Nom, lieu et remarques dans la vue de la station (en direct depuis l’API FreeRadioID
+ID enregistrés
+Enregistrés sur FreeRadioID.net
+ID enregistrés (badge FRID) et avatars, chargés avec la liste des ID
+Avatars en cache
+En cache
+URL de la liste des talkgroups

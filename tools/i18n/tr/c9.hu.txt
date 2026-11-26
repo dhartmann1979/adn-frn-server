@@ -1,0 +1,126 @@
+pl. aprs2.example.org – a térképet a / címen nyitja meg. Erre a szerverre kell mutatnia (DNS). Üres = ki
+1. cím
+2. cím
+3. cím
+1. alcím
+2. alcím
+3. alcím
+1. logó
+2. logó
+3. logó
+Üres = APRS-térkép · domain
+Üres = N8schicht APRS-logó
+Üres = a cím
+Üres = az alcím (Megjelenés → Alcím
+A vezérlőpult tanúsítványába kerül (a Beállítások → HTTPS és web legyen bekapcsolva
+Nincs saját domain. A térkép mindig itt érhető el:
+A HTTPS, a hozzáférés és a DMR-szerver állapota, a telepített verzió és a frissítések, valamint újraindító gombok
+Szerverszoftver
+DMR-szerver (HBlink4
+Csatlakozott rendszerek
+Nincs csatlakozott rendszer
+TX MHz
+Kimenő hálózat
+Bejövő hálózat
+Ismeretlen eszköz
+OpenBridge
+Átjátszó
+App
+Kimenő link
+nincs forgalom
+Kihagyott keep-alive pingek
+FRID
+Minden talkgroup engedélyezve (nincs konfiguráció
+Minden talkgroup tiltva (üres konfiguráció
+DMR-rádióból származó pozícióval rendelkező állomások
+Élő kapcsolat a szerverrel
+Kapcsolat az APRS-hálózattal
+Az állomáslista megjelenítése vagy elrejtése
+Hívójel, DMR ID vagy megjegyzés
+állomás
+Nyers csomagok
+Nyomvonal
+Sebesség
+Irány
+Magasság
+Útvonal
+Pozíció
+Távolság
+Ezen át
+Hotspot
+GPS-jelentés fajtája
+Biztonsági mentés készítése és letöltése
+Biztonsági mentés újbóli letöltése
+Mentett biztonsági mentések
+Állapot frissítése
+A teljes mentések minden hitelesítő adatot tartalmaznak. Ez a terület a superadminé
+Mentse a HBlink4-telepítését, és költöztesse át egy másik HBlink4-szerverre. Benne van a programkód, a konfigurációk, a felhasználók, a hitelesítő adatok, az adatbázisok, az APRS-adatok és a saját fájljai
+Az archívum bizalmas adatokat tartalmaz, és nincs titkosítva. Tartsa biztonságos helyen. A Python-környezetek a célgépen újraépülnek. Az operációs rendszer, a tűzfal és a DNS nem része a mentésnek
+Biztonsági mentés készül. Hagyja nyitva ezt az ablakot
+Automatikus mentés visszaállítás előtt
+Titkosított AutoBackup letöltése
+Helyi mentés törölve
+Helyi mentés törlése
+A törlés csak a helyi mentésfájlt távolítja el. Az SFTP-n vagy Google Drive-on lévő másolatok megmaradnak
+A visszaállítás lecseréli ezt a HBlink4-telepítést. Előbb mentés készül az aktuális állapotról. Ha bármi hibát okoz, az előző állapot visszatér. Utána a forrásszerver felhasználói fiókjával jelentkezik be
+A célszervernek systemd-s Linux és Python 3.9 vagy újabb kell. Eltérő Python-verzió esetén a szolgáltatások leállítása előtt ellenőrizzük a kód és a mentett csomagverziók kompatibilitását. A visszaállítás alatt mindkét szolgáltatás megszakad; a Python-csomagok telepítése több percig is tarthat
+Hiányzik a szolgáltatássegéd. Futtassa egyszer a célszerver HBlink4-mappájában
+Ezután frissítse ezt a területet
+Titkosított AutoBackupokhoz: külön helyreállítási kulcs (.agekey
+Fájl feltöltése és ellenőrzése
+Az archívum feltöltése és teljes ellenőrzése
+Előbb válasszon mentésfájlt
+A fájl nagyobb 2 GiB-nál
+Az ellenőrzőösszegek, fájlútvonalak és adatbázisok érvényesek. Még semmi sincs visszaállítva
+Az Ön jelenlegi superadmin jelszava
+Jelenlegi superadmin jelszó
+Az ellenőrzött mentés visszaállítása
+A visszaállítás elindult. Mindkét szolgáltatás újraindul. Ha kész, töltse újra az oldalt, és jelentkezzen be a forrásszerver fiókjával. Ha bármi hibát okoz, az előző állapot indul újra; az üzenet bejelentkezés után itt jelenik meg
+A helyreállítási kulcsot csak HTTPS-en vagy helyi SSH-alagúton küldje át
+AutoBackup
+AutoBackup előkészítése
+AutoBackup bekapcsolása
+AutoBackup mentve
+AutoBackup-beállítások mentése
+Az AutoBackup a háttérben fut. Ha kész, frissítse az állapotot
+Teljes mentések készítése ütemezetten, titkosítva, SFTP-re vagy Google Drive-ra küldve. Az ütemezés a vezérlőpult szolgáltatásában fut, nyitott böngésző nélkül is. Az AutoBackup hitelesítő adatai titkosítva tárolódnak; a helyreállítási kulcs a programadatokon kívül marad
+Naponta
+Hetente
+Megtartandó napi mentések
+Megtartandó heti mentések
+Cél aktív
+Cél eltávolítása
+SFTP-cél
+Google Drive
+Mentett cél tesztelése
+Az írás, olvasás és törlés működött
+Mentve – üresen hagyva megmarad
+Az üres jelszó/token mezők megtartják a mentett értékeket. A régi mentések csak sikeres feltöltés és tartalomellenőrzés után törlődnek; a kézi mentések megmaradnak
+Előbb egyeztesse a hoszt kulcsát a szerver üzemeltetőjével. Az SSH-kulcsfájloknak olvashatónak kell lenniük a vezérlőpult szolgáltatás-felhasználója számára
+Saját Google OAuth kliensazonosító
+OAuth kliens-titok
+OAuth token JSON refresh_tokennel
+Böngészővel rendelkező számítógépen
+Adja meg itt a token JSON-t
+Mappaazonosító nélkül a célmappa automatikusan létrejön
+A célok saját almappát használnak
+ehhez a szerverhez
+Titkosított mentés futtatása most
+Helyreállítási kulcs letöltése
+Superadmin jelszó a kulcs exportálásához
+Kulcs letöltve. Tartsa ezen a szerveren kívül
+A kulcs exportálva
+Előbb exportálja a kulcsot
+A kulcsot csak HTTPS-en vagy helyi SSH-alagúton exportálja
+A kulcsot csak HTTPS-en vagy helyi SSH-alagúton küldje át
+Sikertelen exportálás
+Használjon HTTPS-t vagy helyi SSH-alagutat a hitelesítő adatokhoz és a kulcs exportálásához
+A hitelesítő adatokat csak HTTPS-en vagy helyi SSH-alagúton mentse
+Mentett célok feloldása
+Eredeti helyreállítási kulcs
+Feloldás után exportálja ennek a szervernek a kulcsát, és kapcsolja be újra az ütemezést
+A célok feloldva. Exportálja ennek a szervernek a kulcsát, és kapcsolja be újra az ütemezést
+Vagy beállítás újra: írja be: RESET
+Célok és ütemezés visszaállítása
+A meglévő mentésfájlok megmaradnak
+Visszaállítás csak HTTPS-en vagy helyi SSH-alagúton

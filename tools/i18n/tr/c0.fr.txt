@@ -1,0 +1,332 @@
+Mise à jour disponible
+Nouveautés
+Mettre à jour maintenant
+Détails
+Plus tard
+Masquer jusqu’à demain
+Installée
+Sur GitHub
+Dernière vérification
+Vérification automatique
+toutes les heures pile
+à jour
+Dernière mise à jour
+réussie
+annulée
+Vérifier maintenant
+Vérification
+Installer la mise à jour maintenant
+Journal des mises à jour
+Vérifié toutes les heures pile. Les mises à jour ne sont installées que lorsque vous appuyez sur le bouton. Le service redémarre ensuite ; si l’interface web ne répond pas, la version précédente est restaurée automatiquement
+Téléchargement et application de la mise à jour
+Annuler
+Le service redémarre (environ une minute). Si l’interface web ne répond pas ensuite, la version précédente est restaurée automatiquement
+Votre mot de passe (confirmation
+Redémarrage du service
+Vérification de l’interface web
+Fermer
+Mise à jour installée. Rechargement de la page
+Mise à jour installée
+La mise à jour a été annulée – la version précédente fonctionne à nouveau
+Pas de mise à jour – la version précédente continue de fonctionner sans changement
+Supprimer cet enregistrement
+Supprimer l’affichage
+Tout supprimer
+Supprimer les enregistrements affichés avec leurs journaux
+Supprimer tous les enregistrements avec leurs journaux ? Cette action est irréversible
+Supprimer cet enregistrement avec son journal
+Détails dans le journal des mises à jour (Système → Mise à jour
+fichiers modifiés à la main – mise à jour interrompue
+Le service ne répond pas encore. Rechargez dans quelques minutes ou consultez le journal des mises à jour
+Langue / Language
+toujours
+désactivé
+jamais
+Menu
+Exploitation
+Utilisateurs et accès
+Apparence
+Réseau et domaines
+Système
+Mise à jour
+Services
+Droits et sudo
+Keep-alive
+en marche
+arrêté
+Erreur
+démarrage
+arrêt
+rechargement
+Démarrage automatique
+démarrage automatique activé
+Redémarrer
+Arrêter
+Démarrer
+Arrêter le service
+État, démarrage automatique au boot et démarrer · arrêter · redémarrer – uniquement ce que ce système autorise. Un service arrêté ici n’est pas redémarré par le keep-alive
+Pas encore configuré – à exécuter une fois dans la console
+Désactiver le démarrage automatique ? Après un redémarrage, le service ne démarrera pas tout seul
+non vérifié
+tout est en ordre
+Console
+vérifications OK
+Vérifier à nouveau
+Corriger
+Correction
+Vérifie l’utilisateur du service, le programme (root, en lecture seule pour le service), les données et mots de passe, les services systemd, « Mettre à jour maintenant », le keep-alive et les règles sudo. Corriger répare ce qui ne va pas et vérifie à nouveau
+Utilisateur du service
+Programme
+Données
+Matériel
+Dossier source
+Vocodeur USB
+Domaines et HTTPS
+non configuré
+en pause
+ne fonctionne pas
+actif
+Internet
+joignable
+hors ligne depuis
+Dernière vérification
+à l’instant
+Heartbeat
+en bonne santé
+aucun redémarrage
+arrêté manuellement – le keep-alive attend
+redémarré
+À configurer une fois dans la console
+Réseau, ports et domaines
+Utilisateurs
+Sessions
+Journal
+Utilisateur
+Rôle
+Dernière connexion
+Modifier
+désactivé
+Nom affiché
+Indicatif
+Nom d’utilisateur
+Mot de passe (min. {n}
+Nouveau mot de passe (facultatif
+Ajouter un utilisateur
+Supprimer
+Vraiment supprimer
+Utilisateur créé
+Utilisateur supprimé
+superadmin uniquement
+Superadmin
+Admin
+Lecteur
+Auteur
+Éditeur
+Qui peut se connecter. Les admins voient les adresses IP et les ports et modifient les réglages ; les utilisateurs ne voient que le tableau de bord
+Toutes les connexions en cours. « Déconnecter » en termine une immédiatement
+Aucune session active
+Dernière activité
+Expire
+Se déconnecter
+Session terminée
+cette session
+Connexions, tentatives échouées et chaque modification dans l’espace admin – avec l’heure, la personne et l’adresse IP
+Heure
+Événement
+Ports
+entrant
+sortant
+Enregistrer les ports
+Tous les ports au même endroit. Entrant : à ouvrir dans le pare-feu et le routeur s’il doit être joignable depuis l’extérieur. Sortant : l’autre côté doit être joignable
+Redémarrer le service
+Le service redémarre – rechargez ensuite la page
+Domaine
+Certificat
+aucun certificat
+certificat de test
+valide
+expiré
+HTTP uniquement
+jusqu’au
+Renouveler
+Obtenir un certificat
+Retirer
+Pas encore de domaine
+DNS : aucun enregistrement trouvé
+Ajouter un domaine
+E-mail pour Let’s Encrypt
+Certificat de test (Let’s Encrypt staging
+Ajouter le domaine et obtenir le certificat
+Obtention du certificat
+En cours – cela peut prendre jusqu’à une minute
+Les certificats sont renouvelés automatiquement
+Le renouvellement automatique n’est pas configuré
+Affiche
+Vos propres domaines avec un certificat gratuit de Let’s Encrypt
+Retirer {d} ? La redirection et le certificat seront supprimés
+Plantages
+Plantage
+Watchdog
+Mémoire insuffisante
+Terminé
+Délai dépassé
+Blocage
+Composant planté
+Thread planté
+Processus auxiliaire planté
+Redémarrage par le keep-alive
+nouveau
+tout lu
+tous
+7 derniers jours
+Aucun plantage enregistré
+Tout marquer comme lu
+Aucun journal disponible
+Surveillance des plantages
+Chaque plantage, blocage et redémarrage d’urgence de chaque service est enregistré ici – avec la partie de l’application concernée et le journal complet (journal système, pile Python). Le service est redémarré automatiquement. Les nouveaux constats apparaissent sous forme d’avis après la connexion jusqu’à ce qu’ils soient marqués comme lus
+Ces services sont surveillés. Après chaque arrêt inattendu, systemd enregistre le constat et redémarre le service ; s’il reste arrêté, le keep-alive le redémarre
+La surveillance des plantages n’est pas encore configurée. La prochaine mise à jour la configure – ou une fois dans la console
+1 nouveau plantage
+n} nouveaux plantages
+plus
+Voir tous les plantages
+Marquer comme lu
+Depuis votre dernière visite, un service a planté ou s’est bloqué. Il a été redémarré automatiquement. Le constat indique la partie de l’application et contient le journal complet
+L’interface web est en cours d’arrêt
+L’interface web redémarre – un instant
+Keep-alive activé
+Redémarrer les services réseau après une coupure Internet
+Adresse heartbeat
+Heartbeat en cas d’erreur (facultatif
+Reprendre
+Pause 1 h (maintenance
+Enregistrer
+Journal du keep-alive
+Chaque minute en root : vérifie réellement chaque service (interface web et connexions des protocoles), redémarre les services défaillants après quelques minutes (au plus 4× par heure), détecte les coupures Internet et redémarre ensuite les services réseau, et se signale à une adresse heartbeat (Uptime Kuma « push », Healthchecks.io …). Un service arrêté manuellement reste arrêté
+Message
+Pas encore de mise à jour via l’interface web
+Recharger
+Se connecter
+Mot de passe
+Afficher le mot de passe
+Répéter le mot de passe
+Le verrouillage majuscule est activé
+Rester connecté
+Créer
+Connexion chiffrée
+Connexion non chiffrée (HTTP
+Veuillez saisir le nom d’utilisateur et le mot de passe
+Le mot de passe est trop court
+Les mots de passe ne correspondent pas
+Échec de la connexion
+Mon compte
+Changer le mot de passe
+Langue
+Trop de tentatives échouées – veuillez patienter 15 minutes
+Connexion
+Webmail
+Rester connecté (30 jours
+Connectez-vous pour gérer le serveur FRN
+Ce tableau de bord est privé. Veuillez vous connecter
+Connectez-vous pour modifier les réglages
+Ce hotspot est privé. Veuillez vous connecter
+Connectez-vous pour voir les adresses IP et l’espace admin
+Veuillez vous connecter pour voir le tableau de bord
+Nom d’utilisateur ou mot de passe incorrect
+Trop de connexions échouées. Réessayez dans 15 minutes
+Trop de mots de passe erronés. Réessayez dans 15 minutes
+Trop de requêtes – veuillez patienter un instant
+Trop de tentatives échouées. Veuillez patienter 15 minutes
+Déconnexion
+Liens
+Réglages
+Mises à jour
+Journaux
+Journal des modifications
+Live
+Données en direct
+Statistiques
+Stats
+Derniers entendus
+Derniers entendus
+À l’antenne
+Aujourd’hui
+24 h
+7 jours
+30 jours
+90 jours
+1 an
+Durée
+Temps d’émission
+Appels
+Passages
+Station
+Stations
+Nom
+État
+En ligne
+Hors ligne
+Calme
+Notifications
+Chargement
+Chargement des liens
+Rien entendu pour l’instant
+aucun
+oui
+non
+activé
+Oui
+Non
+OK
+Retour
+Actualiser
+Redémarrer maintenant
+Téléverser
+Télécharger
+Rechercher
+Filtre
+Tous
+Total
+Version
+Temps de fonctionnement
+Mot de passe actuel
+Nouveau mot de passe
+Répéter le nouveau mot de passe
+Créé
+Ajouter
+Enregistré
+Réglages enregistrés
+Avertissement
+Info
+Talkgroup
+Talkgroups
+Slot
+Source
+Cible
+Direction
+secondes
+minutes
+heures
+jours
+il y a
+Clair
+Sombre
+Automatique
+Couleurs
+Couleurs
+Logo
+Titre
+Aperçu
+Réinitialiser
+Appliquer
+Copier
+Copié
+Afficher
+Masquer
+Plus
+Moins
+Tout afficher
+Afficher moins
+Description
+Activé
+Désactivé

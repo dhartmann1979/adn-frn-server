@@ -1,0 +1,215 @@
+Selettore DKIM
+Politica DMARC
+Allineamento DMARC
+Rapporti DMARC a
+Logo BIMI
+Certificato BIMI (VMC/CMC
+MTA-STS
+Cosa fanno i destinatari con la posta che non supera i controlli – BIMI richiede quarantine o reject
+none – solo rapporti
+quarantine – nello spam
+reject
+relaxed (i sottodomini contano
+strict
+Vuoto = dmarc@<dominio principale>
+Logo accanto alle tue e-mail in Gmail, Apple Mail, Yahoo … (richiede DMARC quarantine/reject
+Indirizzo https:// facoltativo di un VMC o CMC – Gmail e Apple mostrano il logo solo con uno di essi
+Indica agli altri server di consegnarti la posta solo cifrata
+testing – solo rapporto
+enforce
+Il tuo logo accanto alle tue e-mail in Gmail, Yahoo, Apple Mail … Richiede DMARC quarantine o reject; Gmail e Apple vogliono anche un certificato VMC/CMC. Il logo deve essere SVG Tiny PS – il server lo controlla e lo serve sotto /.well-known/bimi/
+creato automaticamente dal titolo
+logo proprio
+Lettere
+Colore
+Crea logo
+Carica SVG
+Standard
+Logo BIMI creato
+Logo BIMI salvato
+Controlla ora il DNS
+Copia tutto
+File di zona
+Tipo
+Valore
+Scopo
+facoltativo
+impostato
+diverso
+mancante
+Indirizzo del server di posta
+Indirizzo IPv6 del server di posta
+La posta del dominio arriva a questo server
+DKIM: la chiave pubblica della firma
+DMARC: politica e rapporti
+BIMI: logo accanto alle tue e-mail (richiede DMARC quarantine/reject
+MTA-STS: consegnare solo cifrato
+TLS-RPT: rapporti sui problemi TLS
+I programmi di posta trovano IMAP da soli
+I programmi di posta trovano SMTP da soli
+Nessun IMAP non cifrato
+SMTP con STARTTLS
+DNS inverso presso il provider di hosting – molto importante contro i filtri antispam
+SPF: chi può inviare per il dominio (questo server e il relay
+SPF: chi può inviare per il dominio (questo server
+dominio principale
+nel certificato
+Aggiungi dominio di posta
+Ordine
+Rendi dominio principale
+Dominio non valido
+Già presente
+Disattiva il server di posta
+Installa il server di posta
+Installa
+In corso – può richiedere alcuni minuti
+Immagine di copertina
+Scegli immagine
+Rimuovi immagine
+Descrizione dell’immagine
+(per i lettori di schermo
+Solo JPEG, PNG o WebP
+L’immagine non può essere letta
+JPEG, PNG o WebP – ridotta nel browser (max. 1600 px di larghezza); mostrata in cima alla scheda e all’articolo, 16:9
+Immagine di copertina: solo JPEG, PNG o WebP
+Immagine di copertina: al massimo 1,5 MB
+Immagine di copertina: il file non è ciò che dichiara di essere
+Immagine di copertina: file danneggiato
+attende il DNS
+Aggiungi automaticamente i domini di posta
+Ogni dominio in 🔒 Domini e HTTPS diventa anche un dominio di posta (news.example.org → example.org); mail.<dominio> viene aggiunto da solo al certificato Let’s Encrypt non appena il suo DNS punta a questo server
+Completamente automatico: i nuovi domini in 🔒 Domini e HTTPS diventano domini di posta, mail.<dominio> viene aggiunto al certificato Let’s Encrypt non appena il suo DNS punta a questo server (controllato ogni 30 minuti, senza riavvio), e il server di posta lo adotta da solo
+Aggiungi qui il dominio di posta (o lascia che venga aggiunto automaticamente) – il certificato viene esteso da solo non appena il DNS è corretto
+Attivo: gli altri server di posta devono usare TLS (STARTTLS) per consegnare – i pochi senza TLS vengono rifiutati, anche strumenti di test come MXToolbox (530 Must issue a STARTTLS command first). L’RFC 3207 lo sconsiglia per un MX pubblico. I programmi di posta hanno sempre bisogno di TLS
+Dashboard live
+Portale (notizie
+Ogni dominio o sottodominio mostra ciò che scegli in 🔒 Domini e HTTPS → «Mostra»: la dashboard live o la pagina del portale – quanti domini vuoi, tutti con Let’s Encrypt
+Il primo dominio è il dominio principale (utente@dominio-principale); ogni dominio aggiuntivo è un alias per le stesse caselle di posta. Ogni dominio aggiunge mail.<dominio> al certificato Let’s Encrypt della dashboard – il server di posta usa solo TLS
+DNS: mail.<dominio> (A/AAAA) → questo server; MX → mail.<dominio>
+Domini e HTTPS: la dashboard ha il suo dominio e HTTPS è attivo
+Aggiungi qui il dominio di posta – il certificato viene esteso
+Server di posta: ⚙️ Installa, relay, ✅ Applica
+Modelli DNS: SPF, DKIM, DMARC, BIMI … presso il provider DNS, PTR presso il provider di hosting
+Porte: 25, 465, 587, 993 aperte nel firewall e nel router
+Dopo una modifica la dashboard si riavvia ed estende il certificato (il DNS di mail.<dominio> deve puntare a questo server, porta 80 raggiungibile). Poi 📮 Server di posta → ✅ Applica
+Server di posta <code>
+I programmi di posta trovano da soli le impostazioni tramite i record SRV (🧾 Modelli DNS). L’IMAP non cifrato (143) è disattivato
+Solo TLS 1.2+: IMAPS 993, SMTPS 465, submission 587 (STARTTLS obbligatorio), accesso solo dopo TLS
+In uscita: firma DKIM per ogni dominio, relay solo cifrato con certificato verificato
+Gli utenti inviano solo con il proprio indirizzo (o i propri alias
+Password: Dovecot riceve solo un hash SHA512-CRYPT; il webmail usa un proprio accesso master, mai la password dell’utente
+attende l’accesso»: gli utenti precedenti al server di posta non hanno ancora una password di posta – viene creata al loro prossimo accesso alla dashboard (o quando un admin imposta una nuova password
+Generati dalle tue impostazioni: MX, A/AAAA, SPF, DKIM (la chiave pubblica appare dopo «Applica»), DMARC, BIMI, MTA-STS, TLS-RPT e record SRV per i programmi di posta. «Controlla DNS» chiede al DNS cosa è impostato in questo momento
+Server DMR
+Inattivo
+Ascoltato qui
+RF (locale
+Rete
+Rete
+RF / Rete
+Quota RF
+Rete DMR
+Modem
+connesso
+Talkgroup più attivi
+Attività
+Chiamate (30 g
+Registro live
+L’accesso di fabbrica n8schicht / n8schicht è ancora attivo
+Hardware e dati
+Chiunque sulla tua rete potrebbe modificare il tuo hotspot. Imposta una password personale
+Cambia ora
+MMDVMHost e DMRGateway li usano dopo un riavvio
+Lista dei talkgroup
+Lista dei talkgroup della N8schicht
+Nomi propri
+Cerca: numero o nome, p. es. 262 o Bayern
+Nomi
+Nomi da github.com/dhartmann1979/n8schicht, più i tuoi
+copia fornita con N8-Hotspot
+Nominativo, ID DMR e posizione
+Il tuo nominativo, p. es. DL1ABC
+ID dell’hotspot
+Suffisso dell’hotspot
+Due cifre che rendono unico l’ID dell’hotspot (ID DMR + suffisso, p. es. 262123401). Vuoto = solo ID DMR
+Posizione
+Città o locator, mostrato al server
+Latitudine
+Longitudine
+Altezza antenna (m
+Potenza (W
+Scheda, porta, frequenze e livelli
+Scheda modem
+Porta seriale
+Velocità della porta
+Compila porta, velocità e simplex/duplex
+Trova il modem
+Cerca
+MMDVM_HS_Hat sul connettore GPIO (simplex
+MMDVM_HS_Dual_Hat sul connettore GPIO (duplex
+ZUMspot / HS hat via USB (simplex
+Scheda ripetitore MMDVM via USB (duplex
+Altro / valori propri
+Frequenza RX (MHz
+Frequenza TX (MHz
+Uguale a RX in simplex
+Offset RX (Hz
+Offset TX (Hz
+Dalla calibrazione
+Livello RX (%
+Livello TX (%
+Potenza RF (%
+Inversione RX
+Inversione TX
+Inversione PTT
+Ritardo TX (ms
+Ritardo DMR (ms
+Modalità DMR
+Color code, time slot, tempi di attesa
+Color code
+Duplex (due time slot
+Disattivo per hotspot simplex (solo TS2
+Time slot
+Time slot 1
+Time slot 2
+Usato solo in modalità duplex
+Attesa chiamata (s
+Attesa TX (s
+Attesa modalità RF (s
+Attesa modalità rete (s
+Solo il mio ID può trasmettere
+Invia talker alias
+Nominativo in morse ogni 10 minuti
+Connetti a un server DMR
+Server, password e opzioni
+Server
+Compila nome, indirizzo e porta
+Altro server (HomeBrew
+Indirizzo del server
+Nome host / IP
+Porta del server (UDP
+Presso la N8schicht: la tua password FreeRadioID.net (accesso completo) o la password ospite
+Facoltativo, p. es. TS1=262;TS2=26500
+Buffer jitter (ms
+Timeout (s
+Titolo, vista pubblica, lista ID
+Disattivo = solo gli utenti connessi vedono la dashboard
+Durata della sessione (ore
+Conserva le chiamate per (giorni
+Lista ID DMR
+Nominativi e nomi per la dashboard e MMDVMHost (DMRIds.dat
+Aggiornamento giornaliero della lista ID
+solo radioid.net
+Carica gli ID FreeRadioID registrati
+Ogni giorno con la lista ID: badge FRID, nomi degli ID solo FreeRadioID
+Avatar, profili e ID registrati
+Mostra avatar
+Foto profilo dei membri FreeRadioID; recuperate quando una stazione viene ascoltata, salvate in cache nel database
+Consulta i profili
+Nome, località e note nella vista della stazione (in diretta dall’API FreeRadioID
+ID registrati
+Registrati su FreeRadioID.net
+ID registrati (badge FRID) e avatar, caricati con la lista ID
+Avatar in cache
+In cache
+URL della lista dei talkgroup

@@ -1,0 +1,215 @@
+Activiteit in de tijd
+Waar de gesprekken vandaan komen
+Lokaal (repeaters en hotspots
+Periode
+Maatstaf
+per uur
+Aandeel van de zendtijd dat via OpenBridge binnenkwam
+Actieve TG’s
+DMR-ID / roepnaam
+Talker Alias (door de portofoon verstuurd
+OpenBridge-trunks
+Trunks
+Trunk
+Verkeer op de trunk
+Top-talkgroups op de trunk
+Talkgroups op de trunk
+Laatste gesprekken op de trunk
+Ontvangen / verzonden
+Ontvangen
+Ontvangen (boven
+Verzonden (onder
+Andere kant
+Protocol
+Netwerk-ID
+Lokale poort
+geen talkgroupfilter
+geen filter
+Nog geen trunk
+OpenBridge-trunks actief / ingesteld · gesprekken vandaag ontvangen (⬇) en verzonden (⬆) via de trunks
+elke talkgroup loopt via deze trunk op TS2, behalve de lokale (1–79, 4000, 5000, 9990–9999
+OpenBridge-trunks incl. FreeDMR-keep-alives, protocolversie en talkgroups
+Geen talkgroup gevonden
+Nummer of naam, bv. 262 of Bayern
+Actief
+Actief (30 dagen
+Alle TG’s
+toegestaan voor u
+Niet voor gasten
+Snelstart
+Server en poort
+FreeRadioID-wachtwoord
+Serveradres voor hotspots
+Poort (UDP
+Gebruik uw DMR-ID en uw
+persoonlijke wachtwoord van FreeRadioID.net
+uw FreeRadioID-wachtwoord
+uw DMR-ID
+U krijgt volledige toegang tot alle talkgroups van deze server
+Nog geen wachtwoord? Registreer uw ID op
+voor gasttoegang
+met uw FreeRadioID-wachtwoord, of gebruik
+Zonder FreeRadioID-wachtwoord verbindt u als gast: u hoort alles, maar u kunt alleen
+zenden op de gast-talkgroups
+Gast
+Gasttoegang
+Gasten mogen zenden op
+Time slot 1 · TS1
+Time slot 2 · TS2
+Uw apparaat kan zijn eigen talkgroups kiezen met het
+veld, bv.
+Kant-en-klare instellingen
+Pi-Star / WPSD: voeg deze regel toe aan
+in de DMR-configuratie
+Opmerking van de sysop
+Zo verbindt u: server, poort, wachtwoord, talkgroups en kant-en-klare instellingen
+Tabblad Configuratie
+Tabblad Instellen
+Portaaltoegang (API-tokens
+Nog geen tokens
+Dit token intrekken? De dienst verliest direct de toegang
+Niet met een API-token
+Gebied
+Alleen superadmin
+Wachtwoord (min. 8
+Browser
+IP-adressen
+Accounts
+Sectie
+Opties (optioneel
+Geavanceerde opties
+Alle huidige aanmeldingen. Beëindig er een met „Intrekken” – dat apparaat wordt direct afgemeld
+Aanmeldingen, mislukte pogingen en elke wijziging in het beheergedeelte, met tijd, persoon en IP-adres
+Admins zien IP-adressen en beheren gebruikers en instellingen. Alleen de superadmin (ingesteld in
+kan admins aanmaken
+Het hele dashboard achter dit venster toont uw wijzigingen al. Nog niet opgeslagen? Sluit het venster en alles keert terug
+Sommige wijzigingen werken pas na een herstart van het dashboard
+Werkt na een herstart
+Werkt direct. HTTPS en poorten na een herstart van het dashboard
+De waarden van deze sectie opnieuw uit het configuratiebestand nemen
+Standaardwaarden uit bestand
+Alle waarden staan in de database (
+Alleen de superadmin en de opstartadressen blijven in de configuratiebestanden
+Instellingen wijzigen
+Zichtbaar zonder aanmelding
+ja (iedereen kan kijken
+niet ingesteld —
+Draait als
+handmatig (run_all.sh
+systemctl via sudo
+aanbevolen
+Toegang tot het dashboard
+Openbaar dashboard
+„Aangemeld blijven” (dagen
+Wie het dashboard mag zien en hoe lang een aanmelding duurt
+Uit = niets zichtbaar zonder aanmelding. IP-adressen en poorten zijn altijd alleen voor admins
+Toegang voor repeaters en hotspots
+Wachtwoord en talkgroups voor repeaters en hotspots
+Passphrase (standaard
+Gedeeld wachtwoord voor repeaters/hotspots zonder eigen patroon. Met FreeRadioID-aanmelding aan is dit het gastwachtwoord
+Talkgroups TS1
+Talkgroups TS2
+Gescheiden door komma’s, all = alle talkgroups, none = geen talkgroups
+Door het apparaat gevraagde TG’s vertrouwen (RPTO
+Aan = de eigen talkgrouplijst van het apparaat wint; uit = alleen de lijsten hierboven
+FreeRadioID-aanmelding
+Beveiligde FreeRadioID-aanmelding
+Persoonlijke aanmeldingen via FreeRadioID.net en de gasttoegang
+Aanmeldingen worden gecontroleerd met het persoonlijke FreeRadioID.net-wachtwoord; de passphrase hierboven wordt de gastaanmelding
+TX-talkgroups voor gasten
+Gasten mogen alleen hier zenden; all = geen beperking, none = gasten kunnen niet zenden
+API-time-out (s
+FreeRadioID-ID’s
+FreeRadioID-gegevens
+FreeRadioID-ID-lijst laden
+Afbeeldingen van bij FreeRadioID geregistreerde ID’s, gecachet in de database
+Avatars, profielen en de FRID-badge van FreeRadioID.net
+Geregistreerde ID’s krijgen de FRID-badge in Laatst gehoord
+Naam en plaats in de detailweergave van het station
+Roepnamendatabase
+Waar roepnamen en namen voor de DMR-ID’s vandaan komen
+Landen
+all, of gescheiden door komma’s precies zoals de lijst ze spelt (Germany, Austria
+Dagelijkse vernieuwing om
+FreeRadioID.net (radioid.net + FreeRadioID
+Talkgroups en statistieken
+Talkgroupstatistieken en talkgroupnamen
+Talkgroupstatistieken vastleggen
+Elk groepsgesprek (talkgroup, duur, radio-ID) wordt voor de grafieken in de database opgeslagen
+SQLite, hoogstens 90 dagen
+Uit = alleen aangemelde gebruikers zien de talkgroup- en OpenBridge-statistieken
+Namen van ca. 1400 talkgroups (github.com/dhartmann1979/n8schicht), dagelijks bijgewerkt met de roepnamendatabase
+Mededelingsbanner tonen
+Een banner boven het dashboard voor nieuws en onderhoudsmeldingen
+Tabblad Configuratie tonen
+Het tabblad Configuratie legt nieuwe gebruikers uit hoe ze hun hotspot verbinden
+Getoond in het tabblad Configuratie
+Getoond aan het einde van het tabblad: regels, contact, links
+Het standaardwachtwoord tonen
+Met FreeRadioID-aanmelding is dit het gastwachtwoord. Uit = „vraag het de sysop”
+Opmerking voor gebruikers
+DMR-master / server
+DMR-master
+Poort en timing van de DMR-server
+DMR-poort (UDP
+Luisteradres
+Leeg = alle adressen (IPv4 en IPv6
+Ping-time-out (s
+Gemiste pings vóór verbreken
+Einde stream zonder terminator (s
+Talkgroup-hangtijd (s
+Hoe lang een slot gereserveerd blijft voor de laatste talkgroup
+Repeaters en hotspots verbinden hier (HomeBrew-standaard 62031
+Bij opslaan naar de DMR-server gestuurd. Poort, links en trunks veranderen na een herstart van de DMR-server
+Herverbindingen korter dan (s) loggen
+0 = elke herverbinding loggen
+Gesprekken tussen trunks doorgeven
+Aan: een gesprek dat via één trunk binnenkomt, gaat ook uit via alle andere trunks die de talkgroup dragen. Lussen worden gestopt door de echobeveiliging en de FreeDMR-hopteller
+Apparaatherkenning
+Hoe stations worden ingedeeld in repeaters, hotspots, apps en netwerken: op de pakketnaam die hun software bij het aanmelden meldt
+Automatische herkenning
+De automatische herkenning herkent ze allemaal
+Gecontroleerd als de pakketnaam niets zegt
+Hotspots – pakketnaam bevat
+Hotspots – software bevat
+Apps – pakketnaam bevat
+Apps – software bevat
+Repeaters – pakketnaam bevat
+Netwerken – pakketnaam bevat
+Netwerken – software bevat
+Telefoon-/pc-apps zonder radiohardware. Gescheiden door komma’s, hoofd-/kleine letters maken niet uit. Verbonden stations worden direct na opslaan opnieuw ingedeeld
+De software van deze stations meldt een naam die HBlink4 nog niet kent (getoond op de kaart). Admins kunnen hem indelen
+Patronen, zwarte lijst en links (JSON
+Regels per station, geblokkeerde ID’s en links naar andere servers – voor ervaren sysops
+Repeaterpatronen
+Eigen regels per ID, ID-bereik of roepnaam: passphrase, talkgroups, freeradioid aan/uit. Zie config/config_advanced_sample.json
+Zwarte lijst
+Geblokkeerde ID’s, ID-bereiken of roepnamen, elk met een reden
+Uitgaande links naar andere servers
+links naar andere servers
+Trunks naar andere netwerken zoals FreeDMR
+HTTPS met Let’s Encrypt
+Versleutelde toegang met een gratis Let’s Encrypt-certificaat
+Domeinen
+E-mail voor Let’s Encrypt
+Testcertificaten (staging
+HTTP-poort (challenge + omleiding
+Gewone webpoort
+Leidt om naar HTTPS als HTTPS aan staat
+Vereist certbot, het domein dat hierheen wijst en open poorten 80/443
+Geldig tot
+Deze pagina via HTTPS
+HTTPS uit
+Let’s Encrypt (automatisch
+Admins informeren over updates
+Aangemelde admins krijgen een melding als GitHub een nieuwere versie heeft
+GitHub-repository
+eigenaar/naam
+Wie op „Nu bijwerken” mag drukken
+Alle admins
+Niemand (met de hand bijwerken
+Herstarten na update
+Vraagt GitHub eens per uur of er een nieuwere versie is. Er wordt niets automatisch geïnstalleerd
+Vraagt altijd opnieuw om het wachtwoord. Haalt alleen op van de git-remote die op de server is ingesteld
+Geïnstalleerde versie · gebaseerd op HBlink4 4.8.0
+Nieuwste daar

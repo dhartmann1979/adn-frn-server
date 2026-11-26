@@ -1,0 +1,214 @@
+Ägarens e-post (server_owner
+Serverägare (får OWNER-rättigheter i varje rum
+Endast en adress; tom = FRN-kontots e-post ovan. OWNER-rättigheter i varje rum
+FRN-kontots e-post (sysman_auth_emailaddr
+FRN-kontots lösenord (sysman_auth_password
+E-post för ditt FRN-användarkonto hos SystemManager
+Lösenordet för detta FRN-konto (som SystemManager skickade det
+Skickas till SystemManager och visas på instrumentpanelen
+Visas på instrumentpanelen
+HTTPS och webb
+Aktivera HTTPS med Let’s Encrypt
+Automatiska HTTPS-certifikat med Let’s Encrypt (kräver publik DNS och portarna 80/443
+Publik domän
+Exempel: dashboard.example.org. Ange inte http:// eller en sökväg
+Certifikatets e-post
+Let’s Encrypt-utgång och viktiga certifikatmeddelanden
+Använd testcertifikat (staging
+Endast för test; webbläsare litar inte på staging-certifikat
+HTTPS-port
+Publik HTTPS-port. Standard är 443
+HTTP-challenge-/omdirigeringsport
+Publik TCP-port för HTTP-01-challenge och omdirigering HTTP → HTTPS
+Kräver ett publikt DNS-namn som pekar på denna server samt inkommande TCP-portar 80 och 443. Spara och starta sedan om frnadn
+Databas
+Hur länge sändningar och inloggningar sparas
+Spara enskilda sändningar (dagar
+Spara inloggningar (dagar
+Spara chattmeddelanden (dagar
+Dagliga summor sparas för alltid, de är små
+Kasta ändringar
+osparat
+från profilen
+inbyggd
+tom
+Nytt rum
+Namn (net00
+Emoji framför namnet
+Rummet är öppet (_enable
+Av: servern erbjuder inte detta rum
+Dolt på instrumentpanelen
+Endast efter inloggning på instrumentpanelen (FRN-klienterna ser det fortfarande
+Rumsägare (_owner
+E-postadresser, kommaseparerade; NETOWNER-rättigheter i detta rum. Tom = serverägaren
+Tillåtna crosslinks (_acl_cl
+Tillåtna gateways (_acl_gw
+Tom = alla, none = inga crosslinks, eller e-postadresser
+Tom = alla, none = inga gateways, eller e-postadresser
+Meddelande för nekade crosslinks/gateways (_acl_info
+Max. sändning (_tot, s
+Häv tystning efter (_unmute, min
+0 = tystad tills tystningen hävs
+Ingen röst till tystade PC-klienter
+Ingen röst till tystade crosslinks
+Ingen röst till tystade gateways
+Talpaus (_speechpause, ms
+Meddelande vid talpaus
+Skickas till PC-klienter; {callsign} ersätts
+Papegoja / ekotest
+Papegoja start/stopp (_parrot_startstop_enable
+Papegojan kan slås på och av med textmeddelande
+Telegram-bot (_tgbot_params
+min. sändning ms;min. vila ms;bot-token;kanal-ID – t.ex. 6000;30000;123:ABC;-100123
+Infomeddelande (_show_infomessage
+Kräv taltillstånd
+Får sända
+Flytta upp
+Flytta ner
+Ordning på instrumentpanelen; FRN-klienterna ser rummen sorterade efter namn. ⭐ = standardrum, 🦜 = net00, test-/papegojrummet
+Åtkomstlista
+Tillåt bara poster på åtkomstlistan
+Åtkomstmeddelande
+Vem som ser åtkomstlistans infomeddelande
+Alla
+endast klienter som berörs av åtkomstlistan
+Spärrmönster (_bl_regexp
+Reguljärt uttryck för namn, e-post och stad
+Meddelande för spärrade klienter (_bl_info
+Tillåt en LAN-adress (allowLANAddr
+Spara åtkomstinställningar
+Lägg till post
+Lägg till i listan
+Inga poster i denna lista
+Kopiera en station som är online
+Välj en ansluten station
+Listorna lagras i SQLite och skrivs i FRN-serverns XML-format. Befintliga XML-poster importeras automatiskt. Ändringar gäller efter omstart av FRN-servern; ursprungliga XML-filer säkerhetskopieras innan de ersätts
+FRN-ägare och administratörer kan fortfarande ändra dessa listor i FRN-klienten. Instrumentpanelen importerar ändringar från XML-filerna innan de visas eller redigeras
+Nytt FRN-konto
+Inga konton än
+E-post (FRN-klientens inloggning
+FRN-lösenord
+FRN-klient-ID
+Serverns lösenordslista för
+läge (acl/FRNPasswd.xml
+på denna server
+Servern är registrerad hos SystemManager: inloggningar kontrolleras där, denna lista används inte
+Servern behöver själv lösenordet i FRNPasswd.xml (filen är bara läsbar för tjänsten
+Ny användare
+Lösenord (minst 10
+Nytt lösenord (minst 10
+Endast administratörer
+Superadmin: allt, även administratörer. Administratörer: allt utom andra administratörer. Användare: ser instrumentpanelen även när den är privat, och dolda rum
+superadmin
+Inloggade användare
+Vad
+Från
+Slut
+installation / kommandorad
+Maskin
+Värd
+Last
+Minne
+Disk
+Starta om
+Stäng av
+Tjänst
+Körs sedan
+Starta om FRN-servern
+Starta om instrumentpanelen
+Journal frn-server
+Journal frnadn
+Java-FRN-server av
+Installerad: okänd
+Installerad version
+uppdatering tillgänglig
+Arkiv
+Data (SQLite
+Statistikcache
+FRN-serverns server.log
+Visa server.properties
+Upp
+Ned
+Importera äldre server.properties
+Importera server.properties
+Välj den gamla server.properties-filen
+Valfritt: importera inställningar från den tidigare FRN-installationen till denna nya installation. Endast stödda egenskaper och rumsdefinitioner överförs. Den gamla databasen, Java-JAR, ACL-listor och lösenords-XML-filer kopieras inte
+Färgprofil
+Välj en färgprofil och ändra sedan valfri färg – eller bygg ett helt eget schema. Hela sidan visar det direkt; det sparas bara efter
+Samma färgmotor som HBlink4-FreeRadioID och N8-HotSpot
+Egna färger
+Klicka på en färg för att ändra den; ↺ tar den från profilen igen
+Tillbaka till profilfärgen
+Accent
+Accent 2
+Bakgrund
+Sidans färg bakom allt
+Knappar, siffror, aktiva flikar
+Andra färgen för knappar och titeln
+Sken uppe till vänster
+Sken uppe till höger
+Sken nere
+Korttoning
+Färg som blandas in i glaskorten
+Kortens ljusstyrka
+Hur tydligt glaskorten framträder
+Glasoskärpa
+Bakgrundssken
+0 = platt bakgrund
+Rundning
+Hörn på kort och knappar
+Av = snabbare på gamla telefoner
+Läsbar (kontrast 18.3 : 1
+N8-standard
+Logotyp och webbplatsikon
+Instrumentpanelens logotyp
+Aktuell logotyp
+Använd standardlogotyp
+Webbplatsikon / favicon
+Aktuell webbplatsikon
+Använd standardikon
+PNG-bild, upp till 2 MB. Visas i sidhuvudet och inloggningsdialogen
+PNG eller ICO, upp till 2 MB. Används i webbläsarflikar och bokmärken
+Spara färger, logotyp och ikon
+Tom = anpassas automatiskt till bakgrunden
+Klientlogotyper
+Stationer visar programvaran eller nätverket de kommer från som avatar – identifierat utifrån band, beskrivning och klienttyp (crosslink, gateway, PC). De inbyggda bilderna är enkla märken. Du kan ersätta var och en med en egen bild (PNG, JPEG, WebP, GIF, ICO eller enkel SVG, max. 512 KB) – till exempel en officiell logotyp, om du får använda den
+Ikon
+Länkmeny
+Visa länkmenyn
+Menyknappens text
+Knapp med rullgardinsmeny
+Rad med knappar under sidhuvudet
+(ordning = ordning i menyn
+Namn, t.ex. Webbplats
+Öppna i en ny webbläsarflik
+ny flik
+Lägg till länk
+Spara länkar
+Spara och uppdatera webbplatsikoner
+Visa webbplatsens cachade favicon
+webbplatsikon
+Enkel HTML
+Dina egna länkar i sidhuvudet: webbplats, chattgrupp, wiki, donationssida … Alla ser dem, även utan inloggning
+Webbplats
+E-post
+Adress
+Kopiera inställningar från
+Registrera inte
+(växlar till den fliken) och
+Okänd ägare: serverägarens e-post (server_owner – Inställningar → Operatör, tom = FRN-kontot) är inget känt FRN-konto hos SystemManager – ange e-posten för ett befintligt FRN-konto
+Orsaken till nekade inloggningar (fel FRN-lösenord, okänd ägare, dubbel anslutning …) – kontrolleras även i bakgrunden: direkt efter ett problem med FRN-servern, sedan varannan minut; nya orsaker visas bland händelserna
+okänd – synkronisera eller öppna partnern en gång
+fristående (ingen SystemManager
+lösenord satt
+inget lösenord
+inget FRN-konto angivet
+FRN-konton hos SystemManager
+röres aldrig av synkroniseringen, varje server behåller sitt eget
+Spara konto
+FRN-konto sparat – starta om FRN-servern för att logga in med det
+Inga ändringar
+FRN-servern här stoppad och låst
+den startar av sig själv så snart ett eget FRN-konto sparas under SystemManager
+Reservservern stoppar och låser själv sin FRN-server (vid nästa synkronisering eller statuskontroll) – mastern förblir online
+Låst: denna reservserver använder samma FRN-konto som mastern. Ange först ett eget FRN-konto under SystemManager (📧 FRN-lösenord Backup

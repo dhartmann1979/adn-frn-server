@@ -1,0 +1,215 @@
+Aktivitet över tid
+Varifrån samtalen kommer
+Lokalt (repeatrar och hotspots
+Period
+Mått
+per timme
+Andel av sändningstiden som kom in via OpenBridge
+Aktiva TG:er
+DMR-ID / anropssignal
+Talker Alias (skickat av radion
+OpenBridge-trunkar
+Trunkar
+Trunk
+Trafik på trunken
+Mest aktiva talkgroups på trunken
+Talkgroups på trunken
+Senaste samtal på trunken
+Mottagna / skickade
+Mottagna
+Mottagna (ovan
+Skickade (nedan
+Motsida
+Protokoll
+Nätverks-ID
+Lokal port
+inget talkgroup-filter
+inget filter
+Ingen trunk än
+OpenBridge-trunkar uppe / konfigurerade · dagens samtal mottagna (⬇) och skickade (⬆) via trunkarna
+varje talkgroup går via denna trunk på TS2, utom de lokala (1–79, 4000, 5000, 9990–9999
+OpenBridge-trunkar inkl. FreeDMR-keep-alives, protokollversion och talkgroups
+Ingen talkgroup hittades
+Nummer eller namn, t.ex. 262 eller Bayern
+Aktiva
+Aktiva (30 dagar
+Alla TG:er
+tillåtna för dig
+Inte för gäster
+Snabbstart
+Server och port
+FreeRadioID-lösenord
+Serveradress för hotspots
+Port (UDP
+Använd ditt DMR-ID och ditt
+personliga lösenord från FreeRadioID.net
+ditt FreeRadioID-lösenord
+ditt DMR-ID
+Du får full åtkomst till alla talkgroups på denna server
+Inget lösenord än? Registrera ditt ID på
+för gäståtkomst
+med ditt FreeRadioID-lösenord, eller använd
+Utan FreeRadioID-lösenord ansluter du som gäst: du hör allt, men du kan bara
+sända på gästtalkgroups
+Gäst
+Gäståtkomst
+Gäster får sända på
+Time slot 1 · TS1
+Time slot 2 · TS2
+Din enhet kan välja sina egna talkgroups med
+fältet, t.ex.
+Färdiga inställningar
+Pi-Star / WPSD: lägg till denna rad i
+i DMR-konfigurationen
+Meddelande från sysop
+Så ansluter du: server, port, lösenord, talkgroups och färdiga inställningar
+Fliken Konfiguration
+Fliken Konfiguration
+Portalåtkomst (API-tokens
+Inga tokens än
+Återkalla denna token? Tjänsten förlorar åtkomsten direkt
+Inte med en API-token
+Område
+Endast superadmin
+Lösenord (minst 8
+Webbläsare
+IP-adresser
+Konton
+Sektion
+Alternativ (valfritt
+Avancerade alternativ
+Alla aktuella inloggningar. Avsluta en med ”Återkalla” – den enheten loggas ut direkt
+Inloggningar, misslyckade försök och varje ändring i administrationen, med tid, person och IP-adress
+Administratörer ser IP-adresser och hanterar användare och inställningar. Bara superadmin (anges i
+kan skapa administratörer
+Hela instrumentpanelen bakom detta fönster visar redan dina ändringar. Inte sparat än? Stäng fönstret så återgår allt
+Vissa ändringar gäller efter en omstart av instrumentpanelen
+Gäller efter en omstart
+Gäller direkt. HTTPS och portar efter en omstart av instrumentpanelen
+Hämta denna sektions värden från konfigurationsfilen igen
+Standardvärden från filen
+Alla värden finns i databasen (
+Bara superadmin och startadresserna finns kvar i konfigurationsfilerna
+Ändra inställningar
+Synligt utan inloggning
+ja (alla kan se
+inte satt —
+Körs som
+manuellt (run_all.sh
+systemctl via sudo
+rekommenderas
+Åtkomst till instrumentpanelen
+Offentlig instrumentpanel
+”Förbli inloggad” (dagar
+Vem som får se instrumentpanelen och hur länge en inloggning varar
+Av = inget syns utan inloggning. IP-adresser och portar är alltid bara för administratörer
+Åtkomst för repeatrar och hotspots
+Lösenord och talkgroups för repeatrar och hotspots
+Lösenfras (standard
+Gemensamt lösenord för repeatrar/hotspots utan eget mönster. Med FreeRadioID-inloggning på är detta gästlösenordet
+Talkgroups TS1
+Talkgroups TS2
+Kommaseparerade, all = alla talkgroups, none = inga talkgroups
+Lita på TG:er som enheten begär (RPTO
+På = enhetens egen talkgroup-lista vinner; av = bara listorna ovan
+FreeRadioID-inloggning
+FreeRadioID säker inloggning
+Personliga inloggningar via FreeRadioID.net och gäståtkomsten
+Inloggningar kontrolleras mot det personliga FreeRadioID.net-lösenordet; lösenfrasen ovan blir gästinloggningen
+Gästernas TX-talkgroups
+Gäster får bara sända här; all = ingen begränsning, none = gäster kan inte sända
+API-tidsgräns (s
+FreeRadioID-ID:n
+FreeRadioID-data
+Ladda FreeRadioID-ID-listan
+Bilder för ID:n registrerade hos FreeRadioID, cachade i databasen
+Avatarer, profiler och FRID-märket från FreeRadioID.net
+Registrerade ID:n får FRID-märket i Senast hörda
+Namn och ort i stationens detaljvy
+Anropssignaldatabas
+Varifrån anropssignaler och namn för DMR-ID:n kommer
+Länder
+all, eller kommaseparerade exakt som listan stavar dem (Germany, Austria
+Daglig uppdatering kl.
+FreeRadioID.net (radioid.net + FreeRadioID
+Talkgroups och statistik
+Talkgroup-statistik och talkgroup-namn
+Registrera talkgroup-statistik
+Varje gruppsamtal (talkgroup, varaktighet, radio-ID) sparas i databasen för diagrammen
+SQLite, högst 90 dagar
+Av = bara inloggade användare ser talkgroup- och OpenBridge-statistiken
+Namn på cirka 1400 talkgroups (github.com/dhartmann1979/n8schicht), uppdateras dagligen med anropssignaldatabasen
+Visa meddelandebanner
+En banner ovanför instrumentpanelen för nyheter och underhållsmeddelanden
+Visa fliken Konfiguration
+Fliken Konfiguration berättar för nya användare hur de ansluter sin hotspot
+Visas i fliken Konfiguration
+Visas i slutet av fliken: regler, kontakt, länkar
+Visa standardlösenordet
+Med FreeRadioID-inloggning är detta gästlösenordet. Av = ”fråga sysop”
+Meddelande till användare
+DMR-master / server
+DMR-master
+DMR-serverns port och tider
+DMR-port (UDP
+Lyssningsadress
+Tom = alla adresser (IPv4 och IPv6
+Ping-tidsgräns (s
+Missade pingar före frånkoppling
+Strömslut utan terminator (s
+Talkgroup-hålltid (s
+Hur länge en slot förblir reserverad för den senaste talkgroupen
+Repeatrar och hotspots ansluter hit (HomeBrew-standard 62031
+Skickas till DMR-servern vid sparande. Port, länkar och trunkar ändras efter en omstart av DMR-servern
+Logga återanslutningar kortare än (s
+0 = logga varje återanslutning
+Skicka samtal mellan trunkar
+På: ett samtal som kommer in via en trunk går också ut via alla andra trunkar som bär talkgroupen. Slingor stoppas av ekoskyddet och FreeDMR:s hoppräknare
+Enhetsidentifiering
+Hur stationer sorteras i repeatrar, hotspots, appar och nätverk: efter paketnamnet deras programvara anger vid inloggning
+Automatisk identifiering
+Den automatiska identifieringen känner igen alla
+Kontrolleras när paketnamnet inte säger något
+Hotspots – paketnamnet innehåller
+Hotspots – programvaran innehåller
+Appar – paketnamnet innehåller
+Appar – programvaran innehåller
+Repeatrar – paketnamnet innehåller
+Nätverk – paketnamnet innehåller
+Nätverk – programvaran innehåller
+Telefon-/PC-appar utan radiohårdvara. Kommaseparerade, versaler/gemener spelar ingen roll. Anslutna stationer sorteras om direkt efter sparande
+Programvaran i dessa stationer anger ett namn som HBlink4 inte känner till än (visas på kortet). Administratörer kan sortera in det
+Mönster, svartlista och länkar (JSON
+Regler per station, blockerade ID:n och länkar till andra servrar – för erfarna sysops
+Repeatermönster
+Egna regler per ID, ID-intervall eller anropssignal: lösenfras, talkgroups, freeradioid på/av. Se config/config_advanced_sample.json
+Svartlista
+Blockerade ID:n, ID-intervall eller anropssignaler, var och en med en orsak
+Utgående länkar till andra servrar
+länkar till andra servrar
+Trunkar till andra nätverk som FreeDMR
+HTTPS med Let’s Encrypt
+Krypterad åtkomst med ett gratis Let’s Encrypt-certifikat
+Domäner
+E-post för Let’s Encrypt
+Testcertifikat (staging
+HTTP-port (challenge + omdirigering
+Vanlig webbport
+Omdirigerar till HTTPS när HTTPS är på
+Kräver certbot, domänen pekande hit och portarna 80/443 öppna
+Giltigt till
+Denna sida via HTTPS
+HTTPS av
+Let’s Encrypt (automatiskt
+Meddela administratörer om uppdateringar
+Inloggade administratörer får ett meddelande när GitHub har en nyare version
+GitHub-arkiv
+ägare/namn
+Vem som får trycka på ”Uppdatera nu”
+Alla administratörer
+Ingen (uppdatering för hand
+Starta om efter uppdatering
+Frågar GitHub en gång i timmen om en nyare version finns. Inget installeras automatiskt
+Frågar alltid efter lösenordet igen. Hämtar bara från den git-remote som är konfigurerad på servern
+Installerad version · baserad på HBlink4 4.8.0
+Nyaste där

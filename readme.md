@@ -142,7 +142,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 |---|---|
 | 📦 [Installation](docs/de/installation.md) | Voraussetzungen, geführte Installation, HTTPS, Router und Firewall, Aktualisieren, Deinstallieren |
 | 🎙️ [Dashboard](docs/de/dashboard.md) | Kopfzeile und Menü, Link-Menü, Tabs Live / Statistics / Stations / Chat, Login |
-| 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), Sprache DE/EN, Updates mit Prüfung und Rollback |
+| 🔐 [Sicherheit & N8 Kit](docs/de/sicherheit.md) | Sicherheits-Header, API-Doku aus, Reverse-Proxy (Caddy/nginx), neun Sprachen, Anmeldefenster, Updates mit Prüfung und Rollback |
 | ✉️ [E-Mail](docs/de/email.md) | Postfach für jeden Benutzer (gleiches Passwort), eigene Mail-Domains, nur TLS mit Let's Encrypt, Upstream-Relay, Empfang per MX, DKIM/DMARC/BIMI/MTA-STS mit DNS-Vorlagen, Webmail |
 | 📰 [Portal-Seite](docs/de/portal.md) | Öffentliche News-Seite – nur Admins sind Autoren, Kategorien, Anheften, Entwürfe, RSS, eigene Domain mit Let's-Encrypt-Zertifikat |
 | 🔁 [Master & Backup](docs/de/master-backup.md) | Zweiter FRN-Server mit derselben Konfiguration: Abgleich jede volle Stunde und auf Knopfdruck, **verschlüsselt mit dem Sync-Schlüssel**, Wartungs-Übergabe von Hand, FRN-Passwort für beide Server |

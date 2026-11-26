@@ -503,3 +503,16 @@ N8Kit.i18n.add({
         [/^(.+) · no e-mail · (.+)$/, '$1 · keine E-Mail · $2'], [/^(.+) – my account$/, '$1 – mein Konto'],
     ],
 });
+
+/* 1.6: texts found without translation by the language scan */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        "Nobody in this room": "Niemand in diesem Raum",
+        "Parrot echo test is on": "Papagei-Echotest ist an",
+        "Top stations": "Aktivste Stationen",
+        "Stations online": "Stationen online",
+    },
+    rules: [
+    ]
+});

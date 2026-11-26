@@ -1,0 +1,75 @@
+Wachten op de volgende uitzending
+vandaag nog geen doorgang
+Vandaag per uur
+Geen FRN-verbinding
+Ontvangst (een station spreekt
+Zenden naar de andere netwerken
+Bron → (FRN: laagafsnijding, midden, hoog) → AGC-ingang → verdeling → AGC-uitgang per netwerk → limiter → netwerk
+Naar DMR volgt daarnaast de midden-/hoogversterking vóór de encoder (🎛️ Vocoder → Vóór de encoder). Wijzigingen werken direct, zonder herstart
+Het niveau waarop elke bron wordt geregeld voordat ze wordt verdeeld. −20 dBFS is een goede waarde
+Niveau naar elk netwerk. Voor AMBE en Zello −18 dBFS; de limiter houdt de pieken onder het plafond
+Maximale versterking (dB
+Zoveel versterkt de AGC zachte stations hoogstens (15 dB
+Maximale verzwakking (dB
+Zoveel regelt hij harde stations hoogstens terug (20 dB
+Hoe snel hij terugregelt bij te harde passages – snel: 5–15 ms
+Hersteltijd (ms
+Hoe snel hij daarna weer versterkt – 200–500 ms klinkt natuurlijk, korter „pompt”
+Daaronder telt het als pauze/ruis: de versterking blijft staan, ruis wordt niet opgehaald (−50 dBFS
+Geen piek gaat erboven – niets wordt oversturd (−1 dBFS
+Verwijdert gerommel, brom en wind uit het FRN-geluid (GSM) – 100–150 Hz
+GSM klinkt dof – de presence maakt stemmen verstaanbaarder, voor Zello en AMBE (3 dB
+FRN: hoog versterken (dB, vanaf 3 kHz
+Iets meer briljantie voor het FRN-geluid (2 dB). Te veel maakt ruis hoorbaar
+Kijk bij problemen eerst hier: het openbare foutenlogboek van freeradionetwork.de noemt de reden voor geweigerde aanmeldingen (verkeerd FRN-wachtwoord, meervoudige verbinding, poort niet bereikbaar …) die de FRN-server zelf niet meldt. Getoond worden vermeldingen over uw roepnaam en uw FRN-servers; N8 Crosslink kijkt na elke weigering zelf mee en schrijft de reden in het gebeurtenissenlogboek
+Vraagt het dashboard van de FRN-server (ADN FRN Server 2.21 of nieuwer) wie master en wie back-up is. De master heeft altijd prioriteit 1: na een storing gaat de brug naar de back-up, en zodra de master weer draait (3 controles met een minuut tussenruimte) tussen twee doorgangen terug naar de master. Zonder herkenning gaat „Server” vóór „Back-upserver”
+Lijst van de FRN-server – „🔄” leest hem opnieuw. Ontbreekt een kamer (bv. verborgen), kies „✏️ Andere kamer …”
+De kamers van de FRN-server uitlezen
+Andere kamer
+0 = willekeurige vrije poort · vast bv. voor firewallregels (alle poorten: 🔌 Poorten
+Wie zich mag aanmelden bij het beheergedeelte. Superadmins mogen daarnaast back-ups herstellen, alles terugzetten en andere superadmins beheren
+betekent: openen in firewall/router als hij van buitenaf bereikbaar moet zijn
+de andere kant moet bereikbaar zijn. Alles wordt met één knop opgeslagen; wat een herstart nodig heeft, staat daarna bovenaan
+0.0.0.0 = alle interfaces (IPv4) · :: = alle (IPv4 en IPv6) · 127.0.0.1 = alleen deze computer (dan alleen via het domein
+Webinterface en live-gegevens (http://IP:poort). Onder 1024 (bv. 80) werkt zonder root – nginx heeft dan andere poorten nodig. Herstart van de dienst
+http:// van de domeinen en de Let’s Encrypt-controle. Let’s Encrypt komt altijd op poort 80 – een andere poort alleen met doorsturing in de router (buiten 80 → binnen deze poort
+https:// van de domeinen (standaard 443; anders https://domein:poort). Wordt direct op alle domeinen toegepast
+naar de back-upserver, indien ingevuld
+aanmelding/wachtwoord bij de SystemManager (standaard 10025
+Bronpoort van de brug · 0 = willekeurig (standaard) · vast voor firewallregels of NAT
+alleen modus AMBEserver (127.0.0.1, standaard 2460) – nu niet in gebruik
+WebSocket wss://zello.io/ws – de poort staat in het adres (💬 Zello
+Eigen domeinen voor deze webinterface met een gratis certificaat van
+nginx neemt het domein aan op poort 80/443 en stuurt door naar N8 Crosslink (127.0.0.1:); certbot haalt het certificaat en vernieuwt het automatisch op tijd vóór het verloopt. Voorwaarde: het domein wijst via DNS naar deze server en poort 80 (Let’s Encrypt controleert altijd daar – anders doorsturing in de router) en 443 zijn vanaf internet bereikbaar
+Domeinen en HTTPS zijn nog niet vrijgegeven – voer eenmaal sudo /opt/n8crosslink/update.sh uit
+nginx luistert op
+en stuurt door naar 127.0.0.1: – wijzigen onder
+Voor meldingen over het verlopen van het certificaat
+Testcertificaat (Let’s Encrypt staging, om zonder limieten uit te proberen
+sudo is nog niet ingericht – eenmaal in de console: sudo /opt/n8crosslink/install.sh --fix-perms
+Offline sinds
+Plaatshouders: {call} = roepnaam, {name} = naam – bv. „{call}” of „{call} {name}”
+Poort van de FRN-server
+Poort van de DMR-server
+Webinterface
+Alle poorten van de N8 Hotspot op één plek. De hotspot heeft geen port forwarding in de router nodig: hij verbindt alleen naar buiten (DMR-server); de webinterface is voor het thuisnetwerk
+ingesteld in de systemd-dienst (N8HS_PORT
+Server en wachtwoord onder Bedrijf → Instellingen → DMR-netwerk
+Verbindingen tussen de diensten op de hotspot – niets openzetten
+Live-gegevens van MMDVMHost en DMRGateway naar de webinterface (127.0.0.1
+Update-trigger („Nu bijwerken”
+Demo – geen echte controle
+DMRGateway (DMR-server
+Niemand in deze kamer
+De papegaai-echotest staat aan
+7-cijferige ID van radioid.net / FreeRadioID.net
+MMDVMHost en DMRGateway stoppen zolang de kalibratie loopt
+De hotspot start daarna opnieuw met de nieuwe offset
+bij de volgende update van de ID-lijst
+Nog geen gebruikers gehoord
+DMR-server: het dashboard is niet verbonden met de DMR-server
+Aanmeldingen geverifieerd door FreeRadioID.net / gastaanmeldingen met de standaard-passphrase
+Nog geen groepsgesprekken in deze periode
+namen verstuurd door de portofoons
+Geen Talker Alias ontvangen in deze periode
+U gebruikt de fabrieksaanmelding. Kies een eigen gebruikersnaam en wachtwoord – de fabrieksaanmelding werkt daarna niet meer

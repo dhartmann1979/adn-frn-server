@@ -1,0 +1,126 @@
+p. ex. aprs2.example.org – ouvre la carte sous /. Doit pointer vers ce serveur (DNS). Vide = désactivé
+Titre 1
+Titre 2
+Titre 3
+Sous-titre 1
+Sous-titre 2
+Sous-titre 3
+Logo 1
+Logo 2
+Logo 3
+Vide = carte APRS · domaine
+Vide = logo APRS N8schicht
+Vide = le titre
+Vide = le sous-titre (Apparence → Sous-titre
+Ajouté au certificat du tableau de bord (Réglages → HTTPS et web doit être activé
+Pas de domaine propre. La carte est toujours sous
+État de HTTPS, de l’accès et du serveur DMR, la version installée et les mises à jour, avec les boutons de redémarrage
+Logiciel serveur
+Serveur DMR (HBlink4
+Systèmes connectés
+Aucun système connecté
+TX MHz
+Réseau sortant
+Réseau entrant
+Appareil inconnu
+OpenBridge
+Relais
+Appli
+Lien sortant
+aucun trafic
+Pings keep-alive manqués
+FRID
+Tous les talkgroups autorisés (aucune configuration
+Tous les talkgroups refusés (configuration vide
+Stations avec une position venant d’une radio DMR
+Connexion en direct au serveur
+Connexion au réseau APRS
+Afficher ou masquer la liste des stations
+Indicatif, ID DMR ou commentaire
+stations
+Paquets bruts
+Trace
+Vitesse
+Cap
+Altitude
+Chemin
+Position
+Distance
+Via
+Hotspot
+Type de rapport GPS
+Créer et télécharger une sauvegarde
+Télécharger à nouveau la sauvegarde
+Sauvegardes enregistrées
+Actualiser l’état
+Les sauvegardes complètes contiennent tous les identifiants. Cet espace est réservé au superadmin
+Sauvegardez votre installation HBlink4 et déplacez-la vers un autre serveur HBlink4. Sont inclus le code du programme, les configurations, les utilisateurs, les identifiants, les bases de données, les données APRS et vos propres fichiers
+L’archive contient des données confidentielles et n’est pas chiffrée. Conservez-la en lieu sûr. Les environnements Python sont reconstruits sur la cible. Le système d’exploitation, le pare-feu et le DNS ne font pas partie de la sauvegarde
+Création de la sauvegarde. Gardez cette fenêtre ouverte
+Sauvegarde automatique avant restauration
+Télécharger l’AutoBackup chiffrée
+Sauvegarde locale supprimée
+Supprimer la sauvegarde locale
+La suppression n’efface que le fichier de sauvegarde local. Les copies sur SFTP ou Google Drive restent
+La restauration remplace cette installation HBlink4. Une sauvegarde de l’état actuel est d’abord créée. En cas d’échec, l’état précédent revient. Ensuite, vous vous connectez avec le compte utilisateur du serveur source
+Le serveur cible nécessite Linux avec systemd et Python 3.9 ou plus récent. Avec une autre version de Python, le code et les versions de paquets enregistrées sont vérifiés pour leur compatibilité avant l’arrêt des services. Les deux services sont interrompus pendant la restauration ; l’installation des paquets Python peut prendre plusieurs minutes
+L’assistant de service manque. Exécutez une fois dans le dossier HBlink4 du serveur cible
+Puis actualisez cet espace
+Pour les AutoBackups chiffrées : clé de récupération séparée (.agekey
+Téléverser et vérifier le fichier
+Téléversement et vérification complète de l’archive
+Choisissez d’abord un fichier de sauvegarde
+Le fichier dépasse 2 Gio
+Sommes de contrôle, chemins de fichiers et bases de données valides. Rien n’a encore été restauré
+Votre mot de passe superadmin actuel
+Mot de passe superadmin actuel
+Restaurer la sauvegarde vérifiée
+Restauration lancée. Les deux services redémarrent. Rechargez la page quand c’est terminé et connectez-vous avec le compte du serveur source. En cas d’échec, l’état précédent redémarre ; le message apparaît ici après la connexion
+Ne transférez la clé de récupération que via HTTPS ou un tunnel SSH local
+AutoBackup
+Préparer l’AutoBackup
+Activer l’AutoBackup
+AutoBackup enregistrée
+Enregistrer les réglages de l’AutoBackup
+L’AutoBackup s’exécute en arrière-plan. Actualisez l’état quand elle est terminée
+Créer des sauvegardes complètes selon un planning, les chiffrer et les envoyer vers SFTP ou Google Drive. Le planning tourne dans le service du tableau de bord, même sans navigateur ouvert. Les identifiants de l’AutoBackup sont stockés chiffrés ; la clé de récupération reste en dehors des données du programme
+Quotidien
+Hebdomadaire
+Sauvegardes quotidiennes à conserver
+Sauvegardes hebdomadaires à conserver
+Cible active
+Retirer la cible
+Cible SFTP
+Google Drive
+Tester la cible enregistrée
+L’écriture, la lecture et la suppression ont fonctionné
+Enregistré – laisser vide pour conserver
+Les champs mot de passe/jeton vides conservent les valeurs enregistrées. Les anciennes sauvegardes ne sont nettoyées qu’après un téléversement et un contrôle du contenu réussis ; les sauvegardes manuelles restent
+Vérifiez d’abord la clé d’hôte auprès de l’exploitant du serveur. Les fichiers de clé SSH doivent être lisibles par l’utilisateur du service du tableau de bord
+ID client Google OAuth propre
+Secret client OAuth
+JSON du jeton OAuth avec refresh_token
+Sur un ordinateur avec navigateur
+Saisissez ici le JSON du jeton
+Sans ID de dossier, le dossier cible est créé automatiquement
+Les cibles utilisent leur propre sous-dossier
+pour ce serveur
+Lancer une sauvegarde chiffrée maintenant
+Télécharger la clé de récupération
+Mot de passe superadmin pour l’export de la clé
+Clé téléchargée. Conservez-la en dehors de ce serveur
+La clé a été exportée
+Exportez d’abord la clé
+N’exportez la clé que via HTTPS ou un tunnel SSH local
+Ne transférez la clé que via HTTPS ou un tunnel SSH local
+Échec de l’export
+Utilisez HTTPS ou un tunnel SSH local pour les identifiants et l’export de la clé
+N’enregistrez les identifiants que via HTTPS ou un tunnel SSH local
+Déverrouiller les cibles enregistrées
+Clé de récupération d’origine
+Après le déverrouillage, exportez la clé de ce serveur et réactivez le planning
+Cibles déverrouillées. Exportez la clé de ce serveur et réactivez le planning
+Ou reconfigurer : tapez RESET
+Réinitialiser cibles et planning
+Les fichiers de sauvegarde existants restent
+Réinitialisation uniquement via HTTPS ou un tunnel SSH local

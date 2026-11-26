@@ -1,0 +1,126 @@
+p. es. aprs2.example.org – apre la mappa su /. Deve puntare a questo server (DNS). Vuoto = disattivo
+Titolo 1
+Titolo 2
+Titolo 3
+Sottotitolo 1
+Sottotitolo 2
+Sottotitolo 3
+Logo 1
+Logo 2
+Logo 3
+Vuoto = mappa APRS · dominio
+Vuoto = logo APRS N8schicht
+Vuoto = il titolo
+Vuoto = il sottotitolo (Aspetto → Sottotitolo
+Va nel certificato della dashboard (Impostazioni → HTTPS e web deve essere attivo
+Nessun dominio proprio. La mappa è sempre su
+Stato di HTTPS, dell’accesso e del server DMR, la versione installata e gli aggiornamenti, più i pulsanti di riavvio
+Software del server
+Server DMR (HBlink4
+Sistemi connessi
+Nessun sistema connesso
+TX MHz
+Rete in uscita
+Rete in entrata
+Dispositivo sconosciuto
+OpenBridge
+Ripetitore
+App
+Link in uscita
+nessun traffico
+Ping keep-alive mancati
+FRID
+Tutti i talkgroup consentiti (nessuna configurazione
+Tutti i talkgroup negati (configurazione vuota
+Stazioni con una posizione da una radio DMR
+Connessione live al server
+Connessione alla rete APRS
+Mostra o nascondi l’elenco delle stazioni
+Nominativo, ID DMR o commento
+stazioni
+Pacchetti grezzi
+Traccia
+Velocità
+Rotta
+Altitudine
+Percorso
+Posizione
+Distanza
+Tramite
+Hotspot
+Tipo di rapporto GPS
+Crea e scarica backup
+Scarica di nuovo il backup
+Backup salvati
+Aggiorna stato
+I backup completi contengono tutte le credenziali. Quest’area è riservata al superadmin
+Esegui il backup della tua installazione HBlink4 e trasferiscila su un altro server HBlink4. Sono inclusi codice del programma, configurazioni, utenti, credenziali, database, dati APRS e i tuoi file
+L’archivio contiene dati riservati e non è cifrato. Conservalo al sicuro. Gli ambienti Python vengono ricostruiti sulla destinazione. Sistema operativo, firewall e DNS non fanno parte del backup
+Creazione del backup. Tieni aperta questa finestra
+Backup automatico prima del ripristino
+Scarica l’AutoBackup cifrato
+Backup locale eliminato
+Elimina backup locale
+L’eliminazione rimuove solo il file di backup locale. Le copie su SFTP o Google Drive restano
+Il ripristino sostituisce questa installazione HBlink4. Prima viene creato un backup dello stato attuale. Se qualcosa va storto, torna lo stato precedente. Poi accedi con l’account utente del server di origine
+Il server di destinazione richiede Linux con systemd e Python 3.9 o più recente. Con una versione di Python diversa, codice e versioni dei pacchetti salvate vengono verificati per la compatibilità prima di fermare i servizi. Entrambi i servizi vengono interrotti durante il ripristino; l’installazione dei pacchetti Python può richiedere diversi minuti
+Manca l’helper del servizio. Esegui una volta nella cartella HBlink4 sul server di destinazione
+Poi aggiorna quest’area
+Per gli AutoBackup cifrati: chiave di ripristino separata (.agekey
+Carica e controlla il file
+Caricamento e controllo completo dell’archivio
+Scegli prima un file di backup
+Il file supera 2 GiB
+Checksum, percorsi dei file e database sono validi. Non è stato ancora ripristinato nulla
+La tua password attuale del superadmin
+Password attuale del superadmin
+Ripristina il backup controllato
+Ripristino avviato. Entrambi i servizi si riavviano. Ricarica la pagina al termine e accedi con l’account del server di origine. Se qualcosa va storto, riparte lo stato precedente; il messaggio compare qui dopo l’accesso
+Trasferisci la chiave di ripristino solo via HTTPS o tramite un tunnel SSH locale
+AutoBackup
+Prepara AutoBackup
+Attiva AutoBackup
+AutoBackup salvato
+Salva le impostazioni di AutoBackup
+AutoBackup viene eseguito in background. Aggiorna lo stato quando ha finito
+Crea backup completi secondo una pianificazione, cifrali e inviali a SFTP o Google Drive. La pianificazione gira nel servizio della dashboard, anche senza browser aperto. Le credenziali di AutoBackup sono salvate cifrate; la chiave di ripristino resta fuori dai dati del programma
+Giornaliero
+Settimanale
+Backup giornalieri da conservare
+Backup settimanali da conservare
+Destinazione attiva
+Rimuovi destinazione
+Destinazione SFTP
+Google Drive
+Prova la destinazione salvata
+Scrittura, lettura ed eliminazione hanno funzionato
+Salvato – lascia vuoto per mantenere
+I campi password/token vuoti mantengono i valori salvati. I vecchi backup vengono eliminati solo dopo un caricamento e un controllo del contenuto riusciti; i backup manuali restano
+Verifica prima la chiave host con il gestore del server. I file delle chiavi SSH devono essere leggibili dall’utente del servizio della dashboard
+ID client Google OAuth proprio
+Segreto client OAuth
+JSON del token OAuth con refresh_token
+Su un computer con browser
+Inserisci qui il JSON del token
+Senza ID cartella, la cartella di destinazione viene creata automaticamente
+Le destinazioni usano una propria sottocartella
+per questo server
+Esegui ora un backup cifrato
+Scarica la chiave di ripristino
+Password del superadmin per l’esportazione della chiave
+Chiave scaricata. Conservala fuori da questo server
+La chiave è stata esportata
+Esporta prima la chiave
+Esporta la chiave solo via HTTPS o tramite un tunnel SSH locale
+Trasferisci la chiave solo via HTTPS o tramite un tunnel SSH locale
+Esportazione non riuscita
+Usa HTTPS o un tunnel SSH locale per le credenziali e l’esportazione della chiave
+Salva le credenziali solo via HTTPS o tramite un tunnel SSH locale
+Sblocca le destinazioni salvate
+Chiave di ripristino originale
+Dopo lo sblocco, esporta la chiave di questo server e riattiva la pianificazione
+Destinazioni sbloccate. Esporta la chiave di questo server e riattiva la pianificazione
+Oppure riconfigura: digita RESET
+Reimposta destinazioni e pianificazione
+I file di backup esistenti restano
+Reimpostazione solo via HTTPS o tramite un tunnel SSH locale
