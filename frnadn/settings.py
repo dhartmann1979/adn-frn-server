@@ -104,6 +104,11 @@ FIELDS: List[Field] = [
           "Encrypts every transfer between the two servers – the same on both (at least 24 characters); “🎲 New key” creates one"),
     Field("cluster.hourly", "cluster", "Sync every full hour", "bool", True,
           "The backup fetches the configuration of the master at every full hour – the difference is at most one hour"),
+    Field("cluster.auto_return", "cluster", "Send stray stations back by themselves", "bool", False,
+          "Backup: every 5 minutes – if stations are here although the master runs (no maintenance, master up for 10 minutes, "
+          "nobody transmitting here), they are sent back to the master"),
+    Field("cluster.return_pause", "cluster", "Pause when sending back (seconds)", "int", 20,
+          "So long the FRN server of the backup stays stopped – time for the stations to reach the master", min=5, max=120),
     # Portal page (portal.py) – own menu group "📰 Portal" in the admin area, not under Settings
     Field("portal.enabled", "portal", "Portal page on", "bool", True,
           "Public page with the news of the operators at /portal (and on the portal domain)"),

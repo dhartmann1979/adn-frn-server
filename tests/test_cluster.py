@@ -230,3 +230,94 @@ def test_public_cluster_info_for_frn_clients(client):
     c = client.get("/api/info").json()["cluster"]
     assert c["role"] == "backup" and c["master"] == {"host": "frn.example.org", "port": 10024}
     assert c["backup"] == {"host": "frn-backup.example.org", "port": 10024}
+
+
+def _stations_here(A, monkeypatch, n=3):
+    real = A.ctx.server.state
+    monkeypatch.setattr(A.ctx.server, "state", lambda: {**real(), "running": True, "service": "active", "clients": n})
+
+
+def test_backup_sends_stray_stations_back(client, monkeypatch):
+    """Verirrte Stationen: das Backup stoppt seinen FRN-Server kurz, die Stationen gehen zum Master, dann startet es wieder."""
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "backup", "cluster.key": KEY, "cluster.peer_url": "https://frn.example.org",
+                           "cluster.return_pause": 5}, "t")
+    assert client.post("/api/admin/server/start", json={}, headers=H).status_code == 200
+    _stations_here(A, monkeypatch)
+    hello = {"ok": True, "role": "master", "maintenance": False, "frn": {"running": True, "clients": 1, "since": 1}}
+    monkeypatch.setattr(cluster, "call", lambda *a, **k: hello)
+    # master in maintenance or its FRN server down → refused, nothing stopped
+    hello["maintenance"] = True
+    r = client.post("/api/admin/cluster/return", json={}, headers=H)
+    assert r.status_code == 409 and "maintenance" in r.json()["error"]
+    hello.update(maintenance=False, frn={"running": False})
+    assert client.post("/api/admin/cluster/return", json={}, headers=H).status_code == 409
+    hello["frn"] = {"running": True, "since": 1}
+    r = client.post("/api/admin/cluster/return", json={}, headers=H).json()
+    assert r["ok"] and r["stopped"] and r["clients"] == 3 and r["pause"] == 5
+    st = client.get("/api/admin/cluster").json()
+    assert st["return_pending"]["start_at"] and st["last_return"]["stopped"]
+    # a second press while it is running does not stop it again
+    assert client.post("/api/admin/cluster/return", json={}, headers=H).json()["stopped"] is False
+
+
+def test_master_asks_backup_to_send_back(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+    _stations_here(A, monkeypatch, 0)
+    seen = []
+    monkeypatch.setattr(cluster, "call", lambda url, path, key, method="GET", payload=None, timeout=20:
+                        seen.append((path, payload.get("by"))) or {"ok": True, "stopped": True, "clients": 2})
+    r = client.post("/api/admin/cluster/return", json={}, headers=H).json()
+    assert r["stopped"] and seen == [("/api/cluster/return", "chef")]
+    A._cluster_set("cluster.maintenance", {"since": time.time()})
+    assert client.post("/api/admin/cluster/return", json={}, headers=H).status_code == 409
+
+
+def test_return_endpoint_only_on_the_backup(client):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+    assert peer(client, "/api/cluster/return").status_code == 409
+    A.ctx.settings.update({"cluster.role": "backup"}, "t")
+    r = peer(client, "/api/cluster/return")
+    assert r.status_code == 200 and cluster.unseal(r.content, KEY)["data"]["ok"]
+    assert client.post("/api/cluster/return", json={}, headers=H).status_code == 403            # not encrypted
+
+
+def test_updates_of_both_servers(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "master", "cluster.key": KEY, "cluster.peer_url": "https://frn-backup.example.org"}, "t")
+
+    async def fake_check(force=False):
+        return {"checked": time.time(), "github": {"local": {"version": "2.30.1", "short": "abc1234"}, "latest": {"short": "def5678"},
+                "remote_version": "2.31.0", "update": True, "can_upgrade": True, "behind": 2, "commits": [{"short": "def5678", "message": "neu"}]},
+                "java": {"installed": {"version": "1.0", "build": "5"}, "latest": {"version": "1.0", "build": "5"}, "update": False}}
+    monkeypatch.setattr(A, "check_all_updates", fake_check)
+    asked = []
+    monkeypatch.setattr(A.ctx.n8, "request_update", lambda: asked.append(1) or (True, "Update angefordert"))
+    # this server (master)
+    d = client.post("/api/admin/cluster/update", json={"server": "master", "action": "check"}, headers=H).json()
+    assert d["self"] and d["dashboard"]["update"] and d["dashboard"]["latest"] == "2.31.0" and d["java"]["installed"] == "1.0 (build 5)"
+    r = client.post("/api/admin/cluster/update", json={"server": "master", "action": "run"}, headers=H).json()
+    assert r["ok"] and r["restarting"] and asked == [1]
+    # the partner: over the encrypted connection
+    calls = []
+    monkeypatch.setattr(cluster, "call", lambda url, path, key, method="GET", payload=None, timeout=20:
+                        calls.append((path, payload["action"])) or {"ok": True, "dashboard": {"update": False}})
+    d = client.post("/api/admin/cluster/update", json={"server": "backup", "action": "check"}, headers=H).json()
+    assert d["ok"] and d["self"] is False and calls == [("/api/cluster/update", "check")]
+    # the partner endpoint itself
+    r = peer(client, "/api/cluster/update")
+    assert r.status_code == 200 and cluster.unseal(r.content, KEY)["data"]["dashboard"]["update"]
+    assert client.post("/api/admin/cluster/update", json={"server": "x"}, headers=H).status_code == 400
+
+
+def test_old_partner_without_remote_update(client, monkeypatch):
+    A = client.A
+    A.ctx.settings.update({"cluster.role": "backup", "cluster.key": KEY, "cluster.peer_url": "https://frn.example.org"}, "t")
+
+    def old(*a, **k):
+        raise cluster.ClusterError("The partner does not know Master & Backup yet – update it to the same version.")
+    monkeypatch.setattr(cluster, "call", old)
+    d = client.post("/api/admin/cluster/update", json={"server": "master", "action": "check"}, headers=H).json()
+    assert d["ok"] is False and "older version" in d["error"]
