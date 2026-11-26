@@ -1,6 +1,6 @@
 /*
  * N8 Kit 1.5.0 – shared by the N8schicht web interfaces
- * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
+ * (N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
  *   N8Kit.lang()                 'de' | 'en'   (cookie n8_lang, valid for every port of the host → all four pages)

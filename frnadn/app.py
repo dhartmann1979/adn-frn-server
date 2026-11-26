@@ -2412,7 +2412,7 @@ async def admin_domains(request: Request):
     return {"intro": "Eigene Domains und Subdomains mit kostenlosem Zertifikat von Let's Encrypt – je Domain wählbar, ob sie das 🎙️ Live-Dashboard "
                      "oder die 📰 Portal-Seite zeigt. Das Dashboard macht HTTPS selbst (certbot, ohne nginx). Voraussetzung: die Domains "
                      "zeigen per DNS auf diesen Server und der HTTP-Port (Let's Encrypt prüft immer auf 80) und der HTTPS-Port sind aus dem "
-                     "Internet erreichbar (siehe 🔌 Ports). Hinter dem HobbyRadioPortal macht das Portal HTTPS – dann hier aus lassen.",
+                     "Internet erreichbar (siehe 🔌 Ports).",
             "hint": hint, "sites": sites, "renew_auto": True if (on and _tls_manager is not None) else None,
             "options": [{"key": "https.enabled", "label": "HTTPS mit Let's Encrypt", "value": on,
                          "help": "Aus = nur http://IP:Web-Port. Ein- und Ausschalten startet das Dashboard neu."}],

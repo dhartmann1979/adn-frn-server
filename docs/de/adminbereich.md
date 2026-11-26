@@ -8,7 +8,7 @@ Oben rechts **🔐 Login**, danach erscheint im Menü der Punkt **⚙️ Admin**
 
 <p align="center"><img src="../images/admin-keepalive.png" alt="Admin-Portal mit Baum-Menü" width="95%"></p>
 
-Seit **2.14.0** steht links ein **Baum-Menü** – dasselbe wie im HobbyRadioPortal, HBlink4-FreeRadioID, N8 Hotspot und N8 Crosslink,
+Seit **2.14.0** steht links ein **Baum-Menü** – dasselbe wie in HBlink4-FreeRadioID, N8 Hotspot und N8 Crosslink,
 mit denselben Gruppen in derselben Reihenfolge:
 
 | Gruppe | Einträge |
@@ -62,7 +62,7 @@ Seit **2.16.0** steht alles zu Netz, HTTPS und Domains **nur noch hier** – wie
   **💾 Ports speichern**; was einen Neustart braucht, steht danach unten, **♻️ Dashboard neu starten** erledigt ihn.
 - **🔒 Domains & HTTPS:** Domain und E-Mail eintragen (optional Test-Zertifikat) → **Domain eintragen & Zertifikat holen**: HTTPS wird
   eingeschaltet, das Dashboard startet neu und holt das Zertifikat. Danach Tabelle mit DNS-Auflösung, Zertifikat (gültig/Test/abgelaufen,
-  bis wann), **🔄 Erneuern**, **Entfernen** und Schalter *HTTPS mit Let's Encrypt*. Hinter dem HobbyRadioPortal HTTPS hier aus lassen.
+  bis wann), **🔄 Erneuern**, **Entfernen** und Schalter *HTTPS mit Let's Encrypt*.
 
 **Zeigt (seit 2.26):** Jede Domain und Subdomain zeigt wahlweise das 🎙️ Live-Dashboard oder die 📰 [Portal-Seite](portal.md#-domains-live-oder-portal) – beliebig viele Domains, alle auf einem Let's-Encrypt-Zertifikat, umstellen ohne Neustart.
 

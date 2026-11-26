@@ -150,7 +150,7 @@ Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, w
 | ⬆️ [Updates](docs/de/updates.md) | Dashboard und Java-Server aktualisieren, Fehlermeldungen und Lösungen |
 | 🧭 [Anleitungen](docs/de/anleitungen.md) | Schritt für Schritt: Link-Menü einrichten, Dashboard aktualisieren, Logo und Farbe, Umzug, weitere Admins |
 | 🧾 [Konfiguration](docs/de/konfiguration.md) | Was in den Dateien steht und was in SQLite, alle Einstellungen im Überblick, Räume |
-| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **💥 Abstürze** mit Teil, Ursache und Protokoll (Hinweis nach der Anmeldung). **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, Keep-Alive, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen (auch im HobbyRadioPortal), Testen ohne Funk |
+| 🩺 [Betrieb & Fehlersuche](docs/de/betrieb.md) | **💥 Abstürze** mit Teil, Ursache und Protokoll (Hinweis nach der Anmeldung). **Bei Problemen zuerst das [öffentliche FRN-Fehlerprotokoll](http://log.freeradionetwork.de:60080/error_log.php)** (im Adminbereich unter Logs eingebaut), Dienste, Keep-Alive, SystemManager-Fehler, typische Probleme, Backup & Wiederherstellen, Testen ohne Funk |
 | 🏷️ [Änderungen](CHANGELOG.md) | Was sich in welcher Version geändert hat |
 
 ## Aktualisieren
