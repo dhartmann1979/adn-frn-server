@@ -105,7 +105,7 @@ async function loadPortalAdmin() {
         </form>
         <div class="tile">
             <h3>🌐 Portal domain</h3>
-            <div class="subt">The portal can have its own domain (e.g. news.example.org) with a Let's Encrypt certificate – it shows the portal page directly.</div>
+            <div class="subt">Every domain or subdomain shows what you choose under 🔒 Domains & HTTPS → “Shows”: the Live dashboard or the portal page – any number of domains, all with Let's Encrypt.</div>
             ${PORTAL.domain ? `<div class="notice-box">✅ <b>${esc(PORTAL.domain)}</b> – <a href="${esc(PORTAL.url)}" target="_blank" rel="noopener">${esc(PORTAL.url)}</a></div>`
                 : '<div class="notice-box">No own domain yet – the portal is at /portal of the dashboard.</div>'}
             <div class="actions" style="justify-content:flex-start"><button type="button" class="btn" onclick="showAdmin('domains')">🔒 Domains &amp; HTTPS</button></div>

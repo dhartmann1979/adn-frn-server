@@ -64,16 +64,45 @@ def test_pinned_first_and_settings(client):
 def test_portal_domain_shows_portal(client):
     login(client)
     client.A.ctx.settings.update({"https.domain": "frn.example.org"}, "test")
-    r = client.post("/api/admin/domains", json={"domain": "news.example.org", "email": "a@example.org"}, headers=H)
+    r = client.post("/api/admin/domains", json={"domain": "news.example.org", "email": "a@example.org", "target": "portal"}, headers=H)
     assert r.status_code == 200 and "Portal" in r.json()["message"]
     assert client.A.ctx.settings.get("portal.domain") == "news.example.org"
     d = client.get("/api/admin/domains").json()
-    assert [s["domain"] for s in d["sites"]] == ["frn.example.org", "news.example.org"] and d["add"]["allowed"] is False
+    assert [(s["domain"], s["target"]) for s in d["sites"]] == [("frn.example.org", "live"), ("news.example.org", "portal")]
+    assert d["add"]["allowed"] and [t["id"] for t in d["add"]["targets"]] == ["live", "portal"]
     assert 'portal.js' in client.get("/", headers={"host": "news.example.org"}).text
     assert 'portal.js' not in client.get("/", headers={"host": "frn.example.org"}).text
     assert client.get("/api/info").json()["portal"]["url"] == "http://news.example.org/"
     assert client.delete("/api/admin/domains/news.example.org", headers=H).json()["ok"]
     assert client.A.ctx.settings.get("portal.domain") == ""
+
+
+def test_choose_what_each_domain_shows(client, monkeypatch):
+    monkeypatch.setattr(client.A, "_restart_soon", lambda why: None)
+    login(client)
+    client.A.ctx.settings.update({"https.domain": "frn.example.org"}, "test")
+    for dom, t in (("www.example.org", "portal"), ("live.example.org", "live"), ("news.example.org", "portal")):
+        assert client.post("/api/admin/domains", json={"domain": dom, "target": t}, headers=H).json()["ok"]
+    assert client.post("/api/admin/domains", json={"domain": "www.example.org"}, headers=H).status_code == 400
+    assert client.post("/api/admin/domains", json={"domain": "x.example.org", "target": "evil"}, headers=H).status_code == 400
+    page = lambda h: "portal.js" in client.get("/", headers={"host": h}).text
+    assert page("www.example.org") and page("news.example.org") and not page("live.example.org") and not page("frn.example.org")
+    # switch: the main domain shows the portal, www the live dashboard – at once, no restart
+    assert client.post("/api/admin/domains/frn.example.org/target", json={"target": "portal"}, headers=H).json()["ok"]
+    assert client.post("/api/admin/domains/www.example.org/target", json={"target": "live"}, headers=H).json()["ok"]
+    assert page("frn.example.org") and not page("www.example.org")
+    assert client.post("/api/admin/domains/nope.example.org/target", json={"target": "live"}, headers=H).status_code == 404
+    assert client.A.ctx.settings.get("portal.domain") == "frn.example.org"
+    assert client.get("/api/info").json()["portal"]["url"] == "http://frn.example.org/"
+    # the portal links back to the first live domain
+    assert client.get("/api/portal", headers={"host": "frn.example.org"}).json()["dashboard_url"] == "http://www.example.org/"
+    # removing the certificate's main name promotes the next one
+    assert client.delete("/api/admin/domains/frn.example.org", headers=H).json()["ok"]
+    assert client.A.ctx.settings.get("https.domain") == "www.example.org"
+    assert [s["domain"] for s in client.get("/api/admin/domains").json()["sites"]][0] == "www.example.org"
+    # turning the portal page off: portal domains show the dashboard
+    client.post("/api/admin/portal/settings", json={"changes": {"portal.enabled": False}}, headers=H)
+    assert not page("news.example.org")
 
 
 def test_cert_names_and_redirect_host(tmp_path):

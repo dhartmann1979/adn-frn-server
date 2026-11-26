@@ -115,6 +115,9 @@ FIELDS: List[Field] = [
           "Side box with the rooms, stations online and who is on air (only when the dashboard is public)"),
     Field("portal.show_stats", "portal", "Show today's figures", "bool", True, "Talks, airtime and stations of today"),
     Field("portal.per_page", "portal", "News per page", "int", 8, "", min=3, max=30),
+    # 2.26: every domain of the dashboard with what it shows – "domain=live" or "domain=portal", one per line
+    Field("web.hosts", "web", "Domains and what they show", "longtext", "",
+          "Set under 🌐 Network, ports & domains → 🔒 Domains & HTTPS"),
     Field("portal.domain", "portal", "Domain of the portal", "text", "",
           "Set under 🌐 Network, ports & domains → 🔒 Domains & HTTPS", pattern=r"(?=.{4,253}$)([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,63}"),
     # E-mail (mailcfg.py / mailctl.py) – own menu group "✉️ E-Mail", domains under "🌐 Netz, Ports & Domains"

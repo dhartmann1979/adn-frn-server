@@ -1,5 +1,5 @@
 /*
- * N8 Kit 1.4.2 – shared by the N8schicht web interfaces
+ * N8 Kit 1.5.0 – shared by the N8schicht web interfaces
  * (HobbyRadioPortal, N8 Crosslink, HBlink4-FreeRadioID, adn-frn-server, N8-HotSpot).
  * The same file is in every repository; change it in one, copy it to the others.
  *
@@ -832,6 +832,9 @@
     //                               renew, remove }], add: { allowed, email, staging, reason, button }, options: [{ key, label, value, help }], renew_auto }
     //   POST /api/admin/domains { domain, email, staging } · POST /api/admin/domains/<d>/renew · DELETE /api/admin/domains/<d>
     //   POST /api/admin/domains/options { key: value }
+    //   1.5: optional per domain a target (what the domain shows, e.g. Live dashboard or portal):
+    //        sites[i].targets = [{ id, label }], sites[i].target = id → select; POST /api/admin/domains/<d>/target { target }
+    //        add.targets = [{ id, label }], add.target = default → select in the add form, sent as { …, target }
     async function netView(el, name, o) {
         const req = o.req;
         const msg = e => `<div class="n8-help">⚠️ ${esc(e && e.message ? e.message : String(e))}</div>`;
@@ -872,11 +875,13 @@
                 const sites = d.sites || [];
                 const add = d.add || {};
                 const opts = d.options || [];
+                const hasTargets = sites.some(x => x.targets || x.target_label);
                 paint(`${card('🔒 Domains & HTTPS', `<p class="n8-help">${esc(t(d.intro || 'Eigene Domains mit kostenlosem Zertifikat von Let’s Encrypt.'))}</p>
                     ${d.hint ? `<div class="n8-help">⚠️ ${esc(t(d.hint))}</div>` : ''}
                     ${opts.length ? `<div class="n8-net-opts">${opts.map(x => `<label class="n8-sw"><input type="checkbox" data-opt="${esc(x.key)}" ${x.value ? 'checked' : ''}><i></i> ${esc(t(x.label))}</label>${x.help ? `<div class="n8-dim">${esc(t(x.help))}</div>` : ''}`).join('')}</div>` : ''}
-                    ${sites.length ? `<table class="n8-tbl"><thead><tr><th>${esc(t('Domain'))}</th><th>${esc(t('Zertifikat'))}</th><th></th></tr></thead><tbody>${sites.map((s, i) => `<tr>
+                    ${sites.length ? `<table class="n8-tbl"><thead><tr><th>${esc(t('Domain'))}</th>${hasTargets ? `<th>${esc(t('Zeigt'))}</th>` : ''}<th>${esc(t('Zertifikat'))}</th><th></th></tr></thead><tbody>${sites.map((s, i) => `<tr>
                         <td><b>${esc(s.domain)}</b>${s.label ? ` <span class="n8-badge">${esc(t(s.label))}</span>` : ''}<div class="n8-dim">${s.dns && s.dns.length ? 'DNS: ' + s.dns.map(esc).join(', ') : s.dns ? '⚠️ ' + esc(t('DNS: kein Eintrag gefunden')) : ''}${s.info ? (s.dns ? ' · ' : '') + esc(t(s.info)) : ''}</div></td>
+                        ${hasTargets ? `<td>${s.targets ? `<select class="n8-in n8-target" data-target="${i}" aria-label="${esc(t('Zeigt'))}">${s.targets.map(x => `<option value="${esc(x.id)}" ${x.id === s.target ? 'selected' : ''}>${esc(t(x.label))}</option>`).join('')}</select>` : `<span class="n8-dim">${esc(t(s.target_label || '–'))}</span>`}</td>` : ''}
                         <td>${s.https ? '<span class="n8-badge ok">HTTPS</span>' : `<span class="n8-badge warn">${esc(t('nur HTTP'))}</span>`} ${certBadge(s)}${s.cert && (s.cert.issuer || s.cert.expires) ? `<div class="n8-dim">${esc(s.cert.issuer || '')}${s.cert.expires ? ' · ' + esc(t('bis')) + ' ' + esc(s.cert.expires) : ''}</div>` : ''}</td>
                         <td class="n8-act"><a class="n8-btn sm" href="https://${esc(s.domain)}/" target="_blank" rel="noopener">↗</a>
                           ${s.renew !== false ? `<button type="button" class="n8-btn sm" data-renew="${i}">${s.cert ? '🔄 ' + esc(t('Erneuern')) : '🔒 ' + esc(t('Zertifikat holen'))}</button>` : ''}
@@ -885,6 +890,7 @@
                     ${d.renew_auto != null ? `<div class="n8-help">${d.renew_auto ? '✅ ' + esc(t('Zertifikate werden automatisch erneuert.')) : '⚠️ ' + esc(t('Automatische Erneuerung ist nicht eingerichtet.'))}</div>` : ''}`)}
                     ${add.allowed === false && !add.reason ? '' : card('➕ Domain hinzufügen', `${add.reason ? `<p class="n8-help">${esc(t(add.reason))}</p>` : ''}
                     <div class="n8-net-form"><label>${esc(t('Domain'))}<input class="n8-in" type="text" data-f="domain" placeholder="${esc(add.placeholder || 'dienst.example.org')}" autocomplete="off" value="${esc(add.domain || '')}"></label>
+                    ${add.targets ? `<label>${esc(t('Zeigt'))}<select class="n8-in" data-f="target">${add.targets.map(x => `<option value="${esc(x.id)}" ${x.id === add.target ? 'selected' : ''}>${esc(t(x.label))}</option>`).join('')}</select></label>` : ''}
                     <label>${esc(t('E-Mail für Let’s Encrypt'))}<input class="n8-in" type="email" data-f="email" value="${esc(add.email || '')}" placeholder="sysop@example.org"></label>
                     <label class="n8-sw"><input type="checkbox" data-f="staging" ${add.staging ? 'checked' : ''}><i></i> ${esc(t('Test-Zertifikat (Let’s-Encrypt-Staging)'))}</label></div>
                     <div class="n8-actions"><button type="button" class="n8-btn primary" data-a="add" ${add.allowed === false ? 'disabled' : ''}>🔒 ${esc(t(add.button || 'Domain anlegen & Zertifikat holen'))}</button></div>`)}
@@ -899,7 +905,9 @@
                     if (!domain) { f('domain').focus(); return; }
                     if (!email) { f('email').focus(); return; }
                     busy(ab, '🔒 ' + t('Hole Zertifikat …'));
-                    try { await done(await req('POST', '/api/admin/domains', { domain, email, staging: f('staging').checked })); } catch (x) { await done({ ok: false, message: x.message }); }
+                    const body = { domain, email, staging: f('staging').checked };
+                    if (f('target')) body.target = f('target').value;
+                    try { await done(await req('POST', '/api/admin/domains', body)); } catch (x) { await done({ ok: false, message: x.message }); }
                 };
                 el.querySelectorAll('[data-renew]').forEach(b => b.onclick = async () => {
                     busy(b, '🔄 …'); const s = sites[b.dataset.renew];
@@ -909,6 +917,11 @@
                     const s = sites[b.dataset.rm];
                     if (!confirm(t('{d} entfernen? Weiterleitung und Zertifikat werden gelöscht.').replace('{d}', s.domain))) return;
                     try { await done(await req('DELETE', `/api/admin/domains/${encodeURIComponent(s.domain)}`)); } catch (x) { await done({ ok: false, message: x.message }); }
+                });
+                el.querySelectorAll('[data-target]').forEach(c => c.onchange = async () => {
+                    const s = sites[c.dataset.target];
+                    try { await done(await req('POST', `/api/admin/domains/${encodeURIComponent(s.domain)}/target`, { target: c.value })); }
+                    catch (x) { c.value = s.target; await done({ ok: false, message: x.message }); }
                 });
                 el.querySelectorAll('[data-opt]').forEach(c => c.onchange = async () => {
                     try { await done(await req('POST', '/api/admin/domains/options', { [c.dataset.opt]: c.checked })); } catch (x) { c.checked = !c.checked; alert(x.message); }
@@ -990,7 +1003,7 @@
             'Noch keine Domain.': 'No domain yet.', 'DNS: kein Eintrag gefunden': 'DNS: no record found', '➕ Domain hinzufügen': '➕ Add domain', 'E-Mail für Let’s Encrypt': 'E-mail for Let’s Encrypt',
             'Test-Zertifikat (Let’s-Encrypt-Staging)': 'Test certificate (Let’s Encrypt staging)', 'Domain anlegen & Zertifikat holen': 'Add domain & get certificate', 'Hole Zertifikat …': 'Getting certificate …',
             'Läuft – das kann bis zu einer Minute dauern …': 'Running – this can take up to a minute …', 'Zertifikate werden automatisch erneuert.': 'Certificates are renewed automatically.',
-            'Automatische Erneuerung ist nicht eingerichtet.': 'Automatic renewal is not set up.', 'Eigene Domains mit kostenlosem Zertifikat von Let’s Encrypt.': 'Own domains with a free certificate from Let’s Encrypt.',
+            'Automatische Erneuerung ist nicht eingerichtet.': 'Automatic renewal is not set up.', 'Zeigt': 'Shows', 'Eigene Domains mit kostenlosem Zertifikat von Let’s Encrypt.': 'Own domains with a free certificate from Let’s Encrypt.',
             '{d} entfernen? Weiterleitung und Zertifikat werden gelöscht.': 'Remove {d}? Forwarding and certificate are deleted.',
             // 1.3.0: crashes
             '💥 Abstürze': '💥 Crashes', 'Absturz': 'Crash', 'Watchdog': 'Watchdog', 'Speicher voll': 'Out of memory', 'Beendet': 'Exited',

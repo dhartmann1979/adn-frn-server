@@ -75,21 +75,22 @@ maskiert, dann formatiert). Grenzen: Titel 140, Anreißer 400, Text 20 000 Zeich
 Mit **Master & Backup** gehen News und diese Einstellungen beim stündlichen Abgleich mit zum Backup – nur die Portal-Domain bleibt je
 Server eigen.
 
-## 🌐 Eigene Domain mit Let's Encrypt
+## 🌐 Domains: Live oder Portal
 
-Wie immer unter **🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS**:
+Seit **2.26.0** wählst du unter **🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS** für **jede Domain und Subdomain**, was sie zeigt:
 
-1. DNS: einen A-/AAAA-Eintrag (oder CNAME) der neuen Domain auf diesen Server setzen.
-2. Hat das Dashboard schon seine Domain, bietet **➕ Domain hinzufügen** jetzt **Portal-Domain eintragen & Zertifikat holen** an.
-3. Das Dashboard startet neu und **erweitert das Let's-Encrypt-Zertifikat** um die Portal-Domain (ein Zertifikat für beide Namen,
-   certbot `--expand`). Bis dahin steht in der Tabelle *Zertifikat wird um diese Domain erweitert …*.
-4. `https://news.example.org/` zeigt direkt die Portal-Seite; `/dashboard` darunter das Dashboard. Der HTTP-Port leitet je Domain auf
-   die richtige HTTPS-Adresse um.
+<p align="center"><img src="../images/admin-domains-zuordnung.png" alt="Domains & HTTPS – Spalte Zeigt" width="95%"></p>
 
-<p align="center"><img src="../images/admin-domains-portal.png" alt="Domains & HTTPS mit Portal-Domain" width="95%"></p>
-
-**Entfernen** nimmt nur die Portal-Domain weg – die Seite bleibt unter `/portal` erreichbar. Ohne HTTPS funktioniert die Portal-Domain
-über HTTP. Erneuert wird automatisch zusammen mit dem Zertifikat des Dashboards (alle 12 Stunden geprüft).
+- Spalte **„Zeigt“**: **🎙️ Live-Dashboard** oder **📰 Portal (News)** – umstellen wirkt **sofort, ohne Neustart**.
+- **➕ Domain hinzufügen** fragt das Ziel gleich mit ab. Beliebig viele Domains, z. B. `frn.example.org` → Live,
+  `news.example.org` und `www.example.org` → Portal.
+- Alle Domains kommen auf **ein Let's-Encrypt-Zertifikat**; die erste ist der **🔒 Hauptname**. Beim Hinzufügen startet das Dashboard
+  neu und erweitert das Zertifikat (DNS der neuen Domain muss auf diesen Server zeigen, Port 80 erreichbar). Der HTTP-Port leitet je
+  Domain auf die richtige HTTPS-Adresse um.
+- **Entfernen** einer Domain: das Portal bleibt unter `/portal` erreichbar, das Dashboard unter `/dashboard`. Wird der Hauptname
+  entfernt, rückt die nächste Domain nach.
+- Auf einer Portal-Domain führt **🎙️ Live** zur ersten Live-Domain; im Dashboard führt **📰 News** zur ersten Portal-Domain.
+- Ist die Portal-Seite unter *📰 Portal → ⚙️ Portal-Seite* ausgeschaltet, zeigen auch Portal-Domains das Dashboard.
 
 ## Schnittstellen
 

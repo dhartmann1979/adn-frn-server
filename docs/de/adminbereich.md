@@ -64,7 +64,7 @@ Seit **2.16.0** steht alles zu Netz, HTTPS und Domains **nur noch hier** – wie
   eingeschaltet, das Dashboard startet neu und holt das Zertifikat. Danach Tabelle mit DNS-Auflösung, Zertifikat (gültig/Test/abgelaufen,
   bis wann), **🔄 Erneuern**, **Entfernen** und Schalter *HTTPS mit Let's Encrypt*. Hinter dem HobbyRadioPortal HTTPS hier aus lassen.
 
-**📰 Portal-Domain (seit 2.24):** Hat das Dashboard seine Domain, kann eine zweite Domain für die [Portal-Seite](portal.md) folgen – sie kommt mit auf dasselbe Let's-Encrypt-Zertifikat und zeigt direkt die News.
+**Zeigt (seit 2.26):** Jede Domain und Subdomain zeigt wahlweise das 🎙️ Live-Dashboard oder die 📰 [Portal-Seite](portal.md#-domains-live-oder-portal) – beliebig viele Domains, alle auf einem Let's-Encrypt-Zertifikat, umstellen ohne Neustart.
 
 Der Listener auf HTTP beantwortet ACME-Challenges und leitet sonst mit HTTP 301 auf HTTPS um. Certbot läuft als Benutzer `frnadn`; seine Daten liegen im Datenverzeichnis unter `letsencrypt/`. Die Erneuerung wird alle zwölf Stunden geprüft. Ein erneuertes Zertifikat wird in den laufenden TLS-Kontext geladen, ohne den Dienst neu zu starten.
 

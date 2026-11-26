@@ -277,3 +277,4 @@ html[data-theme-mode=light] :is(.n8-iform > input, .n8-iform > select, .n8-in) {
   .n8-access .n8-tbl th:nth-child(n+3):not(:last-child), .n8-access .n8-tbl td:nth-child(n+3):not(:last-child):not([colspan]) { display: none; }
   .n8-tbl td.n8-num .n8-in { width: 90px; }
 }
+.n8-tbl select.n8-target { min-width: 180px; width: auto; }

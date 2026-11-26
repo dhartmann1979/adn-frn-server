@@ -260,7 +260,7 @@ def info_for(u) -> Dict[str, Any]:
             # ✉️ N8 Mail: webmail tab for every logged-in user
             "mail": ({"webmail": True, "address": _mail_address(u)} if u and s["mail.enabled"] and mailcfg.domains(s) and _mail_address(u) else None),
             # 📰 portal page (news) – the tab in the menu leads there
-            "portal": ({"url": (f"{'https' if s['https.enabled'] else 'http'}://{s['portal.domain']}/" if s["portal.domain"] else "/portal")}
+            "portal": ({"url": next((_url_of(d) for d, t in web_hosts(s) if t == "portal"), "/portal")}
                        if s["portal.enabled"] else None)}
 
 
@@ -276,10 +276,53 @@ def _page(name: str) -> Response:
     return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
 
+# ---------------------------------------------------------------- domains and what they show (2.26)
+HOST_TARGETS = [("live", "🎙️ Live dashboard"), ("portal", "📰 Portal (news)")]
+_HOST_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
+
+
+def web_hosts(s: Optional[Dict[str, Any]] = None) -> List[Tuple[str, str]]:
+    """Every domain of the dashboard with its target ("live" or "portal"); the certificate's main name comes first."""
+    s = s or ctx.settings.all()
+    out: List[Tuple[str, str]] = []
+    for line in str(s.get("web.hosts") or "").splitlines():
+        d, _, t = line.strip().partition("=")
+        d, t = d.strip().lower().rstrip("."), t.strip()
+        if _HOST_RE.fullmatch(d) and t in dict(HOST_TARGETS) and d not in dict(out):
+            out.append((d, t))
+    main = str(s.get("https.domain") or "").strip().lower()
+    pd = str(s.get("portal.domain") or "").strip().lower()
+    if pd and pd not in dict(out):                      # before 2.26: one portal domain
+        out.append((pd, "portal"))
+    if main and main not in dict(out):
+        out.insert(0, (main, "live"))
+    elif main:
+        out.sort(key=lambda x: x[0] != main)
+    return out
+
+
+def _hosts_changes(hosts: List[Tuple[str, str]]) -> Dict[str, Any]:
+    first_portal = next((d for d, t in hosts if t == "portal"), "")
+    return {"web.hosts": "\n".join(f"{d}={t}" for d, t in hosts), "portal.domain": first_portal}
+
+
+def host_target(host: str) -> Optional[str]:
+    h = (host or "").split(":")[0].strip().lower().rstrip(".")
+    return dict(web_hosts()).get(h)
+
+
+def _url_of(d: str) -> str:
+    s = ctx.settings.all()
+    if s.get("https.enabled"):
+        port = "" if int(s.get("https.port") or 443) == 443 else f":{s['https.port']}"
+        return f"https://{d}{port}/"
+    return f"http://{d}/"
+
+
 @app.get("/")
 async def index(request: Request):
-    # the portal page's own domain shows the portal (📰 Portal → domain under Netz, Ports & Domains)
-    if ctx.settings.get("portal.enabled") and fportal.host_is_portal(request.headers.get("host", ""), ctx.settings.get("portal.domain")):
+    # every domain shows what it is set to under 🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS (Live dashboard or 📰 portal)
+    if ctx.settings.get("portal.enabled") and host_target(request.headers.get("host", "")) == "portal":
         return _page("portal.html")
     return _page("index.html")
 
@@ -306,8 +349,9 @@ async def portal_news_page(nid: int):
 def _portal_info(request: Request) -> Dict[str, Any]:
     s = ctx.settings.all()
     u = user_of(request)
-    dash = f"https://{s['https.domain']}/" if s.get("https.domain") and s.get("https.enabled") else "/dashboard"
-    if not fportal.host_is_portal(request.headers.get("host", ""), s.get("portal.domain")):
+    live = next((d for d, t in web_hosts(s) if t == "live"), "")
+    dash = _url_of(live) if live else "/dashboard"
+    if host_target(request.headers.get("host", "")) != "portal":
         dash = "/"
     return {"title": s["portal.title"] or s["dashboard.title"], "subtitle": s["portal.subtitle"] or s["dashboard.subtitle"],
             "intro": s["portal.intro"], "dashboard_url": dash, "address": f"{s['frn.address']}:{s['frn.port']}" if s["frn.address"] else "",
@@ -714,9 +758,10 @@ async def admin_portal(request: Request):
     need_admin(request)
     sec = {"id": "portal", "fields": ctx.settings.describe_section("portal")}
     s = ctx.settings.all()
-    url = (f"https://{s['portal.domain']}/" if s.get("https.enabled") else f"http://{s['portal.domain']}/") if s.get("portal.domain") else "/portal"
+    pd = [d for d, t in web_hosts(s) if t == "portal"]
+    url = _url_of(pd[0]) if pd else "/portal"
     return {"settings": sec, "news": await asyncio.to_thread(fportal.list_all, ctx.db), "url": url,
-            "domain": s.get("portal.domain") or "", "categories": [{"id": c, "label": l} for c, l in fportal.CATEGORIES]}
+            "domain": ", ".join(pd), "categories": [{"id": c, "label": l} for c, l in fportal.CATEGORIES]}
 
 
 @app.post("/api/admin/portal/settings")
@@ -2171,40 +2216,38 @@ async def admin_domains(request: Request):
     need_admin(request)
     v = ctx.settings.all()
     on, dom = bool(v.get("https.enabled")), str(v.get("https.domain") or "").strip().lower()
-    pdom = str(v.get("portal.domain") or "").strip().lower()
     cert = _cert_info()
-    sites = [{"domain": dom, "label": "Dashboard", "https": on and cert is not None, "cert": cert if on else None,
-              "dns": await asyncio.to_thread(_dns, dom), "info": "" if on else "HTTPS ist aus"}] if dom else []
-    if pdom:
-        pending = bool(_tls_manager and pdom not in _tls_manager.names()) or bool(_tls_manager and _tls_manager.needs_expand())
-        sites.append({"domain": pdom, "label": "📰 Portal", "https": on and cert is not None and not pending,
-                      "cert": cert if on and not pending else None, "dns": await asyncio.to_thread(_dns, pdom),
-                      "info": ("HTTPS ist aus – Portal nur per HTTP" if not on else
-                               "Zertifikat wird um diese Domain erweitert …" if pending else "gleiches Zertifikat wie das Dashboard")})
+    targets = [{"id": i, "label": l} for i, l in HOST_TARGETS]
+    sites = []
+    for d, t in web_hosts(v):
+        pending = bool(_tls_manager and (d not in _tls_manager.names() or _tls_manager.needs_expand()))
+        info = ("HTTPS ist aus" if not on else "Zertifikat wird um diese Domain erweitert …" if pending
+                else "Hauptname des Zertifikats" if d == dom else "gleiches Zertifikat")
+        if t == "portal" and not v.get("portal.enabled"):
+            info += " · Portal-Seite ist aus – zeigt das Dashboard"
+        sites.append({"domain": d, "label": "🔒 Hauptname" if d == dom else "", "target": t, "targets": targets,
+                      "https": on and cert is not None and not pending, "cert": cert if on and not pending else None,
+                      "dns": await asyncio.to_thread(_dns, d), "info": info})
     for mh in mailcfg.cert_names(v):
         pending = bool(_tls_manager and (mh not in _tls_manager.names() or _tls_manager.needs_expand()))
-        sites.append({"domain": mh, "label": "✉️ Mail" if mh.startswith("mail.") else "✉️ MTA-STS",
+        sites.append({"domain": mh, "label": "", "target_label": "✉️ Mail" if mh.startswith("mail.") else "✉️ MTA-STS",
                       "https": on and cert is not None and not pending, "cert": cert if on and not pending else None,
                       "dns": await asyncio.to_thread(_dns, mh), "remove": False,
                       "info": ("HTTPS ist aus – der Mailserver braucht das Let's-Encrypt-Zertifikat" if not on else
                                "Zertifikat wird um diese Domain erweitert …" if pending else "gleiches Zertifikat – Postfix und Dovecot nutzen es")})
     hint = "HTTPS ist an, aber es ist keine Domain eingetragen." if on and not dom else \
         ("HTTPS ist eingeschaltet, läuft aber erst nach einem Neustart des Dashboards." if on and _tls_manager is None else "")
-    if not dom:
-        add = {"allowed": True, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "frn.example.org",
-               "button": "Domain eintragen & Zertifikat holen",
-               "reason": "Zuerst die Domain des Dashboards. Danach kann eine zweite Domain für die 📰 Portal-Seite folgen."}
-    elif not pdom:
-        add = {"allowed": True, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")), "placeholder": "news.example.org",
-               "button": "Portal-Domain eintragen & Zertifikat holen",
-               "reason": "📰 Portal-Seite (News) unter eigener Domain: die Domain kommt mit auf das Let's-Encrypt-Zertifikat des Dashboards "
-                         "und zeigt direkt die Portal-Seite. Die DNS-Einträge müssen auf diesen Server zeigen."}
-    else:
-        add = {"allowed": False, "reason": "Dashboard und Portal haben ihre Domain. Zum Wechseln die bisherige erst entfernen."}
-    return {"intro": "Eigene Domains für Dashboard und 📰 Portal-Seite mit kostenlosem Zertifikat von Let's Encrypt – das Dashboard macht "
-                     "HTTPS selbst (certbot, ohne nginx). Voraussetzung: die Domains zeigen per DNS auf diesen Server und der HTTP-Port "
-                     "(Let's Encrypt prüft immer auf 80) und der HTTPS-Port sind aus dem Internet erreichbar (siehe 🔌 Ports). Hinter dem "
-                     "HobbyRadioPortal macht das Portal HTTPS – dann hier aus lassen.",
+    has_live = any(t == "live" for _, t in web_hosts(v))
+    add = {"allowed": True, "email": v.get("https.email", ""), "staging": bool(v.get("https.staging")),
+           "placeholder": "news.example.org" if dom else "frn.example.org", "targets": targets, "target": "portal" if has_live else "live",
+           "button": "Domain eintragen & Zertifikat holen",
+           "reason": ("Jede Domain oder Subdomain zeigt, was du unter „Zeigt“ wählst: 🎙️ das Live-Dashboard oder 📰 die Portal-Seite mit den "
+                      "News – jederzeit umstellbar. Alle Domains kommen auf ein Let's-Encrypt-Zertifikat; die DNS-Einträge müssen auf diesen "
+                      "Server zeigen.")}
+    return {"intro": "Eigene Domains und Subdomains mit kostenlosem Zertifikat von Let's Encrypt – je Domain wählbar, ob sie das 🎙️ Live-Dashboard "
+                     "oder die 📰 Portal-Seite zeigt. Das Dashboard macht HTTPS selbst (certbot, ohne nginx). Voraussetzung: die Domains "
+                     "zeigen per DNS auf diesen Server und der HTTP-Port (Let's Encrypt prüft immer auf 80) und der HTTPS-Port sind aus dem "
+                     "Internet erreichbar (siehe 🔌 Ports). Hinter dem HobbyRadioPortal macht das Portal HTTPS – dann hier aus lassen.",
             "hint": hint, "sites": sites, "renew_auto": True if (on and _tls_manager is not None) else None,
             "options": [{"key": "https.enabled", "label": "HTTPS mit Let's Encrypt", "value": on,
                          "help": "Aus = nur http://IP:Web-Port. Ein- und Ausschalten startet das Dashboard neu."}],
@@ -2221,25 +2264,45 @@ def _restart_soon(why: str) -> None:
 async def admin_domains_add(request: Request):
     b = await body(request)
     dom = str(b.get("domain") or "").strip().lower().rstrip(".")
-    if not re.fullmatch(r"(?=.{4,253}$)([a-z0-9-]{1,63}\.)+[a-z]{2,63}", dom):
+    if not _HOST_RE.fullmatch(dom):
         raise HTTPError(400, "Keine gültige Domain")
+    hosts = web_hosts()
+    target = str(b.get("target") or ("portal" if any(t == "live" for _, t in hosts) else "live"))
+    if target not in dict(HOST_TARGETS):
+        raise HTTPError(400, "Unbekanntes Ziel")
+    if dom in dict(hosts) or dom in mailcfg.cert_names(ctx.settings.all()):
+        raise HTTPError(400, "Diese Domain ist schon eingetragen.")
+    what = "📰 Portal-Seite" if target == "portal" else "🎙️ Live-Dashboard"
     main = str(ctx.settings.get("https.domain") or "").strip().lower()
-    if main:                                    # second domain = the portal page
-        if dom == main:
-            raise HTTPError(400, "Das ist schon die Domain des Dashboards.")
-        if ctx.settings.get("portal.domain"):
-            raise HTTPError(400, "Das Portal hat schon eine Domain – erst entfernen.")
-        await _save(request, {"portal.domain": dom, "https.email": str(b.get("email") or ctx.settings.get("https.email") or "").strip()})
+    if main:                                    # a further domain on the same certificate
+        await _save(request, {**_hosts_changes(hosts + [(dom, target)]),
+                              "https.email": str(b.get("email") or ctx.settings.get("https.email") or "").strip()})
         if ctx.settings.get("https.enabled"):
-            _restart_soon("Portal-Domain eingetragen")
-            return {"ok": True, "message": f"{dom} ist jetzt die Domain der 📰 Portal-Seite. Das Dashboard startet neu und erweitert das "
-                                           f"Zertifikat – in einer Minute unter https://{dom}/ öffnen."}
-        return {"ok": True, "message": f"{dom} ist jetzt die Domain der 📰 Portal-Seite (HTTPS ist aus: http://{dom}/)."}
-    await _save(request, {"https.domain": dom, "https.email": str(b.get("email") or "").strip(), "https.staging": bool(b.get("staging")),
-                          "https.enabled": True})
+            _restart_soon("Domain hinzugefügt")
+            return {"ok": True, "message": f"{dom} zeigt jetzt die {what}. Das Dashboard startet neu und erweitert das Zertifikat – "
+                                           f"in einer Minute unter https://{dom}/ öffnen."}
+        return {"ok": True, "message": f"{dom} zeigt jetzt die {what} (HTTPS ist aus: http://{dom}/)."}
+    await _save(request, {**_hosts_changes([(dom, target)] + hosts), "https.domain": dom, "https.email": str(b.get("email") or "").strip(),
+                          "https.staging": bool(b.get("staging")), "https.enabled": True})
     _restart_soon("HTTPS/Domain geändert")
-    return {"ok": True, "message": f"{dom} eingetragen, HTTPS ist an. Das Dashboard startet neu und holt das Zertifikat – in einer Minute "
-                                   f"unter https://{dom}/ öffnen."}
+    return {"ok": True, "message": f"{dom} eingetragen ({what}), HTTPS ist an. Das Dashboard startet neu und holt das Zertifikat – "
+                                   f"in einer Minute unter https://{dom}/ öffnen."}
+
+
+@app.post("/api/admin/domains/{domain}/target")
+async def admin_domains_target(domain: str, request: Request):
+    b = await body(request)
+    d, target = domain.strip().lower(), str(b.get("target") or "")
+    if target not in dict(HOST_TARGETS):
+        raise HTTPError(400, "Unbekanntes Ziel")
+    hosts = web_hosts()
+    if d not in dict(hosts):
+        raise HTTPError(404, "Diese Domain ist nicht eingetragen.")
+    await _save(request, _hosts_changes([(h, target if h == d else t) for h, t in hosts]))
+    what = "die 📰 Portal-Seite" if target == "portal" else "das 🎙️ Live-Dashboard"
+    note = " (Die Portal-Seite ist aus – bis sie unter 📰 Portal eingeschaltet ist, zeigt die Domain das Dashboard.)" \
+        if target == "portal" and not ctx.settings.get("portal.enabled") else ""
+    return {"ok": True, "message": f"{d} zeigt jetzt {what} – sofort, ohne Neustart.{note}"}
 
 
 @app.post("/api/admin/domains/{domain}/renew")
@@ -2260,14 +2323,21 @@ async def admin_domains_renew(domain: str, request: Request):
 @app.delete("/api/admin/domains/{domain}")
 async def admin_domains_remove(domain: str, request: Request):
     d = domain.strip().lower()
-    if d and d == str(ctx.settings.get("portal.domain") or "").strip().lower():
-        await _save(request, {"portal.domain": ""})
-        if ctx.settings.get("https.enabled"):
-            _restart_soon("Portal-Domain entfernt")
-        return {"ok": True, "message": f"{domain} entfernt – die Portal-Seite bleibt unter /portal erreichbar."}
-    if d != str(ctx.settings.get("https.domain") or "").strip().lower():
+    hosts = web_hosts()
+    if d not in dict(hosts):
         raise HTTPError(404, "Diese Domain ist nicht eingetragen.")
-    await _save(request, {"https.domain": "", "https.enabled": False})
+    rest = [(h, t) for h, t in hosts if h != d]
+    main = str(ctx.settings.get("https.domain") or "").strip().lower()
+    if d != main:
+        await _save(request, _hosts_changes(rest))
+        if ctx.settings.get("https.enabled"):
+            _restart_soon("Domain entfernt")
+        return {"ok": True, "message": f"{domain} entfernt." + (" Die Portal-Seite bleibt unter /portal erreichbar." if dict(hosts)[d] == "portal" else "")}
+    if rest:                                    # the next domain becomes the certificate's main name
+        await _save(request, {**_hosts_changes(rest), "https.domain": rest[0][0]})
+        _restart_soon("Hauptdomain entfernt")
+        return {"ok": True, "message": f"{domain} entfernt – {rest[0][0]} ist jetzt der Hauptname des Zertifikats. Das Dashboard startet neu."}
+    await _save(request, {**_hosts_changes([]), "https.domain": "", "https.enabled": False})
     _restart_soon("HTTPS/Domain geändert")
     return {"ok": True, "message": f"{domain} entfernt, HTTPS ist aus. Das Dashboard startet neu."}
 
@@ -2693,7 +2763,7 @@ async def _serve(host: str, port: int) -> None:
         "port": ctx.settings.get("https.port"),
         "letsencrypt": True,
         # the portal page's own domain goes on the same certificate (one more name, SAN)
-        "extra": ([ctx.settings.get("portal.domain")] if ctx.settings.get("portal.domain") else [])
+        "extra": [d for d, _ in web_hosts()][1:]                 # further domains (Live or 📰 portal) on the same certificate
                  + mailcfg.cert_names(ctx.settings.all()),          # ✉️ mail.<domain> (and mta-sts.<domain>) of N8 Mail
     }
     servers, server_tasks, helpers = [], [], []

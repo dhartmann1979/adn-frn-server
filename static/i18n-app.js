@@ -443,6 +443,9 @@ N8Kit.i18n.add({
         'Make main domain': 'Zur Hauptdomain machen', 'Not a valid domain': 'Keine gültige Domain', 'Already there': 'Schon vorhanden',
         'Switch the mail server off?': 'Mailserver ausschalten?', 'Install the mail server?': 'Mailserver installieren?', 'Install': 'Installieren',
         'Running – this can take a few minutes …': 'Läuft – das kann ein paar Minuten dauern …',
+        // 2.26: what each domain shows
+        'Live dashboard': 'Live-Dashboard', 'Portal (news)': 'Portal (News)', 'Shows': 'Zeigt',
+        "Every domain or subdomain shows what you choose under 🔒 Domains & HTTPS → “Shows”: the Live dashboard or the portal page – any number of domains, all with Let's Encrypt.": "Jede Domain oder Subdomain zeigt, was du unter 🔒 Domains & HTTPS → „Zeigt“ wählst: das Live-Dashboard oder die Portal-Seite – beliebig viele Domains, alle mit Let's Encrypt.",
         "The first domain is the main domain (user@main-domain); every further domain is an alias for the same mailboxes. Each domain gets mail.<domain> on the Let's Encrypt certificate of the dashboard – the mail server uses only TLS.": "Die erste Domain ist die Hauptdomain (benutzer@hauptdomain); jede weitere Domain ist ein Alias für dieselben Postfächer. Jede Domain bekommt mail.<domain> auf das Let's-Encrypt-Zertifikat des Dashboards – der Mailserver nutzt nur TLS.",
         'DNS: mail.<domain> (A/AAAA) → this server; MX → mail.<domain>.': 'DNS: mail.<domain> (A/AAAA) → dieser Server; MX → mail.<domain>.',
         'Domains & HTTPS: the dashboard has its domain and HTTPS is on.': 'Domains & HTTPS: das Dashboard hat seine Domain und HTTPS ist an.',

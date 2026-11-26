@@ -2,6 +2,23 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.26.0 – 2026-11-26
+
+### 🌐 Domains: je Domain wählen, ob sie Live oder das Portal zeigt
+- Unter *🌐 Netz, Ports & Domains → 🔒 Domains & HTTPS* hat jede Domain und Subdomain jetzt die Spalte **„Zeigt“** mit einem
+  Auswahlfeld: **🎙️ Live-Dashboard** oder **📰 Portal (News)**. Umstellen wirkt **sofort, ohne Neustart**.
+- **Beliebig viele Domains**, jede mit eigener Zuordnung – z. B. `frn.example.org` → Live, `news.example.org` und `www.example.org` →
+  Portal. Beim Hinzufügen wird das Ziel gleich mit gewählt; alle Domains kommen auf **ein Let's-Encrypt-Zertifikat** (die erste ist der
+  🔒 Hauptname, das Zertifikat wird beim Hinzufügen erweitert).
+- Wird der Hauptname entfernt, rückt die nächste Domain nach; Mail-Namen (`mail.…`, `mta-sts.…`) stehen weiter mit ✉️ in der Liste.
+- Die Portal-Seite verlinkt „Live“ auf die erste Live-Domain, der Menüpunkt 📰 News auf die erste Portal-Domain. Ist die Portal-Seite
+  aus, zeigen Portal-Domains das Dashboard (mit Hinweis in der Liste).
+- Bisherige Einstellungen werden übernommen (Dashboard-Domain → Live, Portal-Domain → Portal). Die Zuordnung gilt je Server
+  (Master & Backup gleichen sie nicht ab).
+- **N8 Kit 1.5.0** (gemeinsam für alle N8-Systeme): Domains-Ansicht mit optionalem Ziel je Domain und im Formular „Domain hinzufügen“.
+- Tests: Zuordnung, Umstellen ohne Neustart, mehrere Domains je Ziel, Nachrücken des Hauptnamens, Portal aus.
+- Doku: [Portal-Seite](docs/de/portal.md#-domains-live-oder-portal) und Admin-Portal ergänzt, neuer Screenshot.
+
 ## 2.25.0 – 2026-11-26
 
 ### ✉️ Neu: N8 Mail – Postfachsystem mit Upstream, nur TLS, DKIM/DMARC/BIMI und DNS-Vorlagen
