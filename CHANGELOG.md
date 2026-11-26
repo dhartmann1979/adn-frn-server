@@ -2,6 +2,51 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.31.0 – 2026-11-27
+
+### 🔁 Master & Backup: verirrte Stationen zum Master zwingen, Updates beider Server aus einem Kasten
+
+**🧲 Stationen zum Master zwingen**
+- Neuer Bereich **📡 Stationen** im Kasten *Master & Backup*: wie viele Stationen gerade auf dem Master und auf dem Backup verbunden
+  sind. Sind welche auf dem Backup, obwohl keine Wartung ist, steht dort „⚠️ verirrt – sie gehören auf den Master“.
+- Knopf **🧲 Stationen zum Master zwingen** – auf **Master und Backup**, jederzeit (bisher kamen Stationen nur am Ende einer Wartung
+  zurück). Ablauf: Prüfung, dass der Master erreichbar ist, sein FRN-Server läuft und er nicht in Wartung ist; dann stoppt der
+  FRN-Server des Backups, die Stationen gehen zu ihrer Ausweichadresse (= Master), und nach einer **Pause** startet er wieder.
+- Neue Einstellungen (nur auf diesem Server, werden nicht abgeglichen):
+  - **Pause beim Zurückschicken (Sekunden)** – Standard 20, 5–120.
+  - **Verirrte Stationen selbst zurückschicken** – das Backup prüft alle 5 Minuten und schickt Stationen zurück, wenn der Master seit
+    mindestens 10 Minuten läuft, nicht in Wartung ist und auf dem Backup gerade niemand sendet. Standard: aus.
+- Sicher auch bei einem Neustart dazwischen: Der ausstehende Start des FRN-Servers wird gespeichert und nach einem Neustart des
+  Dashboards nachgeholt. Ein zweiter Knopfdruck während der Pause stoppt nichts erneut.
+- **↩️ Vom Backup zurückholen** (Ende der Wartung) nutzt jetzt denselben Ablauf (stoppen – Pause – starten) statt eines schnellen
+  Neustarts, nach dem einzelne Stationen gleich wieder auf dem Backup landen konnten.
+- Anzeige **Zuletzt zurückgeschickt** (wann, von wem, Ergebnis) und Protokolleintrag `cluster_return`.
+
+**⬆️ Updates beider Server**
+- Neuer Bereich **⬆️ Updates beider Server**: Master und Backup als zwei gleich hohe Blöcke nebeneinander, jeweils mit Version von
+  Dashboard (mit Commit) und Java-FRN-Server, Hinweis auf Neues (mit den neuen Commits), Zeit der Prüfung und letztem Update-Ergebnis.
+- Je Server ein eigener Knopf **🔍 Prüfen** (sofort bei GitHub bzw. freeradionetwork.de nachsehen) und **⬆️ Jetzt aktualisieren**.
+- Funktioniert von **beiden** Servern aus: Der Partner wird über die mit dem Sync-Schlüssel verschlüsselte Verbindung angesprochen
+  (neuer Partner-Aufruf `/api/cluster/update`).
+- Das Dashboard-Update läuft wie unter *System → Update* als root über `scripts/n8-admin.sh update --auto` – mit Prüfung und Korrektur
+  der Berechtigungen, Neustart, Prüfung und Rückkehr zur vorigen Version bei Problemen; ohne Passwort.
+- **Java-Update auf dem Master:** Seine Stationen wechseln beim Neustart kurz zum Backup – das Backup schickt sie danach
+  **von selbst zurück**, sobald der Master wieder läuft.
+- Nach „Jetzt aktualisieren“ zeigt der Block „⏳ Update läuft“, fragt alle 8 Sekunden nach und meldet die neue Version; beim eigenen
+  Server lädt die Seite danach neu. Protokolleintrag `cluster_update` bzw. `upgrade_java` / `upgrade_github`.
+- Ein Partner mit älterer Version wird erkannt („kennt Fern-Updates noch nicht“) – einmal dort selbst aktualisieren, danach geht es
+  von hier aus.
+
+**Sonstiges**
+- `/api/cluster/hello` meldet zusätzlich, seit wann der FRN-Server läuft, ob gerade jemand sendet und ob Stationen zurückgeschickt werden.
+- Alle neuen Texte auf Deutsch übersetzt (andere Sprachen zeigen sie vorerst auf Englisch).
+- Doku [`docs/de/master-backup.md`](docs/de/master-backup.md): neue Abschnitte „🧲 Verirrte Stationen zum Master zwingen“ und
+  „⬆️ Updates beider Server“, neue Bildschirmfotos, Fehlersuche ergänzt.
+- Tests für Zurückschicken (Backup und Master, Wartung, Master aus, Partner-Aufruf) und für die Updates beider Server.
+
+> **Wichtig beim ersten Mal:** Die Fern-Funktionen brauchen 2.31.0 auf **beiden** Servern. Also einmal beide Server wie gewohnt
+> aktualisieren – danach geht alles aus dem Kasten Master & Backup.
+
 ## 2.30.1 – 2026-11-26
 
 ### 📘 Neue Schritt-für-Schritt-Anleitung in neun Sprachen, bereinigte Doku

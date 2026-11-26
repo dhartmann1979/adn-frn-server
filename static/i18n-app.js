@@ -516,3 +516,66 @@ N8Kit.i18n.add({
     rules: [
     ]
 });
+
+/* 2.31.0: Master & Backup – force stray stations back to the master, updates of both servers */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        "Stations": "Stationen", "where the stations are connected now": "wo die Stationen gerade verbunden sind",
+        "station": "Station", "stations": "Stationen", "unknown": "unbekannt",
+        "stray – they belong on the master": "verirrt – sie gehören auf den Master",
+        "sending back – the FRN server of the backup starts again shortly": "wird zurückgeschickt – der FRN-Server des Backups startet gleich wieder",
+        "Last sent back": "Zuletzt zurückgeschickt", "Automatically": "Automatisch", "on – every 5 minutes": "an – alle 5 Minuten",
+        "off – set below": "aus – unten einstellbar", "pause": "Pause",
+        "Maintenance is on – “Take back from the backup” brings the stations back": "Wartung ist an – „Vom Backup zurückholen“ holt auch die Stationen zurück",
+        "Force stations back to the master": "Stationen zum Master zwingen",
+        "The FRN server of the backup stops for a short time – its stations switch to the master": "Der FRN-Server des Backups stoppt kurz – seine Stationen wechseln zum Master",
+        "Force the stations back to the master": "Stationen zum Master zwingen",
+        // with the full stop: “… of …” is caught by an earlier rule otherwise
+        "The FRN server of the backup stops for a short time – its stations switch to the master.": "Der FRN-Server des Backups stoppt kurz – seine Stationen wechseln zum Master.",
+        "The FRN server of the backup stops for a short time (pause set below) and starts again. Its stations lose the connection for a moment and switch to the master – their backup address. Whoever is transmitting there right now is cut off.":
+            "Der FRN-Server des Backups stoppt kurz (Pause unten einstellbar) und startet wieder. Seine Stationen verlieren kurz die Verbindung und wechseln zum Master – ihrer Backup-Adresse. Wer dort gerade sendet, wird unterbrochen.",
+        "Maintenance is on – “Take back from the backup” brings the stations back.": "Wartung ist an – „Vom Backup zurückholen“ holt auch die Stationen zurück.",
+        "The FRN server of the backup stops for a short time (pause set below) and starts again. Its stations lose the connection for a moment and switch to the master – their backup address. Whoever is transmitting there right now is cut off":
+            "Der FRN-Server des Backups stoppt kurz (Pause unten einstellbar) und startet wieder. Seine Stationen verlieren kurz die Verbindung und wechseln zum Master – ihrer Backup-Adresse. Wer dort gerade sendet, wird unterbrochen.",
+        "Send back": "Zurückschicken", "Sending the stations back": "Stationen werden zurückgeschickt", "Nothing to send back": "Nichts zurückzuschicken",
+        "this server": "dieser Server", "Updates of both servers": "Updates beider Server",
+        "dashboard from GitHub and Java FRN server, the partner over the encrypted connection": "Dashboard von GitHub und Java-FRN-Server, der Partner über die verschlüsselte Verbindung",
+        "Dashboard": "Dashboard", "available": "verfügbar", "up to date": "aktuell", "Checked": "Geprüft", "Last update": "Letztes Update",
+        "Checking": "Wird geprüft", "Updating": "Wird aktualisiert",
+        "Update running – the web interface restarts": "Update läuft – das Webinterface startet neu",
+        "Update the Master now": "Master jetzt aktualisieren", "Update the Backup now": "Backup jetzt aktualisieren",
+        "Installs what is new: the Java FRN server (it restarts – its stations switch to the partner for a moment; on the master the backup sends them back afterwards) and the dashboard (as root: fast-forward, packages, permissions, restart, check – otherwise the previous version is restored)":
+            "Installiert, was neu ist: den Java-FRN-Server (er startet neu – seine Stationen wechseln kurz zum Partner; beim Master schickt das Backup sie danach zurück) und das Dashboard (als root: vorspulen, Pakete, Berechtigungen prüfen und korrigieren, Neustart, Prüfung – sonst wird die vorige Version wiederhergestellt).",
+        // answers of the server
+        "already sending back – the FRN server starts again shortly": "wird schon zurückgeschickt – der FRN-Server startet gleich wieder",
+        "FRN server here locked (same FRN account as the master)": "FRN-Server hier gesperrt (dasselbe FRN-Konto wie der Master)",
+        "FRN server here not running – no stations here": "FRN-Server hier läuft nicht – keine Stationen hier",
+        "no stations here – nothing to send back": "keine Stationen hier – nichts zurückzuschicken",
+        "The master is in maintenance (handed over to the backup) – take it back there first": "Der Master ist in Wartung (an das Backup übergeben) – dort zuerst zurückholen",
+        "The FRN server on the master is not running – the stations would have nowhere to go": "Der FRN-Server auf dem Master läuft nicht – die Stationen hätten kein Ziel",
+        "Maintenance is on – use “Take back from the backup”, that brings the stations back too": "Wartung ist an – „Vom Backup zurückholen“ verwenden, das holt auch die Stationen zurück",
+        "The FRN server here (master) is not running – start it first, otherwise the stations have nowhere to go": "Der FRN-Server hier (Master) läuft nicht – zuerst starten, sonst haben die Stationen kein Ziel",
+        "The backup does not know this function yet – update it first (⬆️ Updates of both servers)": "Das Backup kennt diese Funktion noch nicht – zuerst aktualisieren (⬆️ Updates beider Server)",
+        "The partner does not know remote updates yet (older version) – update it once there (System → Update) or on its console: sudo ./scripts/update.sh":
+            "Der Partner kennt Fern-Updates noch nicht (ältere Version) – einmal dort aktualisieren (System → Update) oder auf seiner Konsole: sudo ./scripts/update.sh",
+        "Java FRN server updated": "Java-FRN-Server aktualisiert", "Backup sends the stations back": "Backup schickt die Stationen zurück",
+        "Dashboard update": "Dashboard-Update", "Dashboard update started – the web interface restarts": "Dashboard-Update gestartet – das Webinterface startet neu",
+        "Everything is up to date": "Alles ist aktuell", "cannot be installed from the web interface": "kann nicht über das Webinterface installiert werden",
+        "auto": "automatisch",
+        // settings
+        "Send stray stations back by themselves": "Verirrte Stationen selbst zurückschicken",
+        "Backup: every 5 minutes – if stations are here although the master runs (no maintenance, master up for 10 minutes, nobody transmitting here), they are sent back to the master":
+            "Backup: alle 5 Minuten – sind Stationen hier, obwohl der Master läuft (keine Wartung, Master seit 10 Minuten oben, hier sendet niemand), werden sie zum Master zurückgeschickt",
+        "Pause when sending back (seconds)": "Pause beim Zurückschicken (Sekunden)",
+        "So long the FRN server of the backup stays stopped – time for the stations to reach the master": "So lange bleibt der FRN-Server des Backups gestoppt – Zeit für die Stationen, den Master zu erreichen",
+    },
+    rules: [
+        [/^Stations sent back – (\d+) on the way to the master$/, 'Stationen zurückgeschickt – $1 auf dem Weg zum Master'],
+        [/^(Master|Backup): version (.+) running$/, '$1: Version $2 läuft'],
+        [/^FRN server here stopped – starts again in (\d+) s$/, 'FRN-Server hier gestoppt – startet in $1 s wieder'],
+        [/^stopping the FRN server failed: (.*)$/, 'Stoppen des FRN-Servers fehlgeschlagen: $1'],
+        [/^Master not reachable: (.*)$/, 'Master nicht erreichbar: $1'],
+        [/^(\d+) commits$/, '$1 Commits'],
+    ],
+});

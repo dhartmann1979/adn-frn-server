@@ -15,6 +15,8 @@ Konfiguration des Masters **zu jeder vollen Stunde** und auf Knopfdruck. Die bei
 | **Ausfall** | Erledigt **FRN selbst**: Jeder Server nennt seinen Clients eine Ausweichadresse (`backup_server_addr`). Ist der Server weg, verbinden sich die Clients von selbst dorthin. Mit gesetzter Rolle ist das automatisch der Partner (Host aus „Dashboard des Partners“, Port = eigener FRN-Port), solange unter *FRN-Server → Ausweichserver* nichts anderes steht. |
 | **Abgleich** | Das Backup holt sich zu jeder vollen Stunde (ein paar Sekunden danach) die Konfiguration vom Master. **🔄 Jetzt abgleichen** geht auf beiden Servern: auf dem Backup holt es sofort, auf dem Master bittet es das Backup darum. |
 | **Wartung** | Von Hand auf dem Master: **🛠️ An das Backup übergeben** und danach **↩️ Vom Backup zurückholen** (siehe unten). |
+| **Verirrte Stationen** | **🧲 Stationen zum Master zwingen** – auf Master und Backup, jederzeit (siehe unten). Auf Wunsch auch automatisch. |
+| **Updates** | **⬆️ Updates beider Server**: für Master und Backup je **🔍 Prüfen** und **⬆️ Jetzt aktualisieren** (siehe unten). |
 
 ## Einrichten
 
@@ -67,7 +69,55 @@ Stand-alone-Server (ohne SystemManager) sind ausgenommen – dort gibt es kein K
 Das öffentliche `/api/info` nennt unter `cluster` Master und Backup (Host, FRN-Port, Wartung). **N8 Crosslink** (ab 1.21.0) liest
 das, behandelt den Master immer als Priorität 1 und wechselt nach einem Ausfall vom Backup **von selbst zurück**, sobald der Master
 wieder sauber läuft (3 Prüfungen im Minutentakt, zwischen zwei Durchgängen). Während einer Wartung bleibt er auf dem Backup.
-Normale FRN-Clients bleiben nach einem Ausfall auf dem Backup, bis das Backup sie mit **↩️ Vom Backup zurückholen** zurückschickt.
+Normale FRN-Clients bleiben nach einem Ausfall auf dem Backup – bis du sie mit **🧲 Stationen zum Master zwingen** zurückschickst
+(oder das automatisch erledigen lässt, siehe nächster Abschnitt).
+
+## 🧲 Verirrte Stationen zum Master zwingen
+
+Fällt der Master kurz aus (Neustart, Java-Update, Netzwerk-Hänger), wechseln die Stationen zum Backup – und **bleiben dort**, auch
+wenn der Master längst wieder läuft. Im Kasten steht dann unter **📡 Stationen**, wie viele Stationen auf Master und Backup verbunden
+sind, und beim Backup „⚠️ verirrt – sie gehören auf den Master“.
+
+<p align="center"><img src="../images/admin-cluster-zurueck.png" alt="Stationen zum Master zwingen – Rückfrage" width="45%"></p>
+
+**🧲 Stationen zum Master zwingen** geht **auf beiden Servern** (auf dem Master bittet er das Backup darum, verschlüsselt):
+
+1. Geprüft wird vorher: Der Master ist erreichbar, sein FRN-Server **läuft** und er ist **nicht in Wartung**. Sonst passiert nichts –
+   die Stationen hätten kein Ziel.
+2. Der FRN-Server des Backups **stoppt**. Die Stationen verlieren kurz die Verbindung und gehen zu ihrer Ausweichadresse – das ist
+   beim Backup der Master.
+3. Nach der **Pause** (Einstellung *Pause beim Zurückschicken*, Standard 20 Sekunden, 5–120) startet der FRN-Server des Backups
+   wieder – bereit für den nächsten Ausfall. Während der Pause steht „⏳ wird zurückgeschickt“ im Kasten. Startet das Dashboard in
+   dieser Zeit neu, holt es den Start nach.
+
+Wer gerade auf dem Backup sendet, wird dabei unterbrochen – die Rückfrage sagt das. Jeder Vorgang steht unter **Zuletzt
+zurückgeschickt** und im Protokoll (`cluster_return`).
+
+**Automatisch:** Mit *Verirrte Stationen selbst zurückschicken* (Einstellung auf dem **Backup**) prüft das Backup alle 5 Minuten:
+Sind Stationen hier, obwohl der Master läuft? Zurückgeschickt wird nur, wenn der Master **seit mindestens 10 Minuten** läuft, **nicht
+in Wartung** ist und auf dem Backup **gerade niemand sendet**. Standard: aus.
+
+Auch **↩️ Vom Backup zurückholen** (Ende der Wartung) arbeitet jetzt so: stoppen, Pause, starten – statt eines schnellen Neustarts,
+nach dem manche Stationen gleich wieder auf dem Backup landeten.
+
+## ⬆️ Updates beider Server
+
+Unter **⬆️ Updates beider Server** stehen Master und Backup als zwei gleich hohe Blöcke nebeneinander – egal, auf welchem der beiden
+du gerade angemeldet bist. Jeder Block zeigt die Version des Dashboards (mit Commit) und des Java-FRN-Servers, ob es etwas Neues gibt
+(mit den neuen Commits) und das Ergebnis des letzten Updates.
+
+- **🔍 Prüfen** fragt GitHub und freeradionetwork.de sofort (sonst gilt das Ergebnis der letzten 10 Minuten).
+- **⬆️ Jetzt aktualisieren** installiert, was neu ist:
+  - den **Java-FRN-Server** – er startet neu, seine Stationen wechseln kurz zum Partner. **Beim Master schickt das Backup sie danach
+    von selbst zurück** (sobald der Master wieder läuft).
+  - das **Dashboard** – wie unter *System → Update* als root über `scripts/n8-admin.sh update --auto`: vorspulen, Python-Pakete,
+    **Berechtigungen prüfen und korrigieren**, Neustart, Prüfung, sonst Rückkehr zur vorigen Version. Ein Passwort ist dafür nicht nötig.
+- Der Block zeigt „⏳ Update läuft“, fragt alle 8 Sekunden nach und meldet die neue Version. Wird **dieser** Server aktualisiert, lädt
+  die Seite danach neu.
+- Der Partner wird über die **verschlüsselte Verbindung** angesprochen (Sync-Schlüssel), genau wie beim Abgleich.
+
+Damit das beim Partner geht, muss er selbst schon **2.31.0** oder neuer haben. Ältere Versionen meldet der Block: dann einmal dort
+unter *System → Update* (oder auf seiner Konsole `sudo ./scripts/update.sh`) aktualisieren – danach geht alles von hier aus.
 
 ## 🔗 Partner im Link-Menü
 
@@ -126,8 +176,9 @@ wird **nie** übertragen:
 Oben steht dann „🛠️ Wartung – die Stationen sind auf dem Backup“. Jetzt kannst du den Master warten, aktualisieren oder neu
 starten.
 
-**↩️ Vom Backup zurückholen:** Der FRN-Server auf dem Master startet. Sobald er läuft, startet das Backup seinen FRN-Server
-neu, damit seine Stationen zum Master zurückkommen (für sie ist der Master die Ausweichadresse).
+**↩️ Vom Backup zurückholen:** Der FRN-Server auf dem Master startet. Sobald er läuft, stoppt das Backup seinen FRN-Server für
+die eingestellte Pause und startet ihn dann wieder, damit seine Stationen zum Master zurückkommen (für sie ist der Master die
+Ausweichadresse).
 
 ## 📧 FRN-Passwort für Master und Backup
 
@@ -151,6 +202,8 @@ zweiten ab („falsches FRN-Passwort“ bzw. „bereits online“). Deshalb gibt
 | *request expired …* | Die Uhrzeit eines Servers geht falsch: `timedatectl` prüfen, NTP einschalten. |
 | *Der Partner kennt Master & Backup noch nicht* | Den Partner auf dieselbe Version aktualisieren. |
 | *this server is master, not backup* | Die Rollen sind vertauscht oder beide gleich. |
+| *Der Master ist in Wartung …* / *Der FRN-Server auf dem Master läuft nicht …* (beim Zurückschicken) | Zurückschicken geht nur zu einem laufenden Master ohne Wartung. Wartung mit **↩️ Vom Backup zurückholen** beenden bzw. den FRN-Server des Masters starten. |
+| *Der Partner kennt Fern-Updates noch nicht (ältere Version)* | Den Partner einmal selbst aktualisieren (*System → Update* oder `sudo ./scripts/update.sh`), ab 2.31.0 geht es von hier. |
 | *Neustart steht aus – Stationen verbunden* | Das Backup hat Stationen, deshalb kein automatischer Neustart. Später **Jetzt neu starten** oder beim nächsten ruhigen Abgleich. |
 
-Jeder Abgleich steht unter **📜 Protokoll** (`cluster_sync`, `cluster_maintenance`, `cluster_key`).
+Jeder Abgleich steht unter **📜 Protokoll** (`cluster_sync`, `cluster_maintenance`, `cluster_key`, `cluster_return`, `cluster_update`).

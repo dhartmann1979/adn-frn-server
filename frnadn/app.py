@@ -1720,7 +1720,7 @@ async def update_run(who: str, ip: str = "") -> Dict[str, Any]:
     if not steps:
         steps.append({"step": "Everything is up to date", "ok": True, "detail": ""})
     return {"ok": all(x["ok"] for x in steps), "steps": steps, "restarting": any("restarts" in x["step"] and x["ok"] for x in steps),
-            "version": __version__, "time": time.time()}
+            "version": __version__, "commit": summ["dashboard"]["commit"], "time": time.time()}
 
 
 def jv_txt(v: Optional[Dict[str, Any]]) -> str:

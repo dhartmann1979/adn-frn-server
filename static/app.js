@@ -919,10 +919,96 @@ async function loadCluster() {
             <input type="text" inputmode="email" name="sysman.email" data-skip="1" placeholder="E-mail" value="${esc(d.accounts[d.role] ? d.accounts[d.role].email || '' : '')}" autocomplete="off" spellcheck="false">
             <input type="password" name="sysman.password" data-skip="1" placeholder="${d.accounts[d.role] && d.accounts[d.role].password_set ? '•••••••• (unchanged)' : 'FRN password'}" autocomplete="new-password">
             <button type="button" class="btn small primary" onclick="clusterOwnAccount(this.closest('.cl-own'))">💾 Save account</button></div></div>` : '';
-    box.innerHTML = same + rows + accounts + `<div class="actions" style="justify-content:flex-start">
+    // 📡 where are the stations – and send stray ones back to the master
+    const mine = d.frn ? d.frn.clients : 0, theirs = p && p.ok !== false && p.frn ? (p.frn.running ? p.frn.clients : null) : undefined;
+    const cnt = n => n === undefined ? '<span class="dim">unknown</span>' : n === null ? '<span class="dim">FRN stopped</span>' : `<b>${n}</b> <span>${n === 1 ? 'station' : 'stations'}</span>`;
+    const onB = d.role === 'backup' ? mine : theirs, lr = d.last_return || {}, pend = (d.return_pending && d.return_pending.since) || (p && p.frn && p.frn.returning);
+    const stray = !m && onB > 0 ? ' <span class="cl-warn">⚠️ <span>stray – they belong on the master</span></span>' : '';
+    const lastRet = !lr.time ? '<span class="dim">never</span>'
+        : `<span class="${lr.ok === false ? 'cl-bad' : 'cl-ok'}">${lr.ok === false ? '✕' : '✓'}</span> ${fmtDate(lr.time)} <span class="dim">· <span>${esc(lr.by || '')}</span>${lr.detail ? ` · <span>${esc(lr.detail)}</span>` : ''}</span>`;
+    const stations = d.role === 'off' ? '' : `<div class="cl-acc"><div class="cl-acc-h">📡 <b>Stations</b> <span class="dim">– where the stations are connected now</span></div>
+        <div class="cl-grid"><span>Master</span><div>${cnt(d.role === 'master' ? mine : theirs)}</div>
+            <span>Backup</span><div>${cnt(onB)}${stray}${pend ? ' <span class="cl-warn">⏳ <span>sending back – the FRN server of the backup starts again shortly</span></span>' : ''}</div>
+            <span>Last sent back</span><div>${lastRet}</div>
+            <span>Automatically</span><div>${d.auto_return ? '✅ <span>on – every 5 minutes</span>' : '<span class="dim">off – set below</span>'} <span class="dim">· <span>pause</span> ${esc(d.return_pause)} s</span></div></div>
+        <div class="actions" style="justify-content:flex-start">${m ? '<span class="dim">Maintenance is on – “Take back from the backup” brings the stations back.</span>'
+            : `<button type="button" class="btn small primary" onclick="clusterReturn(this)">🧲 Force stations back to the master</button>
+               <span class="dim" style="font-size:12.5px">The FRN server of the backup stops for a short time – its stations switch to the master.</span>`}</div></div>`;
+    // ⬆️ updates of both servers – each with check and update now
+    const card = (w, label) => `<div class="cl-upd-card" id="clUpd-${w}"><h4>${w === 'master' ? '👑' : '🛟'} <span>${label}</span>${w === d.role ? ' <span class="dim">(<span>this server</span>)</span>' : ''}</h4>
+        <div class="cl-upd-body"><span class="dim">…</span></div>
+        <div class="actions"><button type="button" class="btn small" onclick="clusterUpd('${w}', 'check', this)">🔍 Check</button>
+            <button type="button" class="btn small primary" onclick="clusterUpd('${w}', 'run', this)">⬆️ Update now</button></div></div>`;
+    const updates = d.role === 'off' ? '' : `<div class="cl-acc"><div class="cl-acc-h">⬆️ <b>Updates of both servers</b> <span class="dim">– dashboard from GitHub and Java FRN server, the partner over the encrypted connection</span></div>
+        <div class="cl-upd">${card('master', 'Master')}${card('backup', 'Backup')}</div></div>`;
+    box.innerHTML = same + rows + stations + updates + accounts + `<div class="actions" style="justify-content:flex-start">
         <span class="dim" style="font-size:12.5px">Every server needs its own FRN account:</span>
         <button type="button" class="btn small" onclick="openFrnPassword('master')">📧 FRN password Master</button>
         <button type="button" class="btn small" onclick="openFrnPassword('backup')">📧 FRN password Backup</button></div>`;
+    if (d.role !== 'off') ['master', 'backup'].forEach(w => clusterUpd(w, 'status'));
+}
+async function clusterReturn(btn) {
+    if (!await confirmBox({ title: 'Force the stations back to the master?', body: 'The FRN server of the backup stops for a short time (pause set below) and starts again. Its stations lose the connection for a moment and switch to the master – their backup address. Whoever is transmitting there right now is cut off.' }, 'Send back', 'danger')) return;
+    btn.disabled = true; toast('Sending the stations back …');
+    try {
+        const r = await api('POST', '/api/admin/cluster/return', {});
+        toast(r.stopped ? `Stations sent back – ${r.clients} on the way to the master` : (r.detail || 'Nothing to send back'), r.ok === false);
+    } catch (e) { toast(e.message, true); }
+    btn.disabled = false; loadCluster();
+    setTimeout(() => { if ($('clusterBox')) loadCluster(); }, 25000);
+}
+const _clUpdPoll = {};
+function clusterUpdBody(d) {
+    if (!d) return '<span class="dim">…</span>';
+    if (d.ok === false) return `<div class="cl-bad">✕ <span>${esc(d.error || 'not reachable')}</span></div>`;
+    const db = d.dashboard || {}, j = d.java || {}, r = d.result;
+    const line = (label, cur, upd, latest, err) => `<span>${label}</span><div><span class="mono">${esc(cur || '–')}</span> ${err ? `<span class="cl-bad">✕ <span>${esc(err)}</span></span>`
+        : upd ? `<span class="cl-warn">→ <span class="mono">${esc(latest || 'new')}</span> <span>available</span></span>` : '<span class="cl-ok">✓ <span>up to date</span></span>'}</div>`;
+    return `<div class="cl-grid">${line('Dashboard', db.installed + (db.commit ? ' · ' + db.commit : ''), db.update, db.latest + (db.behind ? ` (${db.behind} commits)` : ''), db.error)}
+        ${line('Java FRN server', j.installed, j.update, j.latest, j.error)}
+        <span>Checked</span><div>${d.checked ? fmtDate(d.checked) : '<span class="dim">never</span>'}</div>
+        ${r && r.time ? `<span>Last update</span><div><span class="${r.ok ? 'cl-ok' : 'cl-bad'}">${r.ok ? '✓' : '✕'}</span> ${fmtDate(r.time)} <span class="dim">${esc(r.from || '')} → ${esc(r.to || '')} ${esc(r.message || '')}</span></div>` : ''}</div>
+        ${db.update && db.commits && db.commits.length ? `<ul class="cl-commits">${db.commits.map(c => `<li><span class="mono">${esc(c.short)}</span> ${esc(c.message || '')}</li>`).join('')}</ul>` : ''}
+        ${db.update && !db.can && db.hint ? `<div class="notice-box" style="margin-top:8px">${esc(db.hint)}</div>` : ''}
+        ${d.running ? '<div class="cl-warn" style="margin-top:8px">⏳ <span>Update running – the web interface restarts</span></div>' : ''}`;
+}
+async function clusterUpd(w, action, btn) {
+    const card = $('clUpd-' + w); if (!card) return;
+    const body = card.querySelector('.cl-upd-body'), label = w === 'master' ? 'Master' : 'Backup';
+    if (action === 'run') {
+        if (!await confirmBox({ title: `Update the ${label} now?`, body: 'Installs what is new: the Java FRN server (it restarts – its stations switch to the partner for a moment; on the master the backup sends them back afterwards) and the dashboard (as root: fast-forward, packages, permissions, restart, check – otherwise the previous version is restored).' }, 'Update now')) return;
+    }
+    if (btn) btn.disabled = true;
+    if (action !== 'status') body.innerHTML = `<span class="dim">${action === 'run' ? '⏳ <span>Updating</span> …' : '🔍 <span>Checking</span> …'}</span>`;
+    let d;
+    try { d = await api('POST', '/api/admin/cluster/update', { server: w, action }); }
+    catch (e) { d = { ok: false, error: e.message }; }
+    if (btn) btn.disabled = false;
+    if (action === 'run' && d.steps) {
+        modal(`<h2>⬆️ <span>Update</span> ${label}</h2><div class="cl-steps">${d.steps.map(x => `<div>${x.ok ? '✅' : '⚠️'} <span>${esc(x.step)}</span> <span class="dim">${esc(x.detail || '')}</span></div>`).join('')}</div>
+            <div class="actions"><button class="btn primary" onclick="closeModal()">OK</button></div>`);
+        if (d.restarting) clusterUpdFollow(w, d, !!d.self);
+        else clusterUpd(w, 'status');
+        return;
+    }
+    if (!card.isConnected) return;
+    body.innerHTML = clusterUpdBody(d);
+}
+function clusterUpdFollow(w, from, self) {
+    const t0 = Date.now() / 1000;
+    // the dashboard of that server restarts: ask again until it answers with the new version (at most 5 minutes)
+    clearInterval(_clUpdPoll[w]); let n = 0;
+    const body = () => { const c = $('clUpd-' + w); return c && c.querySelector('.cl-upd-body'); };
+    if (body()) body().innerHTML = '<span class="cl-warn">⏳ <span>Update running – the web interface restarts</span> …</span>';
+    _clUpdPoll[w] = setInterval(async () => {
+        if (++n > 38 || !body()) { clearInterval(_clUpdPoll[w]); return; }
+        let d; try { d = await api('POST', '/api/admin/cluster/update', { server: w, action: 'status' }); } catch (e) { return; }
+        const done = d.version !== from.version || (d.dashboard || {}).commit !== from.commit || (d.result && d.result.time > t0);
+        if (d.ok === false || d.running || !done) return;
+        clearInterval(_clUpdPoll[w]);
+        toast(d.result && d.result.ok === false && d.result.time > t0 ? `${w === 'master' ? 'Master' : 'Backup'}: ${d.result.message || 'update failed'}` : `${w === 'master' ? 'Master' : 'Backup'}: version ${d.version} running`, !!(d.result && d.result.ok === false && d.result.time > t0));
+        if (self) setTimeout(() => location.reload(), 1500); else if (body()) body().innerHTML = clusterUpdBody(d);
+    }, 8000);
 }
 async function clusterOwnAccount(f) {
     const ch = {}; const e = f.querySelector('[name="sysman.email"]').value.trim(), p = f.querySelector('[name="sysman.password"]').value;

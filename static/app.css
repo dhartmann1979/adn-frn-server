@@ -508,3 +508,12 @@ header { padding:7px 12px; gap:9px; }
 .el-inline { margin: 6px 0 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
 .el-inline h4 { margin: 0 0 4px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
 .el-inline h4 .badge { text-transform: none; letter-spacing: 0; margin-left: 8px; font-weight: 600; }
+/* 2.31: Master & Backup – stations back to the master, updates of both servers (two blocks of the same height) */
+.cl-upd { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; margin-top: 8px; }
+.cl-upd-card { display: flex; flex-direction: column; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(0,0,0,.12); }
+.cl-upd-card h4 { margin: 0 0 8px; font-size: 13.5px; }
+.cl-upd-body { flex: 1 1 auto; }
+.cl-upd-card .actions { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.06); }
+.cl-commits { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: var(--dim, #9aa4b8); max-height: 8.5em; overflow: auto; }
+.cl-commits li { margin: 2px 0; }
+@media (max-width: 760px) { .cl-upd { grid-template-columns: 1fr; } }
