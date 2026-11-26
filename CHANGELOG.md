@@ -2,6 +2,33 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.30.1 – 2026-11-26
+
+### 📘 Neue Schritt-für-Schritt-Anleitung in neun Sprachen, bereinigte Doku
+
+**Neu: [`docs/anleitung/`](docs/anleitung/README.md) – bebilderte Anleitung in neun Sprachen**
+- Eine Anleitung mit Bildern für die ersten Schritte mit dem ADN FRN Server, jeweils in **Deutsch, English, Français, Français (Belgique),
+  Magyar, Svenska, Nederlands, Italiano und Español**. Die Texte sind mit den Fachbegriffen des Funkbetriebs übersetzt und
+  verwenden genau die Menünamen, die die Oberfläche in der jeweiligen Sprache zeigt.
+- Jede Sprache hat **eigene Bildschirmfotos**: die Oberfläche ist darauf in dieser Sprache zu sehen. Gelbe Rahmen mit Ziffern
+  zeigen, wo man klickt: ① ist der Punkt im Menübaum links, ② der Bereich, um den es geht. Die Ziffern im Text gehören dazu.
+- Schritte: Installieren · Anmelden · Sprache wählen · FRN-Server einrichten · Räume anlegen · eigene Domain mit HTTPS · Benutzer hinzufügen · Aktualisieren · Sichern.
+- Oben in jeder Anleitung wechselt eine Sprachleiste zwischen den neun Sprachen; unten steht der Link zur ausführlichen
+  deutschen Beschreibung. Die Übersicht [`docs/anleitung/README.md`](docs/anleitung/README.md) listet alle Sprachen.
+- Die Bilder sind WebP-Dateien (rund 50 KB pro Bild), damit das Repository klein bleibt.
+- Verlinkt in der readme oben in der Doku-Leiste und unter „Schnellstart“.
+
+**Übersetzungen vollständiger**
+- Jede Sprachdatei (`n8-i18n-*.js`) enthält jetzt alle Texte aller vier N8-Systeme, nicht nur die des eigenen Systems.
+  Damit sind auch Texte übersetzt, die mehrere Systeme gemeinsam nutzen und die bisher nur in einem System gefunden wurden
+  (z. B. in Meldungen des Keep-Alive, der Updates oder der Dienste). Die Dateien werden weiter erst geladen, wenn die Sprache
+  gewählt ist – Deutsch und Englisch laden nichts zusätzlich.
+
+**Doku bereinigt**
+- Alle Stellen, die noch den alten Knopf **🔐 Login** und das Abmelden mit **⏻** neben dem Namen beschrieben, zeigen jetzt das
+  neue **Anmeldefenster** und das Benutzermenü **Avatar + Name ▾** (Rolle, Passwort, Adminbereich, Abmelden).
+- Alle Links und Bilder der Doku geprüft: keine toten Verweise.
+
 ## 2.30.0 – 2026-11-26
 
 ### 🌐 Neun Sprachen, neue Kopfleiste und ein Anmeldefenster für alle N8-Systeme (N8 Kit 1.6.0)

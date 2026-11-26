@@ -57,7 +57,7 @@ Zustand der Dienste zeigt. Beides bleibt beim Scrollen oben stehen.
 | 🎙️ Live · 📈 Statistics · 📇 Stations · 💬 Chat | die Reiter; *Chat* nur mit Berechtigung |
 | ⚙️ Admin | erscheint nach dem Login für Admins als eigener Menüpunkt (gestrichelt umrandet) |
 | 🔗 Links ▾ | das Link-Menü (siehe unten) |
-| 🔐 Login | ganz rechts; angemeldet steht dort **👤 Name** (Klick = eigenes Konto, Passwort) und daneben **⏻** zum Abmelden – ohne Aufklappmenü |
+| 🔐 Anmelden | ganz rechts; öffnet das [Anmeldefenster](sicherheit.md#anmeldung). Angemeldet steht dort **Avatar + Name ▾** – das Menü darunter enthält Rolle, 🔑 Mein Konto (Passwort), ✉️ Webmail, ⚙️ Admin und ⏻ Abmelden |
 
 **Statusleiste** – der farbige Punkt sagt den Zustand: grün = ok, gelb = wartet, rot = Problem, blau = Info.
 

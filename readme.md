@@ -15,6 +15,7 @@
 
 <p align="center">
   <a href="#schnellstart">Schnellstart</a> ·
+  🌍 <a href="docs/anleitung/README.md"><b>Schritt für Schritt</b> (9 Sprachen)</a> · 
   <a href="docs/de/installation.md">Installation</a> ·
   <a href="docs/de/dashboard.md">Dashboard</a> ·
   <a href="docs/de/adminbereich.md">Admin-Portal</a> ·
@@ -86,7 +87,7 @@ Jede Frage hat eine Vorgabe, die du mit Enter übernimmst. Danach öffnest du da
 Der Installer ist für eine **saubere Neuinstallation** gedacht und bricht ab, wenn er schon eine FRN-Datenbank, eine `server.properties` oder einen laufenden FRN-Dienst findet.
 
 
-➡️ Ausführlich: **[Installation](docs/de/installation.md)**
+➡️ Ausführlich: **[Installation](docs/de/installation.md)** · 🌍 **[Schritt für Schritt (9 Sprachen)](docs/anleitung/README.md)**
 
 ## So sieht es aus
 
