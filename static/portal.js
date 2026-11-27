@@ -105,7 +105,7 @@ function widgetCard(w) {
         ${stTxt ? `<div class="pw-sub ${esc(st)}">${esc(stTxt)}</div>` : ''}
         ${kpis ? `<div class="ps-stats">${kpis}</div>` : ''}${air}
         ${lh ? `<div class="pw-lh"><div class="pw-lh-h">${esc(t('Last heard'))}</div>${lh}</div>` : ''}
-        ${w.link ? `<a class="btn ps-cta" href="${esc(w.link)}" target="_blank" rel="noopener">${esc(t('Open'))} ${esc(title)} ↗</a>` : ''}`;
+        ${w.link ? `<a class="btn ps-cta" href="${esc(w.link)}" target="_blank" rel="noopener">${esc(t('Open ' + title))} ↗</a>` : ''}`;
 }
 function renderWidgets(i) {
     if (!Array.isArray(i.widgets)) return;               // older server: the three boxes as before

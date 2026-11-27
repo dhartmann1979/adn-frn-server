@@ -203,8 +203,8 @@ function renderWidgetsAdmin() {
                 <a class="btn" href="${esc(PORTAL.url || '/portal')}" target="_blank" rel="noopener">📰 Open portal page ↗</a></div></div>
         <div class="tile"><h3>🔐 How a system is connected</h3>
             <div class="subt">Every system gets its own sync key. It never travels: the portal and the system use it to encrypt each request and each answer (like Master &amp; Backup). The systems send only what their public live page shows – no IP addresses, no accounts.</div>
-            <ol class="wa-steps"><li>Here: <b>＋ system</b>, its dashboard address, <b>🎲 New key</b> → copy the key.</li>
-                <li>On the system: switch the portal feed on and paste the key (see below).</li><li>Here: <b>💾 Save</b> – the portal fetches at once and shows whether it works.</li></ol>
+            <ol class="wa-steps"><li>Here: ＋ system, its dashboard address, 🎲 New key → copy the key.</li>
+                <li>On the system: switch the portal feed on and paste the key (see below).</li><li>Here: 💾 Save – the portal fetches at once and shows whether it works.</li></ol>
             <div class="wa-help">${Object.entries(W_HELP).map(([k, v]) => `<div><b>${esc(WADM.kinds[k] || k)}</b> – <span>${esc(v)}</span></div>`).join('')}</div>
             <div class="notice-box">📶 <span>N8 Hotspot and N8 Gateway answer only in the local network – they are asked only at a LAN address (e.g. http://192.168.1.20).</span></div></div></div>`;
 }

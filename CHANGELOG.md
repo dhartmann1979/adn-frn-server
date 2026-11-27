@@ -2,6 +2,46 @@
 
 Format: neueste Version zuerst. Die Versionsnummer steht in `frnadn/__init__.py`.
 
+## 2.33.0 – 2026-11-27
+
+### 🧩 Portal-Seite: Widgets am Rand mit den Live-Daten von HBlink4, N8 Crosslink, N8 Hotspot und N8 Gateway
+
+**Widgets am Rand der Portal-Seite**
+- Neben den News stehen jetzt **Widgets** – die drei Kästen des eigenen FRN-Servers (📊 Heute, 🎙️ Räume, 📻 Verbinden) und neu die
+  **Live-Daten der anderen N8-Systeme**: 📡 HBlink4-FreeRadioID, 🔀 N8 Crosslink, 📶 N8 Hotspot und 🛰️ N8 Gateway.
+- Jedes Widget zeigt Status (🟢/🟡/🔴, ⚪ = keine aktuellen Daten mit „Stand …“), bis zu vier Kennzahlen (z. B. Repeater & Hotspots,
+  Netze online, Durchgänge, Sprechzeit, Stationen heute), **wer gerade spricht** (magenta hervorgehoben) und **zuletzt gehört**
+  (Rufzeichen, Name, TG bzw. Raum, vor wie viel Minuten) – auf Wunsch mit Knopf „… öffnen“ zum Dashboard des Systems.
+- **Reihenfolge einstellbar** (▲ ▼), jedes Widget ein-/ausschaltbar, Titel frei wählbar, „Zuletzt gehört“ an/aus mit 3–8 Einträgen.
+  Die eigenen Kästen lassen sich verschieben und ausschalten. Unter ⚙️ Portal-Seite: Widgets **rechts oder links** der News.
+
+**Abruf und Zwischenspeicher**
+- Das Portal fragt jedes eingeschaltete System alle **30 Sekunden** (einstellbar 15–600 s) und **speichert die Antwort in SQLite**
+  (neue Tabelle `portal_widgets`). Besucher bekommen immer die gespeicherte Kopie – ein langsames oder ausgefallenes System bremst
+  die Portal-Seite nie; die letzten Daten bleiben mit „Stand …“ stehen.
+- **Verschlüsselt mit dem Sync-Schlüssel** des jeweiligen Systems (neues Modul `frnadn/n8feed.py`, gleiche Bausteine wie Master &
+  Backup: scrypt, SHAKE-256, HMAC-SHA-256; jede Anfrage nur einmal und höchstens 5 Minuten gültig). Der Schlüssel wird nie übertragen
+  und nach dem Speichern nie wieder angezeigt.
+- **N8 Hotspot und N8 Gateway nur lokal:** Für sie nimmt das Portal nur LAN-Adressen an (auch über DNS geprüft), und die beiden
+  antworten nur ins lokale Netz.
+- Die Systeme liefern nur, was ihre öffentliche Live-Seite zeigt – keine IP-Adressen, keine Ports, keine Konten.
+
+**Admin → 📰 Portal → 🧩 Widgets (neu)**
+- Liste in Anzeigereihenfolge mit Status je System (✓ Live-Daten mit Zeit und Version, ✕ Grund), **＋ HBlink4 DMR / N8 Crosslink /
+  N8 Hotspot / N8 Gateway**, ✏️ Bearbeiten, 🔄 Jetzt abrufen, 🗑 Löschen.
+- Im Editor **🎲 Neuer Schlüssel** und 📋 Kopieren, dazu je System der genaue Weg, wo der Schlüssel dort eingetragen wird. Beim
+  Speichern ruft das Portal sofort ab und meldet „✅ Live-Daten empfangen“ oder den Grund.
+- Protokoll: `widget_saved`, `widget_order`, `widget_deleted`.
+
+**Gegenstücke in den anderen N8-Systemen** (jeweils Einstellung „Live-Daten für die Portal-Seite“ + Sync-Schlüssel, Endpunkt
+`POST /api/n8/feed`): **HBlink4-FreeRadioID 1.19.0**, **N8 Crosslink 1.28.0**, **N8 Hotspot 1.13.0**. Für **N8 Gateway** (Repository noch
+leer) ist die Schnittstelle in der Doku beschrieben – sobald es den Feed anbietet, funktioniert das Widget.
+
+**Sonstiges**
+- Master & Backup: die Widgets gehen beim Abgleich mit auf das Backup; die zwischengespeicherten Live-Daten zählen nicht als Änderung.
+- Doku [`docs/de/portal.md`](docs/de/portal.md): Abschnitt „🧩 Widgets am Rand“ mit Einrichtung, Datenfluss und Schnittstelle, neue Bilder.
+- Tests: Widgets, Reihenfolge, Abruf mit echter Verschlüsselung, falscher Schlüssel, Cache, nur LAN für Hotspot/Gateway.
+
 ## 2.32.0 – 2026-11-27
 
 ### ⏱️ Client-Zeitlimit als Auswahl (Standard 5 Minuten) · 📌 MAIN und BACKUP beim Verbinden an die Clients

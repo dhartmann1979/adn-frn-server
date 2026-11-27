@@ -604,3 +604,62 @@ N8Kit.i18n.add({
     },
     rules: [[/^(\d+) \(custom\)$/, '$1 (eigener Wert)']],
 });
+
+/* 2.33.0: 🧩 widgets of the portal page – live data of other N8 systems */
+N8Kit.i18n.add({
+    base: 'en',
+    de: {
+        // portal page
+        "no current data": "keine aktuellen Daten", "as of": "Stand", "Open": "Öffnen", "online": "online", "Last heard": "Zuletzt gehört",
+        "Networks online": "Netze online", "Stations today": "Stationen heute", "Calls today": "Durchgänge heute", "Network": "Netz",
+        "Repeaters & hotspots": "Repeater & Hotspots", "Talking now": "Spricht gerade", "OpenBridge": "OpenBridge",
+        "DMR server not connected": "DMR-Server nicht verbunden",
+        // settings of the portal page
+        "Widgets": "Widgets", "Where the widgets stand next to the news (order: 🧩 Widgets)": "Wo die Widgets neben den News stehen (Reihenfolge: 🧩 Widgets)",
+        "Right of the news": "Rechts neben den News", "Left of the news": "Links neben den News",
+        "Fetch live data every (seconds)": "Live-Daten abrufen alle (Sekunden)",
+        "How often the portal asks HBlink4, N8 Crosslink, N8 Hotspot and N8 Gateway – the answers are cached in SQLite":
+            "Wie oft das Portal HBlink4, N8 Crosslink, N8 Hotspot und N8 Gateway fragt – die Antworten werden in SQLite zwischengespeichert",
+        // admin: 🧩 Widgets
+        "Widgets of the portal page": "Widgets der Portal-Seite", "🧩 Widgets of the portal page": "🧩 Widgets der Portal-Seite", "How a system is connected": "So wird ein System verbunden",
+        "own FRN server": "eigener FRN-Server", "live data": "Live-Daten", "last data": "letzte Daten", "not fetched yet": "noch nicht abgerufen",
+        "Fetch now": "Jetzt abrufen", "Up": "Nach oben", "Down": "Nach unten", "Show on the portal page": "Auf der Portal-Seite zeigen",
+        "📊 Today": "📊 Heute", "🎙️ Rooms": "🎙️ Räume", "📻 Connect": "📻 Verbinden",
+        "Title on the portal page": "Titel auf der Portal-Seite", "Empty = the title of the system": "Leer = der Titel des Systems",
+        "Dashboard address of the system": "Dashboard-Adresse des Systems", "Only in the local network (LAN address).": "Nur im lokalen Netz (LAN-Adresse).",
+        "The address of its web interface, with https:// – e.g. https://dmr.die-n8schicht.de": "Die Adresse seines Webinterfaces, mit https:// – z. B. https://dmr.die-n8schicht.de",
+        "Sync key": "Sync-Schlüssel", "at least 24 characters": "mindestens 24 Zeichen", "New key": "Neuer Schlüssel",
+        "Link of the widget": "Link des Widgets", "Show last heard": "Zuletzt gehört zeigen", "Entries": "Einträge",
+        "A click on “Open …” leads there – e.g. the public dashboard. Empty = no button (the address above is not shown to visitors).":
+            "„Öffnen …“ führt dorthin – z. B. zum öffentlichen Dashboard. Leer = kein Knopf (die Adresse oben sehen Besucher nie).",
+        "Saved, but the system does not answer yet:": "Gespeichert, aber das System antwortet noch nicht:",
+        "live data received": "Live-Daten empfangen", "Enter or create a key first": "Erst einen Schlüssel eintragen oder erzeugen",
+        "Delete the widget?": "Widget löschen?",
+        "Here: 💾 Save – the portal fetches at once and shows whether it works.": "Hier: 💾 Speichern – das Portal ruft sofort ab und zeigt, ob es klappt.",
+        "Every system gets its own sync key. It never travels: the portal and the system use it to encrypt each request and each answer (like Master & Backup). The systems send only what their public live page shows – no IP addresses, no accounts.":
+            "Jedes System bekommt einen eigenen Sync-Schlüssel. Er wird nie übertragen: Portal und System verschlüsseln damit jede Anfrage und jede Antwort (wie bei Master & Backup). Die Systeme schicken nur, was ihre öffentliche Live-Seite zeigt – keine IP-Adressen, keine Konten.",
+        "Here: ＋ system, its dashboard address, 🎲 New key → copy the key.": "Hier: ＋ System, seine Dashboard-Adresse, 🎲 Neuer Schlüssel → Schlüssel kopieren.",
+        "On the system: switch the portal feed on and paste the key (see below).": "Auf dem System: Portal-Feed einschalten und den Schlüssel einfügen (siehe unten).",
+        "N8 Hotspot and N8 Gateway answer only in the local network – they are asked only at a LAN address (e.g. http://192.168.1.20).":
+            "N8 Hotspot und N8 Gateway antworten nur im lokalen Netz – sie werden nur unter einer LAN-Adresse gefragt (z. B. http://192.168.1.20).",
+        "HBlink4-FreeRadioID: Admin → Settings → 🔐 Dashboard access → “Live data for the ADN portal page” on, paste the key.":
+            "HBlink4-FreeRadioID: Admin → Einstellungen → 🔐 Zugang zum Dashboard → „Live-Daten für die Portal-Seite“ an, Schlüssel einfügen.",
+        "N8 Crosslink: Admin → 🏠 Allgemein → “📰 Live-Daten für die Portal-Seite” on, paste the key.":
+            "N8 Crosslink: Admin → 🏠 Allgemein → „📰 Live-Daten für die Portal-Seite“ an, Schlüssel einfügen.",
+        "N8 Hotspot: Admin → Settings → 🌐 Dashboard → “Live data for the ADN portal page” on, paste the key. Only in the local network.":
+            "N8 Hotspot: Admin → Einstellungen → 🌐 Dashboard → „Live-Daten für die Portal-Seite“ an, Schlüssel einfügen. Nur im lokalen Netz.",
+        "N8 Gateway: switch on the portal feed there and paste the key (as soon as N8 Gateway offers it). Only in the local network.":
+            "N8 Gateway: dort den Portal-Feed einschalten und den Schlüssel einfügen (sobald N8 Gateway das anbietet). Nur im lokalen Netz.",
+        // errors of the server
+        "this is not a portal feed of an N8 system": "das ist kein Portal-Feed eines N8-Systems",
+        "the system does not know the portal feed yet – update it": "das System kennt den Portal-Feed noch nicht – bitte aktualisieren",
+        "the answer is not encrypted with the sync key (wrong address or key?)": "die Antwort ist nicht mit dem Sync-Schlüssel verschlüsselt (falsche Adresse oder falscher Schlüssel?)",
+        "The widgets of the own FRN server cannot be deleted – switch them off.": "Die Widgets des eigenen FRN-Servers lassen sich nicht löschen – nur ausschalten.",
+    },
+    rules: [
+        [/^Open (.+)$/, '$1 öffnen'], [/^refused: (.*)$/, 'abgelehnt: $1'], [/^not reachable \((.*)\)$/, 'nicht erreichbar ($1)'],
+        [/^Sync key: at least (\d+) characters – “🎲 New key” creates one\.?$/, 'Sync-Schlüssel: mindestens $1 Zeichen – „🎲 Neuer Schlüssel“ erzeugt einen.'],
+        [/^(.+) is asked only in the local network – enter its LAN address \(e\.g\. http:\/\/192\.168\.1\.20\)\.?$/, '$1 wird nur im lokalen Netz gefragt – bitte seine LAN-Adresse eintragen (z. B. http://192.168.1.20).'],
+        [/^Shown (left|right) of the news, from top to bottom in this order\. (.*)$/, (m, side) => `${side === 'left' ? 'Links' : 'Rechts'} neben den News, von oben nach unten in dieser Reihenfolge. Die Live-Daten der anderen N8-Systeme werden regelmäßig abgerufen, mit ihrem Sync-Schlüssel verschlüsselt, und in SQLite zwischengespeichert – Besucher bekommen die gespeicherte Kopie. Seite und Abstand: ⚙️ Portal-Seite.`],
+    ],
+});
