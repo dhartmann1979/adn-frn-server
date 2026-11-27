@@ -187,6 +187,21 @@ CREATE TABLE IF NOT EXISTS news (               -- portal page: news written by 
     updated_by   TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS news_pub ON news(published, pinned, published_at);
+CREATE TABLE IF NOT EXISTS portal_widgets (     -- portal page: widgets at the side (widgets.py), cache of the live data of other N8 systems
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind TEXT NOT NULL,                         -- frn_today | frn_rooms | frn_connect | hblink4 | crosslink | hotspot | gateway
+    title TEXT NOT NULL DEFAULT '',
+    url TEXT NOT NULL DEFAULT '',               -- dashboard address of the other system (asked over n8feed.py)
+    key TEXT NOT NULL DEFAULT '',               -- sync key of that system
+    link TEXT NOT NULL DEFAULT '',              -- where a click on the widget leads (empty = url)
+    enabled INTEGER NOT NULL DEFAULT 1,
+    position INTEGER NOT NULL DEFAULT 0,
+    show_lh INTEGER NOT NULL DEFAULT 1,         -- show "last heard"
+    lh_count INTEGER NOT NULL DEFAULT 5,
+    data TEXT NOT NULL DEFAULT '',              -- last summary (JSON), cached
+    fetched_at REAL, ok_at REAL, error TEXT NOT NULL DEFAULT '',
+    created_at REAL
+);
 CREATE TABLE IF NOT EXISTS kv (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL

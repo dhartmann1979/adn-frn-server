@@ -164,3 +164,116 @@ function newsShrink(file) {
         img.src = url;
     });
 }
+
+// ---------------------------------------------------------------- 🧩 Widgets at the side of the portal page
+const WADM = { list: [], kinds: {}, local: [] };
+const W_HELP = {
+    hblink4: 'HBlink4-FreeRadioID: Admin → Settings → 🔐 Dashboard access → “Live data for the ADN portal page” on, paste the key.',
+    crosslink: 'N8 Crosslink: Admin → 🏠 Allgemein → “📰 Live-Daten für die Portal-Seite” on, paste the key.',
+    hotspot: 'N8 Hotspot: Admin → Settings → 🌐 Dashboard → “Live data for the ADN portal page” on, paste the key. Only in the local network.',
+    gateway: 'N8 Gateway: switch on the portal feed there and paste the key (as soon as N8 Gateway offers it). Only in the local network.',
+};
+async function loadWidgetsAdmin() {
+    const d = await api('GET', '/api/admin/portal/widgets');
+    WADM.list = d.widgets || []; WADM.kinds = d.kinds || {}; WADM.local = d.local_only || [];
+    WADM.interval = d.interval; WADM.side = d.side;
+    renderWidgetsAdmin();
+}
+function wState(w) {
+    if (w.builtin) return '<span class="dim">own FRN server</span>';
+    if (!w.enabled) return '<span class="dim">off</span>';
+    if (w.error) return `<span class="cl-bad" title="${esc(w.error)}">✕ <span>${esc(w.error)}</span></span>${w.ok_at ? ` <span class="dim">· <span>last data</span> ${esc(fmtDate(w.ok_at))}</span>` : ''}`;
+    if (w.ok_at) return `<span class="cl-ok">✓ <span>live data</span></span> <span class="dim">${esc(fmtDate(w.ok_at))}${w.data && w.data.version ? ' · ' + esc(w.data.version) : ''}</span>`;
+    return '<span class="dim">not fetched yet</span>';
+}
+function renderWidgetsAdmin() {
+    const L = WADM.list;
+    const row = (w, i) => `<div class="wa-row ${w.enabled ? '' : 'off'}" data-wid="${w.id}">
+        <div class="wa-move"><button class="btn small" data-w-up="${w.id}" ${i ? '' : 'disabled'} title="Up">▲</button><button class="btn small" data-w-down="${w.id}" ${i < L.length - 1 ? '' : 'disabled'} title="Down">▼</button></div>
+        <div class="wa-main"><b><span>${esc(w.kind_label)}</span></b>${w.title ? ` <span class="dim">· <span translate="no">${esc(w.title)}</span></span>` : ''}
+            <div class="wa-sub">${w.url ? `<span class="mono">${esc(w.url)}</span> · ` : ''}${wState(w)}</div></div>
+        <label class="switch" title="Show on the portal page"><input type="checkbox" data-w-on="${w.id}" ${w.enabled ? 'checked' : ''}><span></span></label>
+        <div class="wa-act"><button class="btn small" data-w-edit="${w.id}">✏️ Edit</button>
+            ${w.builtin ? '' : `<button class="btn small" data-w-test="${w.id}">🔄 Fetch now</button><button class="btn small danger" data-w-del="${w.id}">🗑</button>`}</div></div>`;
+    $('admin-widgets').innerHTML = `<div class="tiles tiles-even">
+        <div class="tile"><h3>🧩 Widgets of the portal page</h3>
+            <div class="subt">Shown ${WADM.side === 'left' ? 'left' : 'right'} of the news, from top to bottom in this order. The live data of the other N8 systems are fetched every ${esc(WADM.interval)} s, encrypted with their sync key, and cached in SQLite – visitors get the cached copy. Side and interval: ⚙️ Portal page.</div>
+            <div class="wa-list">${L.map(row).join('')}</div>
+            <div class="actions" style="justify-content:flex-start;flex-wrap:wrap">${Object.keys(WADM.kinds).filter(k => !k.startsWith('frn_')).map(k => `<button class="btn" data-w-new="${k}">＋ ${esc(WADM.kinds[k])}</button>`).join('')}
+                <a class="btn" href="${esc(PORTAL.url || '/portal')}" target="_blank" rel="noopener">📰 Open portal page ↗</a></div></div>
+        <div class="tile"><h3>🔐 How a system is connected</h3>
+            <div class="subt">Every system gets its own sync key. It never travels: the portal and the system use it to encrypt each request and each answer (like Master &amp; Backup). The systems send only what their public live page shows – no IP addresses, no accounts.</div>
+            <ol class="wa-steps"><li>Here: <b>＋ system</b>, its dashboard address, <b>🎲 New key</b> → copy the key.</li>
+                <li>On the system: switch the portal feed on and paste the key (see below).</li><li>Here: <b>💾 Save</b> – the portal fetches at once and shows whether it works.</li></ol>
+            <div class="wa-help">${Object.entries(W_HELP).map(([k, v]) => `<div><b>${esc(WADM.kinds[k] || k)}</b> – <span>${esc(v)}</span></div>`).join('')}</div>
+            <div class="notice-box">📶 <span>N8 Hotspot and N8 Gateway answer only in the local network – they are asked only at a LAN address (e.g. http://192.168.1.20).</span></div></div></div>`;
+}
+function widgetEditor(w) {
+    const nw = !w.id, kind = w.kind, local = WADM.local.includes(kind);
+    modal(`<h3>${nw ? '＋' : '✏️'} <span>${esc(WADM.kinds[kind] || kind)}</span></h3>
+        <form id="wForm" onsubmit="event.preventDefault()">
+            <div class="row"><label for="wf_title">Title on the portal page</label><input type="text" id="wf_title" maxlength="80" value="${esc(w.title || '')}" placeholder="${w.builtin ? '' : 'Empty = the title of the system'}" translate="no"></div>
+            ${w.builtin ? '' : `
+            <div class="row"><label for="wf_url">Dashboard address of the system</label><input type="text" id="wf_url" value="${esc(w.url || '')}" placeholder="${local ? 'http://192.168.1.20' : 'https://dmr.example.org'}" spellcheck="false">
+                <div class="help">${local ? 'Only in the local network (LAN address).' : 'The address of its web interface, with https:// – e.g. https://dmr.die-n8schicht.de'}</div></div>
+            <div class="row"><label for="wf_key">Sync key</label><div class="pw-wrap"><input type="text" id="wf_key" value="" placeholder="${w.key_set ? '•••••••• (unchanged)' : 'at least 24 characters'}" autocomplete="off" spellcheck="false">
+                <button type="button" class="btn small" id="wf_gen">🎲 New key</button><button type="button" class="btn small" id="wf_copy">📋</button></div>
+                <div class="help">${esc(W_HELP[kind] || '')}</div></div>
+            <div class="row"><label for="wf_link">Link of the widget <span class="dim">(optional)</span></label><input type="text" id="wf_link" value="${esc(w.link || '')}" placeholder="https://…" spellcheck="false">
+                <div class="help">A click on “Open …” leads there – e.g. the public dashboard. Empty = no button (the address above is not shown to visitors).</div></div>
+            <div class="news-flags"><label class="switch-row"><label class="switch"><input type="checkbox" id="wf_lh" ${w.show_lh !== 0 ? 'checked' : ''}><span></span></label> <span>Show last heard</span></label>
+                <label class="switch-row"><span>Entries</span> <select id="wf_lhn">${[3, 4, 5, 6, 8].map(n => `<option ${n === (w.lh_count || 5) ? 'selected' : ''}>${n}</option>`).join('')}</select></label></div>`}
+            <div class="news-flags"><label class="switch-row"><label class="switch"><input type="checkbox" id="wf_on" ${w.enabled !== 0 ? 'checked' : ''}><span></span></label> <span>Show on the portal page</span></label></div>
+            <div id="wf_res"></div>
+            <div class="actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button type="button" class="btn primary" id="wf_save">💾 Save</button></div>
+        </form>`, false, true);
+    if (!w.builtin) {
+        $('wf_gen').onclick = async () => { try { $('wf_key').value = (await api('POST', '/api/admin/portal/widgets/key', {})).key; $('wf_key').select(); } catch (e) { toast(e.message, true); } };
+        $('wf_copy').onclick = () => { const v = $('wf_key').value; if (!v) return toast('Enter or create a key first', true); navigator.clipboard && navigator.clipboard.writeText(v); toast('Copied'); };
+    }
+    $('wf_save').onclick = async () => {
+        const b = { id: w.id, kind, title: $('wf_title').value, enabled: $('wf_on').checked };
+        if (!w.builtin) Object.assign(b, { url: $('wf_url').value, key: $('wf_key').value, link: $('wf_link').value, show_lh: $('wf_lh').checked, lh_count: +$('wf_lhn').value });
+        $('wf_save').disabled = true;
+        try {
+            const r = await api('POST', '/api/admin/portal/widgets', b);
+            const t = r.widget.test;
+            if (t && !t.ok) {
+                $('wf_res').innerHTML = `<div class="notice-box cl-alarm">⚠️ <span>Saved, but the system does not answer yet:</span> <b>${esc(t.error)}</b></div>`;
+                w = r.widget; $('wf_save').disabled = false; loadWidgetsAdmin(); return;
+            }
+            closeModal(); toast(t ? `✅ ${t.data.title || ''} – live data received` : 'Saved'); loadWidgetsAdmin();
+        } catch (e) { $('wf_res').innerHTML = `<div class="notice-box cl-alarm">⚠️ ${esc(e.message)}</div>`; $('wf_save').disabled = false; }
+    };
+}
+document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-w-up],[data-w-down],[data-w-edit],[data-w-test],[data-w-del],[data-w-new]');
+    if (!b || !$('admin-widgets') || !$('admin-widgets').contains(b)) return;
+    const id = +(b.dataset.wUp || b.dataset.wDown || b.dataset.wEdit || b.dataset.wTest || b.dataset.wDel || 0), w = WADM.list.find(x => x.id === id);
+    if (b.dataset.wNew) return widgetEditor({ kind: b.dataset.wNew, enabled: 1, show_lh: 1, lh_count: 5 });
+    if (b.dataset.wEdit) return widgetEditor(w);
+    if (b.dataset.wUp || b.dataset.wDown) {
+        const ids = WADM.list.map(x => x.id), i = ids.indexOf(id), j = b.dataset.wUp ? i - 1 : i + 1;
+        if (j < 0 || j >= ids.length) return;
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+        try { await api('POST', '/api/admin/portal/widgets/order', { ids }); loadWidgetsAdmin(); } catch (err) { toast(err.message, true); }
+        return;
+    }
+    if (b.dataset.wTest) {
+        b.disabled = true;
+        try { const r = await api('POST', `/api/admin/portal/widgets/${id}/test`, {}); r.ok ? toast(`✅ ${r.data.title || ''} – live data received`) : toast(r.error, true); }
+        catch (err) { toast(err.message, true); }
+        loadWidgetsAdmin(); return;
+    }
+    if (b.dataset.wDel) {
+        if (!await confirmBox({ title: 'Delete the widget?', body: `${w.kind_label}${w.title ? ' – ' + w.title : ''} disappears from the portal page. Switch the portal feed off on the system too.` }, 'Delete', 'danger')) return;
+        try { await api('DELETE', `/api/admin/portal/widgets/${id}`); toast('🗑 Deleted'); loadWidgetsAdmin(); } catch (err) { toast(err.message, true); }
+    }
+});
+document.addEventListener('change', async e => {
+    const c = e.target.closest('[data-w-on]');
+    if (!c) return;
+    const w = WADM.list.find(x => x.id === +c.dataset.wOn);
+    try { await api('POST', '/api/admin/portal/widgets', { id: w.id, kind: w.kind, title: w.title, url: w.url, key: '', link: w.link, show_lh: !!w.show_lh, lh_count: w.lh_count, enabled: c.checked }); loadWidgetsAdmin(); }
+    catch (err) { toast(err.message, true); c.checked = !c.checked; }
+});

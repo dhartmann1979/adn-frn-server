@@ -42,7 +42,7 @@ from . import sysman as fsysman
 from . import portal as fportal
 from . import mailcfg
 from . import webmail as fwebmail
-from . import cluster
+from . import cluster, n8feed, widgets as fwidgets
 from . import frn_errorlog
 from . import __version__, branding as brandstore, clientsw, links as linkstore, siteicons, updater
 from .auth import ADMIN_ROLES, Auth, AuthError
@@ -901,6 +901,9 @@ async def api_portal(request: Request, offset: int = 0, category: str = ""):
     if info["show_stats"]:
         t = (await asyncio.to_thread(ctx.stats.summary, "today", ctx.live.hidden_rooms())).get("totals", {})
         out["today"] = {k: t.get(k) for k in ("talks", "duration", "stations", "peak_online")}
+    # 🧩 widgets at the side: order and choice of the admins, live data of other N8 systems from the SQLite cache
+    out["widgets"] = await asyncio.to_thread(fwidgets.public, ctx.db, int(ctx.settings.get("portal.widget_interval") or 30))
+    out["widgets_side"] = ctx.settings.get("portal.widgets_side")
     return out
 
 
@@ -945,6 +948,85 @@ async def admin_portal_settings(request: Request):
     keys = await _save(request, changes)
     await push({"type": "news"})
     return {"ok": True, "changed": keys}
+
+
+# ---------------------------------------------------------------- 🧩 Portal widgets (widgets.py, n8feed.py)
+@app.get("/api/admin/portal/widgets")
+async def admin_widgets(request: Request):
+    need_admin(request)
+    return {"widgets": await asyncio.to_thread(fwidgets.list_all, ctx.db), "kinds": fwidgets.KINDS, "local_only": list(fwidgets.LOCAL_ONLY),
+            "interval": ctx.settings.get("portal.widget_interval"), "side": ctx.settings.get("portal.widgets_side")}
+
+
+@app.post("/api/admin/portal/widgets")
+async def admin_widget_save(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        w = await asyncio.to_thread(fwidgets.save, ctx.db, b)
+    except fwidgets.WidgetError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("widget_saved", u["username"], f"#{w['id']} {w['kind']} {w['title']}".strip(), ip_of(request))
+    if not w["builtin"] and w["enabled"]:
+        w = {**w, "test": await asyncio.to_thread(fwidgets.fetch_one, ctx.db, w["id"])}
+    await push({"type": "news"})
+    return {"ok": True, "widget": w}
+
+
+@app.post("/api/admin/portal/widgets/order")
+async def admin_widget_order(request: Request):
+    u = need_admin(request)
+    b = await body(request)
+    try:
+        await asyncio.to_thread(fwidgets.order, ctx.db, b.get("ids") or [])
+    except fwidgets.WidgetError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("widget_order", u["username"], ",".join(str(i) for i in b.get("ids") or [])[:200], ip_of(request))
+    await push({"type": "news"})
+    return {"ok": True}
+
+
+@app.post("/api/admin/portal/widgets/key")
+async def admin_widget_key(request: Request):
+    need_admin(request)
+    return {"key": n8feed.new_key()}
+
+
+@app.post("/api/admin/portal/widgets/{wid}/test")
+async def admin_widget_test(wid: int, request: Request):
+    need_admin(request)
+    try:
+        r = await asyncio.to_thread(fwidgets.fetch_one, ctx.db, wid, f"adn-frn-server/{__version__} (portal)")
+    except fwidgets.WidgetError as e:
+        raise HTTPError(400, str(e))
+    await push({"type": "news"})
+    return r
+
+
+@app.delete("/api/admin/portal/widgets/{wid}")
+async def admin_widget_delete(wid: int, request: Request):
+    u = need_admin(request)
+    try:
+        await asyncio.to_thread(fwidgets.delete, ctx.db, wid)
+    except fwidgets.WidgetError as e:
+        raise HTTPError(400, str(e))
+    ctx.auth.audit("widget_deleted", u["username"], f"#{wid}", ip_of(request))
+    await push({"type": "news"})
+    return {"ok": True}
+
+
+async def widget_loop() -> None:
+    """Every portal.widget_interval seconds: ask the other N8 systems for their live data and cache it in SQLite."""
+    await asyncio.sleep(8)
+    while True:
+        try:
+            if ctx.settings.get("portal.enabled"):
+                ids = await asyncio.to_thread(fwidgets.due, ctx.db)
+                agent = f"adn-frn-server/{__version__} (portal)"
+                await asyncio.gather(*(asyncio.to_thread(fwidgets.fetch_one, ctx.db, i, agent) for i in ids), return_exceptions=True)
+        except Exception:  # noqa: BLE001 – never stop the dashboard
+            log.exception("portal widgets")
+        await asyncio.sleep(max(15, int(ctx.settings.get("portal.widget_interval") or 30)))
 
 
 @app.post("/api/admin/news")
@@ -3160,6 +3242,7 @@ async def _startup() -> None:
         ctx = Ctx()
     ctx.auth.on_mail_change = _mail_users_changed      # ✉️ new users / passwords → mailbox list of the mail server
     ctx.store.ensure_rooms()
+    fwidgets.ensure_builtin(ctx.db)                     # 🧩 the three boxes of the own FRN server on the portal page
     if not ctx.db.kv_get("migr.client_timeout_300k"):   # 2.32.0: new default 5 min instead of 8 s
         stored = ctx.db.q("SELECT value FROM settings WHERE key='frn.client_timeout'")
         if stored and str(stored[0]["value"]).strip() in ("8000", "8000.0"):
@@ -3190,6 +3273,7 @@ async def _startup() -> None:
     ctx.tasks.append(asyncio.ensure_future(midnight_site_icon_refresh()))
     ctx.tasks.append(asyncio.ensure_future(cluster_hourly()))
     ctx.tasks.append(asyncio.ensure_future(cluster_auto_return()))
+    ctx.tasks.append(asyncio.ensure_future(widget_loop()))
     pend = _cluster_get("cluster.return_pending")
     if pend:                                           # dashboard restarted while stations were sent back: start FRN again
         ctx.tasks.append(asyncio.ensure_future(_return_restart(float(pend.get("start_at") or 0))))

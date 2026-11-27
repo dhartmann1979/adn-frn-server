@@ -87,6 +87,47 @@ function renderSide(i) {
         $('chipAir').className = 'n8-ss ' + (air ? 'rx' : ''); $('chipAir').textContent = air ? `🎙️ ${air.talking.callsign} · ${air.name}` : t('Quiet');
     } else $('statusStrip').hidden = true;
 }
+// 🧩 widgets at the side: order and choice from the admin area (📰 Portal → 🧩 Widgets), live data of other N8 systems cached
+const BUILTIN_BOX = { frn_today: 'todayBox', frn_rooms: 'liveBox', frn_connect: 'connectBox' };
+const W_ICON = { hblink4: '📡', crosslink: '🔀', hotspot: '📶', gateway: '🛰️' };
+function ago(ts) {
+    const s = Math.max(0, Date.now() / 1000 - (ts || 0));
+    return s < 60 ? t('just now') : s < 3600 ? `${Math.floor(s / 60)} min` : s < 86400 ? `${Math.floor(s / 3600)} h` : fmtDate(ts);
+}
+function widgetCard(w) {
+    const d = w.data || {}, st = w.stale ? 'stale' : d.status || 'ok';
+    const title = w.title || d.title || '';
+    const stTxt = w.stale ? `${t('no current data')} · ${t('as of')} ${ago(d.time)}` : d.status_text || (d.status === 'ok' ? t('online') : '');
+    const kpis = (d.kpis || []).map(k => `<div class="ps-stat"><div class="k">${esc(t(k.label))}</div><div class="v">${esc(k.value)}</div></div>`).join('');
+    const air = (d.on_air || []).map(a => `<div class="pw-air">🎙️ <b translate="no">${esc(a.call)}</b> <span translate="no">${esc(a.name)}</span><small translate="no">${esc(a.where)}</small></div>`).join('');
+    const lh = (d.last_heard || []).map(x => `<div class="pw-lh-r"><span class="c" translate="no">${esc(x.call)}</span><span class="w" translate="no">${esc(x.name ? x.name + ' · ' : '')}${esc(x.where)}</span><span class="a">${esc(ago(x.ts))}</span></div>`).join('');
+    return `<h3><span>${W_ICON[d.system] || '🧩'}</span><span translate="no">${esc(title)}</span><span class="pw-dot ${esc(st)}" title="${esc(stTxt)}"></span></h3>
+        ${stTxt ? `<div class="pw-sub ${esc(st)}">${esc(stTxt)}</div>` : ''}
+        ${kpis ? `<div class="ps-stats">${kpis}</div>` : ''}${air}
+        ${lh ? `<div class="pw-lh"><div class="pw-lh-h">${esc(t('Last heard'))}</div>${lh}</div>` : ''}
+        ${w.link ? `<a class="btn ps-cta" href="${esc(w.link)}" target="_blank" rel="noopener">${esc(t('Open'))} ${esc(title)} ↗</a>` : ''}`;
+}
+function renderWidgets(i) {
+    if (!Array.isArray(i.widgets)) return;               // older server: the three boxes as before
+    const side = document.querySelector('.portal-side');
+    document.querySelector('.portal-grid').classList.toggle('side-left', i.widgets_side === 'left');
+    const shown = new Set();
+    i.widgets.forEach(w => {
+        let el;
+        if (BUILTIN_BOX[w.kind]) {
+            el = $(BUILTIN_BOX[w.kind]);
+            if (w.title) { const h = el.querySelector('h3'); if (h && !h.dataset.orig) h.dataset.orig = h.innerHTML; if (h) h.firstChild.textContent = w.title + ' '; }
+        } else {
+            el = $('pw' + w.id) || Object.assign(document.createElement('div'), { id: 'pw' + w.id, className: 'card ps-box pw' });
+            el.innerHTML = widgetCard(w);
+            el.classList.toggle('stale', !!w.stale);
+            el.hidden = false;
+        }
+        shown.add(el.id);
+        side.appendChild(el);                             // in the chosen order
+    });
+    [...side.children].forEach(c => { if (!shown.has(c.id)) c.hidden = true; });
+}
 function renderCats(i) {
     const cats = [{ id: '', label: '🗂️ ' + t('All') }, ...(i.categories || [])];
     $('catFilter').innerHTML = cats.map(c => `<button data-c="${esc(c.id)}" class="${c.id === P.category ? 'active' : ''}">${esc(t(c.label))}</button>`).join('');
@@ -134,10 +175,10 @@ async function load(append) {
         renderHeader(d);
         if (m) {
             const s = await api('/api/portal?offset=0').catch(() => null);
-            if (s) { renderHero({ ...d, ...s }); renderSide(s); }
+            if (s) { renderHero({ ...d, ...s }); renderSide(s); renderWidgets(s); }
             renderArticle(d.item);
         } else {
-            renderHero(d); renderSide(d); renderCats(d);
+            renderHero(d); renderSide(d); renderWidgets(d); renderCats(d);
             P.items = append ? P.items.concat(d.news) : d.news; P.total = d.total;
             renderList();
         }

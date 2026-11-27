@@ -122,6 +122,10 @@ FIELDS: List[Field] = [
           "Side box with the rooms, stations online and who is on air (only when the dashboard is public)"),
     Field("portal.show_stats", "portal", "Show today's figures", "bool", True, "Talks, airtime and stations of today"),
     Field("portal.per_page", "portal", "News per page", "int", 8, "", min=3, max=30),
+    Field("portal.widgets_side", "portal", "Widgets", "choice", "right", "Where the widgets stand next to the news (order: 🧩 Widgets)",
+          choices=[("right", "Right of the news"), ("left", "Left of the news")]),
+    Field("portal.widget_interval", "portal", "Fetch live data every (seconds)", "int", 30,
+          "How often the portal asks HBlink4, N8 Crosslink, N8 Hotspot and N8 Gateway – the answers are cached in SQLite", min=15, max=600),
     # 2.26: every domain of the dashboard with what it shows – "domain=live" or "domain=portal", one per line
     Field("web.hosts", "web", "Domains and what they show", "longtext", "",
           "Set under 🌐 Network, ports & domains → 🔒 Domains & HTTPS"),

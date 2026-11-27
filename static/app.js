@@ -780,7 +780,7 @@ $('chatFilter').addEventListener('click', e => { const b = e.target.closest('but
 
 // ---------------------------------------------------------------- admin
 // Admin menu: the same tree in every N8 system (N8 Kit) – Betrieb · Benutzer & Zugang · Darstellung · System
-const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys', 'news', 'portalcfg', 'mailsrv', 'mailboxes', 'maildmarc', 'maildns', 'maildomains'];
+const ADMIN_PANES = ['settings', 'rooms', 'lists', 'accounts', 'users', 'system', 'theme', 'links', 'import', 'logs', 'audit', 'sys', 'news', 'portalcfg', 'widgets', 'mailsrv', 'mailboxes', 'maildmarc', 'maildns', 'maildomains'];
 function adminGroups() {
     const G = N8Kit.nav.GROUPS;
     return [
@@ -788,7 +788,7 @@ function adminGroups() {
             children: (S.admin.sections || []).map(sec => ({ id: 'settings:' + sec.id, label: sec.title })) }, { id: 'rooms', label: '🏠 Rooms' }, { id: 'lists', label: '🛡️ Server lists' },
             { id: 'accounts', label: '🔑 FRN accounts' }, { id: 'import', label: '📥 Import' }, { id: 'logs', label: '📜 Logs' }] },
         // 📰 Portal: news (only admins are authors) and the portal page with its own domain
-        { id: 'portal', label: '📰 Portal', items: [{ id: 'news', label: '📝 News' }, { id: 'portalcfg', label: '⚙️ Portal page' }] },
+        { id: 'portal', label: '📰 Portal', items: [{ id: 'news', label: '📝 News' }, { id: 'portalcfg', label: '⚙️ Portal page' }, { id: 'widgets', label: '🧩 Widgets' }] },
         { id: 'zugang', label: G.zugang, items: [{ id: 'users', label: '👥 Benutzer' }, { id: 'sessions', label: '🔑 Sitzungen' }, { id: 'audit', label: '📜 Protokoll' }] },
         { id: 'darstellung', label: G.darstellung, items: [{ id: 'theme', label: '🎨 Theme' }, { id: 'links', label: '🔗 Links' }] },
         // ✉️ N8 Mail: Postfix, Dovecot, Rspamd – every dashboard user has a mailbox
@@ -819,7 +819,7 @@ function showAdmin(a) {
     } else if (pane === 'sys') loadSysView(base.slice(4));
     else ({ settings: loadSettings, rooms: loadRoomsAdmin, lists: loadLists, accounts: loadAccounts, users: loadUsers,
        system: loadSystem, theme: loadThemeAdmin, links: loadLinksAdmin, import: loadImportAdmin, logs: loadLogs, audit: loadAudit,
-       news: loadNewsAdmin, portalcfg: loadPortalAdmin, mailsrv: loadMailSrv, mailboxes: loadMailboxes, maildmarc: loadMailDmarc,
+       news: loadNewsAdmin, portalcfg: loadPortalAdmin, widgets: loadWidgetsAdmin, mailsrv: loadMailSrv, mailboxes: loadMailboxes, maildmarc: loadMailDmarc,
        maildns: loadMailDns, maildomains: loadMailDomains })[pane]()
        .then(() => {
            if (pane === 'system') {             // 💾 Backup has its own entry like in the other N8 systems

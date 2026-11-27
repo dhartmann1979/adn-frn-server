@@ -54,12 +54,13 @@ MAX_AGE = 300
 MIN_KEY = 24
 TABLES = ("rooms", "room_access", "frn_lists", "frn_accounts")          # parents first
 LOCAL_KEYS = {"frn.address", "frn.port", "frn.backup_host", "frn.backup_port", "sysman.email", "sysman.password", "portal.domain", "web.hosts"}
-OPTIONAL_TABLES = ("news",)       # since 2.24: portal news go to the backup too (an older partner simply has none)
+OPTIONAL_TABLES = ("news", "portal_widgets")   # portal news (2.24) and widgets (2.33) go to the backup too (an older partner has none)
 LOCAL_PREFIXES = ("https.", "cluster.", "mail.")
 ACL_RE = re.compile(r"(AdminList|MuteList|BlockList|AccessList)\d{2}\.xml")
 KV_RE = re.compile(r"acl-file-meta:(AdminList|MuteList|BlockList|AccessList)\d{2}\.xml")
 TIMEOUT = 20
-VOLATILE = {"frn_accounts": {"last_login"}}     # changes with every login – not a change of the configuration
+VOLATILE = {"frn_accounts": {"last_login"},     # changes with every login – not a change of the configuration
+            "portal_widgets": {"data", "fetched_at", "ok_at", "error"}}   # the cached live data of the widgets
 
 
 class ClusterError(Exception):
